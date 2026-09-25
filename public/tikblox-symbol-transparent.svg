@@ -1,0 +1,151 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <!-- Top Roof Apex Gradient -->
+    <linearGradient id="topRoofGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="60%" stop-color="#F0FDFA" />
+      <stop offset="100%" stop-color="#CCFBF1" />
+    </linearGradient>
+
+    <!-- Left Cube Top Gradient -->
+    <linearGradient id="leftRoofGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E6FFFE" />
+      <stop offset="100%" stop-color="#7EF7F3" />
+    </linearGradient>
+
+    <!-- Right Cube Top Gradient -->
+    <linearGradient id="rightRoofGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF1F3" />
+      <stop offset="100%" stop-color="#FFA4B6" />
+    </linearGradient>
+
+    <!-- Cyan 3D Faces -->
+    <linearGradient id="cyanLightFace" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#25F4EE" />
+      <stop offset="100%" stop-color="#08B6BC" />
+    </linearGradient>
+    <linearGradient id="cyanDarkFace" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#038085" />
+      <stop offset="100%" stop-color="#014A4E" />
+    </linearGradient>
+
+    <!-- Pink 3D Faces -->
+    <linearGradient id="pinkLightFace" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF385C" />
+      <stop offset="100%" stop-color="#FE2C55" />
+    </linearGradient>
+    <linearGradient id="pinkDarkFace" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#B30E30" />
+      <stop offset="100%" stop-color="#66051A" />
+    </linearGradient>
+
+    <!-- Soft glow filter for chromatic aura -->
+    <filter id="auraGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="15" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- 
+    TIKBLOX 3D ISOMETRIC SYMBOL (STANDALONE TRANSPARENT VECTOR)
+    Pure 3D isometric Blox with signature TikTok chromatic glitch offset.
+  -->
+  <g id="tikblox-3d-symbol" transform="translate(31, 35) scale(7.5)">
+    
+    <!-- LAYER 1: CHROMATIC OFFSET (CYAN #25F4EE) - SHIFTED TOP-LEFT -->
+    <g transform="translate(-2, -1.6)" fill="#25F4EE" opacity="0.85">
+      <polygon points="30,6 41.5,12.5 41.5,25.5 30,32 18.5,25.5 18.5,12.5" />
+      <polygon points="18.5,25 29.5,31.2 29.5,43.7 18.5,50 7.5,43.7 7.5,31.2" />
+      <polygon points="41.5,25 52.5,31.2 52.5,43.7 41.5,50 30.5,43.7 30.5,31.2" />
+    </g>
+
+    <!-- LAYER 2: CHROMATIC OFFSET (PINK #FE2C55) - SHIFTED BOTTOM-RIGHT -->
+    <g transform="translate(2, 1.6)" fill="#FE2C55" opacity="0.85">
+      <polygon points="30,6 41.5,12.5 41.5,25.5 30,32 18.5,25.5 18.5,12.5" />
+      <polygon points="18.5,25 29.5,31.2 29.5,43.7 18.5,50 7.5,43.7 7.5,31.2" />
+      <polygon points="41.5,25 52.5,31.2 52.5,43.7 41.5,50 30.5,43.7 30.5,31.2" />
+    </g>
+
+    <!-- LAYER 3: CRISP 3D ISOMETRIC CUBES (CENTERED CORE) -->
+    <g transform="translate(0, 0)">
+
+      <!-- --- CUBE 1: TOP APEX BLOX --- -->
+      <!-- Top Face -->
+      <polygon
+        points="30,6 41.5,12.5 30,19 18.5,12.5"
+        fill="url(#topRoofGrad)"
+        stroke="#FFFFFF"
+        stroke-width="0.6"
+      />
+      <!-- Left Face (Cyan illuminated) -->
+      <polygon
+        points="18.5,12.5 30,19 30,32 18.5,25.5"
+        fill="url(#cyanLightFace)"
+      />
+      <!-- Right Face (Pink illuminated) -->
+      <polygon
+        points="30,19 41.5,12.5 41.5,25.5 30,32"
+        fill="url(#pinkLightFace)"
+      />
+      <line x1="30" y1="19" x2="30" y2="32" stroke="#FFFFFF" stroke-width="0.6" opacity="0.8" />
+
+      <!-- --- CUBE 2: LEFT BLOX (ELECTRIC CYAN) --- -->
+      <!-- Top Face -->
+      <polygon
+        points="18.5,25 29.5,31.2 18.5,37.5 7.5,31.2"
+        fill="url(#leftRoofGrad)"
+        stroke="#FFFFFF"
+        stroke-width="0.5"
+      />
+      <!-- Left Face (Vibrant Cyan) -->
+      <polygon
+        points="7.5,31.2 18.5,37.5 18.5,50 7.5,43.7"
+        fill="url(#cyanLightFace)"
+      />
+      <!-- Right Face (Shadowed Teal) -->
+      <polygon
+        points="18.5,37.5 29.5,31.2 29.5,43.7 18.5,50"
+        fill="url(#cyanDarkFace)"
+      />
+      <line x1="18.5" y1="37.5" x2="18.5" y2="50" stroke="#25F4EE" stroke-width="0.5" opacity="0.8" />
+
+      <!-- --- CUBE 3: RIGHT BLOX (NEON PINK) --- -->
+      <!-- Top Face -->
+      <polygon
+        points="41.5,25 52.5,31.2 41.5,37.5 30.5,31.2"
+        fill="url(#rightRoofGrad)"
+        stroke="#FFFFFF"
+        stroke-width="0.5"
+      />
+      <!-- Left Face (Shadowed Ruby) -->
+      <polygon
+        points="30.5,31.2 41.5,37.5 41.5,50 30.5,43.7"
+        fill="url(#pinkDarkFace)"
+      />
+      <!-- Right Face (Radiant Pink) -->
+      <polygon
+        points="41.5,37.5 52.5,31.2 52.5,43.7 41.5,50"
+        fill="url(#pinkLightFace)"
+      />
+      <line x1="41.5" y1="37.5" x2="41.5" y2="50" stroke="#FE2C55" stroke-width="0.5" opacity="0.8" />
+
+      <!-- Clean Floating Center Mini-Blox -->
+      <g transform="translate(0, 0)">
+        <polygon
+          points="30,35.5 35,38.3 30,41.2 25,38.3"
+          fill="#FFFFFF"
+          stroke="#FFFFFF"
+          stroke-width="0.4"
+        />
+        <polygon
+          points="25,38.3 30,41.2 30,46.5 25,43.6"
+          fill="#25F4EE"
+        />
+        <polygon
+          points="30,41.2 35,38.3 35,43.6 30,46.5"
+          fill="#FE2C55"
+        />
+      </g>
+    </g>
+  </g>
+</svg>

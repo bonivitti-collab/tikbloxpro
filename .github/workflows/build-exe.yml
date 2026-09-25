@@ -1,0 +1,41 @@
+name: Gerar Instalador Windows TIKBLOX (.exe)
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch: # Permite clicar no botão "Run workflow" no GitHub com 1 clique
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Baixar Código do Projeto
+        uses: actions/checkout@v4
+
+      - name: Configurar Ambiente Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Instalar Dependencias
+        run: |
+          npm install --legacy-peer-deps
+          npm install --save-dev electron electron-builder --legacy-peer-deps
+
+      - name: Compilar TIKBLOX React
+        run: npm run build
+
+      - name: Gerar Instalador Executavel do Windows (.exe)
+        run: npx electron-builder --win nsis:x64
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Salvar Arquivo .EXE para Download
+        uses: actions/upload-artifact@v4
+        with:
+          name: TIKBLOX-Instalador-Windows
+          path: |
+            dist-electron/*.exe
+            dist/*.exe
+          retention-days: 30

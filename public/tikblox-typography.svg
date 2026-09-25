@@ -1,0 +1,148 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 320" width="900" height="320">
+  <defs>
+    <!-- Background Gradient for dark mode canvas -->
+    <radialGradient id="typoBg" cx="40%" cy="50%" r="80%">
+      <stop offset="0%" stop-color="#141622" />
+      <stop offset="50%" stop-color="#0B0C12" />
+      <stop offset="100%" stop-color="#020204" />
+    </radialGradient>
+
+    <!-- Google Font Outfit Embedded -->
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@800;900&amp;display=swap');
+      
+      .font-display {
+        font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        font-weight: 900;
+      }
+      
+      .font-sub {
+        font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        font-weight: 800;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+      }
+
+      .font-badge {
+        font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        font-weight: 900;
+        letter-spacing: 0.12em;
+      }
+    </style>
+
+    <!-- Subtle Cyan & Pink ambient lighting -->
+    <filter id="cyanGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="25" result="blur" />
+    </filter>
+    <filter id="pinkGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="25" result="blur" />
+    </filter>
+  </defs>
+
+  <!-- Dark Obsidian Canvas -->
+  <rect width="900" height="320" rx="32" fill="url(#typoBg)" />
+  <rect width="898" height="318" x="1" y="1" rx="31" fill="none" stroke="rgba(255, 255, 255, 0.1)" stroke-width="2" />
+
+  <!-- Subtle ambient halo behind text -->
+  <circle cx="280" cy="130" r="140" fill="#25F4EE" opacity="0.12" filter="url(#cyanGlow)" />
+  <circle cx="580" cy="160" r="140" fill="#FE2C55" opacity="0.14" filter="url(#pinkGlow)" />
+
+  <!-- 
+    TIKBLOX TYPOGRAPHY GROUP
+  -->
+  <g transform="translate(60, 40)">
+    
+    <!-- MAIN LOGOTYPE ROW -->
+    <g transform="translate(0, 115)">
+      
+      <!-- 1. TIK (PURE CRISP WHITE) -->
+      <text
+        x="0"
+        y="0"
+        class="font-display"
+        font-size="112"
+        fill="#FFFFFF"
+        letter-spacing="-0.04em"
+      >TIK</text>
+
+      <!-- 2. BLOX CHROMATIC OFFSET: CYAN (#25F4EE) - TOP-LEFT -->
+      <text
+        x="228"
+        y="-3"
+        class="font-display"
+        font-size="112"
+        fill="#25F4EE"
+        opacity="0.9"
+        letter-spacing="-0.03em"
+      >BLOX</text>
+
+      <!-- 3. BLOX CHROMATIC OFFSET: PINK (#FE2C55) - BOTTOM-RIGHT -->
+      <text
+        x="234"
+        y="3"
+        class="font-display"
+        font-size="112"
+        fill="#FE2C55"
+        opacity="0.9"
+        letter-spacing="-0.03em"
+      >BLOX</text>
+
+      <!-- 4. BLOX FOREGROUND: CRISP WHITE -->
+      <text
+        x="231"
+        y="0"
+        class="font-display"
+        font-size="112"
+        fill="#FFFFFF"
+        letter-spacing="-0.03em"
+      >BLOX</text>
+
+      <!-- 5. STATUS PILL BADGE: RADAR BR -->
+      <g transform="translate(565, -84)">
+        <!-- Pill Background -->
+        <rect
+          width="170"
+          height="42"
+          rx="21"
+          fill="#13151F"
+          stroke="#25F4EE"
+          stroke-opacity="0.4"
+          stroke-width="1.5"
+        />
+        <!-- Glowing Ping Beacon -->
+        <circle cx="26" cy="21" r="7" fill="#FE2C55" opacity="0.3" />
+        <circle cx="26" cy="21" r="4.5" fill="#FE2C55" />
+        <circle cx="26" cy="21" r="2" fill="#FFFFFF" />
+
+        <!-- Badge Text -->
+        <text
+          x="44"
+          y="26"
+          class="font-badge"
+          font-size="14"
+          fill="#FFFFFF"
+        >RADAR <tspan fill="#25F4EE">BR</tspan></text>
+      </g>
+    </g>
+
+    <!-- SUBTITLE / TAGLINE -->
+    <g transform="translate(4, 185)">
+      <!-- Divider line -->
+      <line x1="0" y1="-22" x2="680" y2="-22" stroke="rgba(255, 255, 255, 0.12)" stroke-width="1.2" />
+
+      <text
+        x="0"
+        y="0"
+        class="font-sub"
+        font-size="17"
+        fill="#8D90A2"
+      >
+        <tspan fill="#25F4EE">SPY VIRAL</tspan>
+        <tspan fill="#4E5166">  •  </tspan>
+        <tspan fill="#FFFFFF">ARBITRAGEM</tspan>
+        <tspan fill="#4E5166">  •  </tspan>
+        <tspan fill="#FE2C55">DROPSHIPPING</tspan>
+      </text>
+    </g>
+  </g>
+</svg>

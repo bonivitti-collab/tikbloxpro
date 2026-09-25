@@ -1,0 +1,31 @@
+{
+  "id": "/",
+  "name": "TIKBLOX - Radar de Tendências Virais & Produtos do Exterior",
+  "short_name": "TIKBLOX",
+  "description": "Radar de tendências de produtos internacionais explodindo nos EUA/China chegando ao Brasil para surfar a onda.",
+  "theme_color": "#000000",
+  "background_color": "#000000",
+  "display": "standalone",
+  "start_url": "/",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/pwa-192x192.png?v=4",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/pwa-512x512.png?v=4",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/pwa-maskable-512x512.png?v=4",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

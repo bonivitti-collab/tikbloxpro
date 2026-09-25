@@ -1,0 +1,149 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 360" width="1200" height="360">
+  <defs>
+    <!-- Background Gradient -->
+    <radialGradient id="fullLogoBg" cx="30%" cy="50%" r="75%">
+      <stop offset="0%" stop-color="#151724" />
+      <stop offset="50%" stop-color="#090A10" />
+      <stop offset="100%" stop-color="#010101" />
+    </radialGradient>
+
+    <!-- Top Roof Apex Gradient -->
+    <linearGradient id="topRoofGradFull" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="60%" stop-color="#F0FDFA" />
+      <stop offset="100%" stop-color="#CCFBF1" />
+    </linearGradient>
+
+    <!-- Left Cube Top Gradient -->
+    <linearGradient id="leftRoofGradFull" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E6FFFE" />
+      <stop offset="100%" stop-color="#7EF7F3" />
+    </linearGradient>
+
+    <!-- Right Cube Top Gradient -->
+    <linearGradient id="rightRoofGradFull" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF1F3" />
+      <stop offset="100%" stop-color="#FFA4B6" />
+    </linearGradient>
+
+    <!-- Cyan 3D Faces -->
+    <linearGradient id="cyanLightFaceFull" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#25F4EE" />
+      <stop offset="100%" stop-color="#08B6BC" />
+    </linearGradient>
+    <linearGradient id="cyanDarkFaceFull" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#038085" />
+      <stop offset="100%" stop-color="#014A4E" />
+    </linearGradient>
+
+    <!-- Pink 3D Faces -->
+    <linearGradient id="pinkLightFaceFull" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF385C" />
+      <stop offset="100%" stop-color="#FE2C55" />
+    </linearGradient>
+    <linearGradient id="pinkDarkFaceFull" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#B30E30" />
+      <stop offset="100%" stop-color="#66051A" />
+    </linearGradient>
+
+    <!-- Google Font Outfit Embedded -->
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@800;900&amp;display=swap');
+      .font-display { font-family: 'Outfit', sans-serif; font-weight: 900; }
+      .font-sub { font-family: 'Outfit', sans-serif; font-weight: 800; letter-spacing: 0.22em; text-transform: uppercase; }
+      .font-badge { font-family: 'Outfit', sans-serif; font-weight: 900; letter-spacing: 0.12em; }
+    </style>
+  </defs>
+
+  <!-- Container -->
+  <rect width="1200" height="360" rx="36" fill="url(#fullLogoBg)" />
+  <rect width="1198" height="358" x="1" y="1" rx="35" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="2" />
+
+  <!-- 1. SYMBOL CONTAINER ON LEFT -->
+  <g transform="translate(60, 50)">
+    <!-- Squircle for symbol -->
+    <rect width="260" height="260" rx="64" fill="#0F101A" stroke="rgba(255,255,255,0.15)" stroke-width="1.5" />
+    
+    <!-- 3D Blox scaled inside squircle -->
+    <g transform="translate(20, 18) scale(3.6)">
+      <!-- Cyan Layer -->
+      <g transform="translate(-1.8, -1.4)" fill="#25F4EE" opacity="0.8">
+        <polygon points="30,6 41.5,12.5 41.5,25.5 30,32 18.5,25.5 18.5,12.5" />
+        <polygon points="18.5,25 29.5,31.2 29.5,43.7 18.5,50 7.5,43.7 7.5,31.2" />
+        <polygon points="41.5,25 52.5,31.2 52.5,43.7 41.5,50 30.5,43.7 30.5,31.2" />
+      </g>
+      <!-- Pink Layer -->
+      <g transform="translate(1.8, 1.4)" fill="#FE2C55" opacity="0.8">
+        <polygon points="30,6 41.5,12.5 41.5,25.5 30,32 18.5,25.5 18.5,12.5" />
+        <polygon points="18.5,25 29.5,31.2 29.5,43.7 18.5,50 7.5,43.7 7.5,31.2" />
+        <polygon points="41.5,25 52.5,31.2 52.5,43.7 41.5,50 30.5,43.7 30.5,31.2" />
+      </g>
+      <!-- Crisp Core -->
+      <g>
+        <polygon points="30,6 41.5,12.5 30,19 18.5,12.5" fill="url(#topRoofGradFull)" stroke="#FFFFFF" stroke-width="0.6" />
+        <polygon points="18.5,12.5 30,19 30,32 18.5,25.5" fill="url(#cyanLightFaceFull)" />
+        <polygon points="30,19 41.5,12.5 41.5,25.5 30,32" fill="url(#pinkLightFaceFull)" />
+        <line x1="30" y1="19" x2="30" y2="32" stroke="#FFFFFF" stroke-width="0.6" opacity="0.75" />
+
+        <polygon points="18.5,25 29.5,31.2 18.5,37.5 7.5,31.2" fill="url(#leftRoofGradFull)" stroke="#FFFFFF" stroke-width="0.5" />
+        <polygon points="7.5,31.2 18.5,37.5 18.5,50 7.5,43.7" fill="url(#cyanLightFaceFull)" />
+        <polygon points="18.5,37.5 29.5,31.2 29.5,43.7 18.5,50" fill="url(#cyanDarkFaceFull)" />
+        <line x1="18.5" y1="37.5" x2="18.5" y2="50" stroke="#25F4EE" stroke-width="0.5" opacity="0.8" />
+
+        <polygon points="41.5,25 52.5,31.2 41.5,37.5 30.5,31.2" fill="url(#rightRoofGradFull)" stroke="#FFFFFF" stroke-width="0.5" />
+        <polygon points="30.5,31.2 41.5,37.5 41.5,50 30.5,43.7" fill="url(#pinkDarkFaceFull)" />
+        <polygon points="41.5,37.5 52.5,31.2 52.5,43.7 41.5,50" fill="url(#pinkLightFaceFull)" />
+        <line x1="41.5" y1="37.5" x2="41.5" y2="50" stroke="#FE2C55" stroke-width="0.5" opacity="0.8" />
+
+        <!-- Mini blox -->
+        <polygon points="30,35.5 35,38.3 30,41.2 25,38.3" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="0.4" />
+        <polygon points="25,38.3 30,41.2 30,46.5 25,43.6" fill="#25F4EE" />
+        <polygon points="30,41.2 35,38.3 35,43.6 30,46.5" fill="#FE2C55" />
+      </g>
+    </g>
+
+    <!-- Radar Beacon -->
+    <circle cx="215" cy="45" r="7" fill="#FE2C55" opacity="0.4" />
+    <circle cx="215" cy="45" r="4.5" fill="#FE2C55" />
+  </g>
+
+  <!-- 2. TYPOGRAPHY ON RIGHT -->
+  <g transform="translate(360, 60)">
+    
+    <!-- MAIN LOGOTYPE ROW -->
+    <g transform="translate(0, 115)">
+      <!-- TIK -->
+      <text x="0" y="0" class="font-display" font-size="116" fill="#FFFFFF" letter-spacing="-0.04em">TIK</text>
+
+      <!-- BLOX CYAN -->
+      <text x="236" y="-3.5" class="font-display" font-size="116" fill="#25F4EE" opacity="0.9" letter-spacing="-0.03em">BLOX</text>
+
+      <!-- BLOX PINK -->
+      <text x="242" y="3.5" class="font-display" font-size="116" fill="#FE2C55" opacity="0.9" letter-spacing="-0.03em">BLOX</text>
+
+      <!-- BLOX FOREGROUND -->
+      <text x="239" y="0" class="font-display" font-size="116" fill="#FFFFFF" letter-spacing="-0.03em">BLOX</text>
+
+      <!-- STATUS BADGE -->
+      <g transform="translate(585, -86)">
+        <rect width="170" height="42" rx="21" fill="#13151F" stroke="#25F4EE" stroke-opacity="0.45" stroke-width="1.5" />
+        <circle cx="26" cy="21" r="7" fill="#FE2C55" opacity="0.35" />
+        <circle cx="26" cy="21" r="4.5" fill="#FE2C55" />
+        <circle cx="26" cy="21" r="2" fill="#FFFFFF" />
+        <text x="44" y="26" class="font-badge" font-size="14" fill="#FFFFFF">RADAR <tspan fill="#25F4EE">BR</tspan></text>
+      </g>
+    </g>
+
+    <!-- SUBTITLE -->
+    <g transform="translate(4, 185)">
+      <line x1="0" y1="-22" x2="680" y2="-22" stroke="rgba(255, 255, 255, 0.12)" stroke-width="1.2" />
+      <text x="0" y="0" class="font-sub" font-size="17" fill="#8D90A2">
+        <tspan fill="#25F4EE">SPY VIRAL</tspan>
+        <tspan fill="#4E5166">  •  </tspan>
+        <tspan fill="#FFFFFF">ARBITRAGEM</tspan>
+        <tspan fill="#4E5166">  •  </tspan>
+        <tspan fill="#FE2C55">DROPSHIPPING</tspan>
+      </text>
+    </g>
+  </g>
+</svg>

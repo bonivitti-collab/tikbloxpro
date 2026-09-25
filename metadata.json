@@ -1,0 +1,7 @@
+{
+  "name": "Radar Pessoal da Mari - Bot TikTok",
+  "description": "Radar pessoal de tendências do TikTok e bot automático para envio de oportunidades no Telegram com roteiro UGC, fornecedores e links.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+

@@ -1,0 +1,98 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --tiktok-black: #010101;
+    --tiktok-card: #12131A;
+    --tiktok-surface: #161823;
+    --tiktok-pink: #FE2C55;
+    --tiktok-pink-hover: #FF3B5C;
+    --tiktok-cyan: #25F4EE;
+    --tiktok-cyan-hover: #4DF8F3;
+    --tiktok-white: #FFFFFF;
+    --tiktok-text-secondary: #A6A7B2;
+    --tiktok-border: rgba(255, 255, 255, 0.08);
+  }
+
+  body {
+    background-color: #010101;
+    color: #F1F1F2;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
+}
+
+html {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+/* Custom TikTok Styled Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: #090A0F;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #252836;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #FE2C55;
+}
+
+/* Subtle scrollbar utility for carousel horizontal scroll */
+.subtle-horizontal-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+.subtle-horizontal-scroll::-webkit-scrollbar {
+  height: 4px;
+}
+.subtle-horizontal-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.subtle-horizontal-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+}
+.subtle-horizontal-scroll::-webkit-scrollbar-thumb:hover {
+  background: #25F4EE;
+}
+
+/* TikTok Dual Chromatic Shadow & Glitch */
+.tiktok-chromatic-box {
+  box-shadow: -2px -2px 0px rgba(37, 244, 238, 0.8), 2px 2px 0px rgba(254, 44, 85, 0.8);
+}
+
+.tiktok-chromatic-text {
+  text-shadow: -1.8px -1.4px 0 rgba(37, 244, 238, 0.95), 1.8px 1.4px 0 rgba(254, 44, 85, 0.95);
+}
+
+.tiktok-chromatic-text-lg {
+  text-shadow: -2.5px -1.8px 0 rgba(37, 244, 238, 0.95), 2.5px 1.8px 0 rgba(254, 44, 85, 0.95);
+}
+
+.tiktok-glow-pink {
+  box-shadow: 0 0 25px -4px rgba(254, 44, 85, 0.45);
+}
+
+.tiktok-glow-cyan {
+  box-shadow: 0 0 25px -4px rgba(37, 244, 238, 0.45);
+}
+
+.tiktok-glow-dual {
+  box-shadow: -4px 0 20px -2px rgba(37, 244, 238, 0.25), 4px 0 20px -2px rgba(254, 44, 85, 0.25);
+}
+
+.tiktok-chromatic-card-hover {
+  box-shadow: -3px -2px 20px -2px rgba(37, 244, 238, 0.28), 3px 2px 20px -2px rgba(254, 44, 85, 0.28);
+  border-color: rgba(254, 44, 85, 0.35);
+}
+

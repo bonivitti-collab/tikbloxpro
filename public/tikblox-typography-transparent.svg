@@ -1,0 +1,121 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 240" width="900" height="240">
+  <defs>
+    <!-- Google Font Outfit Embedded -->
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@800;900&amp;display=swap');
+      
+      .font-display {
+        font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        font-weight: 900;
+      }
+      
+      .font-sub {
+        font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        font-weight: 800;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+      }
+
+      .font-badge {
+        font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        font-weight: 900;
+        letter-spacing: 0.12em;
+      }
+    </style>
+  </defs>
+
+  <!-- 
+    TIKBLOX TYPOGRAPHY STANDALONE (TRANSPARENT BACKGROUND)
+  -->
+  <g transform="translate(10, 20)">
+    
+    <!-- MAIN LOGOTYPE ROW -->
+    <g transform="translate(0, 115)">
+      
+      <!-- 1. TIK (PURE CRISP WHITE) -->
+      <text
+        x="0"
+        y="0"
+        class="font-display"
+        font-size="112"
+        fill="#FFFFFF"
+        letter-spacing="-0.04em"
+      >TIK</text>
+
+      <!-- 2. BLOX CHROMATIC OFFSET: CYAN (#25F4EE) - TOP-LEFT -->
+      <text
+        x="228"
+        y="-3.5"
+        class="font-display"
+        font-size="112"
+        fill="#25F4EE"
+        opacity="0.9"
+        letter-spacing="-0.03em"
+      >BLOX</text>
+
+      <!-- 3. BLOX CHROMATIC OFFSET: PINK (#FE2C55) - BOTTOM-RIGHT -->
+      <text
+        x="234"
+        y="3.5"
+        class="font-display"
+        font-size="112"
+        fill="#FE2C55"
+        opacity="0.9"
+        letter-spacing="-0.03em"
+      >BLOX</text>
+
+      <!-- 4. BLOX FOREGROUND: CRISP WHITE -->
+      <text
+        x="231"
+        y="0"
+        class="font-display"
+        font-size="112"
+        fill="#FFFFFF"
+        letter-spacing="-0.03em"
+      >BLOX</text>
+
+      <!-- 5. STATUS PILL BADGE: RADAR BR -->
+      <g transform="translate(565, -84)">
+        <rect
+          width="170"
+          height="42"
+          rx="21"
+          fill="#13151F"
+          stroke="#25F4EE"
+          stroke-opacity="0.45"
+          stroke-width="1.5"
+        />
+        <circle cx="26" cy="21" r="7" fill="#FE2C55" opacity="0.35" />
+        <circle cx="26" cy="21" r="4.5" fill="#FE2C55" />
+        <circle cx="26" cy="21" r="2" fill="#FFFFFF" />
+
+        <text
+          x="44"
+          y="26"
+          class="font-badge"
+          font-size="14"
+          fill="#FFFFFF"
+        >RADAR <tspan fill="#25F4EE">BR</tspan></text>
+      </g>
+    </g>
+
+    <!-- SUBTITLE / TAGLINE -->
+    <g transform="translate(4, 185)">
+      <line x1="0" y1="-22" x2="680" y2="-22" stroke="rgba(255, 255, 255, 0.15)" stroke-width="1.2" />
+
+      <text
+        x="0"
+        y="0"
+        class="font-sub"
+        font-size="17"
+        fill="#8D90A2"
+      >
+        <tspan fill="#25F4EE">SPY VIRAL</tspan>
+        <tspan fill="#555870">  •  </tspan>
+        <tspan fill="#FFFFFF">ARBITRAGEM</tspan>
+        <tspan fill="#555870">  •  </tspan>
+        <tspan fill="#FE2C55">DROPSHIPPING</tspan>
+      </text>
+    </g>
+  </g>
+</svg>
