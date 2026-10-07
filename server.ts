@@ -1043,7 +1043,7 @@ Responda à pergunta da Duda de forma objetiva, acolhedora, especialista em arbi
             { role: 'user', parts: [{ text: `${systemPrompt}\n\nPergunta da Duda: ${message}` }] }
           ]
         });
-        const reply = response.text();
+        const reply = response.text;
         if (reply) {
           return res.json({ success: true, reply });
         }

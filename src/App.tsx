@@ -47,9 +47,6 @@ const OnboardingModal = React.lazy(() =>
 const WifeBotConfigModal = React.lazy(() =>
   import('./components/WifeBotConfigModal').then((m) => ({ default: m.WifeBotConfigModal }))
 );
-const PersonalAssistantModal = React.lazy(() =>
-  import('./components/PersonalAssistantModal').then((m) => ({ default: m.PersonalAssistantModal }))
-);
 
 const ONBOARDING_STORAGE_KEY = 'tikblox_onboarding_completed_v1';
 import { TrendingProduct, ProductNiche, AppUpdateInfo, ProductPriceCheck, PriceMonitorSummary } from './types';
@@ -130,7 +127,6 @@ export default function App() {
   // Onboarding Welcome Tour state
   const [showOnboardingModal, setShowOnboardingModal] = useState(false);
   const [showWifeBotModal, setShowWifeBotModal] = useState(false);
-  const [showPersonalAssistantModal, setShowPersonalAssistantModal] = useState(false);
 
   // Auto-launch onboarding tour on first visit
   useEffect(() => {
@@ -521,7 +517,6 @@ export default function App() {
         onOpenOfflineStorage={() => setShowOfflineStorageModal(true)}
         onOpenOnboardingTour={() => setShowOnboardingModal(true)}
         onOpenWifeBot={() => setShowWifeBotModal(true)}
-        onOpenAssistant={() => setShowPersonalAssistantModal(true)}
       />
 
       {/* Top Update Alert Banner (shown when a newer version is detected on Google Drive) */}
@@ -951,28 +946,7 @@ export default function App() {
           onClose={() => setShowWifeBotModal(false)}
           products={products}
         />
-
-        {/* Personal Assistant Modal (AI Expert on loaded trends) */}
-        <PersonalAssistantModal
-          isOpen={showPersonalAssistantModal}
-          onClose={() => setShowPersonalAssistantModal(false)}
-          products={products}
-        />
       </Suspense>
-
-      {/* Floating Personal Assistant Button */}
-      <button
-        onClick={() => setShowPersonalAssistantModal(true)}
-        className="fixed bottom-20 right-4 sm:right-6 z-40 flex items-center gap-2 px-4 py-3 bg-gradient-to-r from-cyan-500 to-[#25F4EE] hover:from-cyan-400 hover:to-[#00D2C4] text-black font-extrabold text-xs sm:text-sm rounded-2xl shadow-2xl shadow-cyan-500/40 transition-all hover:scale-105 active:scale-95 cursor-pointer"
-        title="Assistente Pessoal (Tire dúvidas sobre os produtos carregados)"
-      >
-        <span className="relative flex h-2.5 w-2.5">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-black opacity-75"></span>
-          <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-black"></span>
-        </span>
-        <Sparkles className="w-4 h-4" />
-        <span>🤖 Assistente IA</span>
-      </button>
 
       {/* Offline Toast Indicator */}
       <OfflineIndicator onOpenStorageModal={() => setShowOfflineStorageModal(true)} />

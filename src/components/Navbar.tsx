@@ -40,7 +40,6 @@ interface NavbarProps {
   onOpenOfflineStorage?: () => void;
   onOpenOnboardingTour?: () => void;
   onOpenWifeBot?: () => void;
-  onOpenAssistant?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -57,7 +56,6 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenOfflineStorage,
   onOpenOnboardingTour,
   onOpenWifeBot,
-  onOpenAssistant,
 }) => {
   const { t, language, setLanguage } = useTranslation();
   const [showBrandAssetsModal, setShowBrandAssetsModal] = useState(false);
@@ -298,18 +296,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
             )}
 
-            {/* Desktop & Tablet: Personal Assistant Button */}
-            {onOpenAssistant && (
-              <button
-                id="nav-assistant-btn"
-                onClick={onOpenAssistant}
-                className="hidden sm:flex items-center gap-1.5 rounded-xl border border-cyan-500/40 bg-cyan-950/25 hover:border-cyan-400 hover:bg-cyan-900/40 px-3 py-1.5 text-xs font-bold text-cyan-300 hover:text-white shadow-sm transition-all active:scale-95 cursor-pointer whitespace-nowrap shrink-0"
-                title="Assistente Pessoal de Inteligência (Pergunte sobre produtos e margens)"
-              >
-                <Sparkles className="w-3.5 h-3.5 text-[#25F4EE] animate-pulse" />
-                <span>🤖 Assistente IA</span>
-              </button>
-            )}
+
 
             {/* Desktop Only: Elegant Resources & Downloads Dropdown */}
             <div className="relative hidden md:block" ref={desktopToolsRef}>

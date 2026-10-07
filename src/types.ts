@@ -148,7 +148,7 @@ export interface PushAlertLog {
   viralityScore: number;
   profitMarginPercent: number;
   timestamp: string;
-  status: 'delivered' | 'clicked';
+  status: 'delivered' | 'clicked' | 'delivered-morning' | 'delivered-afternoon' | 'delivered-evening';
   alertType?: 'product_radar' | 'trend_pulse_spike';
   niche?: string;
   rateOfChangePercent?: number;
