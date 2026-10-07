@@ -19,6 +19,9 @@ import {
   Loader2,
   FileText,
   MapPin,
+  Activity,
+  Flame,
+  Radio,
 } from 'lucide-react';
 import { TrendingProduct, DeepDiveAnalysis } from '../types';
 import { getProductDeepDive } from '../services/api';
@@ -260,6 +263,102 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                 <span className="text-base font-bold text-white">{product.viralityScore}/100</span>
               </div>
               <span className="text-[10px] text-cyan-400 block">{product.trendingMetrics.searchVolumeBR}</span>
+            </div>
+          </div>
+
+          {/* Engagement Pulse & Virality Analytics */}
+          <div className="rounded-xl border border-cyan-500/40 bg-slate-950/80 p-4 relative overflow-hidden shadow-lg shadow-cyan-950/30">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 rounded-full blur-2xl pointer-events-none" />
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <div className="p-2 rounded-lg bg-cyan-500/15 border border-cyan-500/30 text-[#25F4EE]">
+                  <Activity className="w-4 h-4 animate-pulse" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-extrabold text-white flex items-center gap-1.5">
+                    <span>{language === 'en' ? 'Engagement Pulse & Virality Radar' : 'Pulso de Engajamento & Radar de Viralidade'}</span>
+                    <span className="inline-flex items-center gap-1 rounded-full bg-cyan-500/20 px-2 py-0.5 text-[10px] font-bold text-cyan-300 border border-cyan-500/30">
+                      <Radio className="w-3 h-3 text-[#25F4EE] animate-ping" />
+                      Live Feed
+                    </span>
+                  </h3>
+                  <p className="text-[11px] text-slate-400">
+                    {language === 'en'
+                      ? 'Simulated real-time social engagement metrics across global feeds'
+                      : 'Métricas de engajamento social em tempo real simuladas nas redes globais'}
+                  </p>
+                </div>
+              </div>
+
+              <div className="text-right hidden sm:block">
+                <span className="text-[10px] text-slate-400 block">{language === 'en' ? 'Viral Index' : 'Índice Viral'}</span>
+                <span className="text-lg font-black text-[#25F4EE]">{product.viralityScore} / 100</span>
+              </div>
+            </div>
+
+            {/* Viral Score Progress Bar */}
+            <div className="mb-4 space-y-1">
+              <div className="flex justify-between text-xs font-semibold">
+                <span className="text-slate-300 flex items-center gap-1">
+                  <Flame className="w-3.5 h-3.5 text-orange-400" />
+                  {language === 'en' ? 'Viral Momentum Force' : 'Força de Momento Viral'}
+                </span>
+                <span className="text-cyan-300">{product.viralityScore}%</span>
+              </div>
+              <div className="w-full bg-slate-900 rounded-full h-2.5 p-0.5 border border-slate-800">
+                <div
+                  className="bg-gradient-to-r from-cyan-500 via-[#25F4EE] to-emerald-400 h-full rounded-full transition-all duration-500 shadow-sm shadow-cyan-500/50"
+                  style={{ width: `${Math.min(100, Math.max(15, product.viralityScore))}%` }}
+                />
+              </div>
+            </div>
+
+            {/* 3 Key Engagement Pulse Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+              <div className="p-3 rounded-xl bg-slate-900/90 border border-slate-800 flex flex-col justify-between">
+                <span className="text-[11px] text-slate-400 flex items-center gap-1 mb-1">
+                  <TrendingUp className="w-3.5 h-3.5 text-cyan-400" />
+                  {language === 'en' ? 'Trend Velocity' : 'Velocidade da Tendência'}
+                </span>
+                <div>
+                  <span className="text-sm font-black text-cyan-300 block">
+                    +{product.trendingMetrics.growthRatePercent}% / sem
+                  </span>
+                  <span className="text-[10px] text-slate-400 block mt-0.5">
+                    {product.trendingMetrics.searchVolumeBR}
+                  </span>
+                </div>
+              </div>
+
+              <div className="p-3 rounded-xl bg-slate-900/90 border border-slate-800 flex flex-col justify-between">
+                <span className="text-[11px] text-slate-400 flex items-center gap-1 mb-1">
+                  <Share2 className="w-3.5 h-3.5 text-emerald-400" />
+                  {language === 'en' ? 'Social Feed Mentions' : 'Menções em Feeds Sociais'}
+                </span>
+                <div>
+                  <span className="text-sm font-black text-emerald-400 block">
+                    {(product.viralityScore * 412).toLocaleString('pt-BR')} menções
+                  </span>
+                  <span className="text-[10px] text-slate-400 block mt-0.5">
+                    TikTok US, Douyin & Reels
+                  </span>
+                </div>
+              </div>
+
+              <div className="p-3 rounded-xl bg-slate-900/90 border border-slate-800 flex flex-col justify-between">
+                <span className="text-[11px] text-slate-400 flex items-center gap-1 mb-1">
+                  <Layers className="w-3.5 h-3.5 text-amber-400" />
+                  {language === 'en' ? 'Market Maturity Stage' : 'Estágio de Maturidade'}
+                </span>
+                <div>
+                  <span className="text-sm font-black text-amber-300 block">
+                    {product.waveStageLabel}
+                  </span>
+                  <span className="text-[10px] text-slate-400 block mt-0.5">
+                    Saturação BR: {product.saturationInBrazil}
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
 
