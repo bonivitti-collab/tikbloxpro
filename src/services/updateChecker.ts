@@ -180,7 +180,7 @@ export const SAMPLE_VERSION_JSON_TEMPLATE = `{
   "fileSizeMb": 68.4,
   "downloadUrl": "https://drive.google.com/file/d/SEU_ID_DO_ARQUIVO_EXE/view?usp=sharing",
   "highlights": [
-    "Mineração 3x mais rápida com o novo modelo Google Gemini 3.8 Flash",
+    "Mineração 3x mais rápida com o novo modelo IA do TikBlox",
     "Adicionados nichos automotivo, ferramentas e bem-estar",
     "Fórmula de taxas de importação e ICMS atualizada para cálculo exato em R$",
     "Correção de layout para telas de notebook menores"

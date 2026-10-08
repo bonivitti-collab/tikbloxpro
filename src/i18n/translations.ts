@@ -303,7 +303,7 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     // Footer & General
     footer_tagline: 'Radar de Tendências Virais e Arbitragem de Produtos Estrangeiros para o Brasil.',
     footer_pwa: 'PWA Compatível com Android & iOS',
-    footer_ai: 'Google Gemini 3.8 Flash Grounded',
+    footer_ai: 'IA do TikBlox Pro',
     offline_status: 'Você está offline (modo cache IndexedDB)',
     online_status: 'Conexão restabelecida',
 
@@ -323,7 +323,7 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     onboarding_step1_point2_title: 'Filtros Estratégicos',
     onboarding_step1_point2_desc: 'Filtre por nichos lucrativos (Tech, Casa, Beleza, Pets) e selecione a procedência (🇺🇸 EUA ou 🇨🇳 China).',
     onboarding_step1_point3_title: 'Varredura Contínua com IA',
-    onboarding_step1_point3_desc: 'Dispare varreduras inteligentes para mapear novos vencedores em tempo real com dados do Google Gemini.',
+    onboarding_step1_point3_desc: 'Dispare varreduras inteligentes para mapear novos vencedores em tempo real com dados da IA do TikBlox.',
     onboarding_step1_action: 'Explorar Produtos no Radar',
     onboarding_step2_badge: '2. MINERAÇÃO & CACHE',
     onboarding_step2_title: 'Salvamento de Produtos & Banco Offline',
@@ -493,7 +493,7 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     // Footer & General
     footer_tagline: 'Viral Trends Radar and Cross-Border Product Arbitrage for Brazil.',
     footer_pwa: 'PWA Compatible with Android & iOS',
-    footer_ai: 'Google Gemini 3.8 Flash Grounded',
+    footer_ai: 'TikBlox Pro AI',
     offline_status: 'You are currently offline (IndexedDB cache mode)',
     online_status: 'Connection restored',
 
@@ -513,7 +513,7 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     onboarding_step1_point2_title: 'Strategic Filtering',
     onboarding_step1_point2_desc: 'Filter by high-margin niches (Tech, Home, Beauty, Pets) and select product origin (🇺🇸 USA or 🇨🇳 China).',
     onboarding_step1_point3_title: 'Continuous AI Deep Scan',
-    onboarding_step1_point3_desc: 'Trigger smart scans to map new winning products in real-time grounded by Google Gemini.',
+    onboarding_step1_point3_desc: 'Trigger smart scans to map new winning products in real-time grounded by TikBlox AI.',
     onboarding_step1_action: 'Explore Trends on Radar',
     onboarding_step2_badge: '2. MINING & CACHE',
     onboarding_step2_title: 'Save Winning Products & Offline Storage',

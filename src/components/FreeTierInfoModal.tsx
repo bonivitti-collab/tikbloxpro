@@ -77,12 +77,12 @@ export function FreeTierInfoModal({ isOpen, onClose }: FreeTierInfoModalProps) {
               </p>
             </div>
 
-            {/* Opção 2: Gemini 2.5 Flash Free Tier */}
+            {/* Opção 2: IA do TikBlox Free Tier */}
             <div className="p-3.5 rounded-xl bg-[#161823] border border-white/5 hover:border-[#25F4EE]/30 transition">
               <div className="flex items-center justify-between mb-1.5">
                 <div className="flex items-center gap-2 font-bold text-white">
                   <Sparkles className="w-4 h-4 text-[#FE2C55]" />
-                  <span>2. Google Gemini 2.5 Flash (Free Tier)</span>
+                  <span>2. IA do TikBlox (Free Tier)</span>
                 </div>
                 <span className="text-[10px] font-bold text-[#FE2C55] bg-[#FE2C55]/10 px-2 py-0.5 rounded">
                   15 req/min Grátis

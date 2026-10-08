@@ -100,7 +100,7 @@ export const UpdateSettingsModal: React.FC<UpdateSettingsModalProps> = ({
       fileSizeMb: 68.4,
       downloadUrl: 'https://drive.google.com/file/d/demo-example-id/view?usp=sharing',
       highlights: [
-        'Algoritmo Google Gemini 3.8 Flash com busca aprofundada em tempo real',
+        'Algoritmo IA do TikBlox Pro com busca aprofundada em tempo real',
         'Cálculo automatizado de taxa de importação e ICMS por produto',
         'Filtro horizontal inteligente para telas menores de notebook',
         'Novos nichos: Ferramentas, Automotivo e Saúde & Bem-Estar'

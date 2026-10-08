@@ -1010,7 +1010,7 @@ export default function App() {
               {language === 'en' ? 'PWA Compatible with Android & iOS' : 'PWA Compatível com Android & iOS'}
             </span>
             <span>•</span>
-            <span className="hover:text-white transition">Google Gemini 3.8 Flash Grounded</span>
+            <span className="hover:text-white transition">IA do TikBlox Pro</span>
           </div>
         </div>
       </footer>

@@ -396,7 +396,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                     </div>
                     <div className="flex flex-col text-left">
                       <span className="font-bold text-emerald-300">API R$ 0 Grátis Permanente</span>
-                      <span className="text-[10px] text-[#A6A7B2]">Google Gemini 3.8 Flash sem custos</span>
+                      <span className="text-[10px] text-[#A6A7B2]">IA do TikBlox sem custos</span>
                     </div>
                   </button>
 
