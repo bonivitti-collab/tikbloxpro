@@ -21,6 +21,7 @@ import {
   HelpCircle,
 } from 'lucide-react';
 import { TikBloxLogo } from './TikBloxLogo';
+import { GlobalScanCountdown } from './GlobalScanCountdown';
 import { useTranslation } from '../i18n/LanguageContext';
 
 interface NavbarProps {
@@ -194,7 +195,8 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Right Action Controls */}
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             
-
+            {/* Global Scan Countdown */}
+            <GlobalScanCountdown />
 
             {/* Push Notifications */}
             {onOpenPushModal && (
@@ -262,7 +264,6 @@ export const Navbar: React.FC<NavbarProps> = ({
           </button>
           <button
             onClick={() => {
-              setShowMobileToolsMenu(false);
               setActiveTab('calculator');
             }}
             className={`h-10 rounded-xl text-xs font-bold cursor-pointer ${
