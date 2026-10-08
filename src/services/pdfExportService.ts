@@ -34,22 +34,7 @@ export async function downloadProductViabilityPDF({
       const filename = `TIKBLOX_${product.name
         .replace(/[^a-zA-Z0-9_-]/g, '_')
         .substring(0, 40)}_Viabilidade.pdf`;
-
-      // Safe cross-browser Blob download
-      const blobUrl = window.URL.createObjectURL(blob);
-      const tempLink = document.createElement('a');
-      tempLink.style.display = 'none';
-      tempLink.href = blobUrl;
-      tempLink.setAttribute('download', filename);
-      document.body.appendChild(tempLink);
-      tempLink.click();
-
-      // Clean up memory
-      setTimeout(() => {
-        document.body.removeChild(tempLink);
-        window.URL.revokeObjectURL(blobUrl);
-      }, 1500);
-
+      showInAppFilePreview(blob, filename, language);
       return { success: true };
     } else {
       throw new Error(`Server returned HTTP ${res.status}`);
@@ -65,6 +50,49 @@ export async function downloadProductViabilityPDF({
  * Offline fallback: Generates an elegant, printable standalone summary sheet
  * formatted specifically for A4 printing and direct "Save as PDF" browser dialog.
  */
+
+function showInAppFilePreview(blob: Blob, filename: string, language: 'pt' | 'en') {
+  const existing = document.getElementById('tikblox-pdf-preview');
+  if (existing) existing.remove();
+  const blobUrl = window.URL.createObjectURL(blob);
+  const overlay = document.createElement('div');
+  overlay.id = 'tikblox-pdf-preview';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:2147483646;background:#010101;display:flex;flex-direction:column;';
+  const bar = document.createElement('div');
+  bar.style.cssText = 'display:flex;gap:8px;padding:12px;padding-top:max(12px, env(safe-area-inset-top));background:#090A10;border-bottom:1px solid rgba(255,255,255,.12);';
+  const back = document.createElement('button');
+  back.type = 'button';
+  back.textContent = language === 'en' ? 'Back to app' : 'Voltar ao app';
+  back.style.cssText = 'flex:1;border:0;border-radius:12px;background:#161823;color:#fff;font-weight:800;padding:14px;font-size:15px;';
+  back.onclick = () => {
+    overlay.remove();
+    window.URL.revokeObjectURL(blobUrl);
+  };
+  const save = document.createElement('button');
+  save.type = 'button';
+  save.textContent = language === 'en' ? 'Save' : 'Salvar';
+  save.style.cssText = 'flex:1;border:0;border-radius:12px;background:#FE2C55;color:#fff;font-weight:800;padding:14px;font-size:15px;';
+  save.onclick = async () => {
+    const file = new File([blob], filename, { type: blob.type || 'application/pdf' });
+    const nav = navigator as Navigator & { canShare?: (data: ShareData) => boolean };
+    if (nav.canShare && nav.canShare({ files: [file] })) {
+      await navigator.share({ files: [file], title: filename });
+      return;
+    }
+    const link = document.createElement('a');
+    link.href = blobUrl;
+    link.download = filename;
+    link.rel = 'noopener';
+    link.click();
+  };
+  const frame = document.createElement('iframe');
+  frame.style.cssText = 'flex:1;width:100%;border:0;background:#fff;';
+  frame.src = blobUrl;
+  bar.append(back, save);
+  overlay.append(bar, frame);
+  document.body.appendChild(overlay);
+}
+
 function triggerOfflinePrintSummary(
   product: TrendingProduct,
   analysis: DeepDiveAnalysis | null | undefined,
@@ -194,7 +222,7 @@ function triggerOfflinePrintSummary(
 
   const back = document.createElement('button');
   back.type = 'button';
-  back.textContent = language === 'en' ? 'Back' : 'Voltar';
+  back.textContent = language === 'en' ? 'Back to app' : 'Voltar ao app';
   back.style.cssText = 'flex:1;border:0;border-radius:12px;background:#161823;color:#fff;font-weight:800;padding:12px;';
   back.onclick = () => overlay.remove();
 
@@ -202,7 +230,15 @@ function triggerOfflinePrintSummary(
   save.type = 'button';
   save.textContent = language === 'en' ? 'Save PDF' : 'Salvar PDF';
   save.style.cssText = 'flex:1;border:0;border-radius:12px;background:#FE2C55;color:#fff;font-weight:800;padding:12px;';
-  save.onclick = () => frame.contentWindow?.print();
+  save.onclick = () => {
+    const file = new File([html], 'TIKBLOX-viabilidade.html', { type: 'text/html' });
+    const nav = navigator as Navigator & { canShare?: (data: ShareData) => boolean };
+    if (nav.canShare && nav.canShare({ files: [file] })) {
+      navigator.share({ files: [file], title: 'TIKBLOX' }).catch(() => frame.contentWindow?.print());
+      return;
+    }
+    frame.contentWindow?.print();
+  };
 
   const frame = document.createElement('iframe');
   frame.style.cssText = 'flex:1;width:100%;border:0;background:#fff;';
