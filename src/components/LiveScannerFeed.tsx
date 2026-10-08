@@ -9,12 +9,13 @@ interface LiveScannerFeedProps {
 }
 
 const SCAN_STEPS = [
-  '📡 Conectando aos nós globais de telemetria de e-commerce...',
+  '🧠 Olá! Sou a IA do Gemini. Iniciando uma análise estratégica para você...',
+  '📡 Conectando aos nós globais de telemetria e processando tendências em tempo real...',
   '🇺🇸 Minerando feeds virais do TikTok Shop US e Amazon Movers & Shakers...',
-  '🇨🇳 Varrendo lançamentos no Douyin, Taobao e catálogo de fábricas 1688...',
-  '🇧🇷 Cruzando índice de concorrência ativa na Shopee e Mercado Livre Brasil...',
-  '💰 Computando spread de preço internacional x preço de venda no Brasil...',
-  '⚡ Validação de fit cultural e margens superiores a 250% concluída!',
+  '🇨🇳 Varrendo lançamentos na Ásia e catálogos de fábricas parceiras...',
+  '🇧🇷 Cruzando o índice de saturação na Shopee e Mercado Livre Brasil...',
+  '💰 Computando o spread de preço internacional x preço de venda sugerido...',
+  '⚡ Validação concluída! Preparei as melhores oportunidades para você.'
 ];
 
 export const LiveScannerFeed: React.FC<LiveScannerFeedProps> = ({
@@ -43,7 +44,7 @@ export const LiveScannerFeed: React.FC<LiveScannerFeedProps> = ({
           return prev;
         }
       });
-    }, 900);
+    }, 1200); // slightly slower to read the text
 
     return () => clearInterval(interval);
   }, [isOpen]);
@@ -58,13 +59,13 @@ export const LiveScannerFeed: React.FC<LiveScannerFeedProps> = ({
         <div className="flex items-center justify-between border-b border-slate-800 pb-4 mb-5">
           <div className="flex items-center gap-3">
             <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-500/20 border border-cyan-500/40">
-              <Radio className="h-5 w-5 text-cyan-400 animate-spin" />
+              <Sparkles className="h-5 w-5 text-cyan-400 animate-pulse" />
             </div>
             <div>
               <h3 className="text-base font-bold text-white flex items-center gap-2">
-                <span>Scanner em Tempo Real TIKBLOX</span>
+                <span>Inteligência Artificial Gemini</span>
               </h3>
-              <p className="text-xs text-cyan-400">Varredura de tendências internacionais</p>
+              <p className="text-xs text-cyan-400">Processamento em Tempo Real</p>
             </div>
           </div>
 

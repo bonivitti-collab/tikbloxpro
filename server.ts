@@ -3,9 +3,9 @@ import path from 'path';
 import dotenv from 'dotenv';
 import { GoogleGenAI } from '@google/genai';
 import { createServer as createViteServer } from 'vite';
-import { INITIAL_CURATED_TRENDS } from './src/data/curatedTrends';
-import { TrendingProduct, ProductNiche, DeepDiveAnalysis } from './src/types';
-import { streamProductViabilityPDF } from './src/server/pdfGenerator';
+import { INITIAL_CURATED_TRENDS } from './src/data/curatedTrends.js';
+import { TrendingProduct, ProductNiche, DeepDiveAnalysis } from './src/types.js';
+import { streamProductViabilityPDF } from './src/server/pdfGenerator.js';
 
 dotenv.config();
 
@@ -1098,4 +1098,9 @@ async function startServer() {
   });
 }
 
-startServer();
+// Only start the server automatically if not running on Vercel
+if (!process.env.VERCEL) {
+  startServer();
+}
+
+export default app;

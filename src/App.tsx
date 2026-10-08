@@ -388,7 +388,11 @@ export default function App() {
       if (result.products && result.products.length > 0) {
         setProducts((prev) => {
           const map = new Map<string, TrendingProduct>();
-          result.products.forEach((p) => map.set(p.id, p));
+          result.products.forEach((p) => {
+            // @ts-ignore
+            if (searchQuery) p._matchedQuery = searchQuery.trim().toLowerCase();
+            map.set(p.id, p);
+          });
           prev.forEach((p) => {
             if (!map.has(p.id)) map.set(p.id, p);
           });
@@ -446,7 +450,10 @@ export default function App() {
           p.name.toLowerCase().includes(rawQuery) ||
           p.originalName.toLowerCase().includes(rawQuery) ||
           p.culturalFitReason.toLowerCase().includes(rawQuery) ||
-          p.targetAudience.toLowerCase().includes(rawQuery)
+          p.targetAudience.toLowerCase().includes(rawQuery) ||
+          p.supplierKeywords?.some(k => k.toLowerCase().includes(rawQuery)) ||
+          // @ts-ignore - temporary property injected during AI scan
+          p._matchedQuery === rawQuery
         );
       }
 

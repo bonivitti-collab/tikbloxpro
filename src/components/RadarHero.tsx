@@ -167,30 +167,7 @@ export const RadarHero: React.FC<RadarHeroProps> = React.memo(({
 
       <div className="relative mx-auto max-w-7xl">
         
-        {/* Top Badges & Live Status */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 mb-5 sm:mb-6">
-          <div className="grid grid-cols-3 gap-2 text-[11px]">
-            <div className="col-span-3 h-10 rounded-xl border border-white/10 bg-[#2A3042] px-3 inline-flex items-center gap-2 text-[#C9C6BE]">
-              <span className="h-2 w-2 rounded-full bg-[#FE2C55] shrink-0"></span>
-              <span className="truncate">Varredura: TikTok US + Douyin China + Amazon</span>
-            </div>
-            <button
-              type="button"
-              onClick={onOpenTour}
-              className="h-14 rounded-xl border border-white/10 bg-[#2A3042] text-[#E7E4DC] font-bold cursor-pointer"
-            >
-              {language === 'en' ? 'Quick tour' : 'Guia rápido'}
-            </button>
-            <div className="h-14 rounded-xl border border-white/10 bg-[#2A3042] flex flex-col items-center justify-center">
-              <span className="text-white font-extrabold">{totalProductsCount}</span>
-              <span className="text-[#C9C6BE]">produtos</span>
-            </div>
-            <div className="h-14 rounded-xl border border-white/10 bg-[#2A3042] flex flex-col items-center justify-center">
-              <span className="text-[#25F4EE] font-extrabold">300%+</span>
-              <span className="text-[#C9C6BE]">margem</span>
-            </div>
-          </div>
-        </div>
+
 
         {/* Title and Value Proposition */}
         <div className="max-w-3xl mb-5 sm:mb-8">

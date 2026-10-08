@@ -62,33 +62,49 @@ function showInAppFilePreview(blob: Blob, filename: string, language: 'pt' | 'en
   bar.style.cssText = 'display:flex;gap:8px;padding:12px;padding-top:max(12px, env(safe-area-inset-top));background:#202432;border-bottom:1px solid rgba(255,255,255,.12);';
   const back = document.createElement('button');
   back.type = 'button';
-  back.textContent = language === 'en' ? 'Back to app' : 'Voltar ao app';
-  back.style.cssText = 'flex:1;border:0;border-radius:12px;background:#161823;color:#fff;font-weight:800;padding:14px;font-size:15px;';
+  back.textContent = language === 'en' ? 'Back' : 'Voltar';
+  back.style.cssText = 'flex:1;border:0;border-radius:12px;background:#161823;color:#fff;font-weight:800;padding:14px;font-size:14px;';
   back.onclick = () => {
     overlay.remove();
     window.URL.revokeObjectURL(blobUrl);
   };
-  const save = document.createElement('button');
-  save.type = 'button';
-  save.textContent = language === 'en' ? 'Save' : 'Salvar';
-  save.style.cssText = 'flex:1;border:0;border-radius:12px;background:#FE2C55;color:#fff;font-weight:800;padding:14px;font-size:15px;';
-  save.onclick = async () => {
-    const file = new File([blob], filename, { type: blob.type || 'application/pdf' });
-    const nav = navigator as Navigator & { canShare?: (data: ShareData) => boolean };
-    if (nav.canShare && nav.canShare({ files: [file] })) {
-      await navigator.share({ files: [file], title: filename });
-      return;
-    }
+
+  const download = document.createElement('button');
+  download.type = 'button';
+  download.textContent = language === 'en' ? 'Download' : 'Baixar';
+  download.style.cssText = 'flex:1;border:0;border-radius:12px;background:#059669;color:#fff;font-weight:800;padding:14px;font-size:14px;';
+  download.onclick = () => {
     const link = document.createElement('a');
     link.href = blobUrl;
     link.download = filename;
     link.rel = 'noopener';
     link.click();
   };
+
+  const share = document.createElement('button');
+  share.type = 'button';
+  share.textContent = language === 'en' ? 'Share' : 'Compartilhar';
+  share.style.cssText = 'flex:1;border:0;border-radius:12px;background:#FE2C55;color:#fff;font-weight:800;padding:14px;font-size:14px;';
+  
+  const file = new File([blob], filename, { type: blob.type || 'application/pdf' });
+  const nav = navigator as Navigator & { canShare?: (data: ShareData) => boolean };
+  const canShare = nav.canShare && nav.canShare({ files: [file] });
+  
+  share.onclick = async () => {
+    if (canShare) {
+      await navigator.share({ files: [file], title: filename }).catch(() => {});
+    }
+  };
+
+  bar.append(back, download);
+  if (canShare) {
+    bar.append(share);
+  }
+
   const frame = document.createElement('iframe');
   frame.style.cssText = 'flex:1;width:100%;border:0;background:#fff;';
   frame.src = blobUrl;
-  bar.append(back, save);
+  
   overlay.append(bar, frame);
   document.body.appendChild(overlay);
 }
@@ -222,29 +238,50 @@ function triggerOfflinePrintSummary(
 
   const back = document.createElement('button');
   back.type = 'button';
-  back.textContent = language === 'en' ? 'Back to app' : 'Voltar ao app';
-  back.style.cssText = 'flex:1;border:0;border-radius:12px;background:#161823;color:#fff;font-weight:800;padding:12px;';
+  back.textContent = language === 'en' ? 'Back' : 'Voltar';
+  back.style.cssText = 'flex:1;border:0;border-radius:12px;background:#161823;color:#fff;font-weight:800;padding:12px;font-size:14px;';
   back.onclick = () => overlay.remove();
 
-  const save = document.createElement('button');
-  save.type = 'button';
-  save.textContent = language === 'en' ? 'Save PDF' : 'Salvar PDF';
-  save.style.cssText = 'flex:1;border:0;border-radius:12px;background:#FE2C55;color:#fff;font-weight:800;padding:12px;';
-  save.onclick = () => {
-    const file = new File([html], 'TIKBLOX-viabilidade.html', { type: 'text/html' });
-    const nav = navigator as Navigator & { canShare?: (data: ShareData) => boolean };
-    if (nav.canShare && nav.canShare({ files: [file] })) {
-      navigator.share({ files: [file], title: 'TIKBLOX' }).catch(() => frame.contentWindow?.print());
-      return;
-    }
-    frame.contentWindow?.print();
+  const download = document.createElement('button');
+  download.type = 'button';
+  download.textContent = language === 'en' ? 'Download' : 'Baixar';
+  download.style.cssText = 'flex:1;border:0;border-radius:12px;background:#059669;color:#fff;font-weight:800;padding:12px;font-size:14px;';
+  download.onclick = () => {
+    const blob = new Blob([html], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `TIKBLOX_${product.name.replace(/[^a-zA-Z0-9_-]/g, '_').substring(0, 40)}_Viabilidade.html`;
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(url), 100);
   };
+
+  const share = document.createElement('button');
+  share.type = 'button';
+  share.textContent = language === 'en' ? 'Share' : 'Compartilhar';
+  share.style.cssText = 'flex:1;border:0;border-radius:12px;background:#FE2C55;color:#fff;font-weight:800;padding:12px;font-size:14px;';
+  
+  const file = new File([html], 'TIKBLOX-viabilidade.html', { type: 'text/html' });
+  const nav = navigator as Navigator & { canShare?: (data: ShareData) => boolean };
+  const canShare = nav.canShare && nav.canShare({ files: [file] });
+
+  share.onclick = () => {
+    if (canShare) {
+      navigator.share({ files: [file], title: 'TIKBLOX' }).catch(() => frame.contentWindow?.print());
+    } else {
+      frame.contentWindow?.print();
+    }
+  };
+
+  bar.append(back, download);
+  if (canShare) {
+    bar.append(share);
+  }
 
   const frame = document.createElement('iframe');
   frame.style.cssText = 'flex:1;width:100%;border:0;background:#fff;';
   frame.srcdoc = html;
 
-  bar.append(back, save);
   overlay.append(bar, frame);
   document.body.appendChild(overlay);
 }
