@@ -219,9 +219,18 @@ export const ProfitCalculatorModal: React.FC<ProfitCalculatorModalProps> = ({
 
           {/* Results Summary Cards */}
           <div className="rounded-2xl border border-slate-800 bg-slate-950/80 p-4 sm:p-5">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">
-              {language === 'en' ? 'Unit Economics Result' : 'Resultado da Operação Unitária'}
-            </h3>
+            <div className="flex items-center justify-between gap-3 mb-3">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                {language === 'en' ? 'Unit Economics Result' : 'Resultado da Operação Unitária'}
+              </h3>
+              <button
+                type="button"
+                onClick={clearCalculator}
+                className="rounded-lg border border-[#FE2C55]/50 bg-[#FE2C55]/15 px-3 py-1.5 text-[11px] font-bold text-white cursor-pointer"
+              >
+                {language === 'en' ? 'Delete' : 'Apagar'}
+              </button>
+            </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
               <div className="p-3 rounded-xl bg-slate-900 border border-slate-800">
