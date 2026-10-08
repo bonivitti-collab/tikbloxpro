@@ -58,33 +58,6 @@ export const RadarHero: React.FC<RadarHeroProps> = React.memo(({
     { id: 'health' as ProductNiche, label: t('hero_niche_health'), icon: '🩺' },
   ], [t]);
 
-  const searchContainerRef = useRef<HTMLDivElement>(null);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
-  // Handle clicking outside to close dropdown
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (
-        searchContainerRef.current &&
-        !searchContainerRef.current.contains(e.target as Node)
-      ) {
-        setIsDropdownOpen(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
-
-  const handleSelectRecentQuery = useCallback((query: string) => {
-    setSearchTerm(query);
-    setSearchQuery(query);
-    saveRecentSearch(query);
-    setIsDropdownOpen(false);
-  }, [setSearchTerm, setSearchQuery]);
-
   const checkScroll = () => {
     if (scrollContainerRef.current) {
       const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;

@@ -1083,24 +1083,23 @@ app.post('/api/chat', async (req: Request, res: Response) => {
 
     if (process.env.GEMINI_API_KEY) {
       try {
+        const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
         const systemInstruction = `Você é o Copiloto Estratégico IA do TikBlox Pro, especializado em Dropshipping Internacional, TikTok Ads, e eCommerce no Brasil. 
 Sua missão é ajudar os usuários a encontrar nichos lucrativos, dar ideias de tráfego orgânico, sugerir margens e preços ideais, e tirar dúvidas de mercado.
 Fale de forma objetiva, direta e focada em resultados. Se pedirem ideias de produtos, sugira 3 com margens de lucro estimadas e ganchos (hooks) de vendas. Use Markdown para formatar.`;
         
-        const history = messages.slice(0, -1).map((m: any) => ({
+        const contents = messages.map((m: any) => ({
           role: m.role === 'assistant' ? 'model' : 'user',
           parts: [{ text: m.content }]
         }));
-        
-        const lastMessage = messages[messages.length - 1].content;
 
-        const chat = model.startChat({
-          history,
-          systemInstruction,
+        const response = await ai.models.generateContent({
+          model: 'gemini-2.5-flash',
+          contents,
+          config: { systemInstruction }
         });
 
-        const result = await chat.sendMessage(lastMessage);
-        const replyText = result.response.text();
+        const replyText = response.text || 'Não consegui processar a resposta.';
         return res.json({ reply: replyText });
       } catch (err) {
         console.error('Error in /api/chat with Gemini:', err);
