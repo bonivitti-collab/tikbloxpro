@@ -153,7 +153,7 @@ export const SocialProofBadge: React.FC<SocialProofBadgeProps> = ({
       {showTooltip && (
         <div
           onClick={(e) => e.stopPropagation()}
-          className="absolute z-40 left-0 right-0 top-full mt-1.5 rounded-xl border border-white/15 bg-[#12131A] p-3.5 shadow-2xl backdrop-blur-md animate-in fade-in zoom-in-95 duration-150"
+          className="absolute z-40 left-0 right-0 top-full mt-1.5 rounded-xl border border-white/15 bg-[#2A3042] p-3.5 shadow-2xl backdrop-blur-md animate-in fade-in zoom-in-95 duration-150"
         >
           <div className="flex items-center justify-between border-b border-white/10 pb-2 mb-2.5">
             <div className="flex items-center gap-1.5">
@@ -177,7 +177,7 @@ export const SocialProofBadge: React.FC<SocialProofBadgeProps> = ({
             {velocityReason}
           </p>
 
-          <div className="grid grid-cols-2 gap-2 text-[10px] bg-[#0B0C10] rounded-lg p-2 mb-2.5 border border-white/5">
+          <div className="grid grid-cols-2 gap-2 text-[10px] bg-[#262B3A] rounded-lg p-2 mb-2.5 border border-white/5">
             <div>
               <span className="text-[#A6A7B2] block">
                 {language === 'en' ? 'Database Queries Total:' : 'Total de Buscas no Banco:'}

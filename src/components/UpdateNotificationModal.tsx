@@ -67,7 +67,7 @@ export const UpdateNotificationModal: React.FC<UpdateModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="relative w-full max-w-xl rounded-2xl border border-white/15 bg-[#12131A] shadow-2xl overflow-hidden">
+      <div className="relative w-full max-w-xl rounded-2xl border border-white/15 bg-[#2A3042] shadow-2xl overflow-hidden">
         
         {/* Top Glow & Header */}
         <div className="h-1.5 w-full bg-gradient-to-r from-[#25F4EE] via-[#FE2C55] to-[#25F4EE] animate-pulse" />
@@ -105,7 +105,7 @@ export const UpdateNotificationModal: React.FC<UpdateModalProps> = ({
           </div>
 
           {/* Metadata pill details */}
-          <div className="flex flex-wrap items-center gap-2.5 sm:gap-4 py-2 px-3 rounded-xl bg-[#0B0C10] border border-white/5 text-xs text-[#A6A7B2] mb-4">
+          <div className="flex flex-wrap items-center gap-2.5 sm:gap-4 py-2 px-3 rounded-xl bg-[#262B3A] border border-white/5 text-xs text-[#A6A7B2] mb-4">
             <div className="flex items-center gap-1.5">
               <Clock className="w-3.5 h-3.5 text-[#25F4EE]" />
               <span>Data: <strong>{updateInfo.releaseDate || 'Recente'}</strong></span>
@@ -146,7 +146,7 @@ export const UpdateNotificationModal: React.FC<UpdateModalProps> = ({
 
           {/* Progress or Download Status */}
           {isDownloading && (
-            <div className="mb-5 p-3.5 rounded-xl bg-[#0B0C10] border border-[#25F4EE]/30">
+            <div className="mb-5 p-3.5 rounded-xl bg-[#262B3A] border border-[#25F4EE]/30">
               <div className="flex justify-between text-xs font-bold text-white mb-1.5">
                 <span className="flex items-center gap-1.5 text-[#25F4EE]">
                   <Download className="w-4 h-4 animate-bounce" /> Baixando instalador do Google Drive...

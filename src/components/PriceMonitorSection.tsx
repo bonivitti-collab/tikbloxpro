@@ -82,7 +82,7 @@ export const PriceMonitorSection: React.FC<PriceMonitorSectionProps> = ({
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
       {/* Top Banner Overview */}
-      <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[#121420] via-[#0C0E16] to-[#161826] p-5 sm:p-6 shadow-xl">
+      <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[#2A3042] via-[#242938] to-[#161826] p-5 sm:p-6 shadow-xl">
         <div className="absolute top-0 right-0 -mt-8 -mr-8 w-48 h-48 bg-[#25F4EE]/10 rounded-full blur-3xl pointer-events-none" />
         <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
@@ -110,7 +110,7 @@ export const PriceMonitorSection: React.FC<PriceMonitorSectionProps> = ({
               className={`inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition shadow-lg cursor-pointer ${
                 isCheckingPrices
                   ? 'bg-[#1e2030] text-[#A6A7B2] border border-white/10 cursor-not-allowed'
-                  : 'bg-gradient-to-r from-[#25F4EE] to-[#00D2C4] text-[#0C0E16] hover:brightness-110 shadow-[#25F4EE]/20 active:scale-95'
+                  : 'bg-gradient-to-r from-[#25F4EE] to-[#00D2C4] text-[#242938] hover:brightness-110 shadow-[#25F4EE]/20 active:scale-95'
               }`}
             >
               <RefreshCw className={`w-3.5 h-3.5 ${isCheckingPrices ? 'animate-spin' : ''}`} />
@@ -121,7 +121,7 @@ export const PriceMonitorSection: React.FC<PriceMonitorSectionProps> = ({
 
         {/* 4 Summary Stat Cards */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6 pt-5 border-t border-white/10">
-          <div className="rounded-xl border border-white/5 bg-[#0B0C10]/60 p-3 text-center">
+          <div className="rounded-xl border border-white/5 bg-[#262B3A]/60 p-3 text-center">
             <span className="block text-[10px] uppercase font-bold text-[#A6A7B2]">
               {language === 'en' ? 'Monitored Products' : 'Produtos Monitorados'}
             </span>
@@ -154,7 +154,7 @@ export const PriceMonitorSection: React.FC<PriceMonitorSectionProps> = ({
             </div>
           </div>
 
-          <div className="rounded-xl border border-white/5 bg-[#0B0C10]/60 p-3 text-center">
+          <div className="rounded-xl border border-white/5 bg-[#262B3A]/60 p-3 text-center">
             <span className="block text-[10px] uppercase font-bold text-[#A6A7B2]">
               {language === 'en' ? 'Reference USD/BRL' : 'Câmbio USD/BRL'}
             </span>
@@ -167,7 +167,7 @@ export const PriceMonitorSection: React.FC<PriceMonitorSectionProps> = ({
 
       {/* Filters & Search Row */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="flex items-center gap-1.5 p-1 rounded-xl bg-[#121420] border border-white/10 text-xs overflow-x-auto">
+        <div className="flex items-center gap-1.5 p-1 rounded-xl bg-[#2A3042] border border-white/10 text-xs overflow-x-auto">
           <button
             onClick={() => setFilterSeverity('all')}
             className={`px-3 py-1.5 rounded-lg font-bold transition whitespace-nowrap cursor-pointer ${
@@ -223,14 +223,14 @@ export const PriceMonitorSection: React.FC<PriceMonitorSectionProps> = ({
             placeholder={language === 'en' ? 'Search in monitored products...' : 'Buscar produto monitorado...'}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full rounded-xl border border-white/10 bg-[#0B0C10] py-1.5 pl-8 pr-3 text-xs text-white placeholder-[#757788] focus:border-[#25F4EE] focus:outline-none transition"
+            className="w-full rounded-xl border border-white/10 bg-[#262B3A] py-1.5 pl-8 pr-3 text-xs text-white placeholder-[#757788] focus:border-[#25F4EE] focus:outline-none transition"
           />
         </div>
       </div>
 
       {/* Product Price Comparison Cards */}
       {filteredItems.length === 0 ? (
-        <div className="rounded-2xl border border-white/10 bg-[#121420]/50 p-12 text-center">
+        <div className="rounded-2xl border border-white/10 bg-[#2A3042]/50 p-12 text-center">
           <p className="text-xs text-[#A6A7B2]">
             {language === 'en'
               ? 'No products match the selected price variation filter.'
@@ -248,7 +248,7 @@ export const PriceMonitorSection: React.FC<PriceMonitorSectionProps> = ({
             return (
               <div
                 key={product.id}
-                className={`rounded-2xl border bg-[#121420] p-4 sm:p-5 transition-all hover:border-white/20 ${
+                className={`rounded-2xl border bg-[#2A3042] p-4 sm:p-5 transition-all hover:border-white/20 ${
                   isOpportunity
                     ? 'border-emerald-500/30 shadow-lg shadow-emerald-500/5'
                     : isWarning
@@ -313,7 +313,7 @@ export const PriceMonitorSection: React.FC<PriceMonitorSectionProps> = ({
                 {/* Comparative Price Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-4">
                   {/* Left Column: Original Price Detected */}
-                  <div className="rounded-xl border border-white/5 bg-[#0B0C10] p-3.5">
+                  <div className="rounded-xl border border-white/5 bg-[#262B3A] p-3.5">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-[11px] font-bold uppercase tracking-wider text-[#A6A7B2]">
                         {language === 'en' ? '1. Original Radar Price' : '1. Preço Original Detectado'}
@@ -352,7 +352,7 @@ export const PriceMonitorSection: React.FC<PriceMonitorSectionProps> = ({
                         ? 'border-emerald-500/30 bg-emerald-950/20'
                         : isWarning
                         ? 'border-rose-500/30 bg-rose-950/20'
-                        : 'border-white/10 bg-[#0C0E16]'
+                        : 'border-white/10 bg-[#242938]'
                     }`}
                   >
                     <div className="flex items-center justify-between mb-2">

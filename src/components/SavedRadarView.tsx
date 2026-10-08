@@ -193,7 +193,7 @@ export const SavedRadarView: React.FC<SavedRadarViewProps> = ({
             disabled={savedProducts.length === 0}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold transition shadow-sm cursor-pointer ${
               savedProducts.length === 0
-                ? 'opacity-40 cursor-not-allowed border-white/5 bg-[#121420] text-[#757788]'
+                ? 'opacity-40 cursor-not-allowed border-white/5 bg-[#2A3042] text-[#757788]'
                 : hasExported
                 ? 'border-emerald-500/50 bg-emerald-500/20 text-emerald-300'
                 : 'border-[#25F4EE]/30 bg-[#25F4EE]/10 hover:bg-[#25F4EE]/20 text-[#25F4EE] hover:border-[#25F4EE]/60'
@@ -224,7 +224,7 @@ export const SavedRadarView: React.FC<SavedRadarViewProps> = ({
 
           <button
             onClick={onBackToRadar}
-            className="text-xs font-semibold text-[#25F4EE] hover:text-white px-3 py-1.5 rounded-xl border border-white/10 bg-[#121420] transition cursor-pointer"
+            className="text-xs font-semibold text-[#25F4EE] hover:text-white px-3 py-1.5 rounded-xl border border-white/10 bg-[#2A3042] transition cursor-pointer"
           >
             {language === 'en' ? '← Back to Main Radar' : '← Voltar para o Radar Principal'}
           </button>
@@ -233,7 +233,7 @@ export const SavedRadarView: React.FC<SavedRadarViewProps> = ({
 
       {/* Sub-Tabs: Saved Products vs Live Price Monitor vs Trend History */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="flex items-center gap-1.5 p-1 rounded-xl bg-[#121420] border border-white/10 text-xs overflow-x-auto relative">
+        <div className="flex items-center gap-1.5 p-1 rounded-xl bg-[#2A3042] border border-white/10 text-xs overflow-x-auto relative">
           <button
             onClick={() => setViewMode('saved')}
             className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-bold transition-colors whitespace-nowrap cursor-pointer ${
@@ -261,7 +261,7 @@ export const SavedRadarView: React.FC<SavedRadarViewProps> = ({
             onClick={() => setViewMode('price_monitor')}
             className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-bold transition-colors whitespace-nowrap cursor-pointer ${
               viewMode === 'price_monitor'
-                ? 'text-[#0C0E16] font-black'
+                ? 'text-[#242938] font-black'
                 : 'text-[#A6A7B2] hover:text-[#25F4EE]'
             }`}
           >
@@ -326,7 +326,7 @@ export const SavedRadarView: React.FC<SavedRadarViewProps> = ({
               }
               value={filterQuery}
               onChange={(e) => setFilterQuery(e.target.value)}
-              className="w-full rounded-xl border border-white/10 bg-[#0B0C10] py-1.5 pl-8 pr-3 text-xs text-white placeholder-[#757788] focus:border-[#25F4EE] focus:outline-none transition"
+              className="w-full rounded-xl border border-white/10 bg-[#262B3A] py-1.5 pl-8 pr-3 text-xs text-white placeholder-[#757788] focus:border-[#25F4EE] focus:outline-none transition"
             />
           </div>
         )}
@@ -374,7 +374,7 @@ export const SavedRadarView: React.FC<SavedRadarViewProps> = ({
                 </div>
                 <button
                   onClick={() => setViewMode('price_monitor')}
-                  className="shrink-0 px-3 py-1 rounded-lg text-xs font-bold bg-[#25F4EE] hover:bg-[#00D2C4] text-[#0C0E16] transition cursor-pointer"
+                  className="shrink-0 px-3 py-1 rounded-lg text-xs font-bold bg-[#25F4EE] hover:bg-[#00D2C4] text-[#242938] transition cursor-pointer"
                 >
                   {language === 'en' ? 'View Price Monitor →' : 'Ver Monitor de Preços →'}
                 </button>

@@ -122,7 +122,7 @@ export const UpdateSettingsModal: React.FC<UpdateSettingsModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="relative w-full max-w-2xl rounded-2xl border border-white/15 bg-[#12131A] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+      <div className="relative w-full max-w-2xl rounded-2xl border border-white/15 bg-[#2A3042] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
         
         {/* Header */}
         <div className="p-5 border-b border-white/10 flex items-center justify-between bg-[#161823]">
@@ -155,7 +155,7 @@ export const UpdateSettingsModal: React.FC<UpdateSettingsModalProps> = ({
         <div className="p-5 sm:p-6 overflow-y-auto space-y-6 flex-1 text-xs sm:text-sm">
           
           {/* Passo a Passo Didático */}
-          <div className="p-4 rounded-xl bg-[#0B0C10] border border-white/10">
+          <div className="p-4 rounded-xl bg-[#262B3A] border border-white/10">
             <h4 className="font-bold text-white text-sm flex items-center gap-2 mb-2 text-[#25F4EE]">
               <HelpCircle className="w-4 h-4" />
               <span>Como Funciona o Google Drive no TIKBLOX (2 Passos):</span>
@@ -184,7 +184,7 @@ export const UpdateSettingsModal: React.FC<UpdateSettingsModalProps> = ({
                   placeholder="https://drive.google.com/file/d/1ABC...XYZ/view?usp=sharing"
                   value={versionJsonUrl}
                   onChange={(e) => setVersionJsonUrl(e.target.value)}
-                  className="w-full rounded-xl border border-white/10 bg-[#0B0C10] py-2.5 pl-10 pr-4 text-xs text-white placeholder-[#5A5C6D] focus:border-[#25F4EE] focus:outline-none focus:ring-1 focus:ring-[#25F4EE]"
+                  className="w-full rounded-xl border border-white/10 bg-[#262B3A] py-2.5 pl-10 pr-4 text-xs text-white placeholder-[#5A5C6D] focus:border-[#25F4EE] focus:outline-none focus:ring-1 focus:ring-[#25F4EE]"
                 />
               </div>
               <p className="text-[11px] text-[#7E8092] mt-1">
@@ -203,7 +203,7 @@ export const UpdateSettingsModal: React.FC<UpdateSettingsModalProps> = ({
                   placeholder="https://drive.google.com/drive/folders/1ABC...XYZ?usp=sharing"
                   value={driveFolderUrl}
                   onChange={(e) => setDriveFolderUrl(e.target.value)}
-                  className="w-full rounded-xl border border-white/10 bg-[#0B0C10] py-2.5 pl-10 pr-4 text-xs text-white placeholder-[#5A5C6D] focus:border-[#25F4EE] focus:outline-none focus:ring-1 focus:ring-[#25F4EE]"
+                  className="w-full rounded-xl border border-white/10 bg-[#262B3A] py-2.5 pl-10 pr-4 text-xs text-white placeholder-[#5A5C6D] focus:border-[#25F4EE] focus:outline-none focus:ring-1 focus:ring-[#25F4EE]"
                 />
               </div>
             </div>
@@ -279,7 +279,7 @@ export const UpdateSettingsModal: React.FC<UpdateSettingsModalProps> = ({
               </button>
             </div>
 
-            <pre className="p-3 rounded-xl bg-[#090A0F] border border-white/10 text-[11px] text-[#A6A7B2] font-mono overflow-x-auto leading-relaxed max-h-40">
+            <pre className="p-3 rounded-xl bg-[#202432] border border-white/10 text-[11px] text-[#A6A7B2] font-mono overflow-x-auto leading-relaxed max-h-40">
               {SAMPLE_VERSION_JSON_TEMPLATE}
             </pre>
             <p className="text-[11px] text-[#7E8092] mt-1.5">

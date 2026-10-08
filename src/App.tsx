@@ -495,7 +495,7 @@ export default function App() {
   }, [hasMoreProducts, filteredProducts.length]);
 
   return (
-    <div className="min-h-screen bg-[#010101] text-white flex flex-col font-['Plus_Jakarta_Sans',sans-serif]">
+    <div className="min-h-screen bg-[#1A1D27] text-white flex flex-col font-['Plus_Jakarta_Sans',sans-serif]">
       {/* Top Sticky Navigation */}
       <Navbar
         activeTab={activeTab}
@@ -604,7 +604,7 @@ export default function App() {
             <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto justify-end">
               <button
                 onClick={() => setShowPushModal(true)}
-                className="w-full sm:w-auto text-center px-4 py-2 rounded-xl text-xs font-black bg-gradient-to-r from-[#25F4EE] to-[#00CED1] hover:from-[#4BF6F1] hover:to-[#25F4EE] text-[#05060A] shadow-md transition active:scale-95 cursor-pointer"
+                className="w-full sm:w-auto text-center px-4 py-2 rounded-xl text-xs font-black bg-gradient-to-r from-[#25F4EE] to-[#00CED1] hover:from-[#4BF6F1] hover:to-[#25F4EE] text-[#141722] shadow-md transition active:scale-95 cursor-pointer"
               >
                 Ativar Alertas Push
               </button>
@@ -624,7 +624,7 @@ export default function App() {
             >
               <Suspense
                 fallback={
-                  <div className="h-64 rounded-2xl bg-[#0B0C10] border border-white/5 animate-pulse flex items-center justify-center text-xs text-[#757788]">
+                  <div className="h-64 rounded-2xl bg-[#262B3A] border border-white/5 animate-pulse flex items-center justify-center text-xs text-[#757788]">
                     Carregando produtos salvos...
                   </div>
                 }
@@ -664,7 +664,7 @@ export default function App() {
               </div>
               <Suspense
                 fallback={
-                  <div className="h-96 rounded-2xl bg-[#0B0C10] border border-white/5 animate-pulse flex items-center justify-center text-xs text-[#757788]">
+                  <div className="h-96 rounded-2xl bg-[#262B3A] border border-white/5 animate-pulse flex items-center justify-center text-xs text-[#757788]">
                     Carregando simulador de margem...
                   </div>
                 }
@@ -741,7 +741,7 @@ export default function App() {
 
               {/* Products Grid */}
               {filteredProducts.length === 0 ? (
-                <div className="py-16 text-center rounded-2xl border border-white/10 bg-[#12131A] p-6 sm:p-8">
+                <div className="py-16 text-center rounded-2xl border border-white/10 bg-[#2A3042] p-6 sm:p-8">
                   <AlertCircle className="w-10 h-10 text-[#FE2C55] mx-auto mb-3" />
                   <h3 className="text-base font-bold text-white">
                     {language === 'en' ? 'No products found with these filters' : 'Nenhum produto encontrado com estes filtros'}
@@ -934,7 +934,7 @@ export default function App() {
 
       {/* Floating Price Variation Alert Toast on App Startup */}
       {showPriceVariationToast && priceSummary && (priceSummary.opportunitiesCount > 0 || priceSummary.warningsCount > 0) && (
-        <div className="fixed bottom-6 right-4 sm:right-6 z-40 max-w-sm rounded-2xl border border-[#25F4EE]/40 bg-[#0C0E16]/95 backdrop-blur-md p-4 shadow-2xl shadow-[#25F4EE]/10 animate-in slide-in-from-bottom-5">
+        <div className="fixed bottom-6 right-4 sm:right-6 z-40 max-w-sm rounded-2xl border border-[#25F4EE]/40 bg-[#242938]/95 backdrop-blur-md p-4 shadow-2xl shadow-[#25F4EE]/10 animate-in slide-in-from-bottom-5">
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-start gap-2.5">
               <div className="w-8 h-8 rounded-xl bg-[#25F4EE]/15 border border-[#25F4EE]/30 flex items-center justify-center shrink-0">
@@ -957,7 +957,7 @@ export default function App() {
                       setShowPriceVariationToast(false);
                       window.scrollTo({ top: 0, behavior: 'smooth' });
                     }}
-                    className="px-3 py-1 rounded-lg text-[11px] font-bold bg-[#25F4EE] hover:bg-[#00D2C4] text-[#0C0E16] transition cursor-pointer"
+                    className="px-3 py-1 rounded-lg text-[11px] font-bold bg-[#25F4EE] hover:bg-[#00D2C4] text-[#242938] transition cursor-pointer"
                   >
                     {t('price_monitor_toast_action')} →
                   </button>
@@ -982,7 +982,7 @@ export default function App() {
       )}
 
       {/* Footer */}
-      <footer className="border-t border-white/10 bg-[#0B0C10] py-8 px-4 sm:px-6 lg:px-8 text-xs text-[#A6A7B2]">
+      <footer className="border-t border-white/10 bg-[#262B3A] py-8 px-4 sm:px-6 lg:px-8 text-xs text-[#A6A7B2]">
         <div className="mx-auto max-w-7xl flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <span className="font-extrabold text-white">TIKBLOX</span>

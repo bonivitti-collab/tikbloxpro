@@ -153,7 +153,7 @@ export const BrandAssetsModal: React.FC<BrandAssetsModalProps> = ({ isOpen, onCl
                 <div className="flex flex-wrap items-center gap-2">
                   <button
                     onClick={() => handleDownload(asset.path, asset.filename)}
-                    className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-[#25F4EE] to-[#00CED1] hover:from-[#4BF6F1] hover:to-[#25F4EE] text-[#05060A] font-black text-xs shadow-md shadow-[#25F4EE]/20 transition active:scale-95 cursor-pointer"
+                    className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-[#25F4EE] to-[#00CED1] hover:from-[#4BF6F1] hover:to-[#25F4EE] text-[#141722] font-black text-xs shadow-md shadow-[#25F4EE]/20 transition active:scale-95 cursor-pointer"
                   >
                     <Download className="w-3.5 h-3.5" />
                     <span>Baixar SVG</span>

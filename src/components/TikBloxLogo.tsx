@@ -271,7 +271,7 @@ export const TikBloxLogo: React.FC<TikBloxLogoProps> = ({
             {/* Futuristic Live Status Badge: RADAR BR */}
             {showBadge && (
               <div
-                className={`flex items-center gap-1.5 rounded-full bg-[#12131A] border border-[#25F4EE]/35 ${config.badge} font-black uppercase tracking-wider text-white shadow-[0_0_12px_rgba(37,244,238,0.2)]`}
+                className={`flex items-center gap-1.5 rounded-full bg-[#2A3042] border border-[#25F4EE]/35 ${config.badge} font-black uppercase tracking-wider text-white shadow-[0_0_12px_rgba(37,244,238,0.2)]`}
               >
                 <span className="relative flex h-1.5 w-1.5">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FE2C55] opacity-80" />

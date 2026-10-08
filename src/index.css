@@ -2,21 +2,23 @@
 
 @layer base {
   :root {
-    --tiktok-black: #010101;
-    --tiktok-card: #12131A;
+    --tiktok-black: #1A1D27;
+    --tiktok-card: #2A3042;
     --tiktok-surface: #161823;
     --tiktok-pink: #FE2C55;
     --tiktok-pink-hover: #FF3B5C;
     --tiktok-cyan: #25F4EE;
     --tiktok-cyan-hover: #4DF8F3;
     --tiktok-white: #FFFFFF;
-    --tiktok-text-secondary: #A6A7B2;
+    --tiktok-text-secondary: #C9C6BE;
     --tiktok-border: rgba(255, 255, 255, 0.08);
   }
 
   body {
-    background-color: #010101;
-    color: #F1F1F2;
+    background-color: #1A1D27;
+    background-image: radial-gradient(1200px 500px at 50% -10%, rgba(37, 244, 238, 0.08), transparent 55%);
+    color: #F6F3EC;
+    color: #F6F3EC;
     font-family: 'Plus Jakarta Sans', sans-serif;
     overflow-x: hidden;
     max-width: 100vw;
@@ -35,7 +37,7 @@ html {
 }
 
 ::-webkit-scrollbar-track {
-  background: #090A0F;
+  background: #202432;
 }
 
 ::-webkit-scrollbar-thumb {

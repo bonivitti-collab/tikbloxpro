@@ -157,7 +157,7 @@ export const PushNotificationModal: React.FC<PushNotificationModalProps> = ({
                 className={`px-4 py-2 rounded-xl text-xs font-black shadow-lg transition active:scale-95 shrink-0 flex items-center justify-center gap-1.5 cursor-pointer ${
                   isGranted
                     ? 'bg-white/10 hover:bg-white/15 text-white/90 border border-white/15'
-                    : 'bg-gradient-to-r from-[#25F4EE] to-[#00CED1] hover:from-[#4BF6F1] hover:to-[#25F4EE] text-[#05060A] shadow-[#25F4EE]/20'
+                    : 'bg-gradient-to-r from-[#25F4EE] to-[#00CED1] hover:from-[#4BF6F1] hover:to-[#25F4EE] text-[#141722] shadow-[#25F4EE]/20'
                 }`}
               >
                 {isGranted ? (
@@ -167,7 +167,7 @@ export const PushNotificationModal: React.FC<PushNotificationModalProps> = ({
                   </>
                 ) : (
                   <>
-                    <Bell className="w-4 h-4 text-[#05060A]" />
+                    <Bell className="w-4 h-4 text-[#141722]" />
                     <span>Ativar Alertas Push</span>
                   </>
                 )}
@@ -334,7 +334,7 @@ export const PushNotificationModal: React.FC<PushNotificationModalProps> = ({
                   onClick={() => onUpdateSettings({ minProfitMarginPercent: marginVal })}
                   className={`py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
                     settings.minProfitMarginPercent === marginVal
-                      ? 'bg-[#25F4EE] text-[#010101] shadow-md shadow-[#25F4EE]/20'
+                      ? 'bg-[#25F4EE] text-[#1A1D27] shadow-md shadow-[#25F4EE]/20'
                       : 'bg-white/5 hover:bg-white/10 text-white/70 border border-white/10'
                   }`}
                 >
@@ -359,7 +359,7 @@ export const PushNotificationModal: React.FC<PushNotificationModalProps> = ({
             <img
               src="/pwa-192x192.png"
               alt="TIKBLOX Logo"
-              className="w-10 h-10 rounded-xl bg-[#010101] border border-white/15 p-1 shrink-0"
+              className="w-10 h-10 rounded-xl bg-[#1A1D27] border border-white/15 p-1 shrink-0"
             />
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between gap-2">

@@ -90,7 +90,7 @@ export const RecentSearchesDropdown: React.FC<RecentSearchesDropdownProps> = ({
   return (
     <div
       id="recent-searches-dropdown"
-      className="absolute left-0 right-0 top-full mt-2 z-50 rounded-2xl border border-white/15 bg-[#12131A]/95 backdrop-blur-xl shadow-2xl shadow-black/80 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150"
+      className="absolute left-0 right-0 top-full mt-2 z-50 rounded-2xl border border-white/15 bg-[#2A3042]/95 backdrop-blur-xl shadow-2xl shadow-black/80 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150"
     >
       <div className="p-3.5 space-y-3.5 max-h-[380px] overflow-y-auto subtle-vertical-scroll">
         

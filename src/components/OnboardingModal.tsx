@@ -118,7 +118,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
         <div className="h-1 w-full bg-gradient-to-r from-[#25F4EE] via-white to-[#FE2C55]" />
 
         {/* Modal Header */}
-        <div className="flex items-center justify-between border-b border-white/10 px-5 py-4 bg-[#090A10]/90">
+        <div className="flex items-center justify-between border-b border-white/10 px-5 py-4 bg-[#202432]/90">
           <div className="flex items-center gap-2.5">
             <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-[#FE2C55] to-[#25F4EE] p-0.5 shadow-md">
               <div className="flex h-full w-full items-center justify-center rounded-[10px] bg-[#0C0E17]">
@@ -136,7 +136,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
           </div>
 
           {/* Step Pill Indicators (Clickable) */}
-          <div className="flex items-center gap-1.5 bg-[#121420] border border-white/10 rounded-full p-1 text-xs">
+          <div className="flex items-center gap-1.5 bg-[#2A3042] border border-white/10 rounded-full p-1 text-xs">
             <button
               onClick={() => setCurrentStep(1)}
               className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold transition cursor-pointer ${
@@ -530,7 +530,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
         </div>
 
         {/* Modal Footer Controls */}
-        <div className="border-t border-white/10 bg-[#090A10]/95 px-5 py-3.5 flex items-center justify-between gap-3">
+        <div className="border-t border-white/10 bg-[#202432]/95 px-5 py-3.5 flex items-center justify-between gap-3">
           {/* Left: Skip Tour */}
           <button
             onClick={handleDismiss}

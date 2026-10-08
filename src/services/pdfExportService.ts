@@ -57,9 +57,9 @@ function showInAppFilePreview(blob: Blob, filename: string, language: 'pt' | 'en
   const blobUrl = window.URL.createObjectURL(blob);
   const overlay = document.createElement('div');
   overlay.id = 'tikblox-pdf-preview';
-  overlay.style.cssText = 'position:fixed;inset:0;z-index:2147483646;background:#010101;display:flex;flex-direction:column;';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:2147483646;background:#1A1D27;display:flex;flex-direction:column;';
   const bar = document.createElement('div');
-  bar.style.cssText = 'display:flex;gap:8px;padding:12px;padding-top:max(12px, env(safe-area-inset-top));background:#090A10;border-bottom:1px solid rgba(255,255,255,.12);';
+  bar.style.cssText = 'display:flex;gap:8px;padding:12px;padding-top:max(12px, env(safe-area-inset-top));background:#202432;border-bottom:1px solid rgba(255,255,255,.12);';
   const back = document.createElement('button');
   back.type = 'button';
   back.textContent = language === 'en' ? 'Back to app' : 'Voltar ao app';
@@ -215,10 +215,10 @@ function triggerOfflinePrintSummary(
 
   const overlay = document.createElement('div');
   overlay.id = 'tikblox-pdf-preview';
-  overlay.style.cssText = 'position:fixed;inset:0;z-index:80;background:#010101;display:flex;flex-direction:column;';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:80;background:#1A1D27;display:flex;flex-direction:column;';
 
   const bar = document.createElement('div');
-  bar.style.cssText = 'display:flex;gap:8px;padding:12px;background:#090A10;border-bottom:1px solid rgba(255,255,255,.12);';
+  bar.style.cssText = 'display:flex;gap:8px;padding:12px;background:#202432;border-bottom:1px solid rgba(255,255,255,.12);';
 
   const back = document.createElement('button');
   back.type = 'button';

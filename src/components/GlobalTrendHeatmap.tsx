@@ -391,10 +391,10 @@ export const GlobalTrendHeatmap: React.FC<GlobalTrendHeatmapProps> = ({
   return (
     <div
       id="global-trend-heatmap-container"
-      className="mb-6 rounded-2xl border border-white/10 bg-[#0C0E16] overflow-hidden shadow-2xl transition-all"
+      className="mb-6 rounded-2xl border border-white/10 bg-[#242938] overflow-hidden shadow-2xl transition-all"
     >
       {/* Heatmap Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 sm:p-5 border-b border-white/10 bg-[#12131A]">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 sm:p-5 border-b border-white/10 bg-[#2A3042]">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#FE2C55]/20 to-[#25F4EE]/20 border border-white/10 flex items-center justify-center text-[#25F4EE] shadow-inner shrink-0">
             <Globe className="w-5 h-5 animate-pulse text-[#25F4EE]" />
@@ -449,7 +449,7 @@ export const GlobalTrendHeatmap: React.FC<GlobalTrendHeatmapProps> = ({
               onClick={() => setMetricMode('margin')}
               className={`px-2.5 py-1 rounded-lg font-bold transition cursor-pointer ${
                 metricMode === 'margin'
-                  ? 'bg-[#25F4EE] text-[#0C0E16] font-black shadow-sm'
+                  ? 'bg-[#25F4EE] text-[#242938] font-black shadow-sm'
                   : 'text-[#A6A7B2] hover:text-[#25F4EE]'
               }`}
             >
@@ -538,7 +538,7 @@ export const GlobalTrendHeatmap: React.FC<GlobalTrendHeatmapProps> = ({
                         {language === 'en' ? 'China - Douyin & 1688' : 'China - Douyin & Fábricas'}
                       </strong>
                       {selectedOrigin === 'CN' && (
-                        <span className="rounded bg-[#25F4EE] px-1 py-0.2 text-[9px] font-black text-[#0C0E16]">
+                        <span className="rounded bg-[#25F4EE] px-1 py-0.2 text-[9px] font-black text-[#242938]">
                           FILTRADO
                         </span>
                       )}
@@ -586,7 +586,7 @@ export const GlobalTrendHeatmap: React.FC<GlobalTrendHeatmapProps> = ({
             {/* D3 Map Canvas Container */}
             <div
               ref={containerRef}
-              className="relative w-full overflow-hidden bg-radial from-[#121524] via-[#0C0E16] to-[#06070B] select-none"
+              className="relative w-full overflow-hidden bg-radial from-[#121524] via-[#242938] to-[#06070B] select-none"
               style={{ minHeight: '340px' }}
             >
               <svg
@@ -868,7 +868,7 @@ export const GlobalTrendHeatmap: React.FC<GlobalTrendHeatmapProps> = ({
               {/* Floating Intelligence Tooltip */}
               {tooltipPos && (hoveredRegion || hoveredHub) && (
                 <div
-                  className="pointer-events-none absolute z-30 transform -translate-x-1/2 -translate-y-full mb-3 rounded-xl border border-white/20 bg-[#12131Acc] p-3 text-xs text-white shadow-2xl backdrop-blur-md max-w-xs min-w-[220px]"
+                  className="pointer-events-none absolute z-30 transform -translate-x-1/2 -translate-y-full mb-3 rounded-xl border border-white/20 bg-[#2A3042cc] p-3 text-xs text-white shadow-2xl backdrop-blur-md max-w-xs min-w-[220px]"
                   style={{
                     left: `${Math.min(dimensions.width - 130, Math.max(130, tooltipPos.x))}px`,
                     top: `${Math.max(80, tooltipPos.y - 12)}px`,
@@ -949,7 +949,7 @@ export const GlobalTrendHeatmap: React.FC<GlobalTrendHeatmapProps> = ({
               )}
 
               {/* Bottom Visual Legend */}
-              <div className="absolute bottom-2.5 left-2.5 right-2.5 flex flex-wrap items-center justify-between gap-2 p-2 rounded-xl bg-[#0C0E16dd] border border-white/10 text-[10px] backdrop-blur-sm pointer-events-auto">
+              <div className="absolute bottom-2.5 left-2.5 right-2.5 flex flex-wrap items-center justify-between gap-2 p-2 rounded-xl bg-[#242938dd] border border-white/10 text-[10px] backdrop-blur-sm pointer-events-auto">
                 <div className="flex items-center gap-3">
                   <div className="flex items-center gap-1.5">
                     <span className="w-2.5 h-2.5 rounded-full bg-[#FE2C55]" />

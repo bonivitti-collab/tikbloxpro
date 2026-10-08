@@ -153,7 +153,7 @@ export const RadarHero: React.FC<RadarHeroProps> = React.memo(({
     }
   };
   return (
-    <section className="relative overflow-hidden border-b border-white/10 bg-[#010101] px-4 py-8 sm:py-12 sm:px-6 lg:px-8">
+    <section className="relative overflow-hidden border-b border-white/10 bg-[#1A1D27] px-4 py-8 sm:py-12 sm:px-6 lg:px-8">
       {/* TikTok Dual Ambient Glow: Cyan on top-left, Pink on top-right */}
       <div className="absolute top-0 left-1/4 -translate-y-1/2 -translate-x-1/2 w-[550px] h-[350px] bg-[#25F4EE]/10 rounded-full blur-[110px] pointer-events-none" />
       <div className="absolute top-0 right-1/4 -translate-y-1/2 translate-x-1/2 w-[550px] h-[350px] bg-[#FE2C55]/12 rounded-full blur-[110px] pointer-events-none" />
@@ -226,7 +226,7 @@ export const RadarHero: React.FC<RadarHeroProps> = React.memo(({
         </div>
 
         {/* Action & Filter Console */}
-        <div className="rounded-2xl border border-white/10 bg-[#12131A]/90 backdrop-blur-xl p-3.5 sm:p-5 shadow-2xl">
+        <div className="rounded-2xl border border-white/10 bg-[#2A3042]/90 backdrop-blur-xl p-3.5 sm:p-5 shadow-2xl">
           <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2.5 sm:gap-3">
             
             {/* Search Input Container with Dropdown */}
@@ -257,7 +257,7 @@ export const RadarHero: React.FC<RadarHeroProps> = React.memo(({
                     setIsDropdownOpen(false);
                   }
                 }}
-                className="w-full rounded-xl border border-white/10 bg-[#0B0C10] py-3 md:py-2.5 pl-10 pr-24 text-xs sm:text-sm text-white placeholder-[#757788] focus:border-[#25F4EE] focus:outline-none focus:ring-1 focus:ring-[#FE2C55]/50 transition"
+                className="w-full rounded-xl border border-white/10 bg-[#262B3A] py-3 md:py-2.5 pl-10 pr-24 text-xs sm:text-sm text-white placeholder-[#757788] focus:border-[#25F4EE] focus:outline-none focus:ring-1 focus:ring-[#FE2C55]/50 transition"
               />
               <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
                 {isDebouncing && (
@@ -310,7 +310,7 @@ export const RadarHero: React.FC<RadarHeroProps> = React.memo(({
                   value={selectedOrigin}
                   onChange={(e) => setSelectedOrigin(e.target.value)}
                   aria-label="Filtrar por país ou plataforma de origem"
-                  className="w-full md:w-auto rounded-xl border border-white/10 bg-[#0B0C10] px-3.5 py-3 md:py-2.5 text-xs text-white focus:border-[#25F4EE] focus:outline-none focus:ring-1 focus:ring-[#25F4EE] cursor-pointer"
+                  className="w-full md:w-auto rounded-xl border border-white/10 bg-[#262B3A] px-3.5 py-3 md:py-2.5 text-xs text-white focus:border-[#25F4EE] focus:outline-none focus:ring-1 focus:ring-[#25F4EE] cursor-pointer"
                 >
                   <option value="all">{t('hero_all_origins')}</option>
                   <option value="US">{t('hero_origin_us')}</option>
@@ -343,7 +343,7 @@ export const RadarHero: React.FC<RadarHeroProps> = React.memo(({
               <button
                 type="button"
                 onClick={() => handleScroll('left')}
-                className="hidden sm:flex absolute -left-2 z-10 w-7 h-7 rounded-full bg-[#12131A] border border-white/20 items-center justify-center text-white shadow-xl hover:bg-[#25F4EE] hover:text-black transition cursor-pointer"
+                className="hidden sm:flex absolute -left-2 z-10 w-7 h-7 rounded-full bg-[#2A3042] border border-white/20 items-center justify-center text-white shadow-xl hover:bg-[#25F4EE] hover:text-black transition cursor-pointer"
                 title="Rolar para esquerda"
               >
                 <ChevronLeft className="w-4 h-4" />
@@ -381,7 +381,7 @@ export const RadarHero: React.FC<RadarHeroProps> = React.memo(({
               <button
                 type="button"
                 onClick={() => handleScroll('right')}
-                className="hidden sm:flex absolute -right-2 z-10 w-7 h-7 rounded-full bg-[#12131A] border border-white/20 items-center justify-center text-white shadow-xl hover:bg-[#25F4EE] hover:text-black transition cursor-pointer"
+                className="hidden sm:flex absolute -right-2 z-10 w-7 h-7 rounded-full bg-[#2A3042] border border-white/20 items-center justify-center text-white shadow-xl hover:bg-[#25F4EE] hover:text-black transition cursor-pointer"
                 title="Rolar para direita"
               >
                 <ChevronRight className="w-4 h-4" />

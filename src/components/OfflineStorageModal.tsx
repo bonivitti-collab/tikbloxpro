@@ -200,7 +200,7 @@ export const OfflineStorageModal: React.FC<OfflineStorageModalProps> = ({
 
         {/* Key Metrics Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4">
-          <div className="p-3 rounded-xl border border-white/10 bg-[#121420]">
+          <div className="p-3 rounded-xl border border-white/10 bg-[#2A3042]">
             <div className="flex items-center justify-between text-[#FE2C55] mb-1">
               <Bookmark className="w-4 h-4" />
               <span className="text-[10px] font-mono uppercase text-[#757788]">Salvos</span>
@@ -211,7 +211,7 @@ export const OfflineStorageModal: React.FC<OfflineStorageModalProps> = ({
             <div className="text-[10px] text-[#A6A7B2]">Produtos favoritados</div>
           </div>
 
-          <div className="p-3 rounded-xl border border-white/10 bg-[#121420]">
+          <div className="p-3 rounded-xl border border-white/10 bg-[#2A3042]">
             <div className="flex items-center justify-between text-[#25F4EE] mb-1">
               <TrendingUp className="w-4 h-4" />
               <span className="text-[10px] font-mono uppercase text-[#757788]">Histórico</span>
@@ -222,7 +222,7 @@ export const OfflineStorageModal: React.FC<OfflineStorageModalProps> = ({
             <div className="text-[10px] text-[#A6A7B2]">Tendências arquivadas</div>
           </div>
 
-          <div className="p-3 rounded-xl border border-white/10 bg-[#121420]">
+          <div className="p-3 rounded-xl border border-white/10 bg-[#2A3042]">
             <div className="flex items-center justify-between text-amber-400 mb-1">
               <History className="w-4 h-4" />
               <span className="text-[10px] font-mono uppercase text-[#757788]">Varreduras</span>
@@ -233,7 +233,7 @@ export const OfflineStorageModal: React.FC<OfflineStorageModalProps> = ({
             <div className="text-[10px] text-[#A6A7B2]">Scans registrados</div>
           </div>
 
-          <div className="p-3 rounded-xl border border-white/10 bg-[#121420]">
+          <div className="p-3 rounded-xl border border-white/10 bg-[#2A3042]">
             <div className="flex items-center justify-between text-purple-400 mb-1">
               <HardDrive className="w-4 h-4" />
               <span className="text-[10px] font-mono uppercase text-[#757788]">Espaço</span>

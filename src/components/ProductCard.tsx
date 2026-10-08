@@ -132,7 +132,7 @@ export const ProductCard: React.FC<ProductCardProps> = React.memo(({
       id={`product-card-${product.id}`}
       whileHover={{ y: -4, scale: 1.015 }}
       transition={{ type: 'spring', stiffness: 380, damping: 25 }}
-      className="group relative flex flex-col justify-between rounded-2xl border border-white/10 bg-[#12131A] p-4 sm:p-5 backdrop-blur-sm transition-colors duration-200 hover:border-transparent hover:tiktok-chromatic-card-hover"
+      className="group relative flex flex-col justify-between rounded-2xl border border-white/10 bg-[#2A3042] p-4 sm:p-5 backdrop-blur-sm transition-colors duration-200 hover:border-transparent hover:tiktok-chromatic-card-hover"
     >
       <div>
         {/* Top Header: Wave Badge, Score & Bookmark */}
@@ -194,7 +194,7 @@ export const ProductCard: React.FC<ProductCardProps> = React.memo(({
         </div>
 
         {/* Financial Arbitrage Box (Cost USD vs Price BRL & Margin) */}
-        <div className="rounded-xl border border-white/10 bg-[#0B0C10] p-3 mb-3.5">
+        <div className="rounded-xl border border-white/10 bg-[#262B3A] p-3 mb-3.5">
           <div className="grid grid-cols-3 gap-2 text-center">
             <div>
               <span className="block text-[10px] text-[#A6A7B2] uppercase font-semibold">

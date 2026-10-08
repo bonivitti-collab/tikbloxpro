@@ -328,7 +328,7 @@ export const ProfitCalculatorModal: React.FC<ProfitCalculatorModalProps> = ({
           </button>
           <button
             onClick={onClose}
-            className="rounded-xl bg-[#25F4EE] hover:bg-[#4BF6F1] px-5 py-2 text-xs font-bold text-[#05060A] transition cursor-pointer"
+            className="rounded-xl bg-[#25F4EE] hover:bg-[#4BF6F1] px-5 py-2 text-xs font-bold text-[#141722] transition cursor-pointer"
           >
             {language === 'en' ? 'Close Simulator' : 'Concluir Simulação'}
           </button>

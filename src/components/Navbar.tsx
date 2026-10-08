@@ -80,7 +80,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   }, []);
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-white/10 bg-[#010101]/95 backdrop-blur-2xl">
+    <header className="sticky top-0 z-40 w-full border-b border-white/10 bg-[#1A1D27]/95 backdrop-blur-2xl">
       {/* Subtle top edge chromatic glow line */}
       <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-[#25F4EE]/60 to-[#FE2C55]/60" />
 
@@ -99,7 +99,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
 
           {/* Center Navigation Tabs (Desktop) */}
-          <nav className="hidden md:flex items-center gap-1 rounded-xl bg-[#12131A] p-1 border border-white/10 text-xs shadow-inner shrink-0 relative">
+          <nav className="hidden md:flex items-center gap-1 rounded-xl bg-[#2A3042] p-1 border border-white/10 text-xs shadow-inner shrink-0 relative">
             <button
               id="nav-tab-all"
               onClick={() => setActiveTab('all')}
@@ -245,7 +245,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 className={`hidden md:flex relative items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-bold shadow-sm transition-all active:scale-95 cursor-pointer whitespace-nowrap shrink-0 ${
                   isPushActive
                     ? 'border-emerald-500/40 bg-emerald-950/25 text-emerald-300 hover:border-emerald-400 hover:bg-emerald-900/30'
-                    : 'border-white/10 bg-[#121420] text-[#8E91A6] hover:border-[#FE2C55]/40 hover:text-white'
+                    : 'border-white/10 bg-[#2A3042] text-[#8E91A6] hover:border-[#FE2C55]/40 hover:text-white'
                 }`}
                 title="Configurar Notificações Push do Radar PWA"
               >
@@ -274,7 +274,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 id="nav-onboarding-tour-btn"
                 onClick={onOpenOnboardingTour}
-                className="hidden md:flex items-center gap-1.5 rounded-xl border border-white/10 bg-[#121420] hover:border-[#25F4EE]/50 hover:bg-[#161826] px-3 py-1.5 text-xs font-bold text-[#C5C6D0] hover:text-[#25F4EE] shadow-sm transition-all active:scale-95 cursor-pointer whitespace-nowrap shrink-0"
+                className="hidden md:flex items-center gap-1.5 rounded-xl border border-white/10 bg-[#2A3042] hover:border-[#25F4EE]/50 hover:bg-[#161826] px-3 py-1.5 text-xs font-bold text-[#C5C6D0] hover:text-[#25F4EE] shadow-sm transition-all active:scale-95 cursor-pointer whitespace-nowrap shrink-0"
                 title={language === 'en' ? 'Start Guided Tour (Radar, Bookmarks & Margin)' : 'Iniciar Tour Guiado (Radar, Salvos & Margem)'}
               >
                 <Sparkles className="w-3.5 h-3.5 text-[#25F4EE] shrink-0" />
@@ -306,7 +306,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 className={`flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-bold transition-all active:scale-95 cursor-pointer whitespace-nowrap shrink-0 ${
                   showDesktopTools
                     ? 'border-[#25F4EE] bg-[#1a1d2e] text-white shadow-[0_0_12px_rgba(37,244,238,0.25)]'
-                    : 'border-white/10 bg-[#121420] text-[#8E91A6] hover:border-white/20 hover:text-white'
+                    : 'border-white/10 bg-[#2A3042] text-[#8E91A6] hover:border-white/20 hover:text-white'
                 }`}
                 title="Recursos, Código Fonte e Logos"
               >
@@ -529,7 +529,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               id="mobile-menu-toggle-btn"
               onClick={() => setShowMobileToolsMenu(!showMobileToolsMenu)}
-              className="flex md:hidden items-center justify-center p-1.5 rounded-xl border border-white/10 bg-[#121420] text-[#8E91A6] hover:text-white hover:border-white/25 active:scale-95 cursor-pointer shrink-0"
+              className="flex md:hidden items-center justify-center p-1.5 rounded-xl border border-white/10 bg-[#2A3042] text-[#8E91A6] hover:text-white hover:border-white/25 active:scale-95 cursor-pointer shrink-0"
               title="Mais opções e downloads"
               aria-label="Mais opções"
             >
@@ -547,7 +547,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               className={`flex-1 px-3 py-1.5 rounded-lg font-bold cursor-pointer ${
                 activeTab === 'all' || activeTab === 'early_wave' || activeTab === 'high_margin'
                   ? 'bg-[#FE2C55] text-white'
-                  : 'text-[#A6A7B2] bg-[#12131A] border border-white/5'
+                  : 'text-[#A6A7B2] bg-[#2A3042] border border-white/5'
               }`}
             >
               Radar
@@ -557,7 +557,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               className={`flex-1 px-3 py-1.5 rounded-lg font-bold cursor-pointer inline-flex items-center justify-center gap-1 ${
                 activeTab === 'saved'
                   ? 'bg-[#FE2C55] text-white'
-                  : 'text-[#A6A7B2] bg-[#12131A] border border-white/5'
+                  : 'text-[#A6A7B2] bg-[#2A3042] border border-white/5'
               }`}
             >
               <span>{t('nav_saved')}</span>
@@ -572,8 +572,8 @@ export const Navbar: React.FC<NavbarProps> = ({
               }}
               className={`flex-1 px-3 py-1.5 rounded-lg font-bold cursor-pointer ${
                 activeTab === 'calculator'
-                  ? 'bg-[#25F4EE] text-[#05060A]'
-                  : 'text-[#A6A7B2] bg-[#12131A] border border-white/5'
+                  ? 'bg-[#25F4EE] text-[#141722]'
+                  : 'text-[#A6A7B2] bg-[#2A3042] border border-white/5'
               }`}
             >
               {t('nav_calculator')}
@@ -583,19 +583,19 @@ export const Navbar: React.FC<NavbarProps> = ({
             <div className="flex items-center gap-1.5 pb-2 text-[11px]">
               <button
                 onClick={() => setActiveTab('all')}
-                className={`px-3 py-1.5 rounded-lg font-bold cursor-pointer ${activeTab === 'all' ? 'bg-white text-[#05060A]' : 'text-[#A6A7B2] border border-white/10'}`}
+                className={`px-3 py-1.5 rounded-lg font-bold cursor-pointer ${activeTab === 'all' ? 'bg-white text-[#141722]' : 'text-[#A6A7B2] border border-white/10'}`}
               >
                 {t('nav_all')}
               </button>
               <button
                 onClick={() => setActiveTab('early_wave')}
-                className={`px-3 py-1.5 rounded-lg font-bold cursor-pointer ${activeTab === 'early_wave' ? 'bg-[#25F4EE] text-[#05060A]' : 'text-[#A6A7B2] border border-white/10'}`}
+                className={`px-3 py-1.5 rounded-lg font-bold cursor-pointer ${activeTab === 'early_wave' ? 'bg-[#25F4EE] text-[#141722]' : 'text-[#A6A7B2] border border-white/10'}`}
               >
                 {t('nav_early_wave')}
               </button>
               <button
                 onClick={() => setActiveTab('high_margin')}
-                className={`px-3 py-1.5 rounded-lg font-bold cursor-pointer ${activeTab === 'high_margin' ? 'bg-[#25F4EE] text-[#05060A]' : 'text-[#A6A7B2] border border-white/10'}`}
+                className={`px-3 py-1.5 rounded-lg font-bold cursor-pointer ${activeTab === 'high_margin' ? 'bg-[#25F4EE] text-[#141722]' : 'text-[#A6A7B2] border border-white/10'}`}
               >
                 {t('nav_high_margin')}
               </button>
@@ -605,7 +605,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         {/* Mobile Tools Dropdown Panel */}
         {showMobileToolsMenu && (
-          <div className="md:hidden border-t border-white/10 bg-[#0C0E16] p-3 animate-in fade-in slide-in-from-top-2 duration-200">
+          <div className="md:hidden border-t border-white/10 bg-[#242938] p-3 animate-in fade-in slide-in-from-top-2 duration-200">
             <div className="grid grid-cols-2 gap-2 text-xs">
 
               {onOpenOnboardingTour && (
