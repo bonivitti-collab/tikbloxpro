@@ -88,7 +88,7 @@ export function getActiveFreeEngine(): {
       label: 'Google Gemini Free Tier (Google AI Studio)',
       cost: 'R$ 0,00 Permanente (15 RPM)',
       cardRequired: false,
-      model: 'gemini-2.5-flash',
+      model: 'gemini-3.8-flash',
     };
   }
   return {
@@ -441,7 +441,7 @@ Retorne EXCLUSIVAMENTE o array JSON sem delimitadores markdown adicionais.`;
     // Option B: Google Gemini Free Tier (gemini-2.5-flash)
     if (!rawText && hasGemini) {
       const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
+        model: 'gemini-3.8-flash',
         contents: prompt,
         config: {
           tools: [{ googleSearch: {} }],
@@ -616,7 +616,7 @@ Responda SOMENTE com o JSON válido.`;
     // Option B: Google Gemini Free Tier (gemini-2.5-flash)
     if (!cleanJson && hasGemini) {
       const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
+        model: 'gemini-3.8-flash',
         contents: prompt,
         config: {
           tools: [{ googleSearch: {} }],
@@ -1094,7 +1094,7 @@ Fale de forma objetiva, direta e focada em resultados. Se pedirem ideias de prod
         }));
 
         const response = await ai.models.generateContent({
-          model: 'gemini-2.5-flash',
+          model: 'gemini-3.8-flash',
           contents,
           config: { systemInstruction }
         });
