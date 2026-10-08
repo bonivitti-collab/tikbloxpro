@@ -11,10 +11,7 @@ interface RadarHeroProps {
   setSelectedNiche: (niche: ProductNiche) => void;
   selectedOrigin: string;
   setSelectedOrigin: (origin: string) => void;
-  searchQuery: string;
-  setSearchQuery: (query: string) => void;
-  onTriggerScan: () => void;
-  isScanning: boolean;
+  onOpenCopilot: () => void;
   totalProductsCount: number;
   onOpenTour?: () => void;
 }
@@ -38,10 +35,7 @@ export const RadarHero: React.FC<RadarHeroProps> = React.memo(({
   setSelectedNiche,
   selectedOrigin,
   setSelectedOrigin,
-  searchQuery,
-  setSearchQuery,
-  onTriggerScan,
-  isScanning,
+  onOpenCopilot,
   totalProductsCount,
   onOpenTour,
 }) => {
@@ -66,24 +60,6 @@ export const RadarHero: React.FC<RadarHeroProps> = React.memo(({
 
   const searchContainerRef = useRef<HTMLDivElement>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
-  // High-performance debounced search hook
-  const {
-    searchTerm,
-    setSearchTerm,
-    isDebouncing,
-    clearSearch,
-    flush,
-  } = useDebouncedSearch({
-    initialValue: searchQuery,
-    delay: 280,
-    onDebounce: (debouncedVal: string) => {
-      setSearchQuery(debouncedVal);
-      if (debouncedVal.trim().length >= 3) {
-        saveRecentSearch(debouncedVal);
-      }
-    },
-  });
 
   // Handle clicking outside to close dropdown
   useEffect(() => {
@@ -195,113 +171,46 @@ export const RadarHero: React.FC<RadarHeroProps> = React.memo(({
 
         {/* Action & Filter Console */}
         <div className="rounded-2xl border border-white/10 bg-[#2A3042]/90 backdrop-blur-xl p-3.5 sm:p-5 shadow-2xl">
-          <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2.5 sm:gap-3">
+          <div className="flex flex-col md:flex-row items-stretch md:items-center gap-3">
             
-            {/* Search Input Container with Dropdown */}
-            <div ref={searchContainerRef} className="relative flex-1">
-              <Search
-                className={`absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 transition-colors ${
-                  isDebouncing ? 'text-[#25F4EE] animate-pulse' : 'text-[#A6A7B2]'
-                }`}
-              />
-              <input
-                id="search-products-input"
-                type="text"
-                placeholder={t('hero_search_placeholder')}
-                value={searchTerm}
-                onFocus={() => setIsDropdownOpen(true)}
-                onChange={(e) => {
-                  setSearchTerm(e.target.value);
-                  setIsDropdownOpen(true);
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    flush();
-                    if (searchTerm.trim().length >= 2) {
-                      saveRecentSearch(searchTerm);
-                    }
-                    setIsDropdownOpen(false);
-                  } else if (e.key === 'Escape') {
-                    setIsDropdownOpen(false);
-                  }
-                }}
-                className="w-full rounded-xl border border-white/10 bg-[#262B3A] py-3 md:py-2.5 pl-10 pr-24 text-xs sm:text-sm text-white placeholder-[#757788] focus:border-[#25F4EE] focus:outline-none focus:ring-1 focus:ring-[#FE2C55]/50 transition"
-              />
-              <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
-                {isDebouncing && (
-                  <span className="hidden sm:inline-block text-[10px] font-mono text-[#25F4EE] bg-[#25F4EE]/10 px-1.5 py-0.5 rounded border border-[#25F4EE]/30 animate-pulse">
-                    filtrando...
+            {/* Copilot AI Button (Replaces old Search Bar) */}
+            <button
+              onClick={onOpenCopilot}
+              className="flex-1 flex items-center justify-between gap-3 rounded-xl bg-[#262B3A] border border-[#25F4EE]/30 px-4 py-3 md:py-2.5 text-left text-sm text-white hover:border-[#25F4EE] hover:bg-[#2A3042] transition cursor-pointer group shadow-[0_0_15px_rgba(37,244,238,0.1)] hover:shadow-[0_0_20px_rgba(37,244,238,0.2)]"
+            >
+              <div className="flex items-center gap-3">
+                <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-[#25F4EE]/20 to-[#FE2C55]/20 text-[#25F4EE] group-hover:scale-110 transition-transform">
+                  <Sparkles className="w-4 h-4" />
+                </div>
+                <div>
+                  <span className="font-semibold block text-white group-hover:text-[#25F4EE] transition-colors">
+                    Consultar IA Especialista
                   </span>
-                )}
-                {searchTerm ? (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      clearSearch();
-                      setIsDropdownOpen(true);
-                    }}
-                    className="text-xs font-semibold text-[#A6A7B2] hover:text-white px-1.5 py-0.5 rounded bg-white/5 hover:bg-white/10 transition cursor-pointer"
-                    title="Limpar busca"
-                  >
-                    Limpar
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => setIsDropdownOpen((prev) => !prev)}
-                    className={`p-1.5 rounded-lg transition cursor-pointer ${
-                      isDropdownOpen
-                        ? 'text-[#25F4EE] bg-[#25F4EE]/15 border border-[#25F4EE]/30'
-                        : 'text-[#757788] hover:text-[#25F4EE] hover:bg-white/5'
-                    }`}
-                    title={t('recent_searches_title')}
-                  >
-                    <Clock className="w-3.5 h-3.5" />
-                  </button>
-                )}
+                  <span className="text-[11px] text-[#A6A7B2]">
+                    Peça ideias de produtos, análise de margens e estratégias
+                  </span>
+                </div>
               </div>
-
-              {/* Recent Searches Dropdown */}
-              <RecentSearchesDropdown
-                isOpen={isDropdownOpen}
-                onClose={() => setIsDropdownOpen(false)}
-                currentQuery={searchTerm}
-                onSelectQuery={handleSelectRecentQuery}
-              />
-            </div>
-
-            {/* Controls Row: Origin selector + Full-Width Button on Mobile, Inline on Desktop */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:flex items-center gap-2">
-              <div className="relative w-full md:w-auto">
-                <select
-                  id="origin-country-select"
-                  value={selectedOrigin}
-                  onChange={(e) => setSelectedOrigin(e.target.value)}
-                  aria-label="Filtrar por país ou plataforma de origem"
-                  className="w-full md:w-auto rounded-xl border border-white/10 bg-[#262B3A] px-3.5 py-3 md:py-2.5 text-xs text-white focus:border-[#25F4EE] focus:outline-none focus:ring-1 focus:ring-[#25F4EE] cursor-pointer"
-                >
-                  <option value="all">{t('hero_all_origins')}</option>
-                  <option value="US">{t('hero_origin_us')}</option>
-                  <option value="CN">{t('hero_origin_cn')}</option>
-                </select>
+              <div className="hidden sm:flex items-center justify-center px-2 py-1 rounded bg-white/5 text-[10px] font-mono text-[#A6A7B2] border border-white/10">
+                Novo ✨
               </div>
+            </button>
 
-              {/* Big Scan Button - Highly prominent, full width on mobile, sleek on desktop */}
-              <button
-                id="hero-trigger-scan-btn"
-                onClick={onTriggerScan}
-                disabled={isScanning}
-                className={`w-full md:w-auto flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#FE2C55] via-[#FF0050] to-[#FF3B5C] px-5 py-3 md:py-2.5 text-xs sm:text-sm font-black text-white shadow-lg shadow-[#FE2C55]/30 hover:shadow-[#FE2C55]/50 hover:brightness-110 active:scale-[0.98] transition-all cursor-pointer ${
-                  isScanning ? 'opacity-60 cursor-not-allowed' : ''
-                }`}
+            {/* Origin Selector */}
+            <div className="relative w-full md:w-[220px]">
+              <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#A6A7B2]" />
+              <select
+                id="origin-country-select"
+                value={selectedOrigin}
+                onChange={(e) => setSelectedOrigin(e.target.value)}
+                aria-label="Filtrar por país ou plataforma de origem"
+                className="w-full rounded-xl border border-white/10 bg-[#262B3A] pl-9 pr-3.5 py-3 md:py-2.5 text-sm font-medium text-white focus:border-[#FE2C55] focus:outline-none focus:ring-1 focus:ring-[#FE2C55] cursor-pointer appearance-none"
               >
-                <Sparkles className={`w-4 h-4 shrink-0 ${isScanning ? 'animate-spin' : ''}`} />
-                <span className="whitespace-nowrap font-black tracking-wide">
-                  {isScanning ? t('nav_scanning') : t('hero_scan_ai')}
-                </span>
-              </button>
+                <option value="all">{t('hero_all_origins')}</option>
+                <option value="US">{t('hero_origin_us')}</option>
+                <option value="CN">{t('hero_origin_cn')}</option>
+              </select>
             </div>
-
           </div>
 
           {/* Niches Carousel / Pills with Scroll Controls */}

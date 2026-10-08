@@ -44,6 +44,9 @@ const OnboardingModal = React.lazy(() =>
 const WifeBotConfigModal = React.lazy(() =>
   import('./components/WifeBotConfigModal').then((m) => ({ default: m.WifeBotConfigModal }))
 );
+const AICopilotModal = React.lazy(() =>
+  import('./components/AICopilotModal').then((m) => ({ default: m.AICopilotModal }))
+);
 
 const ONBOARDING_STORAGE_KEY = 'tikblox_onboarding_completed_v1';
 import { TrendingProduct, ProductNiche, AppUpdateInfo, ProductPriceCheck, PriceMonitorSummary } from './types';
@@ -124,6 +127,7 @@ export default function App() {
   // Onboarding Welcome Tour state
   const [showOnboardingModal, setShowOnboardingModal] = useState(false);
   const [showWifeBotModal, setShowWifeBotModal] = useState(false);
+  const [showAICopilotModal, setShowAICopilotModal] = useState(false);
 
   // Auto-launch onboarding tour on first visit
   useEffect(() => {
@@ -575,10 +579,7 @@ export default function App() {
               setSelectedNiche={handleSetSelectedNiche}
               selectedOrigin={selectedOrigin}
               setSelectedOrigin={handleSetSelectedOrigin}
-              searchQuery={searchQuery}
-              setSearchQuery={handleSetSearchQuery}
-              onTriggerScan={handleTriggerScan}
-              isScanning={isScanning}
+              onOpenCopilot={() => setShowAICopilotModal(true)}
               totalProductsCount={products.length}
               onOpenTour={() => setShowOnboardingModal(true)}
             />
@@ -933,6 +934,11 @@ export default function App() {
           isOpen={showWifeBotModal}
           onClose={() => setShowWifeBotModal(false)}
           products={products}
+        />
+        {/* Copilot AI Modal */}
+        <AICopilotModal
+          isOpen={showAICopilotModal}
+          onClose={() => setShowAICopilotModal(false)}
         />
       </Suspense>
 

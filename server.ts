@@ -1074,6 +1074,47 @@ Responda à pergunta da Duda de forma objetiva, acolhedora, especialista em arbi
   }
 });
 
+app.post('/api/chat', async (req: Request, res: Response) => {
+  try {
+    const { messages } = req.body;
+    if (!messages || !Array.isArray(messages)) {
+      return res.status(400).json({ error: 'Messages array is required' });
+    }
+
+    if (process.env.GEMINI_API_KEY) {
+      try {
+        const systemInstruction = `Você é o Copiloto Estratégico IA do TikBlox Pro, especializado em Dropshipping Internacional, TikTok Ads, e eCommerce no Brasil. 
+Sua missão é ajudar os usuários a encontrar nichos lucrativos, dar ideias de tráfego orgânico, sugerir margens e preços ideais, e tirar dúvidas de mercado.
+Fale de forma objetiva, direta e focada em resultados. Se pedirem ideias de produtos, sugira 3 com margens de lucro estimadas e ganchos (hooks) de vendas. Use Markdown para formatar.`;
+        
+        const history = messages.slice(0, -1).map((m: any) => ({
+          role: m.role === 'assistant' ? 'model' : 'user',
+          parts: [{ text: m.content }]
+        }));
+        
+        const lastMessage = messages[messages.length - 1].content;
+
+        const chat = model.startChat({
+          history,
+          systemInstruction,
+        });
+
+        const result = await chat.sendMessage(lastMessage);
+        const replyText = result.response.text();
+        return res.json({ reply: replyText });
+      } catch (err) {
+        console.error('Error in /api/chat with Gemini:', err);
+        return res.status(500).json({ reply: 'Desculpe, ocorreu um erro ao consultar a IA. Tente novamente mais tarde.' });
+      }
+    } else {
+      return res.json({ reply: 'Desculpe, a chave do Gemini API não está configurada no backend. A funcionalidade Copiloto está indisponível.' });
+    }
+  } catch (error: any) {
+    console.error('Error in /api/chat:', error);
+    return res.status(500).json({ reply: 'Erro interno no servidor de Chat.' });
+  }
+});
+
 // Vite middleware setup
 async function startServer() {
   const publicPath = path.join(process.cwd(), 'public');
