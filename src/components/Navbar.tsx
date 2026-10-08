@@ -539,106 +539,83 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
         </div>
 
-        {/* Mobile Navigation Segmented Tabs */}
-        <div className="flex md:hidden items-center gap-1.5 overflow-x-auto py-2 subtle-horizontal-scroll border-t border-white/10 text-xs touch-pan-x relative">
-          <button
-            onClick={() => setActiveTab('all')}
-            className={`relative px-3 py-1.5 rounded-lg shrink-0 font-bold transition-colors cursor-pointer whitespace-nowrap ${
-              activeTab === 'all'
-                ? 'text-white'
-                : 'text-[#A6A7B2] bg-[#12131A] border border-white/5'
-            }`}
-          >
-            {activeTab === 'all' && (
-              <motion.div
-                layoutId="mobile-navbar-active-pill"
-                className="absolute inset-0 rounded-lg bg-[#FE2C55] shadow-md shadow-[#FE2C55]/30"
-                transition={{ type: 'spring', stiffness: 450, damping: 35 }}
-              />
-            )}
-            <span className="relative z-10">{t('nav_all')}</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('early_wave')}
-            className={`relative px-3 py-1.5 rounded-lg shrink-0 font-bold transition-colors cursor-pointer whitespace-nowrap ${
-              activeTab === 'early_wave'
-                ? 'text-emerald-300'
-                : 'text-[#A6A7B2] bg-[#12131A] border border-white/5'
-            }`}
-          >
-            {activeTab === 'early_wave' && (
-              <motion.div
-                layoutId="mobile-navbar-active-pill"
-                className="absolute inset-0 rounded-lg bg-emerald-500/20 border border-emerald-500/40 shadow-sm"
-                transition={{ type: 'spring', stiffness: 450, damping: 35 }}
-              />
-            )}
-            <span className="relative z-10">{t('nav_early_wave')}</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('high_margin')}
-            className={`relative px-3 py-1.5 rounded-lg shrink-0 font-bold transition-colors cursor-pointer whitespace-nowrap ${
-              activeTab === 'high_margin'
-                ? 'text-amber-300'
-                : 'text-[#A6A7B2] bg-[#12131A] border border-white/5'
-            }`}
-          >
-            {activeTab === 'high_margin' && (
-              <motion.div
-                layoutId="mobile-navbar-active-pill"
-                className="absolute inset-0 rounded-lg bg-amber-500/20 border border-amber-500/40 shadow-sm"
-                transition={{ type: 'spring', stiffness: 450, damping: 35 }}
-              />
-            )}
-            <span className="relative z-10">{t('nav_high_margin')}</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('calculator')}
-            className={`relative px-3 py-1.5 rounded-lg shrink-0 font-bold transition-colors cursor-pointer whitespace-nowrap ${
-              activeTab === 'calculator'
-                ? 'text-[#25F4EE]'
-                : 'text-[#A6A7B2] bg-[#12131A] border border-white/5'
-            }`}
-          >
-            {activeTab === 'calculator' && (
-              <motion.div
-                layoutId="mobile-navbar-active-pill"
-                className="absolute inset-0 rounded-lg bg-[#25F4EE]/20 border border-[#25F4EE]/40 shadow-sm"
-                transition={{ type: 'spring', stiffness: 450, damping: 35 }}
-              />
-            )}
-            <span className="relative z-10">{t('nav_calculator')}</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('saved')}
-            className={`relative px-3 py-1.5 rounded-lg shrink-0 font-bold transition-colors cursor-pointer flex items-center gap-1 whitespace-nowrap ${
-              activeTab === 'saved'
-                ? 'text-[#FE2C55]'
-                : 'text-[#A6A7B2] bg-[#12131A] border border-white/5'
-            }`}
-          >
-            {activeTab === 'saved' && (
-              <motion.div
-                layoutId="mobile-navbar-active-pill"
-                className="absolute inset-0 rounded-lg bg-[#FE2C55]/20 border border-[#FE2C55]/40 shadow-sm"
-                transition={{ type: 'spring', stiffness: 450, damping: 35 }}
-              />
-            )}
-            <span className="relative z-10 flex items-center gap-1">
+        {/* Mobile menus: one parent, only its actions */}
+        <div className="md:hidden border-t border-white/10">
+          <div className="flex items-center gap-1.5 py-2 text-xs">
+            <button
+              onClick={() => setActiveTab(activeTab === 'early_wave' || activeTab === 'high_margin' ? activeTab : 'all')}
+              className={`flex-1 px-3 py-1.5 rounded-lg font-bold cursor-pointer ${
+                activeTab === 'all' || activeTab === 'early_wave' || activeTab === 'high_margin'
+                  ? 'bg-[#FE2C55] text-white'
+                  : 'text-[#A6A7B2] bg-[#12131A] border border-white/5'
+              }`}
+            >
+              Radar
+            </button>
+            <button
+              onClick={() => setActiveTab('saved')}
+              className={`flex-1 px-3 py-1.5 rounded-lg font-bold cursor-pointer inline-flex items-center justify-center gap-1 ${
+                activeTab === 'saved'
+                  ? 'bg-[#FE2C55] text-white'
+                  : 'text-[#A6A7B2] bg-[#12131A] border border-white/5'
+              }`}
+            >
               <span>{t('nav_saved')}</span>
               {savedCount > 0 && (
-                <span className="rounded-full bg-[#FE2C55] px-1.5 py-0.2 text-[9px] font-extrabold text-white">
-                  {savedCount}
-                </span>
+                <span className="rounded-full bg-white/20 px-1.5 text-[9px] font-extrabold">{savedCount}</span>
               )}
-            </span>
-          </button>
+            </button>
+            <button
+              onClick={() => {
+                setShowMobileToolsMenu((open) => !open);
+              }}
+              className={`flex-1 px-3 py-1.5 rounded-lg font-bold cursor-pointer ${
+                showMobileToolsMenu || activeTab === 'calculator'
+                  ? 'bg-[#25F4EE] text-[#05060A]'
+                  : 'text-[#A6A7B2] bg-[#12131A] border border-white/5'
+              }`}
+            >
+              Mais
+            </button>
+          </div>
+          {(activeTab === 'all' || activeTab === 'early_wave' || activeTab === 'high_margin') && (
+            <div className="flex items-center gap-1.5 pb-2 text-[11px]">
+              <button
+                onClick={() => setActiveTab('all')}
+                className={`px-3 py-1.5 rounded-lg font-bold cursor-pointer ${activeTab === 'all' ? 'bg-white text-[#05060A]' : 'text-[#A6A7B2] border border-white/10'}`}
+              >
+                {t('nav_all')}
+              </button>
+              <button
+                onClick={() => setActiveTab('early_wave')}
+                className={`px-3 py-1.5 rounded-lg font-bold cursor-pointer ${activeTab === 'early_wave' ? 'bg-[#25F4EE] text-[#05060A]' : 'text-[#A6A7B2] border border-white/10'}`}
+              >
+                {t('nav_early_wave')}
+              </button>
+              <button
+                onClick={() => setActiveTab('high_margin')}
+                className={`px-3 py-1.5 rounded-lg font-bold cursor-pointer ${activeTab === 'high_margin' ? 'bg-[#25F4EE] text-[#05060A]' : 'text-[#A6A7B2] border border-white/10'}`}
+              >
+                {t('nav_high_margin')}
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Mobile Tools Dropdown Panel */}
         {showMobileToolsMenu && (
           <div className="md:hidden border-t border-white/10 bg-[#0C0E16] p-3 animate-in fade-in slide-in-from-top-2 duration-200">
             <div className="grid grid-cols-2 gap-2 text-xs">
+              <button
+                onClick={() => {
+                  setActiveTab('calculator');
+                  setShowMobileToolsMenu(false);
+                }}
+                className="col-span-2 flex items-center justify-center gap-2 p-2.5 rounded-xl border border-[#FE2C55]/40 bg-[#FE2C55]/15 text-white font-bold"
+              >
+                <span>{t('nav_calculator')}</span>
+              </button>
+
               {onOpenOnboardingTour && (
                 <button
                   onClick={() => {

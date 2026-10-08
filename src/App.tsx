@@ -684,25 +684,26 @@ export default function App() {
               exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
             >
-              {/* Trend Pulse: Real-time Early Wave Rate of Change & Niche Spike Monitor */}
-              <TrendPulseSection
-                products={products}
-                selectedNiche={selectedNiche}
-                onSelectNiche={setSelectedNiche}
-                onSelectEarlyWaveTab={() => setActiveTab('early_wave')}
-                pushSettings={pushSettings}
-                onUpdatePushSettings={updatePushSettings}
-                onOpenPushModal={() => setShowPushModal(true)}
-              />
-
-              {/* Top 3 Early Wave Niches Dashboard */}
-              <EarlyWaveDashboard
-                products={products}
-                selectedNiche={selectedNiche}
-                onSelectNiche={setSelectedNiche}
-                activeTab={activeTab}
-                onSelectEarlyWaveTab={() => setActiveTab('early_wave')}
-              />
+              {activeTab === 'early_wave' && (
+                <>
+                  <TrendPulseSection
+                    products={products}
+                    selectedNiche={selectedNiche}
+                    onSelectNiche={setSelectedNiche}
+                    onSelectEarlyWaveTab={() => setActiveTab('early_wave')}
+                    pushSettings={pushSettings}
+                    onUpdatePushSettings={updatePushSettings}
+                    onOpenPushModal={() => setShowPushModal(true)}
+                  />
+                  <EarlyWaveDashboard
+                    products={products}
+                    selectedNiche={selectedNiche}
+                    onSelectNiche={setSelectedNiche}
+                    activeTab={activeTab}
+                    onSelectEarlyWaveTab={() => setActiveTab('early_wave')}
+                  />
+                </>
+              )}
 
               {/* Section Header */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5 sm:mb-6">
