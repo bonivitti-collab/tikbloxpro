@@ -88,7 +88,7 @@ export function getActiveFreeEngine(): {
       label: 'Google Gemini Free Tier (Google AI Studio)',
       cost: 'R$ 0,00 Permanente (15 RPM)',
       cardRequired: false,
-      model: 'gemini-3.8-flash',
+      model: 'gemini-1.5-flash',
     };
   }
   return {
@@ -441,7 +441,7 @@ Retorne EXCLUSIVAMENTE o array JSON sem delimitadores markdown adicionais.`;
     // Option B: Google Gemini Free Tier (gemini-2.5-flash)
     if (!rawText && hasGemini) {
       const response = await ai.models.generateContent({
-        model: 'gemini-3.8-flash',
+        model: 'gemini-1.5-flash',
         contents: prompt,
         config: {
           tools: [{ googleSearch: {} }],
@@ -616,7 +616,7 @@ Responda SOMENTE com o JSON válido.`;
     // Option B: Google Gemini Free Tier (gemini-2.5-flash)
     if (!cleanJson && hasGemini) {
       const response = await ai.models.generateContent({
-        model: 'gemini-3.8-flash',
+        model: 'gemini-1.5-flash',
         contents: prompt,
         config: {
           tools: [{ googleSearch: {} }],
@@ -710,7 +710,7 @@ Retorne APENAS o JSON puro.`;
     // Option B: Google Gemini Free Tier (gemini-2.5-flash)
     if (!cleanJson && hasGemini) {
       const response = await ai.models.generateContent({
-        model: 'gemini-3.8-flash',
+        model: 'gemini-1.5-flash',
         contents: prompt,
       });
       cleanJson = (response.text || '').replace(/```json/gi, '').replace(/```/gi, '').trim();
@@ -794,7 +794,7 @@ app.post('/api/chat', async (req: Request, res: Response) => {
     if (!replyText && hasGemini) {
       // Setup chat session with Gemini
       const chat = ai.chats.create({
-        model: 'gemini-3.8-flash',
+        model: 'gemini-1.5-flash',
         config: {
           systemInstruction: 'Você é a IA do TikBlox, um assistente especialista em e-commerce, dropshipping, mineração de produtos virais no TikTok e arbitragem. Responda sempre em português do Brasil de forma clara, direta e objetiva, mantendo um tom profissional mas empolgante e focado em lucro/estratégia. Nunca mencione que você é um modelo do Google.',
         }
@@ -802,7 +802,7 @@ app.post('/api/chat', async (req: Request, res: Response) => {
       
       // We pass the last user message to get a response
       // For a more robust implementation we'd pass history, but for simplicity:
-      const response = await chat.sendMessage({ message: lastUserMessage });
+      const response = await chat.sendMessage(lastUserMessage);
       replyText = response.text || '';
     }
 
@@ -1176,7 +1176,7 @@ Fale de forma objetiva, direta e focada em resultados. Se pedirem ideias de prod
         }));
 
         const response = await ai.models.generateContent({
-          model: 'gemini-3.8-flash',
+          model: 'gemini-1.5-flash',
           contents,
           config: { systemInstruction }
         });
