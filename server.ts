@@ -2,7 +2,7 @@ import express, { Request, Response } from 'express';
 import path from 'path';
 import dotenv from 'dotenv';
 import { GoogleGenAI } from '@google/genai';
-import { createServer as createViteServer } from 'vite';
+// Vite import is dynamic to avoid crashing Vercel (devDependency)
 import { INITIAL_CURATED_TRENDS } from './src/data/curatedTrends.js';
 import { TrendingProduct, ProductNiche, DeepDiveAnalysis } from './src/types.js';
 import { streamProductViabilityPDF } from './src/server/pdfGenerator.js';
@@ -1119,7 +1119,8 @@ async function startServer() {
   const publicPath = path.join(process.cwd(), 'public');
   app.use(express.static(publicPath));
 
-  if (process.env.NODE_ENV !== 'production') {
+  if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
+    const { createServer: createViteServer } = await import('vite');
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: 'spa',
