@@ -567,15 +567,16 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
             <button
               onClick={() => {
-                setShowMobileToolsMenu((open) => !open);
+                setShowMobileToolsMenu(false);
+                setActiveTab('calculator');
               }}
               className={`flex-1 px-3 py-1.5 rounded-lg font-bold cursor-pointer ${
-                showMobileToolsMenu || activeTab === 'calculator'
+                activeTab === 'calculator'
                   ? 'bg-[#25F4EE] text-[#05060A]'
                   : 'text-[#A6A7B2] bg-[#12131A] border border-white/5'
               }`}
             >
-              Mais
+              {t('nav_calculator')}
             </button>
           </div>
           {(activeTab === 'all' || activeTab === 'early_wave' || activeTab === 'high_margin') && (
@@ -606,15 +607,6 @@ export const Navbar: React.FC<NavbarProps> = ({
         {showMobileToolsMenu && (
           <div className="md:hidden border-t border-white/10 bg-[#0C0E16] p-3 animate-in fade-in slide-in-from-top-2 duration-200">
             <div className="grid grid-cols-2 gap-2 text-xs">
-              <button
-                onClick={() => {
-                  setActiveTab('calculator');
-                  setShowMobileToolsMenu(false);
-                }}
-                className="col-span-2 flex items-center justify-center gap-2 p-2.5 rounded-xl border border-[#FE2C55]/40 bg-[#FE2C55]/15 text-white font-bold"
-              >
-                <span>{t('nav_calculator')}</span>
-              </button>
 
               {onOpenOnboardingTour && (
                 <button
