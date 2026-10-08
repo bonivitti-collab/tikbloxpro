@@ -12,9 +12,7 @@ import {
   Layers,
   Sparkles,
   ShoppingBag,
-  Cloud,
   Share2,
-  Globe,
   FileDown,
   Loader2,
   FileText,
@@ -645,87 +643,6 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
             </ul>
           </div>
 
-          {/* Dynamic SEO & Social Sharing Section */}
-          <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
-              <div className="flex items-center gap-2">
-                <Globe className="w-4 h-4 text-[#25F4EE]" />
-                <h4 className="text-xs font-bold text-white uppercase tracking-wider">
-                  {language === 'en' ? 'Dynamic SEO & Social Metadata (tikblox.com.br)' : 'Metadados SEO & Compartilhamento (tikblox.com.br)'}
-                </h4>
-              </div>
-              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 text-[10px] font-bold text-emerald-400">
-                <Check className="w-3 h-3 text-emerald-400" />
-                {language === 'en' ? 'OpenGraph & Schema.org Active' : 'OpenGraph & Schema.org Ativo'}
-              </span>
-            </div>
-
-            {/* Social Preview Snippet Card */}
-            <div className="rounded-lg border border-slate-800 bg-[#0B0C10] p-3 mb-3 text-xs">
-              <div className="flex items-center justify-between text-[10px] text-[#757788] mb-1 font-mono">
-                <span>tikblox.com.br/?product={product.id}</span>
-                <span className="text-[#25F4EE]">OpenGraph Product Card</span>
-              </div>
-              <p className="font-bold text-white text-xs line-clamp-1 mb-1">
-                {product.name} | {language === 'en' ? 'TIKBLOX Viral Trends Radar' : 'Radar Viral TIKBLOX'}
-              </p>
-              <p className="text-[11px] text-[#A6A7B2] line-clamp-2 leading-relaxed">
-                {language === 'en'
-                  ? `${product.name}: Viral TikTok trend. Estimated profit +${product.estimatedProfitMarginPercent}% and virality ${product.viralityScore}/100. Arbitrage validation on tikblox.com.br.`
-                  : `${product.name}: Tendência viral de produtos do exterior. Lucro estimado de R$ ${(product.estimatedPriceBRL - product.estimatedCostUSD * 5.6).toFixed(0)} (+${product.estimatedProfitMarginPercent}%) e viralidade ${product.viralityScore}/100.`}
-              </p>
-            </div>
-
-            {/* Quick Share Buttons */}
-            <div className="flex flex-wrap items-center gap-2">
-              <button
-                onClick={handleShareProduct}
-                className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 px-3 py-1.5 text-xs font-semibold text-white transition cursor-pointer"
-              >
-                {copiedLink ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5 text-[#25F4EE]" />}
-                <span>{copiedLink ? (language === 'en' ? 'Link Copied!' : 'Link Copiado!') : (language === 'en' ? 'Copy Share Link' : 'Copiar Link')}</span>
-              </button>
-
-              <a
-                href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
-                  language === 'en'
-                    ? `🔥 Viral Product on TIKBLOX: ${product.name} (Estimated Margin: +${product.estimatedProfitMarginPercent}%). Check out the deep-dive: https://tikblox.com.br/?product=${product.id}`
-                    : `🔥 Produto viral no radar TIKBLOX: ${product.name} (Margem Estimada: +${product.estimatedProfitMarginPercent}%). Confira a análise completa: https://tikblox.com.br/?product=${product.id}`
-                )}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/20 px-3 py-1.5 text-xs font-semibold text-emerald-400 transition"
-              >
-                <span>WhatsApp</span>
-                <ExternalLink className="w-3 h-3 text-emerald-400" />
-              </a>
-
-              <a
-                href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(
-                  language === 'en'
-                    ? `🔥 Viral trend alert: ${product.name} with +${product.estimatedProfitMarginPercent}% estimated profit margin on @TIKBLOX:`
-                    : `🔥 Alerta de produto viral: ${product.name} com +${product.estimatedProfitMarginPercent}% de margem estimada no @TIKBLOX:`
-                )}&url=${encodeURIComponent(`https://tikblox.com.br/?product=${product.id}`)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1.5 rounded-lg border border-sky-500/30 bg-sky-500/10 hover:bg-sky-500/20 px-3 py-1.5 text-xs font-semibold text-sky-400 transition"
-              >
-                <span>X / Twitter</span>
-                <ExternalLink className="w-3 h-3 text-sky-400" />
-              </a>
-
-              <a
-                href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(`https://tikblox.com.br/?product=${product.id}`)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1.5 rounded-lg border border-blue-500/30 bg-blue-500/10 hover:bg-blue-500/20 px-3 py-1.5 text-xs font-semibold text-blue-400 transition"
-              >
-                <span>LinkedIn</span>
-                <ExternalLink className="w-3 h-3 text-blue-400" />
-              </a>
-            </div>
-          </div>
-
           {/* Grounding web sources if any */}
           {product.groundingSources && product.groundingSources.length > 0 && (
             <div className="pt-2 border-t border-slate-800 text-xs">
@@ -759,49 +676,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
           </div>
 
           <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-            <button
-              onClick={handleExportPDF}
-              disabled={isExportingPdf}
-              className={`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 rounded-xl border px-3.5 py-2 text-xs font-semibold transition cursor-pointer disabled:opacity-50 min-w-[120px] ${
-                pdfExported
-                  ? 'border-emerald-500/40 bg-emerald-950/40 text-emerald-300'
-                  : 'border-cyan-500/40 bg-cyan-950/30 hover:bg-cyan-900/40 text-cyan-300'
-              }`}
-              title={language === 'en' ? 'Export 1-page PDF Viability Sheet' : 'Exportar Ficha de Viabilidade em PDF'}
-            >
-              {isExportingPdf ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin text-cyan-400" />
-                  <span>{language === 'en' ? 'Exporting...' : 'Gerando...'}</span>
-                </>
-              ) : pdfExported ? (
-                <>
-                  <Check className="w-4 h-4 text-emerald-400" />
-                  <span>{language === 'en' ? 'PDF Exported!' : 'PDF Baixado!'}</span>
-                </>
-              ) : (
-                <>
-                  <FileDown className="w-4 h-4 text-cyan-400" />
-                  <span>{language === 'en' ? 'Export to PDF' : 'Exportar PDF'}</span>
-                </>
-              )}
-            </button>
-
-            {onOpenWorkspaceHub && (
-              <button
-                onClick={() => {
-                  onClose();
-                  onOpenWorkspaceHub('drive');
-                }}
-                className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 rounded-xl border border-emerald-500/40 bg-emerald-950/30 hover:bg-emerald-900/40 px-3.5 py-2 text-xs font-semibold text-emerald-300 transition min-w-[120px]"
-                title="Salvar no Google Drive ou Enviar por Gmail"
-              >
-                <Cloud className="w-4 h-4 text-emerald-400" />
-                <span>Google Workspace</span>
-              </button>
-            )}
-
-            <button
+<button
               onClick={() => {
                 onClose();
                 onOpenCreativeGenerator(product);

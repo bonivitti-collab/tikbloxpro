@@ -74,13 +74,6 @@ function triggerOfflinePrintSummary(
   const grossMargin = (product.estimatedPriceBRL - product.estimatedCostUSD * 5.82).toFixed(2);
   const netProfit = (product.estimatedPriceBRL - product.estimatedCostUSD * 5.82 * 1.44 - (product.estimatedPriceBRL * 0.05 + 1) - 32).toFixed(2);
 
-  const printWindow = window.open('', '_blank');
-  if (!printWindow) {
-    // If popup blocked in iframe, print current page
-    window.print();
-    return;
-  }
-
   const html = `
     <!DOCTYPE html>
     <html lang="${language}">
@@ -185,15 +178,37 @@ function triggerOfflinePrintSummary(
         <div>Página 1 / 1</div>
       </div>
 
-      <script>
-        window.onload = function() {
-          window.print();
-        };
-      </script>
     </body>
     </html>
   `;
 
-  printWindow.document.write(html);
-  printWindow.document.close();
+  const existing = document.getElementById('tikblox-pdf-preview');
+  if (existing) existing.remove();
+
+  const overlay = document.createElement('div');
+  overlay.id = 'tikblox-pdf-preview';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:80;background:#010101;display:flex;flex-direction:column;';
+
+  const bar = document.createElement('div');
+  bar.style.cssText = 'display:flex;gap:8px;padding:12px;background:#090A10;border-bottom:1px solid rgba(255,255,255,.12);';
+
+  const back = document.createElement('button');
+  back.type = 'button';
+  back.textContent = language === 'en' ? 'Back' : 'Voltar';
+  back.style.cssText = 'flex:1;border:0;border-radius:12px;background:#161823;color:#fff;font-weight:800;padding:12px;';
+  back.onclick = () => overlay.remove();
+
+  const save = document.createElement('button');
+  save.type = 'button';
+  save.textContent = language === 'en' ? 'Save PDF' : 'Salvar PDF';
+  save.style.cssText = 'flex:1;border:0;border-radius:12px;background:#FE2C55;color:#fff;font-weight:800;padding:12px;';
+  save.onclick = () => frame.contentWindow?.print();
+
+  const frame = document.createElement('iframe');
+  frame.style.cssText = 'flex:1;width:100%;border:0;background:#fff;';
+  frame.srcdoc = html;
+
+  bar.append(back, save);
+  overlay.append(bar, frame);
+  document.body.appendChild(overlay);
 }
