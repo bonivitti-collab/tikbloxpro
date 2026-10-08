@@ -25,6 +25,17 @@ export const ProfitCalculatorModal: React.FC<ProfitCalculatorModalProps> = ({
   const [gatewayFixedBRL, setGatewayFixedBRL] = useState<number>(1.0);
   const [adSpendCpaBRL, setAdSpendCpaBRL] = useState<number>(35.0);
 
+  const clearCalculator = () => {
+    setCostUSD(0);
+    setUsdRate(5.65);
+    setShippingBRL(0);
+    setSellingPriceBRL(0);
+    setApplyRemessaConforme(true);
+    setGatewayPercent(0);
+    setGatewayFixedBRL(0);
+    setAdSpendCpaBRL(0);
+  };
+
   // Financial calculations
   const calculation = useMemo(() => {
     const rawCostBRL = costUSD * usdRate;
@@ -298,10 +309,17 @@ export const ProfitCalculatorModal: React.FC<ProfitCalculatorModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="border-t border-slate-800 bg-slate-950/80 p-4 flex justify-end">
+        <div className="border-t border-slate-800 bg-slate-950/80 p-4 flex justify-end gap-2">
+          <button
+            type="button"
+            onClick={clearCalculator}
+            className="rounded-xl border border-[#FE2C55]/50 bg-[#FE2C55]/15 px-5 py-2 text-xs font-bold text-white transition cursor-pointer"
+          >
+            {language === 'en' ? 'Clear' : 'Limpar'}
+          </button>
           <button
             onClick={onClose}
-            className="rounded-xl bg-cyan-500 hover:bg-cyan-400 px-5 py-2 text-xs font-bold text-slate-950 transition cursor-pointer"
+            className="rounded-xl bg-[#25F4EE] hover:bg-[#4BF6F1] px-5 py-2 text-xs font-bold text-[#05060A] transition cursor-pointer"
           >
             {language === 'en' ? 'Close Simulator' : 'Concluir Simulação'}
           </button>
