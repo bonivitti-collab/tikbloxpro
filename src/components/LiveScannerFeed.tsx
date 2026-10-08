@@ -9,7 +9,7 @@ interface LiveScannerFeedProps {
 }
 
 const SCAN_STEPS = [
-  '🧠 Olá! Sou a IA do Gemini. Iniciando uma análise estratégica para você...',
+  '🧠 Olá! Sou a IA do TikBlox. Iniciando uma análise estratégica para você...',
   '📡 Conectando aos nós globais de telemetria e processando tendências em tempo real...',
   '🇺🇸 Minerando feeds virais do TikTok Shop US e Amazon Movers & Shakers...',
   '🇨🇳 Varrendo lançamentos na Ásia e catálogos de fábricas parceiras...',
@@ -63,7 +63,7 @@ export const LiveScannerFeed: React.FC<LiveScannerFeedProps> = ({
             </div>
             <div>
               <h3 className="text-base font-bold text-white flex items-center gap-2">
-                <span>Inteligência Artificial Gemini</span>
+                <span>Inteligência Artificial TikBlox</span>
               </h3>
               <p className="text-xs text-cyan-400">Processamento em Tempo Real</p>
             </div>

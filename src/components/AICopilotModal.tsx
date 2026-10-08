@@ -16,7 +16,7 @@ export const AICopilotModal: React.FC<AICopilotModalProps> = ({ isOpen, onClose 
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       role: 'assistant',
-      content: 'Olá! Sou o **Copiloto Estratégico Gemini** do TikBlox Pro. Estou aqui para te ajudar a analisar métricas, encontrar nichos lucrativos e traçar estratégias de vendas. Como posso ajudar o seu negócio hoje?'
+      content: 'Olá! Sou a **IA do TikBlox**. Estou aqui para te ajudar a analisar métricas, encontrar nichos lucrativos e traçar estratégias de vendas. Como posso ajudar o seu negócio hoje?'
     }
   ]);
   const [input, setInput] = useState('');
@@ -93,7 +93,7 @@ export const AICopilotModal: React.FC<AICopilotModalProps> = ({ isOpen, onClose 
               <h2 className="text-base font-black text-white flex items-center gap-2">
                 Copiloto Estratégico IA
                 <span className="px-1.5 py-0.5 rounded-md bg-[#FE2C55]/20 text-[#FE2C55] text-[10px] uppercase font-bold tracking-wider">
-                  Gemini
+                  IA TikBlox
                 </span>
               </h2>
               <p className="text-xs text-[#A6A7B2]">Seu assistente de tendências e tráfego</p>
@@ -135,7 +135,7 @@ export const AICopilotModal: React.FC<AICopilotModalProps> = ({ isOpen, onClose 
             <div className="flex w-full justify-start">
               <div className="max-w-[85%] sm:max-w-[75%] rounded-2xl p-3.5 bg-[#1A1D27] border border-[#2A2E39] text-[#E0E1E8] rounded-tl-sm flex items-center gap-2">
                 <Loader2 className="w-4 h-4 text-[#25F4EE] animate-spin" />
-                <span className="text-xs text-[#A6A7B2]">Gemini está pensando...</span>
+                <span className="text-xs text-[#A6A7B2]">A IA está pensando...</span>
               </div>
             </div>
           )}
