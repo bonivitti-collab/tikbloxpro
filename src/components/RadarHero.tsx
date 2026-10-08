@@ -169,34 +169,25 @@ export const RadarHero: React.FC<RadarHeroProps> = React.memo(({
         
         {/* Top Badges & Live Status */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 mb-5 sm:mb-6">
-          <div className="inline-flex items-center gap-2 rounded-full bg-[#161823] border border-[#25F4EE]/30 px-3 py-1 text-[11px] sm:text-xs font-semibold text-[#25F4EE] shadow-sm max-w-full">
-            <span className="relative flex h-2 w-2 shrink-0">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FE2C55] opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#FE2C55]"></span>
-            </span>
-            <span className="leading-tight">Varredura: TikTok US + Douyin China + Amazon</span>
-          </div>
-
-          <div className="flex items-center gap-3 sm:gap-4 text-xs text-[#A6A7B2]">
-            {onOpenTour && (
-              <button
-                id="hero-onboarding-tour-btn"
-                onClick={onOpenTour}
-                className="inline-flex items-center gap-1.5 rounded-full bg-white/5 hover:bg-[#25F4EE]/15 border border-white/10 hover:border-[#25F4EE]/40 px-3 py-1 text-[11px] sm:text-xs font-bold text-[#C5C6D0] hover:text-[#25F4EE] transition cursor-pointer"
-                title={language === 'en' ? 'Start Guided Tour' : 'Iniciar Tour Guiado'}
-              >
-                <Sparkles className="w-3 h-3 text-[#25F4EE]" />
-                <span>{language === 'en' ? 'Quick Tour' : 'Guia Rápido'}</span>
-              </button>
-            )}
-            <div className="flex items-center gap-1.5">
-              <span className="text-white font-extrabold">{totalProductsCount}</span>
-              <span>{t('hero_monitored_products')}</span>
+          <div className="grid grid-cols-3 gap-2 text-[11px]">
+            <div className="col-span-3 h-10 rounded-xl border border-white/10 bg-[#2A3042] px-3 inline-flex items-center gap-2 text-[#C9C6BE]">
+              <span className="h-2 w-2 rounded-full bg-[#FE2C55] shrink-0"></span>
+              <span className="truncate">Varredura: TikTok US + Douyin China + Amazon</span>
             </div>
-            <span className="text-white/20">|</span>
-            <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={onOpenTour}
+              className="h-14 rounded-xl border border-white/10 bg-[#2A3042] text-[#E7E4DC] font-bold cursor-pointer"
+            >
+              {language === 'en' ? 'Quick tour' : 'Guia rápido'}
+            </button>
+            <div className="h-14 rounded-xl border border-white/10 bg-[#2A3042] flex flex-col items-center justify-center">
+              <span className="text-white font-extrabold">{totalProductsCount}</span>
+              <span className="text-[#C9C6BE]">produtos</span>
+            </div>
+            <div className="h-14 rounded-xl border border-white/10 bg-[#2A3042] flex flex-col items-center justify-center">
               <span className="text-[#25F4EE] font-extrabold">300%+</span>
-              <span>ROI / Margem</span>
+              <span className="text-[#C9C6BE]">margem</span>
             </div>
           </div>
         </div>

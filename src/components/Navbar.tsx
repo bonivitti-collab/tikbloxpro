@@ -539,67 +539,65 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
         </div>
 
-        {/* Mobile menus: one parent, only its actions */}
-        <div className="md:hidden border-t border-white/10">
-          <div className="flex items-center gap-1.5 py-2 text-xs">
-            <button
-              onClick={() => setActiveTab(activeTab === 'early_wave' || activeTab === 'high_margin' ? activeTab : 'all')}
-              className={`flex-1 px-3 py-1.5 rounded-lg font-bold cursor-pointer ${
-                activeTab === 'all' || activeTab === 'early_wave' || activeTab === 'high_margin'
-                  ? 'bg-[#FE2C55] text-white'
-                  : 'text-[#A6A7B2] bg-[#2A3042] border border-white/5'
-              }`}
-            >
-              Radar
-            </button>
-            <button
-              onClick={() => setActiveTab('saved')}
-              className={`flex-1 px-3 py-1.5 rounded-lg font-bold cursor-pointer inline-flex items-center justify-center gap-1 ${
-                activeTab === 'saved'
-                  ? 'bg-[#FE2C55] text-white'
-                  : 'text-[#A6A7B2] bg-[#2A3042] border border-white/5'
-              }`}
-            >
-              <span>{t('nav_saved')}</span>
-              {savedCount > 0 && (
-                <span className="rounded-full bg-white/20 px-1.5 text-[9px] font-extrabold">{savedCount}</span>
-              )}
-            </button>
-            <button
-              onClick={() => {
-                setShowMobileToolsMenu(false);
-                setActiveTab('calculator');
-              }}
-              className={`flex-1 px-3 py-1.5 rounded-lg font-bold cursor-pointer ${
-                activeTab === 'calculator'
-                  ? 'bg-[#25F4EE] text-[#141722]'
-                  : 'text-[#A6A7B2] bg-[#2A3042] border border-white/5'
-              }`}
-            >
-              {t('nav_calculator')}
-            </button>
-          </div>
+        {/* Mobile menus: equal 3-column grid */}
+        <div className="md:hidden border-t border-white/10 px-3 py-2 grid grid-cols-3 gap-2">
+          <button
+            onClick={() => setActiveTab(activeTab === 'early_wave' || activeTab === 'high_margin' ? activeTab : 'all')}
+            className={`h-10 rounded-xl text-xs font-bold cursor-pointer ${
+              activeTab === 'all' || activeTab === 'early_wave' || activeTab === 'high_margin'
+                ? 'bg-[#FE2C55] text-white'
+                : 'text-[#E7E4DC] bg-[#2A3042] border border-white/10'
+            }`}
+          >
+            Radar
+          </button>
+          <button
+            onClick={() => setActiveTab('saved')}
+            className={`h-10 rounded-xl text-xs font-bold cursor-pointer inline-flex items-center justify-center gap-1 ${
+              activeTab === 'saved'
+                ? 'bg-[#FE2C55] text-white'
+                : 'text-[#E7E4DC] bg-[#2A3042] border border-white/10'
+            }`}
+          >
+            <span>{t('nav_saved')}</span>
+            {savedCount > 0 && (
+              <span className="rounded-full bg-white/20 px-1.5 text-[9px] font-extrabold">{savedCount}</span>
+            )}
+          </button>
+          <button
+            onClick={() => {
+              setShowMobileToolsMenu(false);
+              setActiveTab('calculator');
+            }}
+            className={`h-10 rounded-xl text-xs font-bold cursor-pointer ${
+              activeTab === 'calculator'
+                ? 'bg-[#25F4EE] text-[#141722]'
+                : 'text-[#E7E4DC] bg-[#2A3042] border border-white/10'
+            }`}
+          >
+            {t('nav_calculator')}
+          </button>
           {(activeTab === 'all' || activeTab === 'early_wave' || activeTab === 'high_margin') && (
-            <div className="flex items-center gap-1.5 pb-2 text-[11px]">
+            <>
               <button
                 onClick={() => setActiveTab('all')}
-                className={`px-3 py-1.5 rounded-lg font-bold cursor-pointer ${activeTab === 'all' ? 'bg-white text-[#141722]' : 'text-[#A6A7B2] border border-white/10'}`}
+                className={`h-10 rounded-xl text-[11px] font-bold cursor-pointer ${activeTab === 'all' ? 'bg-white text-[#141722]' : 'text-[#E7E4DC] bg-[#2A3042] border border-white/10'}`}
               >
                 {t('nav_all')}
               </button>
               <button
                 onClick={() => setActiveTab('early_wave')}
-                className={`px-3 py-1.5 rounded-lg font-bold cursor-pointer ${activeTab === 'early_wave' ? 'bg-[#25F4EE] text-[#141722]' : 'text-[#A6A7B2] border border-white/10'}`}
+                className={`h-10 rounded-xl text-[11px] font-bold cursor-pointer ${activeTab === 'early_wave' ? 'bg-[#25F4EE] text-[#141722]' : 'text-[#E7E4DC] bg-[#2A3042] border border-white/10'}`}
               >
                 {t('nav_early_wave')}
               </button>
               <button
                 onClick={() => setActiveTab('high_margin')}
-                className={`px-3 py-1.5 rounded-lg font-bold cursor-pointer ${activeTab === 'high_margin' ? 'bg-[#25F4EE] text-[#141722]' : 'text-[#A6A7B2] border border-white/10'}`}
+                className={`h-10 rounded-xl text-[11px] font-bold cursor-pointer ${activeTab === 'high_margin' ? 'bg-[#25F4EE] text-[#141722]' : 'text-[#E7E4DC] bg-[#2A3042] border border-white/10'}`}
               >
                 {t('nav_high_margin')}
               </button>
-            </div>
+            </>
           )}
         </div>
 

@@ -145,11 +145,11 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
   )}`;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-3 sm:p-4 overflow-y-auto animate-in fade-in duration-200">
-      <div className="relative w-full max-w-3xl rounded-2xl border border-slate-800 bg-slate-900 shadow-2xl text-slate-100 my-8 overflow-hidden max-h-[90vh] flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#141722]/80 backdrop-blur-md p-3 sm:p-4 overflow-y-auto animate-in fade-in duration-200">
+      <div className="relative w-full max-w-3xl rounded-2xl border border-white/10 bg-[#262B3A] shadow-2xl text-slate-100 my-8 overflow-hidden max-h-[90vh] flex flex-col">
         
         {/* Modal Header */}
-        <div className="flex items-center justify-between border-b border-slate-800 bg-slate-950/60 p-4 sm:p-5 sticky top-0 z-10">
+        <div className="flex items-center justify-between border-b border-white/10 bg-[#202432] p-4 sm:p-5 sticky top-0 z-10">
           <div>
             <div className="flex items-center gap-2 mb-1">
               <span className="rounded-full bg-cyan-500/20 border border-cyan-500/30 px-2.5 py-0.5 text-[10px] font-bold text-cyan-300 uppercase tracking-wider">
@@ -236,13 +236,13 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
 
           {/* Arbitrage Snapshot Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-3">
+            <div className="rounded-xl border border-white/10 bg-[#202432] p-3">
               <span className="text-[11px] text-slate-400 block mb-0.5">{t('card_supplier_cost')}</span>
               <span className="text-base font-bold text-white">${product.estimatedCostUSD.toFixed(2)} USD</span>
               <span className="text-[10px] text-slate-500 block">≈ R$ {(product.estimatedCostUSD * 5.6).toFixed(2)}</span>
             </div>
 
-            <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-3">
+            <div className="rounded-xl border border-white/10 bg-[#202432] p-3">
               <span className="text-[11px] text-slate-400 block mb-0.5">{t('card_sell_price')}</span>
               <span className="text-base font-bold text-cyan-300">R$ {product.estimatedPriceBRL.toFixed(2)}</span>
               <span className="text-[10px] text-slate-500 block">{language === 'en' ? 'Validated retail price' : 'Preço de saída validado'}</span>
@@ -254,7 +254,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
               <span className="text-[10px] text-emerald-400/80 block">{language === 'en' ? 'High profit margin' : 'Lucro bruto expressivo'}</span>
             </div>
 
-            <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-3">
+            <div className="rounded-xl border border-white/10 bg-[#202432] p-3">
               <span className="text-[11px] text-slate-400 block mb-0.5">{language === 'en' ? 'Virality Score' : 'Score de Viralidade'}</span>
               <div className="flex items-center gap-1.5">
                 <TrendingUp className="w-4 h-4 text-cyan-400" />
@@ -265,7 +265,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
           </div>
 
           {/* Engagement Pulse & Virality Analytics */}
-          <div className="rounded-xl border border-cyan-500/40 bg-slate-950/80 p-4 relative overflow-hidden shadow-lg shadow-cyan-950/30">
+          <div className="rounded-xl border border-cyan-500/40 bg-[#202432] p-4 relative overflow-hidden shadow-lg shadow-cyan-950/30">
             <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 rounded-full blur-2xl pointer-events-none" />
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
@@ -303,7 +303,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                 </span>
                 <span className="text-cyan-300">{product.viralityScore}%</span>
               </div>
-              <div className="w-full bg-slate-900 rounded-full h-2.5 p-0.5 border border-slate-800">
+              <div className="w-full bg-[#262B3A] rounded-full h-2.5 p-0.5 border border-white/10">
                 <div
                   className="bg-gradient-to-r from-cyan-500 via-[#25F4EE] to-emerald-400 h-full rounded-full transition-all duration-500 shadow-sm shadow-cyan-500/50"
                   style={{ width: `${Math.min(100, Math.max(15, product.viralityScore))}%` }}
@@ -313,7 +313,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
 
             {/* 3 Key Engagement Pulse Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-              <div className="p-3 rounded-xl bg-slate-900/90 border border-slate-800 flex flex-col justify-between">
+              <div className="p-3 rounded-xl bg-[#262B3A]/90 border border-white/10 flex flex-col justify-between">
                 <span className="text-[11px] text-slate-400 flex items-center gap-1 mb-1">
                   <TrendingUp className="w-3.5 h-3.5 text-cyan-400" />
                   {language === 'en' ? 'Trend Velocity' : 'Velocidade da Tendência'}
@@ -328,7 +328,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                 </div>
               </div>
 
-              <div className="p-3 rounded-xl bg-slate-900/90 border border-slate-800 flex flex-col justify-between">
+              <div className="p-3 rounded-xl bg-[#262B3A]/90 border border-white/10 flex flex-col justify-between">
                 <span className="text-[11px] text-slate-400 flex items-center gap-1 mb-1">
                   <Share2 className="w-3.5 h-3.5 text-emerald-400" />
                   {language === 'en' ? 'Social Feed Mentions' : 'Menções em Feeds Sociais'}
@@ -343,7 +343,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                 </div>
               </div>
 
-              <div className="p-3 rounded-xl bg-slate-900/90 border border-slate-800 flex flex-col justify-between">
+              <div className="p-3 rounded-xl bg-[#262B3A]/90 border border-white/10 flex flex-col justify-between">
                 <span className="text-[11px] text-slate-400 flex items-center gap-1 mb-1">
                   <Layers className="w-3.5 h-3.5 text-amber-400" />
                   {language === 'en' ? 'Market Maturity Stage' : 'Estágio de Maturidade'}
@@ -447,14 +447,14 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
           </div>
 
           {/* Diagnosis on Brazilian Competition */}
-          <div className="rounded-xl border border-slate-800 bg-slate-950/50 p-4">
+          <div className="rounded-xl border border-white/10 bg-[#202432] p-4">
             <h3 className="text-sm font-bold text-white flex items-center gap-2 mb-3">
               <ShoppingBag className="w-4 h-4 text-cyan-400" />
               <span>{language === 'en' ? 'Market Diagnosis in Brazil (Blue Ocean)' : 'Diagnóstico de Mercado no Brasil (Oceano Azul)'}</span>
             </h3>
             
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-              <div className="p-3 rounded-lg bg-slate-900/80 border border-slate-800 flex flex-col justify-between">
+              <div className="p-3 rounded-lg bg-[#262B3A]/80 border border-white/10 flex flex-col justify-between">
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-[11px] font-bold text-amber-400">Shopee Brasil</span>
@@ -475,7 +475,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                 </div>
               </div>
 
-              <div className="p-3 rounded-lg bg-slate-900/80 border border-slate-800 flex flex-col justify-between">
+              <div className="p-3 rounded-lg bg-[#262B3A]/80 border border-white/10 flex flex-col justify-between">
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-[11px] font-bold text-yellow-400">Mercado Livre Full</span>
@@ -496,7 +496,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                 </div>
               </div>
 
-              <div className="p-3 rounded-lg bg-slate-900/80 border border-slate-800 flex flex-col justify-between">
+              <div className="p-3 rounded-lg bg-[#262B3A]/80 border border-white/10 flex flex-col justify-between">
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-[11px] font-bold text-pink-400">TikTok Viral</span>
@@ -544,7 +544,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
               {product.adHooks.map((hook, idx) => (
                 <div
                   key={idx}
-                  className="flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-950/70 border border-slate-800 text-xs hover:border-slate-700 transition"
+                  className="flex items-center justify-between gap-3 p-3 rounded-xl bg-[#202432] border border-white/10 text-xs hover:border-slate-700 transition"
                 >
                   <p className="text-slate-200 italic font-medium">
                     "{hook}"
@@ -566,7 +566,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
           </div>
 
           {/* Direct Supplier Search Links */}
-          <div className="rounded-xl border border-slate-800 bg-slate-950/50 p-4">
+          <div className="rounded-xl border border-white/10 bg-[#202432] p-4">
             <h3 className="text-sm font-bold text-white flex items-center gap-2 mb-3">
               <Package className="w-4 h-4 text-cyan-400" />
               <span>{language === 'en' ? 'Where to Find Fast Suppliers' : 'Onde Encontrar Fornecedores Rápidos'}</span>
@@ -613,7 +613,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
           </div>
 
           {/* Action Checklist */}
-          <div className="rounded-xl border border-slate-800 bg-slate-950/50 p-4">
+          <div className="rounded-xl border border-white/10 bg-[#202432] p-4">
             <h3 className="text-sm font-bold text-white flex items-center gap-2 mb-2">
               <Layers className="w-4 h-4 text-cyan-400" />
               <span>{language === 'en' ? 'Action Plan to Ride This Wave' : 'Plano de Ação para Surfar Essa Onda'}</span>
@@ -645,7 +645,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
 
           {/* Grounding web sources if any */}
           {product.groundingSources && product.groundingSources.length > 0 && (
-            <div className="pt-2 border-t border-slate-800 text-xs">
+            <div className="pt-2 border-t border-white/10 text-xs">
               <span className="text-[11px] font-semibold text-slate-400 block mb-2">
                 {language === 'en' ? 'Tracked Web Sources & References:' : 'Fontes Web e Referências Rastreadas:'}
               </span>
@@ -669,7 +669,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
         </div>
 
         {/* Modal Footer Controls */}
-        <div className="border-t border-slate-800 bg-slate-950/80 p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="border-t border-white/10 bg-[#202432] p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="text-xs text-slate-400 text-center sm:text-left">
             <span>{language === 'en' ? 'Estimated average net margin: ' : 'Margem líquida média estimada: '}</span>
             <strong className="text-emerald-400 font-bold">+{product.estimatedProfitMarginPercent}%</strong>
