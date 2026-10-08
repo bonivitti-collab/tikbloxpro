@@ -92,6 +92,33 @@ export const RadarHero: React.FC<RadarHeroProps> = React.memo(({
     };
   }, []);
 
+  const [timeLeft, setTimeLeft] = useState('');
+
+  useEffect(() => {
+    const calculateTimeLeft = () => {
+      const now = new Date();
+      const brtTime = new Date(now.toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
+      const nextMidnight = new Date(brtTime);
+      nextMidnight.setHours(24, 0, 0, 0);
+
+      const diff = nextMidnight.getTime() - brtTime.getTime();
+      if (diff <= 0) return "00h 00m 00s";
+
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+      return `${hours.toString().padStart(2, '0')}h ${minutes.toString().padStart(2, '0')}m ${seconds.toString().padStart(2, '0')}s`;
+    };
+
+    setTimeLeft(calculateTimeLeft());
+    const timer = setInterval(() => {
+      setTimeLeft(calculateTimeLeft());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
   const handleScroll = (direction: 'left' | 'right') => {
     if (scrollContainerRef.current) {
       const scrollAmount = 260;
@@ -140,6 +167,19 @@ export const RadarHero: React.FC<RadarHeroProps> = React.memo(({
           <p className="mt-2 sm:mt-3 text-xs sm:text-base text-[#C5C6D0] font-normal leading-relaxed">
             {t('hero_subtitle')}
           </p>
+
+          {/* Global Scan Countdown */}
+          <div className="mt-4 flex items-center gap-2 bg-[#1A1D27]/80 backdrop-blur-sm border border-[#25F4EE]/30 rounded-full px-3.5 py-2 w-fit shadow-[0_0_15px_rgba(37,244,238,0.15)]">
+            <div className="flex items-center justify-center w-6 h-6 rounded-full bg-[#25F4EE]/20">
+              <Clock className="w-3.5 h-3.5 text-[#25F4EE] animate-pulse" />
+            </div>
+            <span className="text-xs font-semibold text-white/90">
+              {language === 'en' ? 'Next Global Radar Scan:' : 'Próxima Varredura Global:'}
+            </span>
+            <span className="text-sm font-bold text-[#25F4EE] font-mono tracking-widest bg-black/20 px-2 py-0.5 rounded border border-[#25F4EE]/20">
+              {timeLeft}
+            </span>
+          </div>
         </div>
 
         {/* Action & Filter Console */}

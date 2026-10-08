@@ -377,16 +377,38 @@ export default function App() {
     }
   }, [products]);
 
+  // Daily Global Scan Logic (runs once per day at midnight Brasília time)
+  useEffect(() => {
+    const checkDailyScan = () => {
+      const now = new Date();
+      // Use Brasília time (UTC-3)
+      const spTime = new Date(now.toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
+      const todayDateStr = `${spTime.getFullYear()}-${spTime.getMonth() + 1}-${spTime.getDate()}`;
+      
+      const lastScan = localStorage.getItem('tikblox_last_daily_scan_date');
+      if (lastScan !== todayDateStr) {
+        // Need to run the daily scan!
+        localStorage.setItem('tikblox_last_daily_scan_date', todayDateStr);
+        handleTriggerScan(true);
+      }
+    };
+    
+    // Delay slightly to not block initial render or conflict with onboarding
+    const timer = setTimeout(checkDailyScan, 3000);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Trigger web scan
-  const handleTriggerScan = async () => {
+  const handleTriggerScan = async (isDailyGlobalScan = false) => {
     setIsScanning(true);
     setShowScanFeedModal(true);
 
     try {
       const result = await scanTrends({
-        niche: selectedNiche !== 'all' ? selectedNiche : undefined,
-        originCountry: selectedOrigin !== 'all' ? selectedOrigin : undefined,
-        query: searchQuery || undefined,
+        niche: isDailyGlobalScan ? undefined : (selectedNiche !== 'all' ? selectedNiche : undefined),
+        originCountry: isDailyGlobalScan ? undefined : (selectedOrigin !== 'all' ? selectedOrigin : undefined),
+        query: isDailyGlobalScan ? undefined : (searchQuery || undefined),
       });
 
       if (result.products && result.products.length > 0) {
@@ -512,8 +534,6 @@ export default function App() {
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         savedCount={savedIds.length}
-        onTriggerScan={handleTriggerScan}
-        isScanning={isScanning}
         onOpenPushModal={() => setShowPushModal(true)}
         isPushActive={pushPermission === 'granted' && pushSettings.enabled}
         onOpenUpdateSettings={() => setShowUpdateSettingsModal(true)}
@@ -590,35 +610,7 @@ export default function App() {
       {/* Main Content Area */}
       <main className="flex-1 mx-auto max-w-7xl w-full px-3 sm:px-6 lg:px-8 py-5 sm:py-8">
         
-        {/* Push Notification Callout Banner (shown when permission has not yet been decided) */}
-        {pushPermission === 'default' && !pushSettings.enabled && activeTab !== 'calculator' && (
-          <div className="mb-5 sm:mb-6 p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-[#25F4EE]/10 via-[#161823] to-[#FE2C55]/10 border border-[#25F4EE]/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-lg">
-            <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-[#25F4EE]/20 text-[#25F4EE] shrink-0 border border-[#25F4EE]/40">
-                <BellRing className="w-5 h-5 animate-pulse" />
-              </div>
-              <div>
-                <h4 className="text-sm font-black text-white flex items-center gap-2">
-                  <span>Ativar Notificações Push do Radar Viral</span>
-                  <span className="px-1.5 py-0.2 rounded bg-[#FE2C55] text-white text-[10px] font-extrabold uppercase">
-                    PWA Ativo
-                  </span>
-                </h4>
-                <p className="text-xs text-[#8E91A6] mt-0.5">
-                  Receba alertas na tela do seu celular ou computador assim que novos produtos lucrativos explodirem no exterior.
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto justify-end">
-              <button
-                onClick={() => setShowPushModal(true)}
-                className="w-full sm:w-auto text-center px-4 py-2 rounded-xl text-xs font-black bg-gradient-to-r from-[#25F4EE] to-[#00CED1] hover:from-[#4BF6F1] hover:to-[#25F4EE] text-[#141722] shadow-md transition active:scale-95 cursor-pointer"
-              >
-                Ativar Alertas Push
-              </button>
-            </div>
-          </div>
-        )}
+        {/* Push Notification banner removed */}
         
         {/* TAB Content Switching with Framer Motion */}
         <AnimatePresence mode="wait" initial={false}>

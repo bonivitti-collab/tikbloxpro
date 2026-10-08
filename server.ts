@@ -710,7 +710,7 @@ Retorne APENAS o JSON puro.`;
     // Option B: Google Gemini Free Tier (gemini-2.5-flash)
     if (!cleanJson && hasGemini) {
       const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
+        model: 'gemini-3.8-flash',
         contents: prompt,
       });
       cleanJson = (response.text || '').replace(/```json/gi, '').replace(/```/gi, '').trim();
@@ -734,6 +734,88 @@ Retorne APENAS o JSON puro.`;
       success: true,
       source: 'resilient_offline_engine',
       scripts: fallback,
+    });
+  }
+});
+
+// Endpoint: AI Chat Copilot
+app.post('/api/chat', async (req: Request, res: Response) => {
+  try {
+    const { messages } = req.body;
+    if (!messages || !Array.isArray(messages)) {
+      return res.status(400).json({ error: 'Formato de mensagens inválido.' });
+    }
+
+    const ai = getGenAI();
+    const hasGroq = !!process.env.GROQ_API_KEY && !isRateLimited();
+    const hasGemini = !!process.env.GEMINI_API_KEY && !isRateLimited();
+
+    // Prepare history for Gemini/Groq
+    const lastUserMessage = messages[messages.length - 1]?.content || '';
+    
+    if (!hasGroq && !hasGemini) {
+      return res.json({
+        reply: "No momento estou operando no modo autônomo offline e não consigo processar conversas complexas. Verifique suas chaves de API (Gemini ou Groq) para habilitar o chat inteligente."
+      });
+    }
+
+    let replyText = '';
+
+    if (hasGroq) {
+      // Using Groq
+      const groqMessages = [
+        { role: 'system', content: 'Você é a IA do TikBlox, um assistente especialista em e-commerce, dropshipping, mineração de produtos virais no TikTok e arbitragem. Responda sempre em português do Brasil de forma clara, direta e objetiva, mantendo um tom profissional mas empolgante e focado em lucro/estratégia. Nunca mencione que você é um modelo da Groq ou OpenAI.' },
+        ...messages.map((m: any) => ({
+          role: m.role === 'assistant' ? 'assistant' : 'user',
+          content: m.content
+        }))
+      ];
+      
+      const apiKey = process.env.GROQ_API_KEY;
+      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model: 'llama-3.3-70b-versatile',
+          messages: groqMessages,
+          temperature: 0.7,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        replyText = data.choices?.[0]?.message?.content || '';
+      }
+    }
+
+    if (!replyText && hasGemini) {
+      // Setup chat session with Gemini
+      const chat = ai.chats.create({
+        model: 'gemini-3.8-flash',
+        config: {
+          systemInstruction: 'Você é a IA do TikBlox, um assistente especialista em e-commerce, dropshipping, mineração de produtos virais no TikTok e arbitragem. Responda sempre em português do Brasil de forma clara, direta e objetiva, mantendo um tom profissional mas empolgante e focado em lucro/estratégia. Nunca mencione que você é um modelo do Google.',
+        }
+      });
+      
+      // We pass the last user message to get a response
+      // For a more robust implementation we'd pass history, but for simplicity:
+      const response = await chat.sendMessage({ message: lastUserMessage });
+      replyText = response.text || '';
+    }
+
+    if (!replyText) {
+      throw new Error('Sem resposta do provedor de IA.');
+    }
+
+    return res.json({ reply: replyText });
+  } catch (error: any) {
+    console.error('Chat error:', error);
+    triggerRateLimitCooldown(60000);
+    return res.json({
+      reply: 'Desculpe, encontrei um erro temporário de conexão ou excedi o limite de mensagens. Por favor, tente novamente em alguns instantes.'
     });
   }
 });

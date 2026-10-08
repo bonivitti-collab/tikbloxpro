@@ -1,5 +1,5 @@
 import { TrendingProduct } from '../types';
-import { ALL_NICHE_TRENDS, NICHE_TRENDS_MAP } from './niches';
+import { ALL_NICHE_TRENDS, NICHE_TRENDS_MAP } from './niches/index';
 
 export { ALL_NICHE_TRENDS, NICHE_TRENDS_MAP };
 

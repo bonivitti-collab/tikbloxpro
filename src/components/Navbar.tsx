@@ -30,8 +30,6 @@ interface NavbarProps {
   activeTab: 'all' | 'early_wave' | 'high_margin' | 'saved' | 'calculator';
   setActiveTab: (tab: 'all' | 'early_wave' | 'high_margin' | 'saved' | 'calculator') => void;
   savedCount: number;
-  onTriggerScan: () => void;
-  isScanning: boolean;
   onOpenPushModal?: () => void;
   isPushActive?: boolean;
   onOpenUpdateSettings?: () => void;
@@ -46,8 +44,6 @@ export const Navbar: React.FC<NavbarProps> = ({
   activeTab,
   setActiveTab,
   savedCount,
-  onTriggerScan,
-  isScanning,
   onOpenPushModal,
   isPushActive = false,
   onOpenUpdateSettings,
@@ -221,21 +217,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Right Action Controls */}
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             
-            {/* Quick Scan Button */}
-            <button
-              id="quick-scan-btn"
-              onClick={onTriggerScan}
-              disabled={isScanning}
-              className={`flex items-center gap-1.5 sm:gap-2 rounded-xl border border-[#25F4EE]/40 bg-[#161823] hover:border-[#25F4EE] hover:shadow-[0_0_15px_rgba(37,244,238,0.3)] px-2.5 sm:px-3.5 py-1.5 text-xs font-bold text-[#25F4EE] hover:text-white shadow-sm transition-all active:scale-95 cursor-pointer whitespace-nowrap shrink-0 ${
-                isScanning ? 'opacity-50 cursor-not-allowed' : ''
-              }`}
-              title="Real-time internet viral radar scan"
-            >
-              <RefreshCw className={`w-3.5 h-3.5 text-[#25F4EE] shrink-0 ${isScanning ? 'animate-spin' : ''}`} />
-              <span className="hidden sm:inline">
-                {isScanning ? t('nav_scanning') : t('nav_scan')}
-              </span>
-            </button>
+
 
             {/* Desktop Only: Push Notifications */}
             {onOpenPushModal && (
@@ -269,209 +251,9 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
             )}
 
-            {/* Desktop Only: Guided Onboarding Tour Button */}
-            {onOpenOnboardingTour && (
-              <button
-                id="nav-onboarding-tour-btn"
-                onClick={onOpenOnboardingTour}
-                className="hidden md:flex items-center gap-1.5 rounded-xl border border-white/10 bg-[#2A3042] hover:border-[#25F4EE]/50 hover:bg-[#161826] px-3 py-1.5 text-xs font-bold text-[#C5C6D0] hover:text-[#25F4EE] shadow-sm transition-all active:scale-95 cursor-pointer whitespace-nowrap shrink-0"
-                title={language === 'en' ? 'Start Guided Tour (Radar, Bookmarks & Margin)' : 'Iniciar Tour Guiado (Radar, Salvos & Margem)'}
-              >
-                <Sparkles className="w-3.5 h-3.5 text-[#25F4EE] shrink-0" />
-                <span className="hidden xl:inline">{t('onboarding_menu_item')}</span>
-                <span className="xl:hidden inline">Tour</span>
-              </button>
-            )}
-
-            {/* Desktop Only: Bot Telegram / Wife Radar Button */}
-            {onOpenWifeBot && (
-              <button
-                id="nav-wife-bot-btn"
-                onClick={onOpenWifeBot}
-                className="hidden md:flex items-center gap-1.5 rounded-xl border border-pink-500/40 bg-pink-950/20 hover:border-pink-400 hover:bg-pink-900/35 px-3 py-1.5 text-xs font-bold text-pink-300 hover:text-white shadow-sm transition-all active:scale-95 cursor-pointer whitespace-nowrap shrink-0"
-                title="Configurar Bot Telegram & Radar do TikTok Pessoal"
-              >
-                <span className="text-sm">🤖</span>
-                <span>Bot Telegram</span>
-              </button>
-            )}
 
 
-
-            {/* Desktop Only: Elegant Resources & Downloads Dropdown */}
-            <div className="relative hidden md:block" ref={desktopToolsRef}>
-              <button
-                id="desktop-resources-menu-btn"
-                onClick={() => setShowDesktopTools(!showDesktopTools)}
-                className={`flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-bold transition-all active:scale-95 cursor-pointer whitespace-nowrap shrink-0 ${
-                  showDesktopTools
-                    ? 'border-[#25F4EE] bg-[#1a1d2e] text-white shadow-[0_0_12px_rgba(37,244,238,0.25)]'
-                    : 'border-white/10 bg-[#2A3042] text-[#8E91A6] hover:border-white/20 hover:text-white'
-                }`}
-                title="Recursos, Código Fonte e Logos"
-              >
-                <FolderDown className="w-3.5 h-3.5 text-[#25F4EE] shrink-0" />
-                <span>Recursos</span>
-                <ChevronDown
-                  className={`w-3 h-3 text-[#A6A7B2] transition-transform duration-200 ${
-                    showDesktopTools ? 'rotate-180 text-white' : ''
-                  }`}
-                />
-              </button>
-
-              {/* Floating Menu Card */}
-              {showDesktopTools && (
-                <div className="absolute right-0 mt-2 w-72 rounded-2xl border border-white/15 bg-[#0C0E17]/98 backdrop-blur-xl p-2 shadow-2xl z-50 animate-in fade-in slide-in-from-top-2 duration-150 text-xs">
-                  <div className="px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-wider text-[#757788] border-b border-white/10 mb-1">
-                    Arquivos & Ferramentas
-                  </div>
-
-                  {/* Tour Guiado Onboarding Item */}
-                  {onOpenOnboardingTour && (
-                    <button
-                      onClick={() => {
-                        onOpenOnboardingTour();
-                        setShowDesktopTools(false);
-                      }}
-                      className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-white hover:bg-[#25F4EE]/15 hover:border-[#25F4EE]/30 border border-transparent transition group text-left cursor-pointer"
-                    >
-                      <div className="w-8 h-8 rounded-lg bg-[#25F4EE]/20 flex items-center justify-center shrink-0">
-                        <Sparkles className="w-4 h-4 text-[#25F4EE]" />
-                      </div>
-                      <div className="flex flex-col text-left">
-                        <span className="font-bold text-white group-hover:text-[#25F4EE] transition flex items-center gap-1.5">
-                          <span>{t('onboarding_menu_item')}</span>
-                          <span className="px-1.5 py-0.2 rounded bg-[#25F4EE]/30 text-[#25F4EE] text-[9px] font-black">GUIA</span>
-                        </span>
-                        <span className="text-[10px] text-[#A6A7B2]">Radar, Salvos & Cálculo de Margem</span>
-                      </div>
-                    </button>
-                  )}
-
-                  {/* PDF Código Fonte */}
-                  <a
-                    href="/TIKBLOX_Codigo_Fonte.pdf"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    download="TIKBLOX_Codigo_Fonte.pdf"
-                    onClick={() => setShowDesktopTools(false)}
-                    className="flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-white hover:bg-[#FE2C55]/15 hover:border-[#FE2C55]/30 border border-transparent transition group"
-                  >
-                    <div className="w-8 h-8 rounded-lg bg-[#FE2C55]/20 flex items-center justify-center shrink-0">
-                      <FileText className="w-4 h-4 text-[#FE2C55]" />
-                    </div>
-                    <div className="flex flex-col text-left">
-                      <span className="font-bold text-white group-hover:text-[#FE2C55] transition">Dossiê Código Fonte PDF</span>
-                      <span className="text-[10px] text-[#A6A7B2]">96 páginas completas com arquitetura</span>
-                    </div>
-                  </a>
-
-                  {/* Baixar Logos SVG */}
-                  <button
-                    onClick={() => {
-                      setShowBrandAssetsModal(true);
-                      setShowDesktopTools(false);
-                    }}
-                    className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-white hover:bg-[#25F4EE]/15 hover:border-[#25F4EE]/30 border border-transparent transition group text-left cursor-pointer"
-                  >
-                    <div className="w-8 h-8 rounded-lg bg-[#25F4EE]/20 flex items-center justify-center shrink-0">
-                      <Download className="w-4 h-4 text-[#25F4EE]" />
-                    </div>
-                    <div className="flex flex-col text-left">
-                      <span className="font-bold text-white group-hover:text-[#25F4EE] transition">Baixar Logos & Tipografia</span>
-                      <span className="text-[10px] text-[#A6A7B2]">Arquivos SVG originais e símbolos 3D</span>
-                    </div>
-                  </button>
-
-                  {/* API Grátis R$ 0 */}
-                  <button
-                    onClick={() => {
-                      setShowFreeTierModal(true);
-                      setShowDesktopTools(false);
-                    }}
-                    className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-white hover:bg-emerald-500/15 hover:border-emerald-500/30 border border-transparent transition group text-left cursor-pointer"
-                  >
-                    <div className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center shrink-0">
-                      <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                    </div>
-                    <div className="flex flex-col text-left">
-                      <span className="font-bold text-emerald-300">API R$ 0 Grátis Permanente</span>
-                      <span className="text-[10px] text-[#A6A7B2]">IA do TikBlox sem custos</span>
-                    </div>
-                  </button>
-
-                  {/* Atualizações Google Drive */}
-                  {onOpenUpdateSettings && (
-                    <button
-                      onClick={() => {
-                        onOpenUpdateSettings();
-                        setShowDesktopTools(false);
-                      }}
-                      className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-white hover:bg-[#25F4EE]/15 hover:border-[#25F4EE]/30 border border-transparent transition group text-left cursor-pointer"
-                    >
-                      <div className="w-8 h-8 rounded-lg bg-[#25F4EE]/20 flex items-center justify-center shrink-0 relative">
-                        <FolderUp className="w-4 h-4 text-[#25F4EE]" />
-                        {hasUpdateAvailable && (
-                          <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[#FE2C55] animate-ping" />
-                        )}
-                      </div>
-                      <div className="flex flex-col text-left">
-                        <span className="font-bold text-white group-hover:text-[#25F4EE] transition flex items-center gap-1.5">
-                          <span>Atualizações Google Drive</span>
-                          {hasUpdateAvailable && (
-                            <span className="px-1.5 py-0.2 rounded bg-[#FE2C55] text-white text-[9px] font-black">NOVO</span>
-                          )}
-                        </span>
-                        <span className="text-[10px] text-[#A6A7B2]">Distribuir novas versões .exe via nuvem</span>
-                      </div>
-                    </button>
-                  )}
-                  {/* Google Workspace Hub */}
-                  {onOpenWorkspaceHub && (
-                    <button
-                      onClick={() => {
-                        onOpenWorkspaceHub('drive');
-                        setShowDesktopTools(false);
-                      }}
-                      className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-white hover:bg-emerald-500/15 hover:border-emerald-500/30 border border-transparent transition group text-left cursor-pointer"
-                    >
-                      <div className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center shrink-0">
-                        <Cloud className="w-4 h-4 text-emerald-400" />
-                      </div>
-                      <div className="flex flex-col text-left">
-                        <span className="font-bold text-white group-hover:text-emerald-400 transition flex items-center gap-1.5">
-                          <span>Google Workspace Hub</span>
-                          <span className="px-1.5 py-0.2 rounded bg-emerald-500/30 text-emerald-300 text-[9px] font-black">ATIVO</span>
-                        </span>
-                        <span className="text-[10px] text-[#A6A7B2]">Drive, Gmail e Google Classroom</span>
-                      </div>
-                    </button>
-                  )}
-
-                  {/* Banco Offline IndexedDB */}
-                  {onOpenOfflineStorage && (
-                    <button
-                      onClick={() => {
-                        onOpenOfflineStorage();
-                        setShowDesktopTools(false);
-                      }}
-                      className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-white hover:bg-cyan-500/15 hover:border-cyan-500/30 border border-transparent transition group text-left cursor-pointer"
-                    >
-                      <div className="w-8 h-8 rounded-lg bg-cyan-500/20 flex items-center justify-center shrink-0">
-                        <Database className="w-4 h-4 text-cyan-400" />
-                      </div>
-                      <div className="flex flex-col text-left">
-                        <span className="font-bold text-white group-hover:text-cyan-400 transition flex items-center gap-1.5">
-                          <span>Banco Offline (IndexedDB)</span>
-                          <span className="px-1.5 py-0.2 rounded bg-cyan-500/30 text-cyan-300 text-[9px] font-black">LOCAL</span>
-                        </span>
-                        <span className="text-[10px] text-[#A6A7B2]">Gerenciar cache e histórico offline</span>
-                      </div>
-                    </button>
-                  )}
-                </div>
-              )}
-            </div>
+            {/* Recursos dropdown removed */}
 
             {/* Language Selector Toggle (Desktop) */}
             <div className="hidden sm:flex items-center rounded-xl border border-white/10 bg-[#0C0E17] p-0.5 text-xs shrink-0">
@@ -606,18 +388,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           <div className="md:hidden border-t border-white/10 bg-[#242938] p-3 animate-in fade-in slide-in-from-top-2 duration-200">
             <div className="grid grid-cols-2 gap-2 text-xs">
 
-              {onOpenOnboardingTour && (
-                <button
-                  onClick={() => {
-                    onOpenOnboardingTour();
-                    setShowMobileToolsMenu(false);
-                  }}
-                  className="col-span-2 flex items-center justify-center gap-2 p-2.5 rounded-xl border border-[#25F4EE]/40 bg-[#25F4EE]/15 text-white font-bold"
-                >
-                  <Sparkles className="w-4 h-4 text-[#25F4EE] shrink-0" />
-                  <span>{t('onboarding_menu_item')} (Passo a Passo)</span>
-                </button>
-              )}
+              {/* Mobile Onboarding Tour removed */}
 
               <a
                 href="/TIKBLOX_Codigo_Fonte.pdf"
