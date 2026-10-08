@@ -21,9 +21,6 @@ import {
   HelpCircle,
 } from 'lucide-react';
 import { TikBloxLogo } from './TikBloxLogo';
-import { BrandAssetsModal } from './BrandAssetsModal';
-import { FreeTierInfoModal } from './FreeTierInfoModal';
-import { PWAInstallButton } from './PWAInstallButton';
 import { useTranslation } from '../i18n/LanguageContext';
 
 interface NavbarProps {
@@ -53,27 +50,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenOnboardingTour,
   onOpenWifeBot,
 }) => {
-  const { t, language, setLanguage } = useTranslation();
-  const [showBrandAssetsModal, setShowBrandAssetsModal] = useState(false);
-  const [showFreeTierModal, setShowFreeTierModal] = useState(false);
-  const [showMobileToolsMenu, setShowMobileToolsMenu] = useState(false);
-  const [showDesktopTools, setShowDesktopTools] = useState(false);
-
-  const desktopToolsRef = useRef<HTMLDivElement>(null);
-
-  // Close dropdown on click outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        desktopToolsRef.current &&
-        !desktopToolsRef.current.contains(event.target as Node)
-      ) {
-        setShowDesktopTools(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  const { t } = useTranslation();
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-white/10 bg-[#1A1D27]/95 backdrop-blur-2xl">
@@ -219,12 +196,12 @@ export const Navbar: React.FC<NavbarProps> = ({
             
 
 
-            {/* Desktop Only: Push Notifications */}
+            {/* Push Notifications */}
             {onOpenPushModal && (
               <button
                 id="push-notifications-btn"
                 onClick={onOpenPushModal}
-                className={`hidden md:flex relative items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-bold shadow-sm transition-all active:scale-95 cursor-pointer whitespace-nowrap shrink-0 ${
+                className={`flex relative items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-bold shadow-sm transition-all active:scale-95 cursor-pointer whitespace-nowrap shrink-0 ${
                   isPushActive
                     ? 'border-emerald-500/40 bg-emerald-950/25 text-emerald-300 hover:border-emerald-400 hover:bg-emerald-900/30'
                     : 'border-white/10 bg-[#2A3042] text-[#8E91A6] hover:border-[#FE2C55]/40 hover:text-white'
@@ -254,69 +231,6 @@ export const Navbar: React.FC<NavbarProps> = ({
 
 
             {/* Recursos dropdown removed */}
-
-            {/* Language Selector Toggle (Desktop) */}
-            <div className="hidden sm:flex items-center rounded-xl border border-white/10 bg-[#0C0E17] p-0.5 text-xs shrink-0">
-              <button
-                id="lang-toggle-pt"
-                onClick={() => setLanguage('pt')}
-                className={`flex items-center gap-1 px-2 py-1 rounded-lg font-black text-[11px] transition-all cursor-pointer ${
-                  language === 'pt'
-                    ? 'bg-[#FE2C55] text-white shadow-sm'
-                    : 'text-[#8E91A6] hover:text-white'
-                }`}
-                title="Português (Brasil)"
-              >
-                <span>🇧🇷</span>
-                <span>PT</span>
-              </button>
-              <button
-                id="lang-toggle-en"
-                onClick={() => setLanguage('en')}
-                className={`flex items-center gap-1 px-2 py-1 rounded-lg font-black text-[11px] transition-all cursor-pointer ${
-                  language === 'en'
-                    ? 'bg-[#25F4EE] text-black shadow-sm'
-                    : 'text-[#8E91A6] hover:text-white'
-                }`}
-                title="English (US)"
-              >
-                <span>🇺🇸</span>
-                <span>EN</span>
-              </button>
-            </div>
-
-            {/* Desktop Native App Mode Indicator */}
-            <div className="hidden xl:flex items-center gap-1.5 px-2.5 py-1 rounded-xl border border-white/10 bg-[#0C0E17] text-[11px] text-[#A6A7B2]">
-              <span className="w-2 h-2 rounded-full bg-[#25F4EE] animate-pulse" />
-              <span>Windows Desktop v1.0</span>
-            </div>
-
-            {/* Mobile PWA Install / iOS Shortcut Quick Button */}
-            <div className="flex md:hidden">
-              <PWAInstallButton />
-            </div>
-
-            {/* Mobile Language Toggle */}
-            <div className="flex sm:hidden items-center rounded-xl border border-white/10 bg-[#0C0E17] p-0.5 text-xs shrink-0">
-              <button
-                onClick={() => setLanguage(language === 'pt' ? 'en' : 'pt')}
-                className="flex items-center gap-1 px-2 py-1 rounded-lg font-black text-[11px] text-white bg-white/10"
-                title="Alterar Idioma / Switch Language"
-              >
-                <span>{language === 'pt' ? '🇧🇷 PT' : '🇺🇸 EN'}</span>
-              </button>
-            </div>
-
-            {/* Mobile More Options Button */}
-            <button
-              id="mobile-menu-toggle-btn"
-              onClick={() => setShowMobileToolsMenu(!showMobileToolsMenu)}
-              className="flex md:hidden items-center justify-center p-1.5 rounded-xl border border-white/10 bg-[#2A3042] text-[#8E91A6] hover:text-white hover:border-white/25 active:scale-95 cursor-pointer shrink-0"
-              title="Mais opções e downloads"
-              aria-label="Mais opções"
-            >
-              {showMobileToolsMenu ? <X className="w-4 h-4 text-white" /> : <MoreVertical className="w-4 h-4" />}
-            </button>
 
           </div>
         </div>
@@ -383,115 +297,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           )}
         </div>
 
-        {/* Mobile Tools Dropdown Panel */}
-        {showMobileToolsMenu && (
-          <div className="md:hidden border-t border-white/10 bg-[#242938] p-3 animate-in fade-in slide-in-from-top-2 duration-200">
-            <div className="grid grid-cols-2 gap-2 text-xs">
-
-              {/* Mobile Onboarding Tour removed */}
-
-              <a
-                href="/TIKBLOX_Codigo_Fonte.pdf"
-                target="_blank"
-                rel="noopener noreferrer"
-                download="TIKBLOX_Codigo_Fonte.pdf"
-                onClick={() => setShowMobileToolsMenu(false)}
-                className="flex items-center gap-2 p-2.5 rounded-xl border border-[#FE2C55]/30 bg-[#FE2C55]/10 text-white font-bold"
-              >
-                <FileText className="w-4 h-4 text-[#FE2C55] shrink-0" />
-                <span>PDF Código (96p)</span>
-              </a>
-
-              <button
-                onClick={() => {
-                  setShowBrandAssetsModal(true);
-                  setShowMobileToolsMenu(false);
-                }}
-                className="flex items-center gap-2 p-2.5 rounded-xl border border-white/10 bg-[#141724] text-white font-bold"
-              >
-                <Download className="w-4 h-4 text-[#25F4EE] shrink-0" />
-                <span>Baixar Logo SVG</span>
-              </button>
-
-              {onOpenPushModal && (
-                <button
-                  onClick={() => {
-                    onOpenPushModal();
-                    setShowMobileToolsMenu(false);
-                  }}
-                  className="flex items-center gap-2 p-2.5 rounded-xl border border-white/10 bg-[#141724] text-white font-bold"
-                >
-                  <Bell className="w-4 h-4 text-amber-400 shrink-0" />
-                  <span>Notificações Push</span>
-                </button>
-              )}
-
-              <button
-                onClick={() => {
-                  setShowFreeTierModal(true);
-                  setShowMobileToolsMenu(false);
-                }}
-                className="flex items-center gap-2 p-2.5 rounded-xl border border-emerald-500/30 bg-emerald-950/20 text-emerald-300 font-bold"
-              >
-                <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>API R$ 0 Grátis</span>
-              </button>
-
-              {onOpenWorkspaceHub && (
-                <button
-                  onClick={() => {
-                    onOpenWorkspaceHub('drive');
-                    setShowMobileToolsMenu(false);
-                  }}
-                  className="col-span-2 flex items-center justify-center gap-2 p-2.5 rounded-xl border border-emerald-500/40 bg-emerald-950/30 text-emerald-300 font-bold"
-                >
-                  <Cloud className="w-4 h-4 text-emerald-400 shrink-0" />
-                  <span>Google Workspace (Drive, Gmail, Classroom)</span>
-                </button>
-              )}
-
-              {onOpenUpdateSettings && (
-                <button
-                  onClick={() => {
-                    onOpenUpdateSettings();
-                    setShowMobileToolsMenu(false);
-                  }}
-                  className="col-span-2 flex items-center justify-center gap-2 p-2.5 rounded-xl border border-[#25F4EE]/40 bg-[#25F4EE]/10 text-white font-bold"
-                >
-                  <FolderUp className="w-4 h-4 text-[#25F4EE] shrink-0" />
-                  <span>Configurar Atualizações Google Drive (.exe)</span>
-                </button>
-              )}
-
-              {onOpenOfflineStorage && (
-                <button
-                  onClick={() => {
-                    onOpenOfflineStorage();
-                    setShowMobileToolsMenu(false);
-                  }}
-                  className="col-span-2 flex items-center justify-center gap-2 p-2.5 rounded-xl border border-cyan-500/40 bg-cyan-950/30 text-cyan-300 font-bold cursor-pointer"
-                >
-                  <Database className="w-4 h-4 text-cyan-400 shrink-0" />
-                  <span>Banco Offline (IndexedDB)</span>
-                </button>
-              )}
-            </div>
-          </div>
-        )}
-
       </div>
-
-      {/* Brand Assets Export Modal */}
-      <BrandAssetsModal
-        isOpen={showBrandAssetsModal}
-        onClose={() => setShowBrandAssetsModal(false)}
-      />
-
-      {/* Free Tier Info Modal */}
-      <FreeTierInfoModal
-        isOpen={showFreeTierModal}
-        onClose={() => setShowFreeTierModal(false)}
-      />
     </header>
   );
 };
