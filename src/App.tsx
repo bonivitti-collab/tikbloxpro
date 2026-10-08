@@ -26,9 +26,6 @@ const SavedRadarView = React.lazy(() =>
 const OfflineStorageModal = React.lazy(() =>
   import('./components/OfflineStorageModal').then((m) => ({ default: m.OfflineStorageModal }))
 );
-const GlobalTrendHeatmap = React.lazy(() =>
-  import('./components/GlobalTrendHeatmap').then((m) => ({ default: m.GlobalTrendHeatmap }))
-);
 const PushNotificationModal = React.lazy(() =>
   import('./components/PushNotificationModal').then((m) => ({ default: m.PushNotificationModal }))
 );
@@ -687,23 +684,6 @@ export default function App() {
               exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
             >
-              {/* Global Trend Intensity Heatmap (D3 Geo-projection: USA & China) */}
-              <Suspense
-                fallback={
-                  <div className="h-44 sm:h-56 rounded-2xl bg-[#0B0C10] border border-white/5 animate-pulse mb-6 flex flex-col items-center justify-center text-xs text-[#757788] gap-2">
-                    <div className="w-6 h-6 rounded-full border-2 border-[#25F4EE]/30 border-t-[#25F4EE] animate-spin" />
-                    <span>Carregando projeção global...</span>
-                  </div>
-                }
-              >
-                <GlobalTrendHeatmap
-                  products={products}
-                  selectedOrigin={selectedOrigin as 'all' | 'US' | 'CN'}
-                  onSelectOrigin={(origin) => handleSetSelectedOrigin(origin)}
-                  onSelectProduct={handleOpenDeepDive}
-                />
-              </Suspense>
-
               {/* Trend Pulse: Real-time Early Wave Rate of Change & Niche Spike Monitor */}
               <TrendPulseSection
                 products={products}
