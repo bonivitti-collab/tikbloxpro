@@ -57,8 +57,10 @@ const creativeScriptsCache = new Map<string, any[]>();
 const CACHE_TTL_MS = 4 * 60 * 60 * 1000; // 4 hours
 
 // Circuit breaker for API rate limits and high-load cooldown
+export const IS_FROZEN = true;
 let rateLimitCooldownUntil = 0;
 function isRateLimited(): boolean {
+  if (IS_FROZEN) return true;
   return Date.now() < rateLimitCooldownUntil;
 }
 function triggerRateLimitCooldown(durationMs = 90000) {
@@ -330,7 +332,8 @@ app.get('/api/health', (req: Request, res: Response) => {
   res.json({
     status: 'ok',
     appName: 'TIKBLOX',
-    hasApiKey: !!process.env.GEMINI_API_KEY,
+    isFrozen: IS_FROZEN,
+    hasApiKey: IS_FROZEN ? false : !!process.env.GEMINI_API_KEY,
     timestamp: new Date().toISOString(),
   });
 });
@@ -1115,7 +1118,7 @@ ${contextSummary}
 
 Responda à pergunta da Duda de forma objetiva, acolhedora, especialista em arbitragem e focada em conversão e lucro no Brasil. Se ela perguntar sobre margens, fornecedores ou estratégias, use os dados acima. Se faltar algum dado, faça uma estimativa realista baseada no mercado de dropshipping e TikTok Shop.`;
 
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = IS_FROZEN ? '' : process.env.GEMINI_API_KEY;
     if (apiKey) {
       try {
         const ai = getGenAI();
@@ -1163,7 +1166,7 @@ app.post('/api/chat', async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Messages array is required' });
     }
 
-    if (process.env.GEMINI_API_KEY) {
+    if (!IS_FROZEN && process.env.GEMINI_API_KEY) {
       try {
         const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
         const systemInstruction = `Você é o Copiloto Estratégico IA do TikBlox Pro, especializado em Dropshipping Internacional, TikTok Ads, e eCommerce no Brasil. 

@@ -10,8 +10,9 @@ import {
 import firebaseConfig from '../../firebase-applet-config.json';
 
 // Initialize Firebase App singleton safely
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
-export const auth = getAuth(app);
+const isFirebaseConfigured = Boolean(firebaseConfig.apiKey && firebaseConfig.apiKey.trim().length > 0);
+const app = isFirebaseConfigured ? (getApps().length === 0 ? initializeApp(firebaseConfig) : getApp()) : null;
+export const auth: any = app ? getAuth(app) : { currentUser: null };
 
 // Complete scopes as approved by user
 export const WORKSPACE_SCOPES = [
@@ -49,6 +50,10 @@ export const initAuth = (
   onAuthSuccess?: (user: User, token: string) => void,
   onAuthFailure?: () => void
 ) => {
+  if (!isFirebaseConfigured) {
+    if (onAuthFailure) onAuthFailure();
+    return () => {};
+  }
   return onAuthStateChanged(auth, async (user: User | null) => {
     if (user) {
       if (cachedAccessToken) {

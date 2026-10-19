@@ -309,7 +309,7 @@ export default function App() {
   const hasTriggeredStartupPriceCheck = useRef(false);
   useEffect(() => {
     if (hasTriggeredStartupPriceCheck.current) return;
-    if (savedProductsList.length > 0) {
+    if (false && savedProductsList.length > 0) { // PWA FROZEN: startup auto-check disabled
       hasTriggeredStartupPriceCheck.current = true;
       const runStartupCheck = async () => {
         setIsCheckingPrices(true);
@@ -386,7 +386,7 @@ export default function App() {
       const todayDateStr = `${spTime.getFullYear()}-${spTime.getMonth() + 1}-${spTime.getDate()}`;
       
       const lastScan = localStorage.getItem('tikblox_last_daily_scan_date');
-      if (lastScan !== todayDateStr) {
+      if (false && lastScan !== todayDateStr) { // PWA FROZEN: daily auto-scan disabled
         // Need to run the daily scan!
         localStorage.setItem('tikblox_last_daily_scan_date', todayDateStr);
         handleTriggerScan(true);

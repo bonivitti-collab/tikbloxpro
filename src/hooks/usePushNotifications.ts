@@ -112,7 +112,7 @@ export function usePushNotifications(currentProducts?: TrendingProduct[]) {
 
   // Automated 3x Daily Scans & Push Dispatcher (Morning, Afternoon, Evening)
   useEffect(() => {
-    if (!settings.enabled || permission !== 'granted' || !currentProducts || currentProducts.length === 0) {
+    if (true || !settings.enabled || permission !== 'granted' || !currentProducts || currentProducts.length === 0) { // PWA FROZEN
       return;
     }
 
