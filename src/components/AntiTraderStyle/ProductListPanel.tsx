@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { TrendingProduct, ProductNiche } from '../../types';
 import { enrichWithTikTokShopData } from '../../data/tiktokShopEnricher';
+import { resolveRealProductImage } from '../../data/productImageResolver';
 
 interface CategoryOption {
   id: ProductNiche;
@@ -369,7 +370,7 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
         </div>
       </div>
 
-      {/* Lista Rolável de Cards com Identidade TikBlox */}
+      {/* Lista Rolável de Cards com Foto Real e Identidade TikBlox */}
       <div className="flex-1 overflow-y-auto p-2 sm:p-2.5 space-y-2 min-h-0">
         {filtered.length === 0 ? (
           <div className="p-6 text-center text-slate-500 text-xs bg-white rounded-xl border border-slate-200 my-4 shadow-2xs">
@@ -396,6 +397,7 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
             const commPct = Number(prod.commissionPercent || prod.tiktokShop?.commissionRatePercent || 20);
             const isSample = Boolean(prod.freeSampleAvailable || prod.tiktokShop?.freeSampleAvailable);
             const stockLoc = String(prod.stockLocationBrazil || prod.tiktokShop?.stockLocation || 'São Paulo - SP');
+            const prodImg = resolveRealProductImage(prod);
 
             return (
               <div
@@ -407,31 +409,42 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
                     : 'bg-white border-slate-200/90 hover:border-[#25F4EE]/60 hover:shadow-xs'
                 }`}
               >
-                {/* Linha 1: Título e Badges */}
-                <div className="flex items-start justify-between gap-1.5 mb-1">
+                {/* Linha 1: Miniatura Real + Título e Badges */}
+                <div className="flex items-start gap-2.5 mb-1.5">
+                  <img
+                    src={prodImg}
+                    alt={prod.name}
+                    className="w-12 h-12 rounded-lg object-cover border border-slate-200 shrink-0 bg-slate-50 shadow-2xs mt-0.5"
+                    onError={(e) => {
+                      (e.target as HTMLElement).style.display = 'none';
+                    }}
+                  />
+                  
                   <div className="min-w-0 flex-1">
-                    <span className="text-[10px] font-extrabold uppercase px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 border border-slate-200 mr-1.5">
-                      {prod.nicheLabel || 'Nicho'}
-                    </span>
-                    {isSelected && (
-                      <span className="text-[9px] font-black px-1.5 py-0.2 rounded bg-gradient-to-r from-[#25F4EE] to-[#00B4D8] text-[#0F121C] shadow-2xs">
-                        EM FOCO
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 border border-slate-200">
+                        {prod.nicheLabel || 'Nicho'}
                       </span>
-                    )}
-                    <h3 className="text-xs font-bold text-slate-900 leading-snug line-clamp-1 mt-0.5">
+                      {isSelected && (
+                        <span className="text-[9px] font-black px-1.5 py-0.2 rounded bg-gradient-to-r from-[#25F4EE] to-[#00B4D8] text-[#0F121C] shadow-2xs">
+                          EM FOCO
+                        </span>
+                      )}
+                      {isSample ? (
+                        <span className="text-[9px] font-extrabold px-1.5 py-0.2 rounded uppercase bg-emerald-50 text-emerald-800 border border-emerald-300 ml-auto">
+                          🎁 Amostra
+                        </span>
+                      ) : (
+                        <span className="text-[9px] font-semibold px-1.5 py-0.2 rounded uppercase bg-[#25F4EE]/10 text-[#007A87] border border-[#25F4EE]/30 ml-auto">
+                          {prod.creatorSaturationBR === 'Baixa' ? '🌊 Oceano' : 'Em Alta'}
+                        </span>
+                      )}
+                    </div>
+
+                    <h3 className="text-xs font-bold text-slate-900 leading-snug line-clamp-1 mt-1">
                       {prod.name}
                     </h3>
                   </div>
-
-                  {isSample ? (
-                    <span className="text-[9px] font-extrabold px-1.5 py-0.2 rounded uppercase bg-emerald-50 text-emerald-800 border border-emerald-300 shrink-0">
-                      🎁 Amostra
-                    </span>
-                  ) : (
-                    <span className="text-[9px] font-semibold px-1.5 py-0.2 rounded uppercase bg-[#25F4EE]/10 text-[#007A87] border border-[#25F4EE]/30 shrink-0">
-                      {prod.creatorSaturationBR === 'Baixa' ? '🌊 Oceano Azul' : 'Em Alta'}
-                    </span>
-                  )}
                 </div>
 
                 {/* Linha 2: Métricas de Preço e Comissão */}

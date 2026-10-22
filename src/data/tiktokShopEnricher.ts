@@ -1,3 +1,4 @@
+import { resolveRealProductImage } from './productImageResolver';
 import { TrendingProduct } from '../types';
 
 export function enrichWithTikTokShopData(product: any): any {
@@ -74,7 +75,7 @@ export function enrichWithTikTokShopData(product: any): any {
     creatorSaturationBR: saturationLevel,
     tiktokShopAffiliateLink,
     hookViral3s: topViralHook,
-    imageUrl: product.imageUrl || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&q=80',
+    imageUrl: resolveRealProductImage(product),
     tiktokShop: {
       hasBrazilStock: true,
       stockLocation,

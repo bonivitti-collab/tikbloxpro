@@ -14,10 +14,13 @@ import {
   ShieldCheck,
   TrendingUp,
   MapPin,
-  Users
+  Users,
+  Search,
+  Camera
 } from 'lucide-react';
 import { TrendingProduct } from '../../types';
 import { enrichWithTikTokShopData } from '../../data/tiktokShopEnricher';
+import { resolveRealProductImage } from '../../data/productImageResolver';
 
 interface ProductDetailTerminalProps {
   product: TrendingProduct | null;
@@ -35,6 +38,7 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
   onOpenCalculator,
 }) => {
   const [copiedHook, setCopiedHook] = useState(false);
+  const [imageError, setImageError] = useState(false);
 
   if (!product) {
     return (
@@ -59,8 +63,11 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
   const hookText = String(tk.hookViral3s || tk.tiktokShop?.topViralHook || tk.adHooks?.[0] || 'Oportunidade em alta no TikTok Shop!');
   const isSample = Boolean(tk.freeSampleAvailable || tk.tiktokShop?.freeSampleAvailable);
   const saturation = String(tk.creatorSaturationBR || tk.tiktokShop?.saturationLevel || 'Oceano Azul');
-  const imgUrl = String(tk.imageUrl || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&q=80');
   const affLink = String(tk.tiktokShopAffiliateLink || tk.tiktokShop?.tiktokShopAffiliateLink || 'https://seller-br.tiktok.com');
+
+  // Resolução inteligente da foto real do produto
+  const realImageUrl = resolveRealProductImage(tk);
+  const tiktokSearchUrl = `https://www.tiktok.com/search?q=${encodeURIComponent(tk.name + ' unboxing review')}`;
 
   const handleCopyHook = () => {
     navigator.clipboard.writeText(hookText);
@@ -72,22 +79,40 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
     <main className="flex-1 min-w-0 bg-[#F8FAFC] overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-5 text-slate-900 select-none">
       
       {/* ========================================================= */}
-      {/* 1. CABEÇALHO DO PRODUTO EM FOCO COM TOQUES TIKBLOX         */}
+      {/* 1. CABEÇALHO COM APRESENTAÇÃO DE FOTO REAL DE ESTÚDIO     */}
       {/* ========================================================= */}
-      <div className="bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-xs relative overflow-hidden">
+      <div className="bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-5 shadow-xs relative overflow-hidden">
         
         {/* Barra Decorativa Superior com Gradiente do Logo */}
         <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-[#25F4EE] via-[#FE2C55] to-[#25F4EE]" />
 
-        <div className="flex items-start sm:items-center gap-3.5 min-w-0">
-          <img
-            src={imgUrl}
-            alt={tk.name}
-            className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl object-cover border border-slate-200 shadow-2xs shrink-0 bg-slate-50"
-            onError={(e) => {
-              (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&q=80';
-            }}
-          />
+        <div className="flex items-start sm:items-center gap-4 min-w-0">
+          
+          {/* Box de Foto de Estúdio Real com Acabamento Premium */}
+          <div className="relative group shrink-0">
+            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden border border-slate-200 shadow-sm bg-slate-50 relative flex items-center justify-center group-hover:border-[#25F4EE] transition-colors">
+              {!imageError ? (
+                <img
+                  src={realImageUrl}
+                  alt={tk.name}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  onError={() => setImageError(true)}
+                />
+              ) : (
+                <div className="w-full h-full flex flex-col items-center justify-center p-2 text-center bg-gradient-to-tr from-[#25F4EE]/10 to-[#FE2C55]/10">
+                  <span className="text-2xl mb-1">📦</span>
+                  <span className="text-[9px] font-bold text-slate-500 uppercase">Catálogo</span>
+                </div>
+              )}
+
+              {/* Selo de Verificação de Foto */}
+              <div className="absolute bottom-1 right-1 bg-black/60 backdrop-blur-xs text-white text-[8px] font-bold px-1.5 py-0.5 rounded flex items-center gap-1">
+                <Camera className="w-2.5 h-2.5 text-[#25F4EE]" />
+                <span>Real</span>
+              </div>
+            </div>
+          </div>
+
           <div className="min-w-0">
             <div className="flex items-center gap-2 flex-wrap mb-1">
               <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-[#25F4EE]/10 text-[#007A87] border border-[#25F4EE]/40">
@@ -109,6 +134,21 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
             <p className="text-xs text-slate-500 mt-0.5 font-medium line-clamp-1">
               {tk.originalName || tk.name}
             </p>
+
+            {/* Link Rápido para Ver Fotos Reais e Vídeos de Reviews no TikTok */}
+            <div className="mt-2 flex items-center gap-2">
+              <a
+                href={tiktokSearchUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-[11px] font-bold text-[#007A87] hover:text-[#FE2C55] bg-sky-50 hover:bg-sky-100 px-2 py-0.5 rounded-md border border-sky-200 transition cursor-pointer"
+                title="Abrir busca no TikTok para ver dezenas de vídeos de unboxing e fotos reais de compradores"
+              >
+                <Search className="w-3 h-3" />
+                <span>Ver Unboxings & Fotos Reais no TikTok</span>
+                <ExternalLink className="w-2.5 h-2.5 opacity-70" />
+              </a>
+            </div>
           </div>
         </div>
 
