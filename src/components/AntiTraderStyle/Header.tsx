@@ -73,16 +73,6 @@ export const Header: React.FC<HeaderProps> = ({
           </span>
         </button>
 
-        {/* Botão Simulador de Lucro / Calculadora */}
-        <button
-          onClick={onOpenCalculator}
-          className="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 hover:text-slate-900 transition-all cursor-pointer shadow-2xs"
-          title="Simulador de Margem & Taxas de Envio"
-        >
-          <SlidersHorizontal className="w-3.5 h-3.5 text-[#007A87]" />
-          <span>Calculadora</span>
-        </button>
-
         {/* Toggles de Painéis no Desktop */}
         <div className="hidden lg:flex items-center gap-1.5 border-l border-slate-200 pl-2.5 ml-1">
           <button

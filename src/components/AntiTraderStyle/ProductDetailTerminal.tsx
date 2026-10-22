@@ -219,15 +219,6 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
           </a>
 
           <button
-            onClick={() => onOpenCalculator(product)}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 hover:text-slate-900 transition cursor-pointer active:scale-95 shadow-2xs"
-            title="Simular Lucro e Taxas de Envio"
-          >
-            <SlidersHorizontal className="w-3.5 h-3.5 text-[#007A87]" />
-            <span className="hidden sm:inline">Simular</span>
-          </button>
-
-          <button
             onClick={() => onToggleSave(tk.id)}
             className={`p-2 rounded-xl border transition cursor-pointer active:scale-95 shadow-2xs ${
               isSaved

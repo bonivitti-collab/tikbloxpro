@@ -178,7 +178,45 @@ Para atuar como afiliado e ganhar comissões em cada venda no TikTok Brasil, o p
   }
 
   // =========================================================================
-  // 4. COMISSÕES, PAGAMENTOS, SAQUES E GANHOS
+  // 4. SIMULAÇÃO FINANCEIRA DE LUCRO & MARGEM (SUBSTITUI CALCULADORA MANUAL)
+  // =========================================================================
+  if (
+    q.includes('simular') || q.includes('simule') || q.includes('simulacao') || q.includes('simulação') || 
+    q.includes('calculadora') || q.includes('calcular') || q.includes('margem') || 
+    q.includes('quanto sobra') || q.includes('quanto ganho')
+  ) {
+    const itemTitle = productContext?.name ? productContext.name : 'Produto em Alta no TikTok Shop';
+    const itemPriceNum = Number(productContext?.estimatedPriceBRL || 89.90);
+    const itemCommPct = Number(productContext?.commissionPercent || productContext?.tiktokShop?.commissionRatePercent || 25);
+    const itemCommNum = Number(productContext?.commissionEstimatedBRL || (itemPriceNum * (itemCommPct / 100)) || 22.50);
+
+    const profit10 = (itemCommNum * 10).toFixed(2);
+    const profit30 = (itemCommNum * 30).toFixed(2);
+    const profit50 = (itemCommNum * 50).toFixed(2);
+    const profit100 = (itemCommNum * 100).toFixed(2);
+
+    return `### 🧮 Simulação Financeira & Projeção de Lucro Líquido
+
+**Base da Simulação:** ${itemTitle}
+- 🏷️ **Preço Médio de Venda no Feed:** R$ ${itemPriceNum.toFixed(2)}
+- 💰 **Sua Comissão Líquida por Venda:** **R$ ${itemCommNum.toFixed(2)} (${itemCommPct}%)**
+- 📦 **Taxas de Envio & Embalagem:** **R$ 0,00** (Custeado pelo lojista de pronta entrega no Brasil)
+- 💳 **Taxa de Intermediação TikTok:** Já descontada na fonte pela plataforma
+
+---
+
+#### 📈 Projeção Real de Ganhos por Volume de Vendas:
+- **10 Vendas** *(1 vídeo com tração de ~8k views)*: **R$ ${profit10} líquidos**
+- **30 Vendas** *(Resultado médio de 1 Live de 45 minutos)*: **R$ ${profit30} líquidos**
+- **50 Vendas** *(Vídeo viral no For You de ~35k views)*: **R$ ${profit50} líquidos**
+- **100 Vendas** *(Consistência de 2 vídeos diários na semana)*: **R$ ${profit100} líquidos**
+
+💡 **Como e quando você recebe:**
+O saldo acumulado cai na sua **Carteira TikTok Shop** e fica liberado para **saque instantâneo via Pix** assim que expirar o prazo de 7 dias de garantia de entrega do cliente. Zero burocracia bancária!`;
+  }
+
+  // =========================================================================
+  // 5. COMISSÕES, PAGAMENTOS, SAQUES E GANHOS
   // =========================================================================
   if (
     q.includes('quanto ganha') || q.includes('como paga') || q.includes('pagamento') || 

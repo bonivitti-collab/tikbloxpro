@@ -131,7 +131,7 @@ export const AICopilotPanel: React.FC<AICopilotPanelProps> = ({
               </span>
             </div>
             <span className="text-[10px] text-slate-500 truncate block mt-0.5">
-              {tk ? `Focado em: ${tk.name}` : 'Especialista em TikTok Shop BR'}
+              Especialista em TikTok Shop Brasil
             </span>
           </div>
         </div>
@@ -163,29 +163,10 @@ export const AICopilotPanel: React.FC<AICopilotPanelProps> = ({
         {messages.length === 0 ? (
           <div className="space-y-4 py-2">
             
-            {/* Boas-vindas com Estilo TikBlox */}
-            <div className="bg-white border border-slate-200/90 rounded-2xl p-3.5 shadow-2xs space-y-2 relative overflow-hidden">
-              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#25F4EE] to-[#FE2C55]" />
-              <div className="flex items-center gap-2 pt-1">
-                <span className="text-base">👋</span>
-                <h4 className="text-xs font-bold text-slate-900">
-                  Inteligência de Vendas TikTok Shop Brasil
-                </h4>
-              </div>
-              <p className="text-[11px] text-slate-600 leading-relaxed">
-                Eu analiso ganchos de 3s, crio roteiros de vídeos para o feed, scripts de live commerce e mensagens para conseguir amostras grátis direto dos fornecedores de SP/PR.
-              </p>
-              {tk && (
-                <div className="p-2 rounded-lg bg-slate-50 border border-slate-200 text-[11px] text-slate-700">
-                  <span className="text-[#007A87] font-bold">Produto em análise:</span> {tk.name} (R$ {Number(tk.estimatedPriceBRL || 0).toFixed(2)})
-                </div>
-              )}
-            </div>
-
             {/* Prompts Rápidos com Borda Lateral com as Cores da Marca */}
             <div className="space-y-2">
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block px-1">
-                Ações Imediatas para Este Produto:
+                Sugestões de Perguntas & Ações Rápidas:
               </span>
 
               {/* Roteiros: Borda Ciano TikBlox */}
