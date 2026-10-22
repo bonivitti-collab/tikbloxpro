@@ -532,7 +532,7 @@ export default function App() {
   }, [hasMoreProducts, filteredProducts.length]);
 
   return (
-    <div className="h-full h-dvh w-full max-w-full bg-[#12151F] text-[#F6F3EC] font-sans flex flex-col overflow-hidden select-none">
+    <div className="h-full h-dvh w-full max-w-full bg-[#eef2f6] text-[#0f172a] font-sans flex flex-col overflow-hidden select-none">
       
       {/* 1. HEADER PRINCIPAL RESPONSIVO */}
       <Header
@@ -550,14 +550,14 @@ export default function App() {
         }}
       />
 
-      {/* 2. SELETOR DE ABAS MOBILE / TABLET */}
-      <nav className="grid grid-cols-3 lg:hidden w-full bg-[#1A1D28] border-b border-white/10 p-1.5 gap-1.5 shrink-0 text-xs font-bold select-none">
+      {/* 2. SELETOR DE ABAS MOBILE / TABLET (CINZA CLARO) */}
+      <nav className="grid grid-cols-3 lg:hidden w-full bg-slate-200 border-b border-slate-300 p-1.5 gap-1.5 shrink-0 text-xs font-bold select-none">
         <button
           onClick={() => setMobileTab('produtos')}
           className={`py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1 cursor-pointer transition-all border ${
             mobileTab === 'produtos'
-              ? 'bg-[#25F4EE] text-[#0F121C] border-[#25F4EE] shadow-[0_0_12px_rgba(37,244,238,0.3)] font-black'
-              : 'bg-[#222738] text-slate-300 border-white/10 hover:bg-[#2A3042] hover:text-white'
+              ? 'bg-slate-900 text-white border-slate-900 shadow-2xs font-black'
+              : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100'
           }`}
         >
           <span>🛍️ Tendências</span>
@@ -567,8 +567,8 @@ export default function App() {
           onClick={() => setMobileTab('terminal')}
           className={`py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1 cursor-pointer transition-all border ${
             mobileTab === 'terminal'
-              ? 'bg-[#25F4EE] text-[#0F121C] border-[#25F4EE] shadow-[0_0_12px_rgba(37,244,238,0.3)] font-black'
-              : 'bg-[#222738] text-slate-300 border-white/10 hover:bg-[#2A3042] hover:text-white'
+              ? 'bg-slate-900 text-white border-slate-900 shadow-2xs font-black'
+              : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100'
           }`}
         >
           <span>🔬 Raio-X Produto</span>
@@ -578,8 +578,8 @@ export default function App() {
           onClick={() => setMobileTab('copilot')}
           className={`py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1 cursor-pointer transition-all border ${
             mobileTab === 'copilot'
-              ? 'bg-[#25F4EE] text-[#0F121C] border-[#25F4EE] shadow-[0_0_12px_rgba(37,244,238,0.3)] font-black'
-              : 'bg-[#222738] text-slate-300 border-white/10 hover:bg-[#2A3042] hover:text-white'
+              ? 'bg-slate-900 text-white border-slate-900 shadow-2xs font-black'
+              : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100'
           }`}
         >
           <span>🤖 Copiloto IA</span>
@@ -587,7 +587,7 @@ export default function App() {
       </nav>
 
       {/* 3. ÁREA PRINCIPAL: THREE-PANEL TERMINAL (CUSTOMIZÁVEL NO NOTEBOOK/DESKTOP) */}
-      <div className="flex-1 flex flex-col lg:flex-row w-full max-w-full overflow-hidden min-h-0 bg-[#12151F] relative">
+      <div className="flex-1 flex flex-col lg:flex-row w-full max-w-full overflow-hidden min-h-0 bg-[#e2e8f0] relative">
         {/* PAINEL 1: Lista de Produtos */}
         <div className={`h-full ${mobileTab !== 'produtos' ? 'hidden lg:flex' : 'flex'}`}>
           <ProductListPanel
