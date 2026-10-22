@@ -6,8 +6,10 @@ import { ProductCard } from './components/ProductCard';
 import { OfflineIndicator } from './components/OfflineIndicator';
 import { EarlyWaveDashboard } from './components/EarlyWaveDashboard';
 import { TrendPulseSection } from './components/TrendPulseSection';
-import { LeftSidebar } from './components/ThreePanelWorkspace/LeftSidebar';
-import { RightAICopilot } from './components/ThreePanelWorkspace/RightAICopilot';
+import { Header } from './components/AntiTraderStyle/Header';
+import { ProductListPanel } from './components/AntiTraderStyle/ProductListPanel';
+import { ProductDetailTerminal } from './components/AntiTraderStyle/ProductDetailTerminal';
+import { AICopilotPanel } from './components/AntiTraderStyle/AICopilotPanel';
 
 // High-speed lazy loading: Keep initial bundle minimal so mobile devices render in under 1 second
 const ProductDetailModal = React.lazy(() =>
@@ -98,8 +100,13 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [filterFreeSampleOnly, setFilterFreeSampleOnly] = useState<boolean>(false);
   const [filterBlueOceanOnly, setFilterBlueOceanOnly] = useState<boolean>(false);
-  const [activeProductForAI, setActiveProductForAI] = useState<TrendingProduct | null>(() => INITIAL_CURATED_TRENDS[0] || null);
-  const [isRightPanelOpen, setIsRightPanelOpen] = useState(true);
+  const [activeProduct, setActiveProduct] = useState<TrendingProduct | null>(() => INITIAL_CURATED_TRENDS[0] || null);
+  const [painelEsquerdoRecolhido, setPainelEsquerdoRecolhido] = useState(false);
+  const [painelDireitoRecolhido, setPainelDireitoRecolhido] = useState(false);
+  const [mobileTab, setMobileTab] = useState<'produtos' | 'terminal' | 'copilot'>('produtos');
+  const [filterHighCommissionOnly, setFilterHighCommissionOnly] = useState<boolean>(false);
+  const [showSavedModal, setShowSavedModal] = useState<boolean>(false);
+  const [showCalculatorModal, setShowCalculatorModal] = useState<boolean>(false);
 
   // Modals state
   const [selectedProductForDetail, setSelectedProductForDetail] =
@@ -525,364 +532,173 @@ export default function App() {
   }, [hasMoreProducts, filteredProducts.length]);
 
   return (
-    <div className="min-h-screen bg-[#1A1D27] text-white flex flex-col font-['Plus_Jakarta_Sans',sans-serif]">
-      {/* Top Sticky Navigation */}
-      <Navbar
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
+    <div className="h-full h-dvh w-full max-w-full bg-white text-[#1e293b] font-sans flex flex-col overflow-hidden select-none">
+      
+      {/* 1. HEADER PRINCIPAL RESPONSIVO ESTILO ANTITRADER */}
+      <Header
+        onScanTrends={() => handleTriggerScan(false)}
+        isScanning={isScanning}
         savedCount={savedIds.length}
-        onOpenPushModal={() => setShowPushModal(true)}
-        isPushActive={pushPermission === 'granted' && pushSettings.enabled}
-        onOpenUpdateSettings={() => setShowUpdateSettingsModal(true)}
-        hasUpdateAvailable={!!availableUpdate}
-        onOpenWorkspaceHub={(tab = 'drive') => {
-          setWorkspaceInitialTab(tab);
-          setShowWorkspaceHub(true);
+        onOpenSaved={() => setShowSavedModal(true)}
+        painelEsquerdoRecolhido={painelEsquerdoRecolhido}
+        setPainelEsquerdoRecolhido={setPainelEsquerdoRecolhido}
+        painelDireitoRecolhido={painelDireitoRecolhido}
+        setPainelDireitoRecolhido={setPainelDireitoRecolhido}
+        onOpenCalculator={() => {
+          setSelectedProductForCalc(activeProduct);
+          setShowCalculatorModal(true);
         }}
-        onOpenOfflineStorage={() => setShowOfflineStorageModal(true)}
-        onOpenOnboardingTour={() => setShowOnboardingModal(true)}
-        onOpenWifeBot={() => setShowWifeBotModal(true)}
       />
 
-      {/* Top Update Alert Banner (shown when a newer version is detected on Google Drive) */}
-      {availableUpdate && (
-        <div className="bg-gradient-to-r from-[#FE2C55]/20 via-[#161823] to-[#25F4EE]/20 border-b border-[#FE2C55]/30 px-4 py-2.5">
-          <div className="mx-auto max-w-7xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5">
-            <div className="flex items-center gap-2.5">
-              <span className="flex h-2.5 w-2.5 relative">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FE2C55] opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#FE2C55]"></span>
-              </span>
-              <span className="text-xs text-white">
-                <strong className="text-[#FE2C55] font-black mr-1.5">ATUALIZAÇÃO DISPONÍVEL:</strong>
-                Versão <strong>v{availableUpdate.version}</strong> pronta para download no seu notebook!
-              </span>
-            </div>
+      {/* 2. SELETOR DE ABAS MOBILE / TABLET (ESTILO ANTITRADER) */}
+      <nav className="grid grid-cols-3 lg:hidden w-full bg-slate-100 border-b border-slate-300 p-1 gap-1 shrink-0 text-xs font-bold select-none">
+        <button
+          onClick={() => setMobileTab('produtos')}
+          className={`py-1.5 rounded-md text-xs font-bold flex items-center justify-center gap-1 cursor-pointer transition-all border ${
+            mobileTab === 'produtos'
+              ? 'bg-blue-600 text-white border-blue-600 shadow-2xs'
+              : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'
+          }`}
+        >
+          <span>🛍️ Tendências</span>
+        </button>
 
-            <div className="flex items-center gap-2">
+        <button
+          onClick={() => setMobileTab('terminal')}
+          className={`py-1.5 rounded-md text-xs font-bold flex items-center justify-center gap-1 cursor-pointer transition-all border ${
+            mobileTab === 'terminal'
+              ? 'bg-blue-600 text-white border-blue-600 shadow-2xs'
+              : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'
+          }`}
+        >
+          <span>🔬 Raio-X Produto</span>
+        </button>
+
+        <button
+          onClick={() => setMobileTab('copilot')}
+          className={`py-1.5 rounded-md text-xs font-bold flex items-center justify-center gap-1 cursor-pointer transition-all border ${
+            mobileTab === 'copilot'
+              ? 'bg-blue-600 text-white border-blue-600 shadow-2xs'
+              : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'
+          }`}
+        >
+          <span>🤖 Copiloto IA</span>
+        </button>
+      </nav>
+
+      {/* 3. ÁREA PRINCIPAL: THREE-PANEL TERMINAL (CUSTOMIZÁVEL NO NOTEBOOK/DESKTOP) */}
+      <div className="flex-1 flex flex-col lg:flex-row w-full max-w-full overflow-hidden min-h-0 bg-slate-100 relative">
+        {/* PAINEL 1: Lista de Produtos */}
+        <div className={`h-full ${mobileTab !== 'produtos' ? 'hidden lg:flex' : 'flex'}`}>
+          <ProductListPanel
+            products={products}
+            activeProduct={activeProduct}
+            onSelectProduct={(p) => {
+              setActiveProduct(p);
+              setMobileTab('terminal');
+            }}
+            isCollapsed={painelEsquerdoRecolhido}
+            onToggleCollapse={() => setPainelEsquerdoRecolhido(!painelEsquerdoRecolhido)}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            filterFreeSampleOnly={filterFreeSampleOnly}
+            setFilterFreeSampleOnly={setFilterFreeSampleOnly}
+            filterBlueOceanOnly={filterBlueOceanOnly}
+            setFilterBlueOceanOnly={setFilterBlueOceanOnly}
+            filterHighCommissionOnly={filterHighCommissionOnly}
+            setFilterHighCommissionOnly={setFilterHighCommissionOnly}
+          />
+        </div>
+
+        {/* PAINEL 2: Terminal de Raio-X & Destrinchamento do Produto em Foco */}
+        <div className={`h-full flex-1 overflow-hidden min-w-0 ${mobileTab !== 'terminal' ? 'hidden lg:flex' : 'flex'}`}>
+          <ProductDetailTerminal
+            product={activeProduct}
+            onOpenInCopilot={(p) => {
+              setActiveProduct(p);
+              setPainelDireitoRecolhido(false);
+              setMobileTab('copilot');
+            }}
+            onToggleSave={handleToggleSave}
+            isSaved={activeProduct ? savedIdsSet.has(activeProduct.id) : false}
+            onOpenCalculator={(p) => {
+              setSelectedProductForCalc(p);
+              setShowCalculatorModal(true);
+            }}
+          />
+        </div>
+
+        {/* PAINEL 3: Copiloto IA Especialista em TikTok Shop */}
+        <div className={`h-full ${mobileTab !== 'copilot' ? 'hidden lg:flex' : 'flex'}`}>
+          <AICopilotPanel
+            activeProduct={activeProduct}
+            isCollapsed={painelDireitoRecolhido}
+            onToggleCollapse={() => setPainelDireitoRecolhido(!painelDireitoRecolhido)}
+          />
+        </div>
+      </div>
+
+      {/* Modal de Produtos Salvos */}
+      {showSavedModal && (
+        <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5">
+          <div className="bg-white rounded-2xl border border-slate-300 w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl">
+            <div className="p-3 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+              <h3 className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
+                <Bookmark className="w-4 h-4 text-amber-500" />
+                <span>Produtos Salvos ({savedProductsList.length})</span>
+              </h3>
               <button
-                onClick={() => setShowUpdateModal(true)}
-                className="px-3 py-1 rounded-lg bg-gradient-to-r from-[#FE2C55] to-[#FF0050] text-white font-extrabold text-[11px] shadow-sm hover:brightness-110 active:scale-95 transition cursor-pointer flex items-center gap-1.5"
+                onClick={() => setShowSavedModal(false)}
+                className="p-1 hover:bg-slate-200 rounded text-slate-500 hover:text-slate-800 transition cursor-pointer"
               >
-                <Download className="w-3 h-3" />
-                <span>Ver Novidades & Baixar</span>
+                <X className="w-4 h-4" />
               </button>
-              <button
-                onClick={() => {
-                  setVersionDismissed(availableUpdate.version);
-                  setAvailableUpdate(null);
+            </div>
+            <div className="flex-1 overflow-y-auto p-4">
+              <SavedRadarView
+                savedProducts={savedProductsList}
+                priceSummary={priceSummary}
+                isCheckingPrices={isCheckingPrices}
+                onRefreshPrices={handleRefreshPrices}
+                onApplyPriceUpdate={handleApplyPriceUpdate}
+                onToggleSave={handleToggleSave}
+                onOpenDeepDive={handleOpenDeepDive}
+                onOpenCalculator={(p) => {
+                  setSelectedProductForCalc(p);
+                  setShowCalculatorModal(true);
                 }}
-                className="px-2 py-1 text-[11px] text-[#A6A7B2] hover:text-white transition cursor-pointer"
-              >
-                Dispensar
-              </button>
+                onOpenCreativeGenerator={handleOpenCreativeGenerator}
+                onBackToRadar={() => setShowSavedModal(false)}
+                initialSubTab={savedInitialSubTab}
+              />
             </div>
           </div>
         </div>
       )}
 
-      {/* Three Panel Workspace for TikTok Shop Brasil */}
-      <div className="w-full max-w-[1920px] mx-auto px-2 sm:px-4 lg:px-6 py-4 flex flex-col lg:flex-row gap-5 items-start">
-        {/* Panel 1: Left Navigation & Filters Sidebar */}
-        <aside className="w-full lg:w-72 xl:w-80 shrink-0 lg:sticky lg:top-20 z-10">
-          <LeftSidebar
-            selectedNiche={selectedNiche}
-            setSelectedNiche={handleSetSelectedNiche}
-            selectedOrigin={selectedOrigin}
-            setSelectedOrigin={handleSetSelectedOrigin}
-            searchQuery={searchQuery}
-            setSearchQuery={handleSetSearchQuery}
-            onTriggerScan={() => handleTriggerScan(false)}
-            isScanning={isScanning}
-            filterFreeSampleOnly={filterFreeSampleOnly}
-            setFilterFreeSampleOnly={setFilterFreeSampleOnly}
-            filterBlueOceanOnly={filterBlueOceanOnly}
-            setFilterBlueOceanOnly={setFilterBlueOceanOnly}
-            activeTab={activeTab}
-            setActiveTab={setActiveTab}
-            savedCount={savedIds.length}
-            totalProductsCount={products.length}
-          />
-        </aside>
-
-        {/* Panel 2: Center Main Workspace / Destrinchados Product Cards */}
-        <main className="flex-1 min-w-0 w-full space-y-4">
-          {/* Top Quick Status & Navigation Bar */}
-          <div className="bg-[#1E2230] border border-white/10 rounded-2xl p-3 sm:p-4 shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-3">
-            <div className="flex items-center gap-2 flex-wrap">
+      {/* Modal de Calculadora de Margem */}
+      {showCalculatorModal && (
+        <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5">
+          <div className="bg-white rounded-2xl border border-slate-300 w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl">
+            <div className="p-3 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+              <h3 className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
+                <SlidersHorizontal className="w-4 h-4 text-blue-600" />
+                <span>Simulador de Lucro Líquido & Margem</span>
+              </h3>
               <button
-                onClick={() => setActiveTab('all')}
-                className={`px-3 py-1.5 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-1.5 ${
-                  activeTab === 'all'
-                    ? 'bg-gradient-to-r from-[#FE2C55] to-[#FF0050] text-white shadow-md shadow-[#FE2C55]/30'
-                    : 'bg-[#161823] text-[#A6A7B2] hover:text-white border border-white/5'
-                }`}
+                onClick={() => setShowCalculatorModal(false)}
+                className="p-1 hover:bg-slate-200 rounded text-slate-500 hover:text-slate-800 transition cursor-pointer"
               >
-                <span>🔥 Todas as Tendências</span>
-                <span className="text-[10px] px-1.5 py-0.5 bg-white/20 rounded-full font-bold">{filteredProducts.length}</span>
-              </button>
-
-              <button
-                onClick={() => setActiveTab('early_wave')}
-                className={`px-3 py-1.5 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-1.5 ${
-                  activeTab === 'early_wave'
-                    ? 'bg-gradient-to-r from-[#25F4EE] to-cyan-500 text-black shadow-md shadow-[#25F4EE]/30'
-                    : 'bg-[#161823] text-[#A6A7B2] hover:text-white border border-white/5'
-                }`}
-              >
-                <span>🌊 Ondas Iniciais</span>
-              </button>
-
-              <button
-                onClick={() => setActiveTab('high_margin')}
-                className={`px-3 py-1.5 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-1.5 ${
-                  activeTab === 'high_margin'
-                    ? 'bg-gradient-to-r from-emerald-500 to-green-600 text-white shadow-md shadow-emerald-500/30'
-                    : 'bg-[#161823] text-[#A6A7B2] hover:text-white border border-white/5'
-                }`}
-              >
-                <span>💰 Alta Margem</span>
+                <X className="w-4 h-4" />
               </button>
             </div>
-
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setIsRightPanelOpen(!isRightPanelOpen)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-1.5 border ${
-                  isRightPanelOpen
-                    ? 'bg-[#161823] text-[#25F4EE] border-[#25F4EE]/40 hover:border-[#25F4EE]'
-                    : 'bg-gradient-to-r from-[#FE2C55] to-[#25F4EE] text-white border-transparent shadow-md shadow-[#FE2C55]/20'
-                }`}
-                title="Alternar painel do Copiloto IA à direita"
-              >
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>{isRightPanelOpen ? 'Fechar Copiloto IA' : 'Abrir Copiloto IA'}</span>
-              </button>
+            <div className="flex-1 overflow-y-auto p-4">
+              <ProfitCalculatorModal
+                product={selectedProductForCalc}
+                onClose={() => setShowCalculatorModal(false)}
+              />
             </div>
           </div>
-
-          {/* TAB Content Switching with Framer Motion */}
-          <AnimatePresence mode="wait" initial={false}>
-            {activeTab === 'saved' ? (
-              <motion.div
-                key="tab-view-saved"
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-              >
-                <Suspense
-                  fallback={
-                    <div className="h-64 rounded-2xl bg-[#262B3A] border border-white/5 animate-pulse flex items-center justify-center text-xs text-[#757788]">
-                      Carregando produtos salvos...
-                    </div>
-                  }
-                >
-                  <SavedRadarView
-                    savedProducts={savedProductsList}
-                    priceSummary={priceSummary}
-                    isCheckingPrices={isCheckingPrices}
-                    onRefreshPrices={handleRefreshPrices}
-                    onApplyPriceUpdate={handleApplyPriceUpdate}
-                    onToggleSave={handleToggleSave}
-                    onOpenDeepDive={handleOpenDeepDive}
-                    onOpenCalculator={handleOpenCalculator}
-                    onOpenCreativeGenerator={handleOpenCreativeGenerator}
-                    onBackToRadar={() => setActiveTab('all')}
-                    initialSubTab={savedInitialSubTab}
-                  />
-                </Suspense>
-              </motion.div>
-            ) : activeTab === 'calculator' ? (
-              /* TAB: General Calculator */
-              <motion.div
-                key="tab-view-calculator"
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-                className="max-w-3xl mx-auto"
-              >
-                <div className="text-center mb-6">
-                  <h2 className="text-2xl font-black text-white">
-                    Simulador de Margem Líquida & Viabilidade de Importação
-                  </h2>
-                  <p className="text-xs sm:text-sm text-[#A6A7B2] mt-1">
-                    Calcule custos em USD, frete internacional, impostos alfandegários (Remessa Conforme), taxas de checkout e tráfego pago para qualquer produto.
-                  </p>
-                </div>
-                <Suspense
-                  fallback={
-                    <div className="h-96 rounded-2xl bg-[#262B3A] border border-white/5 animate-pulse flex items-center justify-center text-xs text-[#757788]">
-                      Carregando simulador de margem...
-                    </div>
-                  }
-                >
-                  <ProfitCalculatorModal
-                    product={null}
-                    onClose={() => setActiveTab('all')}
-                  />
-                </Suspense>
-              </motion.div>
-            ) : (
-              /* TAB: Product Grid (All / Early Wave / High Margin) */
-              <motion.div
-                key={`tab-view-products-${activeTab}`}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-                className="space-y-4"
-              >
-                {activeTab === 'early_wave' && (
-                  <>
-                    <TrendPulseSection
-                      products={products}
-                      selectedNiche={selectedNiche}
-                      onSelectNiche={setSelectedNiche}
-                      onSelectEarlyWaveTab={() => setActiveTab('early_wave')}
-                      pushSettings={pushSettings}
-                      onUpdatePushSettings={updatePushSettings}
-                      onOpenPushModal={() => setShowPushModal(true)}
-                    />
-                    <EarlyWaveDashboard
-                      products={products}
-                      selectedNiche={selectedNiche}
-                      onSelectNiche={setSelectedNiche}
-                      activeTab={activeTab}
-                      onSelectEarlyWaveTab={() => setActiveTab('early_wave')}
-                    />
-                  </>
-                )}
-
-                {/* Section Subheader info */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-1">
-                  <div>
-                    <h2 className="text-base sm:text-lg font-black text-white flex items-center gap-2">
-                      <span className="relative flex h-2 w-2 shrink-0">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FE2C55] opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-2 w-2 bg-[#FE2C55]"></span>
-                      </span>
-                      <span>
-                        {activeTab === 'early_wave'
-                          ? 'Ondas Iniciais no TikTok Shop Brasil'
-                          : activeTab === 'high_margin'
-                          ? 'Produtos com Mais de 20% de Comissão'
-                          : 'Radar TikTok Shop Brasil — Estoque Nacional & Alta Margem'}
-                      </span>
-                    </h2>
-                    <p className="text-xs text-[#A6A7B2]">
-                      Clique em um card para abrir o raio-x e carregar ganchos virais no Copiloto IA à direita.
-                    </p>
-                  </div>
-
-                  <div className="flex flex-wrap items-center gap-1.5 text-xs">
-                    <span className="rounded-lg bg-[#161823] px-2.5 py-1 text-white border border-white/10 font-bold text-[11px]">
-                      {selectedNiche === 'all' ? 'Todos os Nichos' : selectedNiche}
-                    </span>
-                    {selectedOrigin !== 'all' && (
-                      <span className="rounded-lg bg-[#161823] px-2.5 py-1 text-white border border-white/10 font-bold text-[11px]">
-                        {selectedOrigin === 'US' ? '🇺🇸 EUA' : '🇨🇳 China'}
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                {/* Products Grid */}
-                {filteredProducts.length === 0 ? (
-                  <div className="py-16 text-center rounded-2xl border border-white/10 bg-[#2A3042] p-6 sm:p-8">
-                    <AlertCircle className="w-10 h-10 text-[#FE2C55] mx-auto mb-3" />
-                    <h3 className="text-base font-bold text-white">
-                      Nenhum produto encontrado com estes filtros
-                    </h3>
-                    <p className="text-xs text-[#A6A7B2] max-w-sm mx-auto mt-1 mb-4">
-                      Tente limpar os termos de busca ou dispare uma nova varredura com o botão no menu esquerdo.
-                    </p>
-                    <button
-                      onClick={() => {
-                        setSelectedNiche('all');
-                        setSelectedOrigin('all');
-                        setSearchQuery('');
-                        setFilterFreeSampleOnly(false);
-                        setFilterBlueOceanOnly(false);
-                      }}
-                      className="rounded-xl bg-[#FE2C55] hover:bg-[#FF0050] px-4 py-2 text-xs font-bold text-white transition shadow-md shadow-[#FE2C55]/30 cursor-pointer"
-                    >
-                      Restaurar Filtros Padrão
-                    </button>
-                  </div>
-                ) : (
-                  <>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
-                      {visibleProducts.map((product) => (
-                        <ProductCard
-                          key={product.id}
-                          product={product}
-                          priceCheck={priceSummary?.items[product.id]}
-                          isSaved={savedIdsSet.has(product.id)}
-                          onToggleSave={handleToggleSave}
-                          onOpenDeepDive={handleOpenDeepDive}
-                          onOpenCalculator={handleOpenCalculator}
-                          onOpenCreativeGenerator={handleOpenCreativeGenerator}
-                          onSelectForAI={(p) => {
-                            setActiveProductForAI(p);
-                            setIsRightPanelOpen(true);
-                          }}
-                          isSelectedForAI={activeProductForAI?.id === product.id}
-                        />
-                      ))}
-                    </div>
-
-                    {/* Progressive Windowing / Pagination Controls */}
-                    {hasMoreProducts ? (
-                      <div className="mt-8 flex flex-col items-center justify-center gap-3 pt-4 border-t border-white/10">
-                        <p className="text-xs text-[#A6A7B2]">
-                          Exibindo <strong className="text-white">{visibleProducts.length}</strong> de <strong className="text-white">{filteredProducts.length.toLocaleString('pt-BR')}</strong> produtos encontrados
-                        </p>
-                        <button
-                          onClick={handleLoadMore}
-                          className="px-6 py-2.5 rounded-xl bg-[#161823] hover:bg-[#1E202E] border border-white/10 hover:border-[#25F4EE]/50 text-white font-bold text-xs flex items-center gap-2 transition active:scale-95 cursor-pointer shadow-lg hover:shadow-[#25F4EE]/10"
-                        >
-                          <span>Carregar Mais Produtos (+{CHUNK_SIZE})</span>
-                          <ChevronDown className="w-4 h-4 text-[#25F4EE]" />
-                        </button>
-                        <div ref={loadMoreSentinelRef} className="h-4 w-full" />
-                      </div>
-                    ) : filteredProducts.length > CHUNK_SIZE ? (
-                      <div className="mt-8 text-center pt-4 border-t border-white/5 text-xs text-[#757788] flex items-center justify-center gap-1.5">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                        <span>Todos os {filteredProducts.length.toLocaleString('pt-BR')} produtos do radar carregados</span>
-                      </div>
-                    ) : null}
-                  </>
-                )}
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </main>
-
-        {/* Panel 3: Right AI Copilot (Permanent, Free & Unlimited) */}
-        {isRightPanelOpen && (
-          <aside className="w-full lg:w-80 xl:w-96 shrink-0 lg:sticky lg:top-20 z-10">
-            <RightAICopilot
-              activeProduct={activeProductForAI}
-              onClose={() => setIsRightPanelOpen(false)}
-              isOpen={isRightPanelOpen}
-            />
-          </aside>
-        )}
-      </div>
-
-      {/* Floating Action Button for Mobile / Small Screens */}
-      {!isRightPanelOpen && (
-        <div className="fixed bottom-5 right-5 z-40">
-          <button
-            onClick={() => setIsRightPanelOpen(true)}
-            className="flex items-center gap-2 px-4 py-3 rounded-full bg-gradient-to-r from-[#FE2C55] via-[#FF0050] to-[#25F4EE] text-white font-black text-xs shadow-2xl shadow-[#FE2C55]/40 active:scale-95 transition cursor-pointer"
-          >
-            <Sparkles className="w-4 h-4" />
-            <span>Copiloto IA BR</span>
-          </button>
         </div>
       )}
 
