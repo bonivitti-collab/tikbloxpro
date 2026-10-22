@@ -142,35 +142,35 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
   // Se o painel estiver recolhido no Desktop
   if (isCollapsed) {
     return (
-      <aside className="hidden lg:flex w-9 bg-slate-200 border-r border-slate-300 flex-col items-center py-3 justify-between shrink-0 select-none">
+      <aside className="hidden lg:flex w-9 bg-slate-100 border-r border-slate-200 flex-col items-center py-3 justify-between shrink-0 select-none">
         <button
           onClick={onToggleCollapse}
-          className="p-1.5 hover:bg-slate-300/80 rounded-lg text-slate-700 hover:text-slate-900 transition-colors cursor-pointer"
+          className="p-1.5 hover:bg-white rounded-lg text-slate-600 hover:text-[#007A87] transition-colors cursor-pointer border border-transparent hover:border-slate-300"
           title="Expandir Lista de Tendências"
         >
           <PanelLeft className="w-4 h-4" />
         </button>
-        <span className="[writing-mode:vertical-rl] rotate-180 text-[11px] font-bold text-slate-700 tracking-wider uppercase flex items-center gap-1.5">
+        <span className="[writing-mode:vertical-rl] rotate-180 text-[11px] font-bold text-slate-600 tracking-wider uppercase flex items-center gap-1.5">
           <span>Produtos TikTok Shop</span>
-          <span className="text-[9px] bg-slate-800 text-white px-1.5 py-0.5 rounded-full font-mono font-bold">
+          <span className="text-[9px] bg-gradient-to-r from-[#25F4EE] to-[#00B4D8] text-[#0F121C] px-1.5 py-0.5 rounded-full font-mono font-black">
             {filtered.length}
           </span>
         </span>
-        <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+        <div className="w-2 h-2 rounded-full bg-[#FE2C55] animate-pulse" />
       </aside>
     );
   }
 
   return (
-    <section className="w-full lg:w-80 xl:w-[340px] shrink-0 bg-[#f1f5f9] flex flex-col border-r border-slate-300 h-full overflow-hidden select-none text-slate-900">
+    <section className="w-full lg:w-80 xl:w-[340px] shrink-0 bg-[#F8FAFC] flex flex-col border-r border-slate-200 h-full overflow-hidden select-none text-slate-900">
       
-      {/* Topo: Cabeçalho com Seletor de Categoria (Sem scroll lateral) */}
-      <div className="bg-white border-b border-slate-300 p-2.5 sm:p-3 space-y-2 shrink-0 shadow-2xs">
+      {/* Topo: Cabeçalho com Seletor de Categoria e Acentos TikBlox */}
+      <div className="bg-white border-b border-slate-200 p-2.5 sm:p-3 space-y-2 shrink-0 shadow-2xs">
         
-        {/* Linha 1: Título e Botão de Recolher */}
+        {/* Linha 1: Título com Gradiente do Logo e Botão de Recolher */}
         <div className="flex items-center justify-between gap-1.5">
           <div className="flex items-center gap-1.5 min-w-0">
-            <div className="w-6 h-6 rounded-md bg-slate-100 border border-slate-300 flex items-center justify-center text-slate-800 shrink-0 font-bold text-xs">
+            <div className="w-6 h-6 rounded-md bg-gradient-to-tr from-[#25F4EE] to-[#FE2C55] flex items-center justify-center text-white shrink-0 font-bold text-xs shadow-2xs">
               🛍️
             </div>
             <div className="min-w-0">
@@ -185,14 +185,14 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
 
           <button
             onClick={onToggleCollapse}
-            className="hidden lg:flex p-1 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-md transition-colors cursor-pointer"
+            className="hidden lg:flex p-1 text-slate-400 hover:text-slate-800 hover:bg-slate-100 rounded-md transition-colors cursor-pointer"
             title="Recolher painel para focar no Raio-X"
           >
             <PanelLeft className="w-3.5 h-3.5" />
           </button>
         </div>
 
-        {/* Linha 2: SELETOR DE CATEGORIAS CUSTOMIZADO EM CINZA CLARO */}
+        {/* Linha 2: SELETOR DE CATEGORIAS CUSTOMIZADO (SEM SCROLL LATERAL) */}
         <div className="relative" ref={dropdownRef}>
           <div className="flex items-center gap-1">
             {/* Botão de Categoria Principal */}
@@ -201,8 +201,8 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
               onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
               className={`flex-1 flex items-center justify-between px-2.5 py-1.5 rounded-lg border text-xs font-bold transition-all cursor-pointer shadow-2xs ${
                 selectedNiche !== 'all'
-                  ? 'bg-sky-50 border-sky-400 text-sky-900'
-                  : 'bg-slate-100 border-slate-300 text-slate-800 hover:bg-slate-200/80 hover:border-slate-400'
+                  ? 'bg-[#25F4EE]/10 border-[#25F4EE] text-[#007A87]'
+                  : 'bg-white border-slate-300 text-slate-800 hover:border-[#25F4EE]/60'
               }`}
             >
               <div className="flex items-center gap-2 truncate">
@@ -211,10 +211,10 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
               </div>
 
               <div className="flex items-center gap-1.5 shrink-0 ml-1">
-                <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-slate-200 text-slate-700 font-bold">
+                <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-slate-100 text-slate-700 font-bold border border-slate-200">
                   {filtered.length}
                 </span>
-                <ChevronDown className={`w-3.5 h-3.5 text-slate-500 transition-transform ${isCategoryDropdownOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform ${isCategoryDropdownOpen ? 'rotate-180' : ''}`} />
               </div>
             </button>
 
@@ -223,7 +223,7 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
               <button
                 type="button"
                 onClick={() => setSelectedNiche('all')}
-                className="p-1.5 rounded-lg bg-slate-100 border border-slate-300 hover:bg-slate-200 text-slate-600 hover:text-slate-900 transition cursor-pointer"
+                className="p-1.5 rounded-lg bg-white border border-slate-300 hover:bg-slate-50 text-slate-500 hover:text-slate-800 transition cursor-pointer"
                 title="Limpar filtro de categoria"
               >
                 <X className="w-3.5 h-3.5" />
@@ -236,8 +236,8 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
               onClick={() => setShowSearchInput(!showSearchInput)}
               className={`p-1.5 rounded-lg border transition cursor-pointer ${
                 showSearchInput || searchQuery
-                  ? 'bg-sky-100 border-sky-400 text-sky-800'
-                  : 'bg-slate-100 border-slate-300 text-slate-600 hover:text-slate-900 hover:bg-slate-200'
+                  ? 'bg-[#25F4EE]/15 border-[#25F4EE] text-[#007A87]'
+                  : 'bg-white border-slate-300 text-slate-500 hover:text-slate-800 hover:border-[#25F4EE]/60'
               }`}
               title="Buscar por palavra-chave (ex: bolsa, fone)"
             >
@@ -254,7 +254,7 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Filtrar por nome (ex: bolsa, relógio)..."
                 autoFocus
-                className="w-full py-1 pl-2.5 pr-7 text-xs bg-white border border-slate-300 rounded-lg text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-sky-600 focus:ring-1 focus:ring-sky-600"
+                className="w-full py-1 pl-2.5 pr-7 text-xs bg-slate-50 border border-slate-300 rounded-lg text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#25F4EE] focus:bg-white focus:ring-1 focus:ring-[#25F4EE]/40"
               />
               {searchQuery && (
                 <button
@@ -267,12 +267,12 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
             </div>
           )}
 
-          {/* Menu Dropdown de Categorias (Sem Scroll Lateral - Grid Compacto de 2 Colunas) */}
+          {/* Menu Dropdown de Categorias */}
           {isCategoryDropdownOpen && (
-            <div className="absolute top-full left-0 right-0 mt-1.5 z-50 bg-white border border-slate-300 rounded-xl shadow-xl p-2 animate-in fade-in slide-in-from-top-2">
-              <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider px-1 pb-1 mb-1 border-b border-slate-200 flex items-center justify-between">
+            <div className="absolute top-full left-0 right-0 mt-1.5 z-50 bg-white border border-slate-200 rounded-xl shadow-xl p-2 animate-in fade-in slide-in-from-top-2">
+              <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-1 pb-1 mb-1 border-b border-slate-100 flex items-center justify-between">
                 <span>Escolha uma Categoria</span>
-                <span className="text-[9px] text-sky-700 font-bold">Sem rolagem lateral</span>
+                <span className="text-[9px] text-[#007A87] font-bold">Sem rolagem lateral</span>
               </div>
 
               <div className="grid grid-cols-2 gap-1 max-h-60 overflow-y-auto pr-0.5">
@@ -291,7 +291,7 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
                       }}
                       className={`flex items-center justify-between p-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer text-left border ${
                         isSelected
-                          ? 'bg-slate-900 text-white font-bold border-slate-900 shadow-2xs'
+                          ? 'bg-gradient-to-r from-[#25F4EE] to-[#00D2C4] text-[#0F121C] font-bold border-transparent shadow-2xs'
                           : 'bg-slate-50 text-slate-700 hover:bg-slate-100 hover:text-slate-900 border-slate-200'
                       }`}
                     >
@@ -301,7 +301,7 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
                       </span>
 
                       <span className={`text-[9px] font-mono px-1 rounded shrink-0 ${
-                        isSelected ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-600'
+                        isSelected ? 'bg-black/15 text-[#0F121C]' : 'bg-slate-200 text-slate-600'
                       }`}>
                         {count}
                       </span>
@@ -313,7 +313,7 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
           )}
         </div>
 
-        {/* Linha 3: Filtros de Afiliado em 1 Linha (Sem Scroll Lateral) */}
+        {/* Linha 3: Filtros de Afiliado em 1 Linha com Cores Vivas do Logo */}
         <div className="flex items-center gap-1 text-[11px] select-none">
           <button
             type="button"
@@ -324,8 +324,8 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
             }}
             className={`px-2 py-0.5 rounded-md font-bold cursor-pointer transition-colors whitespace-nowrap ${
               !filterFreeSampleOnly && !filterBlueOceanOnly && !filterHighCommissionOnly
-                ? 'bg-slate-900 text-white shadow-2xs'
-                : 'text-slate-700 bg-slate-200/90 hover:bg-slate-300'
+                ? 'bg-[#0F172A] text-white shadow-2xs'
+                : 'text-slate-600 bg-slate-100 hover:bg-slate-200'
             }`}
           >
             TODOS
@@ -336,8 +336,8 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
             onClick={() => setFilterFreeSampleOnly(!filterFreeSampleOnly)}
             className={`px-2 py-0.5 rounded-md font-bold cursor-pointer transition-colors whitespace-nowrap flex items-center gap-1 ${
               filterFreeSampleOnly
-                ? 'bg-emerald-700 text-white font-black shadow-2xs'
-                : 'text-slate-700 bg-slate-200/90 hover:bg-slate-300'
+                ? 'bg-emerald-600 text-white font-black shadow-2xs'
+                : 'text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200/60'
             }`}
           >
             <span>🎁 Amostra</span>
@@ -348,8 +348,8 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
             onClick={() => setFilterBlueOceanOnly(!filterBlueOceanOnly)}
             className={`px-2 py-0.5 rounded-md font-bold cursor-pointer transition-colors whitespace-nowrap flex items-center gap-1 ${
               filterBlueOceanOnly
-                ? 'bg-sky-700 text-white font-black shadow-2xs'
-                : 'text-slate-700 bg-slate-200/90 hover:bg-slate-300'
+                ? 'bg-gradient-to-r from-[#25F4EE] to-[#00B4D8] text-[#0F121C] font-black shadow-2xs'
+                : 'text-[#007A87] bg-[#25F4EE]/10 hover:bg-[#25F4EE]/20 border border-[#25F4EE]/30'
             }`}
           >
             <span>🌊 Oceano</span>
@@ -360,8 +360,8 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
             onClick={() => setFilterHighCommissionOnly(!filterHighCommissionOnly)}
             className={`px-2 py-0.5 rounded-md font-bold cursor-pointer transition-colors whitespace-nowrap flex items-center gap-1 ${
               filterHighCommissionOnly
-                ? 'bg-amber-600 text-white font-black shadow-2xs'
-                : 'text-slate-700 bg-slate-200/90 hover:bg-slate-300'
+                ? 'bg-gradient-to-r from-[#FE2C55] to-[#FF3B5C] text-white font-black shadow-2xs'
+                : 'text-[#C1123A] bg-[#FE2C55]/10 hover:bg-[#FE2C55]/20 border border-[#FE2C55]/30'
             }`}
           >
             <span>💰 +20%</span>
@@ -369,10 +369,10 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
         </div>
       </div>
 
-      {/* Lista Rolável de Cards em Cinza Claro */}
+      {/* Lista Rolável de Cards com Identidade TikBlox */}
       <div className="flex-1 overflow-y-auto p-2 sm:p-2.5 space-y-2 min-h-0">
         {filtered.length === 0 ? (
-          <div className="p-6 text-center text-slate-500 text-xs bg-white rounded-xl border border-slate-300 my-4 shadow-2xs">
+          <div className="p-6 text-center text-slate-500 text-xs bg-white rounded-xl border border-slate-200 my-4 shadow-2xs">
             <p className="font-bold text-slate-700">Nenhum produto nesta categoria.</p>
             <p className="text-[11px] text-slate-500 mt-1">Experimente selecionar "Todas as Categorias" ou limpar os filtros.</p>
             <button
@@ -383,7 +383,7 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
                 setFilterBlueOceanOnly(false);
                 setFilterHighCommissionOnly(false);
               }}
-              className="mt-3 px-3 py-1 bg-slate-900 text-white rounded-lg text-xs font-bold transition cursor-pointer"
+              className="mt-3 px-3 py-1 bg-[#0F172A] text-white rounded-lg text-xs font-bold transition cursor-pointer"
             >
               Resetar Filtros
             </button>
@@ -403,18 +403,18 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
                 onClick={() => onSelectProduct(prod)}
                 className={`p-2.5 rounded-xl border transition-all cursor-pointer relative ${
                   isSelected
-                    ? 'bg-white border-2 border-sky-600 shadow-sm ring-2 ring-sky-500/20'
-                    : 'bg-white border-slate-300/80 hover:border-slate-400 hover:shadow-2xs'
+                    ? 'bg-white border-2 border-[#25F4EE] shadow-[0_4px_20px_rgba(37,244,238,0.22)] ring-1 ring-[#FE2C55]/30'
+                    : 'bg-white border-slate-200/90 hover:border-[#25F4EE]/60 hover:shadow-xs'
                 }`}
               >
                 {/* Linha 1: Título e Badges */}
                 <div className="flex items-start justify-between gap-1.5 mb-1">
                   <div className="min-w-0 flex-1">
-                    <span className="text-[10px] font-extrabold uppercase px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 border border-slate-300 mr-1.5">
+                    <span className="text-[10px] font-extrabold uppercase px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 border border-slate-200 mr-1.5">
                       {prod.nicheLabel || 'Nicho'}
                     </span>
                     {isSelected && (
-                      <span className="text-[9px] font-black px-1.5 py-0.2 rounded bg-sky-600 text-white shadow-2xs">
+                      <span className="text-[9px] font-black px-1.5 py-0.2 rounded bg-gradient-to-r from-[#25F4EE] to-[#00B4D8] text-[#0F121C] shadow-2xs">
                         EM FOCO
                       </span>
                     )}
@@ -428,13 +428,13 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
                       🎁 Amostra
                     </span>
                   ) : (
-                    <span className="text-[9px] font-semibold px-1.5 py-0.2 rounded uppercase bg-slate-100 text-slate-600 border border-slate-300 shrink-0">
+                    <span className="text-[9px] font-semibold px-1.5 py-0.2 rounded uppercase bg-[#25F4EE]/10 text-[#007A87] border border-[#25F4EE]/30 shrink-0">
                       {prod.creatorSaturationBR === 'Baixa' ? '🌊 Oceano Azul' : 'Em Alta'}
                     </span>
                   )}
                 </div>
 
-                {/* Linha 2: Métricas de Preço e Comissão (Destaque Limpo) */}
+                {/* Linha 2: Métricas de Preço e Comissão */}
                 <div className="grid grid-cols-2 gap-1 bg-slate-50 p-1.5 rounded-lg border border-slate-200 font-mono text-xs my-1">
                   <div>
                     <span className="block text-[8px] font-sans font-bold text-slate-400 uppercase">
@@ -448,7 +448,7 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
                     <span className="block text-[8px] font-sans font-bold text-slate-400 uppercase">
                       Sua Comissão
                     </span>
-                    <span className="font-extrabold text-emerald-700">
+                    <span className="font-extrabold text-emerald-600">
                       R$ {commVal.toFixed(2)} ({commPct}%)
                     </span>
                   </div>
@@ -457,7 +457,7 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
                 {/* Linha 3: Estoque e Gancho */}
                 <div className="flex items-center justify-between text-[10px] text-slate-500 pt-0.5">
                   <span className="truncate">📦 {stockLoc.split('(')[0].trim()}</span>
-                  <span className="font-bold text-sky-700 shrink-0 flex items-center gap-0.5">
+                  <span className="font-bold text-[#FE2C55] shrink-0 flex items-center gap-0.5 hover:underline">
                     <span>Ver Raio-X</span>
                     <ChevronRight className="w-3 h-3" />
                   </span>

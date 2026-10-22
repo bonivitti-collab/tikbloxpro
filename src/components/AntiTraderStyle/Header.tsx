@@ -32,39 +32,43 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenCalculator,
 }) => {
   return (
-    <header className="bg-[#1e2433] border-b border-slate-700/60 px-3 sm:px-4 py-2 flex items-center justify-between shrink-0 z-20 gap-2 min-h-[52px] select-none text-white shadow-xs">
-      {/* 1. Logo Oficial TikBlox */}
-      <div className="flex items-center gap-3 shrink-0">
-        <TikBloxLogo size="sm" showBadge={true} animate={false} />
+    <header className="relative bg-white border-b border-slate-200/90 px-3 sm:px-4 py-2 flex items-center justify-between shrink-0 z-20 gap-2 min-h-[54px] select-none text-slate-900 shadow-2xs">
+      
+      {/* Faixa de Identidade Visual TikBlox: Friso Cromático Ciano e Rosa do Logo */}
+      <div className="absolute bottom-0 left-0 right-0 h-[2.5px] bg-gradient-to-r from-[#25F4EE] via-[#FE2C55] to-[#25F4EE] opacity-90" />
 
-        <span className="hidden xl:inline-flex items-center gap-1.5 text-[11px] font-bold text-emerald-300 bg-emerald-950/60 px-2.5 py-0.5 rounded-full border border-emerald-500/30">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+      {/* 1. Logo Oficial TikBlox em Versão Light com Emblema 3D Vibrante */}
+      <div className="flex items-center gap-3 shrink-0">
+        <TikBloxLogo size="sm" showBadge={true} animate={false} theme="light" />
+
+        <span className="hidden xl:inline-flex items-center gap-1.5 text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-300">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
           <span>Pronta Entrega no Brasil</span>
         </span>
       </div>
 
-      {/* 2. Ações Centrais / Direitas */}
+      {/* 2. Ações Centrais / Direitas com Toques das Cores do Logo */}
       <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-        {/* Botão de Varredura / Atualização */}
+        {/* Botão de Varredura com Realce Ciano TikBlox */}
         <button
           onClick={onScanTrends}
           disabled={isScanning}
-          className="flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800/90 hover:bg-slate-700 text-xs font-bold text-white hover:text-[#25F4EE] hover:border-[#25F4EE]/40 transition-all cursor-pointer shadow-xs active:scale-95 disabled:opacity-50"
+          className="flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-xs font-bold text-slate-800 hover:border-[#25F4EE] hover:text-[#007A87] transition-all cursor-pointer shadow-2xs active:scale-95 disabled:opacity-50"
           title="Buscar novas tendências validadas no TikTok Shop Brasil"
         >
-          <RefreshCw className={`w-3.5 h-3.5 text-[#25F4EE] ${isScanning ? 'animate-spin' : ''}`} />
+          <RefreshCw className={`w-3.5 h-3.5 text-[#00B4D8] ${isScanning ? 'animate-spin' : ''}`} />
           <span className="hidden sm:inline">{isScanning ? 'Varrendo...' : 'Escanear Tendências'}</span>
         </button>
 
-        {/* Botão de Salvos */}
+        {/* Botão de Salvos com Realce Rosa Neon TikBlox */}
         <button
           onClick={onOpenSaved}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800/90 hover:bg-slate-700 text-xs font-semibold text-slate-200 hover:text-white transition-all cursor-pointer shadow-xs active:scale-95"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-800 hover:border-[#FE2C55]/60 transition-all cursor-pointer shadow-2xs active:scale-95"
           title="Ver produtos salvos"
         >
-          <Bookmark className="w-3.5 h-3.5 text-[#FE2C55]" />
+          <Bookmark className="w-3.5 h-3.5 text-[#FE2C55] fill-[#FE2C55]/20" />
           <span className="hidden sm:inline">Salvos:</span>
-          <span className="font-mono text-xs font-bold text-white bg-white/10 px-1.5 py-0.2 rounded">
+          <span className="font-mono text-xs font-bold text-slate-900 bg-slate-100 px-1.5 py-0.2 rounded border border-slate-200">
             {savedCount}
           </span>
         </button>
@@ -72,26 +76,26 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Botão Simulador de Lucro / Calculadora */}
         <button
           onClick={onOpenCalculator}
-          className="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-slate-700 bg-slate-800/90 hover:bg-slate-700 text-xs font-semibold text-slate-300 hover:text-white transition-all cursor-pointer shadow-xs"
+          className="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 hover:text-slate-900 transition-all cursor-pointer shadow-2xs"
           title="Simulador de Margem & Taxas de Envio"
         >
-          <SlidersHorizontal className="w-3.5 h-3.5 text-[#25F4EE]" />
+          <SlidersHorizontal className="w-3.5 h-3.5 text-[#007A87]" />
           <span>Calculadora</span>
         </button>
 
         {/* Toggles de Painéis no Desktop */}
-        <div className="hidden lg:flex items-center gap-1.5 border-l border-slate-700 pl-2.5 ml-1">
+        <div className="hidden lg:flex items-center gap-1.5 border-l border-slate-200 pl-2.5 ml-1">
           <button
             type="button"
             onClick={() => setPainelEsquerdoRecolhido(!painelEsquerdoRecolhido)}
             className={`p-1.5 px-2 rounded-lg border text-[11px] font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
               painelEsquerdoRecolhido
-                ? 'bg-[#25F4EE]/15 text-[#25F4EE] border-[#25F4EE]/40 shadow-[0_0_12px_rgba(37,244,238,0.2)]'
-                : 'bg-slate-800/90 text-slate-300 border-slate-700 hover:bg-slate-700 hover:text-white'
+                ? 'bg-[#25F4EE]/15 text-[#007A87] border-[#25F4EE] shadow-2xs'
+                : 'bg-white text-slate-700 border-slate-300 hover:border-[#25F4EE] hover:text-[#007A87]'
             }`}
             title={painelEsquerdoRecolhido ? 'Expandir Lista de Produtos' : 'Recolher Lista de Produtos para focar no Raio-X'}
           >
-            <PanelLeft className="w-3.5 h-3.5 text-[#25F4EE]" />
+            <PanelLeft className="w-3.5 h-3.5 text-[#007A87]" />
             <span className="text-[10px] hidden xl:inline">Lista</span>
           </button>
 
@@ -100,8 +104,8 @@ export const Header: React.FC<HeaderProps> = ({
             onClick={() => setPainelDireitoRecolhido(!painelDireitoRecolhido)}
             className={`p-1.5 px-2 rounded-lg border text-[11px] font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
               painelDireitoRecolhido
-                ? 'bg-[#FE2C55]/15 text-[#FE2C55] border-[#FE2C55]/40 shadow-[0_0_12px_rgba(254,44,85,0.2)]'
-                : 'bg-slate-800/90 text-slate-300 border-slate-700 hover:bg-slate-700 hover:text-white'
+                ? 'bg-[#FE2C55]/10 text-[#FE2C55] border-[#FE2C55]/40 shadow-2xs'
+                : 'bg-white text-slate-700 border-slate-300 hover:border-[#FE2C55]/60 hover:text-[#FE2C55]'
             }`}
             title={painelDireitoRecolhido ? 'Expandir Copiloto IA' : 'Recolher Copiloto IA para focar no Raio-X'}
           >

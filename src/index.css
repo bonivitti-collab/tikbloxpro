@@ -7,8 +7,8 @@ html, body, #root {
   margin: 0;
   padding: 0;
   overflow: hidden;
-  background-color: #eef2f6;
-  color: #0f172a;
+  background-color: #F8FAFC;
+  color: #0F172A;
   font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -19,7 +19,7 @@ button, [role="button"], a, input, select, .cursor-pointer {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Barras de rolagem discretas para o tema Cinza Claro */
+/* Barras de rolagem discretas com hover na cor ciano do TikBlox */
 ::-webkit-scrollbar {
   width: 5px;
   height: 5px;
@@ -30,17 +30,17 @@ button, [role="button"], a, input, select, .cursor-pointer {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #CBD5E1;
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #25F4EE;
 }
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: #cbd5e1 transparent;
+  scrollbar-color: #CBD5E1 transparent;
 }
 
 .no-scrollbar::-webkit-scrollbar {

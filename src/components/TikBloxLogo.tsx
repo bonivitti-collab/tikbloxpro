@@ -1,6 +1,7 @@
 import React from 'react';
 
 interface TikBloxLogoProps {
+  theme?: 'light' | 'dark';
   size?: 'sm' | 'md' | 'lg' | 'xl';
   showText?: boolean;
   showBadge?: boolean;
@@ -14,6 +15,7 @@ export const TikBloxLogo: React.FC<TikBloxLogoProps> = ({
   showBadge = true,
   className = '',
   animate = false,
+  theme = 'dark',
 }) => {
   // Dimensions and scaling based on size
   const config = {
@@ -239,7 +241,7 @@ export const TikBloxLogo: React.FC<TikBloxLogoProps> = ({
             <div className="relative flex items-center font-black tracking-[-0.03em] leading-none select-none">
               
               {/* TIK: Pure White Display Letterforms */}
-              <span className={`font-black text-white ${config.title} drop-shadow-[0_2px_12px_rgba(255,255,255,0.25)]`}>
+              <span className={`font-black ${theme === 'light' ? 'text-slate-900' : 'text-white'} ${config.title} drop-shadow-[0_2px_12px_rgba(255,255,255,0.25)]`}>
                 TIK
               </span>
 
@@ -262,7 +264,7 @@ export const TikBloxLogo: React.FC<TikBloxLogoProps> = ({
                 </span>
 
                 {/* Foreground Crisp White Lettering */}
-                <span className="relative z-10 text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
+                <span className={`relative z-10 ${theme === 'light' ? 'text-slate-900' : 'text-white'} drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]`}>
                   BLOX
                 </span>
               </span>

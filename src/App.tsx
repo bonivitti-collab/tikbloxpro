@@ -532,7 +532,7 @@ export default function App() {
   }, [hasMoreProducts, filteredProducts.length]);
 
   return (
-    <div className="h-full h-dvh w-full max-w-full bg-[#eef2f6] text-[#0f172a] font-sans flex flex-col overflow-hidden select-none">
+    <div className="h-full h-dvh w-full max-w-full bg-[#F8FAFC] text-[#0F172A] font-sans flex flex-col overflow-hidden select-none">
       
       {/* 1. HEADER PRINCIPAL RESPONSIVO */}
       <Header
@@ -551,7 +551,7 @@ export default function App() {
       />
 
       {/* 2. SELETOR DE ABAS MOBILE / TABLET (CINZA CLARO) */}
-      <nav className="grid grid-cols-3 lg:hidden w-full bg-slate-200 border-b border-slate-300 p-1.5 gap-1.5 shrink-0 text-xs font-bold select-none">
+      <nav className="grid grid-cols-3 lg:hidden w-full bg-white border-b border-slate-200 p-1.5 gap-1.5 shrink-0 text-xs font-bold select-none">
         <button
           onClick={() => setMobileTab('produtos')}
           className={`py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1 cursor-pointer transition-all border ${
@@ -587,7 +587,7 @@ export default function App() {
       </nav>
 
       {/* 3. ÁREA PRINCIPAL: THREE-PANEL TERMINAL (CUSTOMIZÁVEL NO NOTEBOOK/DESKTOP) */}
-      <div className="flex-1 flex flex-col lg:flex-row w-full max-w-full overflow-hidden min-h-0 bg-[#e2e8f0] relative">
+      <div className="flex-1 flex flex-col lg:flex-row w-full max-w-full overflow-hidden min-h-0 bg-[#F1F5F9] relative">
         {/* PAINEL 1: Lista de Produtos */}
         <div className={`h-full ${mobileTab !== 'produtos' ? 'hidden lg:flex' : 'flex'}`}>
           <ProductListPanel
@@ -874,22 +874,24 @@ export default function App() {
       )}
 
       {/* Footer */}
-      <footer className="border-t border-white/10 bg-[#262B3A] py-8 px-4 sm:px-6 lg:px-8 text-xs text-[#A6A7B2]">
-        <div className="mx-auto max-w-7xl flex flex-col sm:flex-row items-center justify-between gap-4">
+      <footer className="border-t border-slate-200 bg-white py-3.5 px-4 sm:px-6 text-xs text-slate-500 shadow-2xs">
+        <div className="mx-auto max-w-7xl flex flex-col sm:flex-row items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <span className="font-extrabold text-white">TIKBLOX</span>
+            <span className="font-black text-slate-900 flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-[#25F4EE]" />
+              <span>TIKBLOX</span>
+              <span className="w-2 h-2 rounded-full bg-[#FE2C55]" />
+            </span>
             <span>
               — {language === 'en'
-                ? 'Viral Trends Radar and Cross-Border Product Arbitrage for Brazil.'
-                : 'Radar de Tendências Virais e Arbitragem de Produtos Estrangeiros para o Brasil.'}
+                ? 'Viral Trends Radar for TikTok Shop Brazil.'
+                : 'Radar de Tendências Virais e Produtos Pronta Entrega no Brasil.'}
             </span>
           </div>
-          <div className="flex items-center gap-4 text-[#757788]">
-            <span className="hover:text-white transition">
-              {language === 'en' ? 'PWA Compatible with Android & iOS' : 'PWA Compatível com Android & iOS'}
-            </span>
+          <div className="flex items-center gap-3 text-slate-400 text-[11px]">
+            <span>PWA Compatível</span>
             <span>•</span>
-            <span className="hover:text-white transition">IA do TikBlox Pro</span>
+            <span className="text-[#007A87] font-bold">100% Estoque Nacional SP/PR</span>
           </div>
         </div>
       </footer>
