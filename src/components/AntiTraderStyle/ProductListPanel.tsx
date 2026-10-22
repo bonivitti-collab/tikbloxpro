@@ -46,7 +46,7 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
 }) => {
   // Enriquecer e filtrar produtos de forma reativa e leve
   const enrichedProducts = useMemo(() => {
-    return products.map(enrichWithTikTokShopData);
+    return (products || []).map(enrichWithTikTokShopData);
   }, [products]);
 
   const filtered = useMemo(() => {
@@ -56,22 +56,22 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
       const q = searchQuery.toLowerCase().trim();
       list = list.filter(
         (p) =>
-          p.name.toLowerCase().includes(q) ||
-          p.nicheLabel.toLowerCase().includes(q) ||
-          p.culturalFitReason.toLowerCase().includes(q)
+          (p.name || '').toLowerCase().includes(q) ||
+          (p.nicheLabel || '').toLowerCase().includes(q) ||
+          (p.culturalFitReason || '').toLowerCase().includes(q)
       );
     }
 
     if (filterFreeSampleOnly) {
-      list = list.filter((p) => p.freeSampleAvailable);
+      list = list.filter((p) => p.freeSampleAvailable || p.tiktokShop?.freeSampleAvailable);
     }
 
     if (filterBlueOceanOnly) {
-      list = list.filter((p) => p.creatorSaturationBR === 'Baixa');
+      list = list.filter((p) => p.creatorSaturationBR === 'Baixa' || p.tiktokShop?.saturationLevel === 'Oceano Azul');
     }
 
     if (filterHighCommissionOnly) {
-      list = list.filter((p) => p.commissionPercent >= 20);
+      list = list.filter((p) => (p.commissionPercent || p.tiktokShop?.commissionRatePercent || 0) >= 20);
     }
 
     return list;
@@ -144,7 +144,7 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
               className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 cursor-pointer p-0.5"
               title="Limpar busca"
             >
-              <X className="w-3 h-3" />
+              <X className="w-3.5 h-3.5" />
             </button>
           )}
         </div>
@@ -210,6 +210,11 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
         ) : (
           filtered.map((prod) => {
             const isSelected = activeProduct?.id === prod.id;
+            const priceBRL = Number(prod.estimatedPriceBRL || 0);
+            const commVal = Number(prod.commissionEstimatedBRL || prod.tiktokShop?.commissionValueBRL || (priceBRL * 0.22) || 0);
+            const commPct = Number(prod.commissionPercent || prod.tiktokShop?.commissionRatePercent || 20);
+            const isSample = Boolean(prod.freeSampleAvailable || prod.tiktokShop?.freeSampleAvailable);
+            const stockLoc = String(prod.stockLocationBrazil || prod.tiktokShop?.stockLocation || 'São Paulo - SP');
 
             return (
               <div
@@ -225,7 +230,7 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
                 <div className="flex items-start justify-between gap-1.5 mb-1">
                   <div className="min-w-0 flex-1">
                     <span className="text-[10px] font-extrabold uppercase px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 border border-slate-200 mr-1.5">
-                      {prod.nicheLabel}
+                      {prod.nicheLabel || 'Nicho'}
                     </span>
                     {isSelected && (
                       <span className="text-[9px] font-black px-1.5 py-0.2 rounded bg-blue-600 text-white shadow-2xs">
@@ -237,7 +242,7 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
                     </h3>
                   </div>
 
-                  {prod.freeSampleAvailable ? (
+                  {isSample ? (
                     <span className="text-[9px] font-extrabold px-1.5 py-0.2 rounded uppercase bg-emerald-50 text-emerald-800 border border-emerald-300 shrink-0">
                       🎁 Amostra
                     </span>
@@ -255,7 +260,7 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
                       Preço Shop
                     </span>
                     <span className="font-extrabold text-slate-900">
-                      R$ {prod.estimatedPriceBRL.toFixed(2)}
+                      R$ {priceBRL.toFixed(2)}
                     </span>
                   </div>
                   <div className="text-right">
@@ -263,14 +268,14 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
                       Sua Comissão
                     </span>
                     <span className="font-extrabold text-emerald-700">
-                      R$ {prod.commissionEstimatedBRL.toFixed(2)} ({prod.commissionPercent}%)
+                      R$ {commVal.toFixed(2)} ({commPct}%)
                     </span>
                   </div>
                 </div>
 
                 {/* Linha 3: Estoque e Gancho */}
                 <div className="flex items-center justify-between text-[10px] text-slate-500 pt-0.5">
-                  <span className="truncate">📦 {prod.stockLocationBrazil}</span>
+                  <span className="truncate">📦 {stockLoc.split('(')[0].trim()}</span>
                   <span className="font-bold text-blue-600 shrink-0 flex items-center gap-0.5">
                     <span>Ver Raio-X</span>
                     <ChevronRight className="w-3 h-3" />
