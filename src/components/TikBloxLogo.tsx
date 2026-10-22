@@ -286,17 +286,7 @@ export const TikBloxLogo: React.FC<TikBloxLogoProps> = ({
             )}
           </div>
 
-          {/* Elevated Brand Subtitle / Tagline */}
-          <div className="hidden sm:flex items-center gap-1.5 mt-0.5">
-            <span className={`${config.sub} font-black tracking-[0.2em] uppercase text-[#8B8D9E] group-hover:text-white transition-colors flex items-center gap-1.5`}>
-              <span className="text-[#25F4EE]">SPY VIRAL</span>
-              <span className="text-white/20 text-[7px]">•</span>
-              <span className="text-[#C5C6D2]">ARBITRAGEM</span>
-              <span className="text-white/20 text-[7px]">•</span>
-              <span className="text-[#FE2C55]">DROPSHIPPING</span>
-            </span>
           </div>
-        </div>
       )}
     </div>
   );

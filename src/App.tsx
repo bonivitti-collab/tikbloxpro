@@ -678,32 +678,6 @@ export default function App() {
         </div>
       )}
 
-      {/* Modal de Calculadora de Margem */}
-      {showCalculatorModal && (
-        <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5">
-          <div className="bg-white rounded-2xl border border-slate-300 w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl">
-            <div className="p-3 border-b border-slate-200 flex items-center justify-between bg-slate-50">
-              <h3 className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
-                <SlidersHorizontal className="w-4 h-4 text-blue-600" />
-                <span>Simulador de Lucro Líquido & Margem</span>
-              </h3>
-              <button
-                onClick={() => setShowCalculatorModal(false)}
-                className="p-1 hover:bg-slate-200 rounded text-slate-500 hover:text-slate-800 transition cursor-pointer"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-            <div className="flex-1 overflow-y-auto p-4">
-              <ProfitCalculatorModal
-                product={selectedProductForCalc}
-                onClose={() => setShowCalculatorModal(false)}
-              />
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Modals wrapped in Suspense for asynchronous lazy chunk loading */}
       <Suspense fallback={null}>
         <ProductDetailModal
@@ -717,10 +691,13 @@ export default function App() {
           }}
         />
 
-        {selectedProductForCalc && (
+        {(showCalculatorModal || selectedProductForCalc) && (
           <ProfitCalculatorModal
-            product={selectedProductForCalc}
-            onClose={() => setSelectedProductForCalc(null)}
+            product={selectedProductForCalc || activeProduct}
+            onClose={() => {
+              setShowCalculatorModal(false);
+              setSelectedProductForCalc(null);
+            }}
           />
         )}
 
