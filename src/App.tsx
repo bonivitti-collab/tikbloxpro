@@ -582,7 +582,7 @@ export default function App() {
               : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100'
           }`}
         >
-          <span>🤖 Copiloto IA</span>
+          <span>🤖 TIKBLOX AI</span>
         </button>
       </nav>
 
@@ -630,7 +630,7 @@ export default function App() {
           />
         </div>
 
-        {/* PAINEL 3: Copiloto IA Especialista em TikTok Shop */}
+        {/* PAINEL 3: TIKBLOX AI Especialista em TikTok Shop */}
         <div className={`h-full ${mobileTab !== 'copilot' ? 'hidden lg:flex' : 'flex'}`}>
           <AICopilotPanel
             activeProduct={activeProduct}

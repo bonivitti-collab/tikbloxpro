@@ -101,13 +101,13 @@ export const AICopilotPanel: React.FC<AICopilotPanelProps> = ({
         <button
           onClick={onToggleCollapse}
           className="p-1.5 hover:bg-white rounded-lg text-slate-600 hover:text-[#FE2C55] transition-colors cursor-pointer border border-transparent hover:border-slate-300"
-          title="Expandir TikBlox AI Copilot"
+          title="Expandir TIKBLOX AI"
         >
           <PanelRight className="w-4 h-4" />
         </button>
         <span className="[writing-mode:vertical-rl] text-[11px] font-bold text-slate-600 tracking-wider uppercase flex items-center gap-1.5">
           <Bot className="w-3.5 h-3.5 text-[#FE2C55]" />
-          <span>TikBlox AI</span>
+          <span>TIKBLOX AI</span>
         </span>
         <div className="w-2 h-2 rounded-full bg-[#25F4EE] animate-pulse" />
       </aside>
@@ -125,7 +125,7 @@ export const AICopilotPanel: React.FC<AICopilotPanelProps> = ({
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-1.5 leading-none">
-              <span className="font-bold text-xs text-slate-900 truncate">TikBlox Copilot IA</span>
+              <span className="font-bold text-xs text-slate-900 truncate">TIKBLOX AI</span>
               <span className="text-[9px] font-mono px-1.5 py-0.2 rounded-full bg-[#25F4EE]/15 text-[#007A87] font-bold border border-[#25F4EE]/40">
                 100% Gratuito
               </span>
@@ -150,7 +150,7 @@ export const AICopilotPanel: React.FC<AICopilotPanelProps> = ({
           <button
             onClick={onToggleCollapse}
             className="hidden lg:flex p-1 text-slate-400 hover:text-slate-800 hover:bg-slate-100 rounded-md transition-colors cursor-pointer"
-            title="Recolher Copiloto IA para focar no Raio-X"
+            title="Recolher TIKBLOX AI para focar no Raio-X"
           >
             <PanelRight className="w-3.5 h-3.5" />
           </button>
@@ -292,7 +292,7 @@ export const AICopilotPanel: React.FC<AICopilotPanelProps> = ({
               className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}
             >
               <span className="text-[10px] text-slate-400 font-bold mb-0.5 px-1">
-                {msg.role === 'user' ? 'Você' : 'TikBlox AI'}
+                {msg.role === 'user' ? 'Você' : 'TIKBLOX AI'}
               </span>
 
               <div

@@ -91,9 +91,9 @@ export const AICopilotModal: React.FC<AICopilotModalProps> = ({ isOpen, onClose 
             </div>
             <div>
               <h2 className="text-base font-black text-white flex items-center gap-2">
-                Copiloto Estratégico IA
+                TIKBLOX AI
                 <span className="px-1.5 py-0.5 rounded-md bg-[#FE2C55]/20 text-[#FE2C55] text-[10px] uppercase font-bold tracking-wider">
-                  IA TikBlox
+                  IA Oficial
                 </span>
               </h2>
               <p className="text-xs text-[#A6A7B2]">Seu assistente de tendências e tráfego</p>
@@ -165,7 +165,7 @@ export const AICopilotModal: React.FC<AICopilotModalProps> = ({ isOpen, onClose 
             </button>
           </div>
           <p className="text-[10px] text-center text-[#5E6070] mt-2">
-            O Copiloto IA pode cometer erros. Verifique informações importantes sobre produtos e fretes.
+            A TIKBLOX AI pode cometer erros. Verifique informações importantes sobre produtos e fretes.
           </p>
         </div>
 

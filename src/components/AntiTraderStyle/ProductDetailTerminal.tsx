@@ -338,7 +338,7 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
               Precisa de roteiro de live ou quer pedir amostra grátis para este produto?
             </h4>
             <p className="text-[11px] text-slate-600 mt-0.5">
-              O Copiloto IA à direita gera o script de 5 minutos e o pitch de WhatsApp em 1 clique.
+              A TIKBLOX AI à direita gera o script de 5 minutos e o pitch de WhatsApp em 1 clique.
             </p>
           </div>
         </div>
@@ -347,7 +347,7 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
           onClick={() => onOpenInCopilot(product)}
           className="w-full sm:w-auto px-4 py-2 rounded-xl bg-[#0F172A] hover:bg-black text-white font-bold text-xs transition cursor-pointer shadow-xs whitespace-nowrap active:scale-95 border border-white/10"
         >
-          Conversar com a IA Agora ⚡
+          Conversar com a TIKBLOX AI Agora ⚡
         </button>
       </div>
 

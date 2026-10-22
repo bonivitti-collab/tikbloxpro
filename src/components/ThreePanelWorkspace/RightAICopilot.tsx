@@ -39,9 +39,9 @@ export const RightAICopilot: React.FC<RightAICopilotProps> = ({
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: `👋 **Olá! Sou o seu Copiloto Especialista em TikTok Shop Brasil.**
+      content: `👋 **Olá! Sou a TIKBLOX AI, sua especialista em TikTok Shop Brasil.**
 
-Estou aqui para criar **ganchos virais de 3 segundos**, **roteiros completos de Live Selling** e **mensagens para pedir amostra grátis** aos lojistas.
+Estou aqui para tirar qualquer dúvida e criar **ganchos virais de 3 segundos**, **roteiros completos de Live Selling** e **mensagens para pedir amostra grátis** aos lojistas.
 
 💡 *Dica:* Clique em qualquer produto no painel central que eu analiso a comissão e o estoque dele na hora!`,
     },
@@ -133,7 +133,7 @@ Estou aqui para criar **ganchos virais de 3 segundos**, **roteiros completos de 
           </div>
           <div>
             <h3 className="text-xs font-black text-white flex items-center gap-1.5 leading-tight">
-              <span>Copiloto TikTok Shop</span>
+              <span>TIKBLOX AI</span>
               <span className="flex h-1.5 w-1.5 relative">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>

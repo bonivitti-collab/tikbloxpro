@@ -339,7 +339,7 @@ export const ProductCard: React.FC<ProductCardProps> = React.memo(({
                 ? 'bg-[#25F4EE]/25 border-[#25F4EE] text-[#25F4EE] shadow-sm'
                 : 'bg-[#161823] border-white/10 text-white hover:border-[#25F4EE]/40 hover:bg-[#1E202E]'
             }`}
-            title="Abrir este produto no Copiloto IA à direita"
+            title="Abrir este produto na TIKBLOX AI à direita"
           >
             <Sparkles className="w-3.5 h-3.5 text-[#25F4EE]" />
             <span>IA Ganchos</span>

@@ -107,10 +107,10 @@ export const Header: React.FC<HeaderProps> = ({
                 ? 'bg-[#FE2C55]/10 text-[#FE2C55] border-[#FE2C55]/40 shadow-2xs'
                 : 'bg-white text-slate-700 border-slate-300 hover:border-[#FE2C55]/60 hover:text-[#FE2C55]'
             }`}
-            title={painelDireitoRecolhido ? 'Expandir Copiloto IA' : 'Recolher Copiloto IA para focar no Raio-X'}
+            title={painelDireitoRecolhido ? 'Expandir TIKBLOX AI' : 'Recolher TIKBLOX AI para focar no Raio-X'}
           >
             <PanelRight className="w-3.5 h-3.5 text-[#FE2C55]" />
-            <span className="text-[10px] hidden xl:inline">IA Copilot</span>
+            <span className="text-[10px] hidden xl:inline">TIKBLOX AI</span>
           </button>
         </div>
       </div>
