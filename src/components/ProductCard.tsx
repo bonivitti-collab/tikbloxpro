@@ -38,6 +38,8 @@ interface ProductCardProps {
   onOpenDeepDive: (product: TrendingProduct) => void;
   onOpenCalculator: (product: TrendingProduct) => void;
   onOpenCreativeGenerator: (product: TrendingProduct) => void;
+  onSelectForAI?: (product: TrendingProduct) => void;
+  isSelectedForAI?: boolean;
 }
 
 export const ProductCard: React.FC<ProductCardProps> = React.memo(({
@@ -48,6 +50,8 @@ export const ProductCard: React.FC<ProductCardProps> = React.memo(({
   onOpenDeepDive,
   onOpenCalculator,
   onOpenCreativeGenerator,
+  onSelectForAI,
+  isSelectedForAI = false,
 }) => {
   const { t, language } = useTranslation();
   const tk = product.tiktokShop || enrichWithTikTokShopData(product).tiktokShop!;
@@ -138,9 +142,14 @@ export const ProductCard: React.FC<ProductCardProps> = React.memo(({
   return (
     <motion.div
       id={`product-card-${product.id}`}
-      whileHover={{ y: -4, scale: 1.015 }}
+      whileHover={{ y: -3, scale: 1.01 }}
       transition={{ type: 'spring', stiffness: 380, damping: 25 }}
-      className="group relative flex flex-col justify-between rounded-2xl border border-white/10 bg-[#2A3042] p-4 sm:p-5 backdrop-blur-sm transition-colors duration-200 hover:border-transparent hover:tiktok-chromatic-card-hover"
+      onClick={() => onSelectForAI && onSelectForAI(product)}
+      className={`group relative flex flex-col justify-between rounded-2xl border p-4 sm:p-5 backdrop-blur-sm transition-all duration-200 cursor-pointer ${
+        isSelectedForAI
+          ? 'bg-[#2B3245] border-[#25F4EE] shadow-xl shadow-[#25F4EE]/15 ring-2 ring-[#25F4EE]/60'
+          : 'bg-[#2A3042] border-white/10 hover:border-white/25 hover:bg-[#2F364B]'
+      }`}
     >
       <div>
         {/* Top Header: Wave Badge, Score & Bookmark */}
@@ -311,6 +320,7 @@ export const ProductCard: React.FC<ProductCardProps> = React.memo(({
           href={tk.tiktokShopAffiliateLink}
           target="_blank"
           rel="noopener noreferrer"
+          onClick={(e) => e.stopPropagation()}
           className="w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#FE2C55] via-[#FF0050] to-[#25F4EE] hover:brightness-110 text-white font-black py-2.5 text-xs shadow-lg shadow-[#FE2C55]/25 active:scale-98 transition-all cursor-pointer"
         >
           <ShoppingBag className="w-4 h-4 text-white" />
@@ -318,23 +328,45 @@ export const ProductCard: React.FC<ProductCardProps> = React.memo(({
           <ExternalLink className="w-3.5 h-3.5 text-white/90" />
         </a>
 
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-3 gap-1.5">
           <button
-            onClick={() => onOpenCreativeGenerator(product)}
-            className="flex items-center justify-center gap-1.5 rounded-lg border border-white/10 bg-[#161823] hover:bg-[#1E202E] hover:border-[#25F4EE]/40 py-2 px-2 text-[11px] font-bold text-white transition cursor-pointer"
-            title="Gerar 3 roteiros e ganchos de vídeo para TikTok e Lives"
+            onClick={(e) => {
+              e.stopPropagation();
+              onSelectForAI && onSelectForAI(product);
+            }}
+            className={`flex items-center justify-center gap-1 rounded-lg border py-2 px-1 text-[11px] font-bold transition cursor-pointer ${
+              isSelectedForAI
+                ? 'bg-[#25F4EE]/25 border-[#25F4EE] text-[#25F4EE] shadow-sm'
+                : 'bg-[#161823] border-white/10 text-white hover:border-[#25F4EE]/40 hover:bg-[#1E202E]'
+            }`}
+            title="Abrir este produto no Copiloto IA à direita"
           >
-            <Video className="w-3.5 h-3.5 text-[#25F4EE]" />
-            <span>Roteiro & Ganchos</span>
+            <Sparkles className="w-3.5 h-3.5 text-[#25F4EE]" />
+            <span>IA Ganchos</span>
           </button>
 
           <button
-            onClick={() => onOpenDeepDive(product)}
-            className="flex items-center justify-center gap-1.5 rounded-lg border border-white/10 bg-[#161823] hover:bg-[#1E202E] hover:border-emerald-400/40 py-2 px-2 text-[11px] font-bold text-white transition cursor-pointer"
+            onClick={(e) => {
+              e.stopPropagation();
+              onOpenCreativeGenerator(product);
+            }}
+            className="flex items-center justify-center gap-1 rounded-lg border border-white/10 bg-[#161823] hover:bg-[#1E202E] hover:border-[#FE2C55]/40 py-2 px-1 text-[11px] font-bold text-white transition cursor-pointer"
+            title="Gerar 3 roteiros e ganchos de vídeo para TikTok e Lives"
+          >
+            <Video className="w-3.5 h-3.5 text-[#FE2C55]" />
+            <span>Roteiros</span>
+          </button>
+
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onOpenDeepDive(product);
+            }}
+            className="flex items-center justify-center gap-1 rounded-lg border border-white/10 bg-[#161823] hover:bg-[#1E202E] hover:border-emerald-400/40 py-2 px-1 text-[11px] font-bold text-white transition cursor-pointer"
             title="Ver Raio-X completo da onda e análise de demanda"
           >
-            <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Raio-X da Onda</span>
+            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+            <span>Raio-X</span>
           </button>
         </div>
       </div>

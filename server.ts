@@ -789,12 +789,98 @@ Retorne APENAS o JSON puro.`;
   }
 });
 
-// Endpoint: AI Chat Copilot
+// Autonomous TikTok Shop Brasil Affiliate Intelligence Helper
+function generateAutonomousTikTokShopReply(
+  userQuery: string,
+  productContext?: any
+): string {
+  const q = (userQuery || '').toLowerCase();
+  const prodName = productContext?.name || 'este produto viral';
+  const commission = productContext?.tiktokShop?.commissionValueBRL 
+    ? `R$ ${Number(productContext.tiktokShop.commissionValueBRL).toFixed(2)} (${productContext.tiktokShop.commissionRatePercent}%)` 
+    : '20% a 25%';
+  const stock = productContext?.tiktokShop?.stockLocation || 'São Paulo - SP (Pronta Entrega)';
+
+  if (q.includes('gancho') || q.includes('hook') || q.includes('abertura') || q.includes('começar') || q.includes('gravar')) {
+    return `### 🎯 3 Ganchos Magnéticos de 3 Segundos para ${prodName}
+
+1. **Gancho de Quebra de Padrão (Curiosidade Brutal):**
+> *"Se você ainda faz isso do jeito tradicional, pare agora! Você tá perdendo tempo e dinheiro sem saber..."*
+> *(Ação: Mostre o problema acontecendo em 1 segundo e dê o corte seco para o produto funcionando).*
+
+2. **Gancho de Alívio / Desejo Imediato:**
+> *"Eu duvido você assistir esse vídeo até o final e não querer pedir um desse no TikTok Shop agora mesmo..."*
+> *(Ação: Mostre o resultado final satisfatório nos primeiros 2 segundos).*
+
+3. **Gancho de Estoque Nacional & Escassez:**
+> *"Finalmente chegou com estoque no Brasil o que os gringos estavam escondendo! Olha só..."*
+> *(Ação: Desembale rápido mostrando a caixinha recebida com envio de ${stock}).*
+
+💡 **Dica de Ouro:** Não comece dizendo "Oi gente". Mostre o movimento ou a dor nos primeiros 1.5 segundos!`;
+  }
+
+  if (q.includes('live') || q.includes('aovivo') || q.includes('ao vivo')) {
+    return `### 🎬 Estrutura de Live Selling (5 Minutos de Alta Conversão) para ${prodName}
+
+* **Minuto 1: Abertura Explosiva & Fixação do Carrinho**
+  * Segure o produto na mão e aponte para a sacola amarela: *"Gente, liberaram cupom e o estoque tá saindo de ${stock} com envio rápido. Prestem atenção nessa demonstração!"*
+* **Minuto 2: A Demonstração Prática (O 'Efeito Uau')**
+  * Mostre a função principal ao vivo sem enrolação. Mostre o antes e depois com boa iluminação.
+* **Minuto 3: Quebra de Objeções Clássicas**
+  * *"Mas funciona mesmo? Chega rápido?"* Responda: *"Tem pronta entrega no Brasil, chega em 2 a 4 dias e você não paga taxa de importação nenhuma."*
+* **Minuto 4: Escassez Real**
+  * Mostre as unidades acabando no carrinho: *"Restam poucas peças com esse preço promocional no carrinho 1!"*
+* **Minuto 5: Chamada para Ação Final (CTA)**
+  * *"Clica na sacola amarela aqui embaixo no canto esquerdo e garante o seu antes do término da live!"*`;
+  }
+
+  if (q.includes('amostra') || q.includes('loja') || q.includes('vendedor') || q.includes('pedir')) {
+    return `### 📩 Mensagem de Alta Conversão para Solicitar Amostra Grátis
+
+Copie e envie esta mensagem no chat do vendedor dentro do Centro de Criadores do TikTok Shop:
+
+---
+*"Olá, equipe! Tudo bem?*
+
+*Acompanho a loja de vocês e vi que o produto **${prodName}** tem altíssimo potencial de vendas com o meu público.*
+
+*Tenho perfil ativo focado em vídeos curtos e Lives no TikTok com público comprador qualificado. Gostaria de solicitar **1 amostra grátis** para gravar 3 vídeos verticais com gancho de alta conversão e incluir o produto com destaque na minha próxima Live Shop assim que chegar.*
+
+*Fico no aguardo para aprovação e envio para começarmos a rodar as vendas juntos! Muito obrigado!"*
+---
+
+💡 **Dica:** Lojas com estoque no Brasil aprovam muito mais rápido criadores que se comprometem com número específico de vídeos (ex: 3 vídeos + 1 live)!`;
+  }
+
+  if (q.includes('objeç') || q.includes('publico') || q.includes('público') || q.includes('vender') || q.includes('estratégia')) {
+    return `### 🎯 Análise de Público & Como Quebrar as 3 Maiores Objeções
+
+* **Público-Alvo Ideal:** Homens e mulheres de 18 a 45 anos que compram por impulso visual e buscam praticidade imediata.
+* **Objeção 1: 'Demora para chegar?'**
+  * *Como quebrar no vídeo:* Enfatize verbalmente e com texto na tela: *"Estoque já no Brasil, chega rapidinho em São Paulo e capitais!"*
+* **Objeção 2: 'Será que compensa o valor?'**
+  * *Como quebrar no vídeo:* Mostre o custo por uso diário. Se custa R$ 69,90, mostre que custa centavos por dia e dura anos.
+* **Objeção 3: 'É golpe ou frágil?'**
+  * *Como quebrar no vídeo:* Mostre detalhes de acabamento, bateria recarregável USB e a garantia do TikTok Shop.
+
+💰 **Sua Comissão Estimada:** ${commission} limpa por cada venda que sair do seu link!`;
+  }
+
+  return `### 🚀 Estratégia de Afiliado TikTok Shop para ${prodName}
+
+1. **Volume de Conteúdo:** Grave 2 a 3 variações de vídeos mudando apenas os **primeiros 3 segundos** (o gancho). O TikTok entrega vídeos diferentes para públicos diferentes.
+2. **Sacola Amarela:** Lembre-se sempre de vincular o produto exato na opção "Adicionar Link > Produto" antes de postar o vídeo.
+3. **Comissão Garantida:** Com ${commission} por venda, se 1 vídeo seu pegar 10.000 visualizações e converter 1% (100 vendas), você fatura mais de **R$ 1.500,00** apenas com esse conteúdo.
+
+💬 *Quer que eu crie um roteiro completo ou ganchos para outro nicho? É só me pedir!*`;
+}
+
+// Endpoint: AI Chat Copilot (TikTok Shop Brasil Strategist)
 app.post('/api/chat', async (req: Request, res: Response) => {
   try {
-    const { messages } = req.body;
+    const { messages, productContext } = req.body;
     if (!messages || !Array.isArray(messages)) {
-      return res.status(400).json({ error: 'Formato de mensagens invÃ¡lido.' });
+      return res.status(400).json({ error: 'Formato de mensagens inválido.' });
     }
 
     const ai = getGenAI();
@@ -803,70 +889,79 @@ app.post('/api/chat', async (req: Request, res: Response) => {
     const hasGroq = !!groqKey && !isRateLimited();
     const hasGemini = !!geminiKey && !isRateLimited();
 
-    // Prepare history for Gemini/Groq
     const lastUserMessage = messages[messages.length - 1]?.content || '';
     
+    // Fallback directly to rich autonomous intelligence if no external API keys
     if (!hasGroq && !hasGemini) {
-      return res.json({
-        reply: "No momento estou operando no modo autÃ´nomo offline e nÃ£o consigo processar conversas complexas. Verifique suas chaves de API (Gemini ou Groq) para habilitar o chat inteligente."
-      });
+      const autonomousReply = generateAutonomousTikTokShopReply(lastUserMessage, productContext);
+      return res.json({ reply: autonomousReply });
     }
 
     let replyText = '';
 
-    if (hasGroq) {
-      // Using Groq
-      const groqMessages = [
-        { role: 'system', content: 'VocÃª Ã© a IA do TikBlox, um assistente especialista em e-commerce, dropshipping, mineraÃ§Ã£o de produtos virais no TikTok e arbitragem. Responda sempre em portuguÃªs do Brasil de forma clara, direta e objetiva, mantendo um tom profissional mas empolgante e focado em lucro/estratÃ©gia. Nunca mencione que vocÃª Ã© um modelo da Groq ou OpenAI.' },
-        ...messages.map((m: any) => ({
-          role: m.role === 'assistant' ? 'assistant' : 'user',
-          content: m.content
-        }))
-      ];
-      
-      const apiKey = groqKey;
-      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${apiKey}`,
-        },
-        body: JSON.stringify({
-          model: 'llama-3.3-70b-versatile',
-          messages: groqMessages,
-          temperature: 0.7,
-        }),
-      });
+    const systemPrompt = `Você é o Copiloto Estratégico Especialista em TikTok Shop Brasil do TikBlox Pro.
+Sua missão é ajudar criadores e afiliados a ganharem muito dinheiro no TikTok Shop Brasil com produtos de alta demanda e baixa saturação.
+${productContext ? `PRODUTO ATUALMENTE SELECIONADO PELO USUÁRIO:\nNome: ${productContext.name}\nPreço: R$ ${productContext.estimatedPriceBRL}\nComissão: ${productContext.tiktokShop?.commissionRatePercent}% (R$ ${productContext.tiktokShop?.commissionValueBRL})\nEstoque: ${productContext.tiktokShop?.stockLocation}\nAmostra Grátis: ${productContext.tiktokShop?.freeSampleAvailable ? 'Disponível' : 'Sob Consulta'}\nCriadores Ativos: ${productContext.tiktokShop?.activeCreatorsCount}` : ''}
+Instruções:
+- Responda sempre em português do Brasil, com tom enérgico, direto, focado em vendas rápidas, ganchos magnéticos de 3s e roteiros de Lives.
+- Formate com markdown, bullet points e destaques. Nunca mencione que você é um modelo de linguagem genérico.`;
 
-      if (response.ok) {
-        const data = await response.json();
-        replyText = data.choices?.[0]?.message?.content || '';
+    if (hasGroq) {
+      try {
+        const groqMessages = [
+          { role: 'system', content: systemPrompt },
+          ...messages.map((m: any) => ({
+            role: m.role === 'assistant' ? 'assistant' : 'user',
+            content: m.content
+          }))
+        ];
+        
+        const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${groqKey}`,
+          },
+          body: JSON.stringify({
+            model: 'llama-3.3-70b-versatile',
+            messages: groqMessages,
+            temperature: 0.7,
+          }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          replyText = data.choices?.[0]?.message?.content || '';
+        }
+      } catch (groqErr) {
+        console.warn('Groq chat error, trying fallback:', groqErr);
       }
     }
 
     if (!replyText && hasGemini) {
-      // Use standard generateContent for single-turn or simple interaction
-      const response = await ai.models.generateContent({
-        model: 'gemini-3.8-flash',
-        contents: lastUserMessage,
-        config: {
-          systemInstruction: 'VocÃª Ã© a IA do TikBlox, um assistente especialista em e-commerce, dropshipping, mineraÃ§Ã£o de produtos virais no TikTok e arbitragem. Responda sempre em portuguÃªs do Brasil de forma clara, direta e objetiva, mantendo um tom profissional mas empolgante e focado em lucro/estratÃ©gia. Nunca mencione que vocÃª Ã© um modelo do Google.',
-        }
-      });
-      replyText = response.text || '';
+      try {
+        const response = await ai.models.generateContent({
+          model: 'gemini-2.5-flash',
+          contents: lastUserMessage,
+          config: {
+            systemInstruction: systemPrompt,
+          }
+        });
+        replyText = response.text || '';
+      } catch (geminiErr) {
+        console.warn('Gemini chat error, trying fallback:', geminiErr);
+      }
     }
 
     if (!replyText) {
-      throw new Error('Sem resposta do provedor de IA.');
+      replyText = generateAutonomousTikTokShopReply(lastUserMessage, productContext);
     }
 
     return res.json({ reply: replyText });
   } catch (error: any) {
     console.error('Chat error:', error);
-    triggerRateLimitCooldown(60000);
-    return res.json({
-      reply: 'Desculpe, encontrei um erro temporÃ¡rio de conexÃ£o ou excedi o limite de mensagens. Por favor, tente novamente em alguns instantes.'
-    });
+    const fallback = generateAutonomousTikTokShopReply(req.body?.messages?.slice(-1)[0]?.content || '', req.body?.productContext);
+    return res.json({ reply: fallback });
   }
 });
 
