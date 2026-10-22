@@ -12,59 +12,147 @@ export default async function handler(req: any, res: any) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  try {
-    const { messages = [], productContext } = req.body || {};
-    const lastMessage = messages.slice(-1)[0]?.content || '';
+  const { messages = [], productContext } = req.body || {};
+  const lastMessage = messages.slice(-1)[0]?.content || '';
 
-    // 1. Optional Groq AI
-    const groqKey = process.env.GROQ_API_KEY;
-    if (groqKey) {
-      try {
-        const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${groqKey}`,
-          },
-          body: JSON.stringify({
-            model: 'llama-3.3-70b-versatile',
-            messages: [
-              {
-                role: 'system',
-                content: `Você é o Copiloto Especialista em TikTok Shop Brasil do TikBlox Pro. Ajude criadores e afiliados a maximizarem vendas no Brasil com ganchos virais de 3s, roteiros de live e pedidos de amostra grátis. Produto: ${productContext?.name || 'Geral'}.`,
-              },
-              ...messages.map((m: any) => ({
-                role: m.role === 'assistant' ? 'assistant' : 'user',
-                content: m.content,
-              })),
-            ],
-            temperature: 0.7,
-          }),
-        });
+  const systemPrompt = `Você é o Copiloto Especialista em TikTok Shop Brasil do TikBlox Pro.
+Sua missão é ajudar criadores e afiliados a maximizarem vendas no TikTok Shop Brasil com produtos de pronta entrega nacional.
+${productContext ? `PRODUTO SELECIONADO:\nNome: ${productContext.name}\nPreço: R$ ${productContext.estimatedPriceBRL}\nComissão: ${productContext.commissionPercent || 25}% (R$ ${productContext.commissionEstimatedBRL || 15})\nEstoque: ${productContext.stockLocationBrazil || 'São Paulo - SP'}\nAmostra Grátis: ${productContext.freeSampleAvailable ? 'Sim' : 'Sob consulta'}` : ''}
+Instruções:
+- Seja ultra prático, persuasivo e focado em alta conversão no público brasileiro.
+- Formate com títulos em Markdown, bullet points claros e ganchos magnéticos de 3 segundos.`;
 
-        if (groqRes.ok) {
-          const data = await groqRes.json();
-          const reply = data.choices?.[0]?.message?.content;
-          if (reply) {
-            return res.status(200).json({ reply });
-          }
+  // ==========================================
+  // TIER 1: GROQ CLUSTER (Chave Principal + Reservas)
+  // ==========================================
+  const groqKeys = [
+    process.env.GROQ_API_KEY,
+    process.env.GROQ_API_KEY_2,
+    process.env.GROQ_API_KEY_3,
+  ].filter(Boolean) as string[];
+
+  for (const groqKey of groqKeys) {
+    try {
+      const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${groqKey}`,
+        },
+        body: JSON.stringify({
+          model: 'llama-3.3-70b-versatile',
+          messages: [
+            { role: 'system', content: systemPrompt },
+            ...messages.map((m: any) => ({
+              role: m.role === 'assistant' ? 'assistant' : 'user',
+              content: m.content,
+            })),
+          ],
+          temperature: 0.7,
+        }),
+      });
+
+      if (groqRes.ok) {
+        const data = await groqRes.json();
+        const reply = data.choices?.[0]?.message?.content;
+        if (reply) {
+          return res.status(200).json({ reply, provider: 'groq' });
         }
-      } catch (groqErr) {
-        console.warn('Groq error:', groqErr);
+      } else {
+        console.warn(`Groq key failed with HTTP ${groqRes.status}, cascading to backup...`);
       }
+    } catch (groqErr) {
+      console.warn('Groq cluster connection error, cascading to backup:', groqErr);
     }
-
-    // 2. High-performance Autonomous TikTok Shop Intelligence
-    const reply = generateAutonomousTikTokShopReply(lastMessage, productContext);
-    return res.status(200).json({ reply });
-  } catch (error: any) {
-    console.error('Chat error:', error);
-    const fallback = generateAutonomousTikTokShopReply(
-      req.body?.messages?.slice(-1)[0]?.content || '',
-      req.body?.productContext
-    );
-    return res.status(200).json({ reply: fallback });
   }
+
+  // ==========================================
+  // TIER 2: GOOGLE GEMINI CLUSTER (Chave Principal + Reservas)
+  // ==========================================
+  const geminiKeys = [
+    process.env.GEMINI_API_KEY,
+    process.env.GEMINI_API_KEY_2,
+    process.env.GEMINI_API_KEY_3,
+  ].filter(Boolean) as string[];
+
+  for (const geminiKey of geminiKeys) {
+    try {
+      const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiKey}`;
+      const geminiRes = await fetch(geminiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          system_instruction: {
+            parts: [{ text: systemPrompt }],
+          },
+          contents: [
+            {
+              parts: [{ text: lastMessage }],
+            },
+          ],
+        }),
+      });
+
+      if (geminiRes.ok) {
+        const geminiData = await geminiRes.json();
+        const reply = geminiData.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (reply) {
+          return res.status(200).json({ reply, provider: 'gemini' });
+        }
+      } else {
+        console.warn(`Gemini key failed with HTTP ${geminiRes.status}, cascading to backup...`);
+      }
+    } catch (geminiErr) {
+      console.warn('Gemini cluster connection error, cascading to backup:', geminiErr);
+    }
+  }
+
+  // ==========================================
+  // TIER 3: OPENROUTER CLUSTER (Reserva Adicional)
+  // ==========================================
+  const openRouterKeys = [
+    process.env.OPENROUTER_API_KEY,
+    process.env.OPENROUTER_API_KEY_2,
+  ].filter(Boolean) as string[];
+
+  for (const orKey of openRouterKeys) {
+    try {
+      const orRes = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${orKey}`,
+        },
+        body: JSON.stringify({
+          model: 'meta-llama/llama-3.3-70b-instruct:free',
+          messages: [
+            { role: 'system', content: systemPrompt },
+            ...messages.map((m: any) => ({
+              role: m.role === 'assistant' ? 'assistant' : 'user',
+              content: m.content,
+            })),
+          ],
+        }),
+      });
+
+      if (orRes.ok) {
+        const orData = await orRes.json();
+        const reply = orData.choices?.[0]?.message?.content;
+        if (reply) {
+          return res.status(200).json({ reply, provider: 'openrouter' });
+        }
+      }
+    } catch (orErr) {
+      console.warn('OpenRouter connection error:', orErr);
+    }
+  }
+
+  // ==========================================
+  // TIER 4: AUTONOMOUS HEURISTIC ENGINE (100% Offline & Ilimitado)
+  // ==========================================
+  // Nunca falha, zero dependência externa de saldo, tokens ou rate-limit.
+  const autonomousReply = generateAutonomousTikTokShopReply(lastMessage, productContext);
+  return res.status(200).json({ reply: autonomousReply, provider: 'autonomous_engine' });
 }
 
 function generateAutonomousTikTokShopReply(
