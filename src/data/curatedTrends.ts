@@ -1,7 +1,11 @@
 import { TrendingProduct } from '../types';
 import { ALL_NICHE_TRENDS, NICHE_TRENDS_MAP } from './niches/index';
+import { enrichWithTikTokShopData } from './tiktokShopEnricher';
 
 export { ALL_NICHE_TRENDS, NICHE_TRENDS_MAP };
 
-// Comprehensive 300 trends (30 per niche across all 10 niches: Tech, Home, Beauty, Fitness, Pets, Accessories, Kids, Tools, Auto, Health)
-export const INITIAL_CURATED_TRENDS: TrendingProduct[] = ALL_NICHE_TRENDS;
+// Comprehensive 300+ trends enriched with TikTok Shop Brasil affiliate metrics
+export const INITIAL_CURATED_TRENDS: TrendingProduct[] = [...ALL_NICHE_TRENDS]
+  .map(enrichWithTikTokShopData)
+  .sort((a, b) => b.viralityScore - a.viralityScore);
+

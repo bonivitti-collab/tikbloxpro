@@ -11,7 +11,11 @@ export type ProductNiche =
   | 'kids'
   | 'tools'
   | 'auto'
-  | 'health';
+  | 'health'
+  | 'gaming'
+  | 'office'
+  | 'outdoor'
+  | 'travel';
 
 export interface TrendingProduct {
   id: string;
@@ -41,6 +45,20 @@ export interface TrendingProduct {
     viewsLast30Days: string;
     growthRatePercent: number;
     searchVolumeBR: 'Emergindo agora' | 'Crescimento +340%' | 'Disparada +620%' | 'Primeiras Buscas';
+  };
+  tiktokShop?: {
+    hasBrazilStock: boolean;
+    stockLocation: string;
+    commissionRatePercent: number;
+    commissionValueBRL: number;
+    freeSampleAvailable: boolean;
+    minFollowersForSample: number;
+    activeCreatorsCount: number;
+    recentSalesCount: number;
+    saturationLevel: 'Oceano Azul' | 'Baixa' | 'Média' | 'Saturado';
+    tiktokShopAffiliateLink: string;
+    topViralHook: string;
+    sampleRequestTip?: string;
   };
   groundingSources?: Array<{
     title: string;

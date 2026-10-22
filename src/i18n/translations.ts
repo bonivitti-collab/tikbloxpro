@@ -37,6 +37,10 @@ export interface TranslationDictionary {
   hero_niche_tools: string;
   hero_niche_auto: string;
   hero_niche_health: string;
+  hero_niche_gaming: string;
+  hero_niche_office: string;
+  hero_niche_outdoor: string;
+  hero_niche_travel: string;
   recent_searches_title: string;
   recent_searches_top: string;
   recent_searches_clear: string;
@@ -226,6 +230,10 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     hero_niche_tools: 'Ferramentas & Obra',
     hero_niche_auto: 'Automotivo & Carros',
     hero_niche_health: 'Saúde & Bem-Estar',
+    hero_niche_gaming: 'Gamer & Setup',
+    hero_niche_office: 'Escritório & Desk',
+    hero_niche_outdoor: 'Outdoor & Camping',
+    hero_niche_travel: 'Viagem & Bagagem',
     recent_searches_title: 'Buscas Recentes',
     recent_searches_top: 'Mais Investigados',
     recent_searches_clear: 'Limpar Histórico',
@@ -416,6 +424,10 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     hero_niche_tools: 'Tools & DIY',
     hero_niche_auto: 'Auto & Accessories',
     hero_niche_health: 'Health & Wellness',
+    hero_niche_gaming: 'Gaming & Setup',
+    hero_niche_office: 'Office & Desk',
+    hero_niche_outdoor: 'Outdoor & Survival',
+    hero_niche_travel: 'Travel & Luggage',
     recent_searches_title: 'Recent Searches',
     recent_searches_top: 'Most Investigated',
     recent_searches_clear: 'Clear History',

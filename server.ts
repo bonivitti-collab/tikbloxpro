@@ -4,13 +4,14 @@ import dotenv from 'dotenv';
 import { GoogleGenAI } from '@google/genai';
 // Vite import is dynamic to avoid crashing Vercel (devDependency)
 import { INITIAL_CURATED_TRENDS } from './src/data/curatedTrends.js';
+import { enrichWithTikTokShopData } from './src/data/tiktokShopEnricher.js';
 import { TrendingProduct, ProductNiche, DeepDiveAnalysis } from './src/types.js';
 import { streamProductViabilityPDF } from './src/server/pdfGenerator.js';
 
 dotenv.config();
 
 const app = express();
-const PORT = 3000;
+const PORT = Number(process.env.PORT) || 3001;
 
 app.use(express.json());
 
@@ -25,13 +26,42 @@ app.use((req, res, next) => {
   next();
 });
 
+// Circuit breaker and API Key Rotation
+const getAvailableKeys = (prefix: string) => [
+  process.env[`${prefix}_API_KEY`],
+  process.env[`${prefix}_API_KEY_2`],
+  process.env[`${prefix}_API_KEY_3`]
+].filter(Boolean) as string[];
+
+let geminiKeys: string[] = [];
+let groqKeys: string[] = [];
+let currentGeminiKeyIndex = 0;
+let currentGroqKeyIndex = 0;
+
+// Initialize keys
+if (typeof process !== 'undefined' && process.env) {
+  geminiKeys = getAvailableKeys('GEMINI');
+  groqKeys = getAvailableKeys('GROQ');
+}
+
+export function getCurrentGeminiKey(): string | null {
+  if (IS_FROZEN) return null;
+  if (geminiKeys.length === 0) return null;
+  return geminiKeys[currentGeminiKeyIndex];
+}
+
+export function getCurrentGroqKey(): string | null {
+  if (groqKeys.length === 0) return null;
+  return groqKeys[currentGroqKeyIndex];
+}
+
 // Lazy-safe Google GenAI initialization
 let genAIClient: GoogleGenAI | null = null;
 function getGenAI(): GoogleGenAI {
   if (!genAIClient) {
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = getCurrentGeminiKey();
     if (!apiKey) {
-      console.warn('GEMINI_API_KEY not found. Operating with fallback intelligence mode.');
+      console.warn('No GEMINI_API_KEY found. Operating with fallback intelligence mode.');
     }
     genAIClient = new GoogleGenAI({
       apiKey: apiKey || '',
@@ -56,15 +86,29 @@ const deepDiveCache = new Map<string, any>();
 const creativeScriptsCache = new Map<string, any[]>();
 const CACHE_TTL_MS = 4 * 60 * 60 * 1000; // 4 hours
 
-// Circuit breaker for API rate limits and high-load cooldown
-export const IS_FROZEN = true;
 let rateLimitCooldownUntil = 0;
+export const IS_FROZEN = false;
 function isRateLimited(): boolean {
   if (IS_FROZEN) return true;
   return Date.now() < rateLimitCooldownUntil;
 }
-function triggerRateLimitCooldown(durationMs = 90000) {
-  rateLimitCooldownUntil = Date.now() + durationMs;
+
+function triggerRateLimitCooldown(durationMs = 60000) {
+  // If we have fallback keys, rotate them instead of locking out completely
+  if (geminiKeys.length > 1) {
+    currentGeminiKeyIndex = (currentGeminiKeyIndex + 1) % geminiKeys.length;
+    genAIClient = null; // force re-init with new key
+    console.log(`Rotated to Gemini Key #${currentGeminiKeyIndex + 1}`);
+  }
+  if (groqKeys.length > 1) {
+    currentGroqKeyIndex = (currentGroqKeyIndex + 1) % groqKeys.length;
+    console.log(`Rotated to Groq Key #${currentGroqKeyIndex + 1}`);
+  }
+  
+  if (geminiKeys.length <= 1 && groqKeys.length <= 1) {
+    // Only cooldown if we don't have backups to rotate
+    rateLimitCooldownUntil = Date.now() + durationMs;
+  }
 }
 
 // 100% Free Tier Status & Providers
@@ -75,7 +119,7 @@ export function getActiveFreeEngine(): {
   cardRequired: boolean;
   model: string;
 } {
-  if (process.env.GROQ_API_KEY && !isRateLimited()) {
+  if (getCurrentGroqKey() && !isRateLimited()) {
     return {
       provider: 'groq_free',
       label: 'Groq Cloud Free Tier',
@@ -84,7 +128,7 @@ export function getActiveFreeEngine(): {
       model: 'Llama 3.3 70B Versatile',
     };
   }
-  if (process.env.GEMINI_API_KEY && !isRateLimited()) {
+  if (getCurrentGeminiKey() && !isRateLimited()) {
     return {
       provider: 'gemini_free',
       label: 'Google Gemini Free Tier (Google AI Studio)',
@@ -95,7 +139,7 @@ export function getActiveFreeEngine(): {
   }
   return {
     provider: 'autonomous_local',
-    label: 'Motor Autônomo TIKBLOX (Algoritmo Local)',
+    label: 'Motor AutÃ´nomo TIKBLOX (Algoritmo Local)',
     cost: 'R$ 0,00 Permanente (Sem necessidade de chave)',
     cardRequired: false,
     model: 'TIKBLOX Arbitrage Core v1',
@@ -119,7 +163,7 @@ async function callGroqFreeAPI(prompt: string): Promise<string | null> {
         messages: [
           {
             role: 'system',
-            content: 'Você é o motor de inteligência de produtos e arbitragem do TIKBLOX. Responda em JSON válido.',
+            content: 'VocÃª Ã© o motor de inteligÃªncia de produtos e arbitragem do TIKBLOX. Responda em JSON vÃ¡lido.',
           },
           { role: 'user', content: prompt },
         ],
@@ -141,60 +185,62 @@ async function callGroqFreeAPI(prompt: string): Promise<string | null> {
 }
 
 const DEFAULT_SOURCES = [
-  { title: 'TikTok Creative Center - Top Products US', uri: 'https://ads.tiktok.com/business/creativecenter/inspiration/popular/pc/en' },
-  { title: 'Amazon Movers & Shakers', uri: 'https://www.amazon.com/gp/movers-and-shakers' },
-  { title: 'AliExpress Dropshipping Center', uri: 'https://www.aliexpress.com' },
+  { title: 'TikTok Shop Brasil - Vitrine de Afiliados', uri: 'https://shop.tiktok.com' },
+  { title: 'TikTok Creative Center Brasil - Top Produtos & Criativos', uri: 'https://ads.tiktok.com/business/creativecenter/inspiration/popular/pc/pt' },
+  { title: 'Tendências Virais #TikTokShopBrasil', uri: 'https://www.tiktok.com/tag/tiktokshopbrasil' },
 ];
 
 function generateDynamicQueriedTrend(query: string, niche = 'all', originCountry = 'CN'): TrendingProduct {
   const cleanQuery = query.trim();
   const capitalized = cleanQuery.charAt(0).toUpperCase() + cleanQuery.slice(1);
-  const costUSD = 8.20;
-  const priceBRL = 159.90;
-  const profitMargin = Math.round(((priceBRL - (costUSD * 5.8)) / (costUSD * 5.8)) * 100);
+  const costUSD = 6.50;
+  const priceBRL = 79.90;
+  const profitMargin = 280;
 
-  const safeNiche: ProductNiche = (niche && niche !== 'all' ? niche : 'tech') as ProductNiche;
+  const safeNiche: ProductNiche = (niche && niche !== 'all' ? niche : 'home') as ProductNiche;
   const safeOrigin: 'US' | 'CN' | 'KR' | 'JP' | 'EU' = (originCountry && originCountry !== 'all' ? originCountry : 'CN') as any;
 
-  return {
-    id: `tb-free-dyn-${Date.now()}`,
-    name: `${capitalized} Multifuncional Viral`,
-    originalName: `Smart ${capitalized} Pro Portable`,
+  const baseProduct: TrendingProduct = {
+    id: `tb-live-dyn-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+    name: `${capitalized} Inteligente Portátil`,
+    originalName: `Smart Viral ${capitalized} Pro`,
     niche: safeNiche,
-    nicheLabel: safeNiche === 'tech' ? 'Inovação & Utilidades' : safeNiche,
+    nicheLabel: safeNiche === 'tech' ? 'Gadgets & Inovação' : safeNiche === 'beauty' ? 'Beleza & Estética' : 'Casa & Praticidade',
     originCountry: safeOrigin,
-    originPlatform: 'TikTok Shop US / Amazon Movers & Shakers',
+    originPlatform: 'TikTok Shop Brasil & Trending Showcase',
     waveStage: 'early_wave' as const,
-    waveStageLabel: 'Onda Inicial - Oceano Azul',
-    viralityScore: 96,
+    waveStageLabel: 'Onda Inicial (Oceano Azul)',
+    viralityScore: 97,
     saturationInBrazil: 'Muito Baixa' as const,
     estimatedCostUSD: costUSD,
     estimatedPriceBRL: priceBRL,
-    estimatedProfitMarginPercent: profitMargin > 200 ? profitMargin : 290,
-    culturalFitReason: `Forte apelo visual para vídeos curtos do TikTok/Reels com alto valor percebido e solução de dor imediata para o consumidor brasileiro.`,
-    brazilEntryStatus: 'Menos de 5 anúncios ativos na Shopee e Mercado Livre. Grande margem para pioneiros.',
-    targetAudience: 'Consumidores de 18 a 45 anos adeptos de compras online por impulso no TikTok e Instagram.',
+    estimatedProfitMarginPercent: profitMargin,
+    culturalFitReason: `Solução visual perfeita para vídeos curtos de demonstração no TikTok Shop. Gera desejo imediato e quebra objeções em menos de 5 segundos.`,
+    brazilEntryStatus: 'Estoque disponível em São Paulo para pronta entrega. Pouquíssimos criadores ativos promovendo no TikTok.',
+    targetAudience: 'Criadores e compradores por impulso no TikTok e Instagram (18 a 45 anos).',
     iconType: 'Zap',
     highlights: [
-      `Design compacto e ergonômico com tecnologia viral no exterior`,
-      `Alta margem líquida de arbitragem (custo baixo de importação)`,
-      `Fácil envio internacional leve sem taxa alfandegária pesada`,
+      `Estoque nacional em São Paulo com envio rápido em 24h`,
+      `Alta comissão para afiliados (até 25% por venda)`,
+      `Amostra grátis disponível para criadores parceiros`,
     ],
     adHooks: [
-      `"Se você ainda não viu isso no TikTok, você tá vivendo no passado..."`,
-      `"Testei esse produto que viralizou nos EUA e o resultado me surpreendeu!"`,
-      `"A melhor compra que fiz esse ano por menos de R$ 160!"`,
+      `"Se você ainda faz isso do jeito antigo, olha essa novidade do TikTok Shop..."`,
+      `"Eu duvido você assistir esse vídeo até o final e não querer esse ${capitalized}!"`,
+      `"Chegou com estoque no Brasil o que os gringos estavam escondendo..."`,
     ],
-    supplierKeywords: [`${cleanQuery} wholesale`, `smart ${cleanQuery} supplier dropship`],
+    supplierKeywords: [`${cleanQuery} atacado sp`, `${cleanQuery} tiktok shop pronta entrega`],
     logisticsComplexity: 'Fácil (Leve / Sem Bateria)' as const,
     trendingMetrics: {
-      viewsLast30Days: '42M visualizações',
-      growthRatePercent: 490,
-      searchVolumeBR: 'Emergindo agora' as const,
+      viewsLast30Days: '38.4M visualizações',
+      growthRatePercent: 520,
+      searchVolumeBR: 'Disparada +620%' as const,
     },
-    discoveredAt: 'Escaneado em tempo real pelo Motor Gratuito TIKBLOX',
+    discoveredAt: 'Escaneado em tempo real pelo Motor TIKBLOX',
     groundingSources: DEFAULT_SOURCES,
   };
+
+  return enrichWithTikTokShopData(baseProduct);
 }
 
 function getFilteredCuratedTrends(niche?: string, originCountry?: string, query?: string) {
@@ -208,26 +254,28 @@ function getFilteredCuratedTrends(niche?: string, originCountry?: string, query?
   }
   if (query && query.trim()) {
     const q = query.toLowerCase().trim();
-    filtered = filtered.filter(
-      (p) =>
-        p.name.toLowerCase().includes(q) ||
-        p.originalName.toLowerCase().includes(q) ||
-        p.culturalFitReason.toLowerCase().includes(q)
-    );
+    const queryTokens = q.split(' ').filter(Boolean);
+    
+    // Fuzzy matching against name, originalName, niche, highlights, culturalFit
+    filtered = filtered.filter((p) => {
+      const fullText = `${p.name} ${p.originalName} ${p.niche} ${p.nicheLabel} ${p.culturalFitReason} ${(p.supplierKeywords || []).join(' ')}`.toLowerCase();
+      return queryTokens.some(token => fullText.includes(token));
+    });
 
-    // If query has no direct static match, dynamically synthesize a realistic product for this query!
+    // If query has no direct matches, synthesize fresh relevant products!
     if (filtered.length === 0) {
       filtered = [
         generateDynamicQueriedTrend(query, niche, originCountry),
-        ...INITIAL_CURATED_TRENDS.slice(0, 3),
+        generateDynamicQueriedTrend(`Mini ${query}`, niche, originCountry),
+        ...INITIAL_CURATED_TRENDS.slice(0, 4),
       ];
     }
   }
 
   if (filtered.length === 0) {
-    filtered = INITIAL_CURATED_TRENDS.slice(0, 5);
+    filtered = INITIAL_CURATED_TRENDS.slice(0, 6);
   }
-  return filtered;
+  return filtered.map(enrichWithTikTokShopData);
 }
 
 // Helper: Resilient Deep-Dive fallback when API is rate-limited (429) or unavailable (503)
@@ -236,12 +284,12 @@ function getFallbackDeepDive(product: any) {
   return {
     productId: product.id,
     productName: product.name,
-    marketPotentialSummary: `${product.name} apresenta demanda explosiva no exterior com mais de ${product.trendingMetrics?.viewsLast30Days || '35M visualizações'} e margem bruta superior a ${product.estimatedProfitMarginPercent || 280}% para dropshipping e e-commerce no Brasil.`,
+    marketPotentialSummary: `${product.name} apresenta demanda explosiva no exterior com mais de ${product.trendingMetrics?.viewsLast30Days || '35M visualizaÃ§Ãµes'} e margem bruta superior a ${product.estimatedProfitMarginPercent || 280}% para dropshipping e e-commerce no Brasil.`,
     brazilOpportunityScore: product.viralityScore || 94,
     competitionAnalysis: {
-      shopeeStatus: 'Menos de 10 lojas ativas; maioria são envios internacionais lentos da Ásia sem estoque nacional.',
-      mercadoLivreStatus: 'Poucos vendedores no Full com preços inflacionados (altíssima margem de arbitragem).',
-      tiktokShopBRStatus: 'Oceano azul absoluto: vídeos começam a viralizar de forma orgânica sem vendedores estruturados.',
+      shopeeStatus: 'Menos de 10 lojas ativas; maioria sÃ£o envios internacionais lentos da Ãsia sem estoque nacional.',
+      mercadoLivreStatus: 'Poucos vendedores no Full com preÃ§os inflacionados (altÃ­ssima margem de arbitragem).',
+      tiktokShopBRStatus: 'Oceano azul absoluto: vÃ­deos comeÃ§am a viralizar de forma orgÃ¢nica sem vendedores estruturados.',
     },
     recommendedPriceBRL: {
       min: Math.round(priceBRL * 0.85),
@@ -250,32 +298,32 @@ function getFallbackDeepDive(product: any) {
     },
     recommendedAdAngles: (product.adHooks && product.adHooks.length > 0)
       ? product.adHooks.map((hook: string, idx: number) => ({
-          angleName: idx === 0 ? 'Quebra de Padrão Viral' : idx === 1 ? 'Curiosidade & Desejo Imediato' : 'Problema Real vs Solução Mágica',
+          angleName: idx === 0 ? 'Quebra de PadrÃ£o Viral' : idx === 1 ? 'Curiosidade & Desejo Imediato' : 'Problema Real vs SoluÃ§Ã£o MÃ¡gica',
           hook,
-          targetPainPoint: product.culturalFitReason || 'Desejo de inovação e praticidade no dia a dia',
+          targetPainPoint: product.culturalFitReason || 'Desejo de inovaÃ§Ã£o e praticidade no dia a dia',
           visualSuggestion: idx === 0
-            ? '0-2s: Demonstração do efeito visual do produto em corte rápido sem introduções lentas.'
-            : '0-2s: Demonstração da frustração clássica sendo resolvida em 3 segundos.',
+            ? '0-2s: DemonstraÃ§Ã£o do efeito visual do produto em corte rÃ¡pido sem introduÃ§Ãµes lentas.'
+            : '0-2s: DemonstraÃ§Ã£o da frustraÃ§Ã£o clÃ¡ssica sendo resolvida em 3 segundos.',
         }))
       : [
           {
-            angleName: 'Efeito Uau / Satisfação Imediata',
-            hook: 'Eu duvido você assistir esse vídeo até o final sem querer comprar isso!',
-            targetPainPoint: 'Curiosidade e desejo imediato por inovação',
-            visualSuggestion: 'Comece com corte seco do produto funcionando em câmera lenta nos primeiros 2 segundos.',
+            angleName: 'Efeito Uau / SatisfaÃ§Ã£o Imediata',
+            hook: 'Eu duvido vocÃª assistir esse vÃ­deo atÃ© o final sem querer comprar isso!',
+            targetPainPoint: 'Curiosidade e desejo imediato por inovaÃ§Ã£o',
+            visualSuggestion: 'Comece com corte seco do produto funcionando em cÃ¢mera lenta nos primeiros 2 segundos.',
           },
           {
             angleName: 'Economia Inteligente vs Marcas Caras',
-            hook: `Por que gastar centenas de reais no shopping se você pode ter o mesmo resultado por R$ ${priceBRL}?`,
-            targetPainPoint: 'Custo benefício e valor percebido alto',
-            visualSuggestion: 'Comparativo lado a lado na tela com preço riscado.',
+            hook: `Por que gastar centenas de reais no shopping se vocÃª pode ter o mesmo resultado por R$ ${priceBRL}?`,
+            targetPainPoint: 'Custo benefÃ­cio e valor percebido alto',
+            visualSuggestion: 'Comparativo lado a lado na tela com preÃ§o riscado.',
           },
         ],
-    logisticsAdvice: `Complexidade logística: "${product.logisticsComplexity || 'Médio'}". Recomendado envio padrão rastreado (AliExpress Standard / Cainiao) com declaração regularizada.`,
+    logisticsAdvice: `Complexidade logÃ­stica: "${product.logisticsComplexity || 'MÃ©dio'}". Recomendado envio padrÃ£o rastreado (AliExpress Standard / Cainiao) com declaraÃ§Ã£o regularizada.`,
     actionChecklist: [
-      `Buscar termos de fábrica: ${(product.supplierKeywords || ['viral gadget', 'wholesale']).join(', ')}`,
+      `Buscar termos de fÃ¡brica: ${(product.supplierKeywords || ['viral gadget', 'wholesale']).join(', ')}`,
       'Minerar ou gravar 3 criativos em formato vertical 9:16 para TikTok e Reels',
-      'Montar página de produto focada em conversão rápida com PIX instantâneo',
+      'Montar pÃ¡gina de produto focada em conversÃ£o rÃ¡pida com PIX instantÃ¢neo',
       'Testar campanha inicial de R$ 30 a R$ 50/dia com foco em engajamento',
     ],
   };
@@ -288,41 +336,41 @@ function getFallbackCreativeScripts(productName: string, originalName: string, n
     {
       title: 'Gancho de Curiosidade Imediata (O Segredo Gringo)',
       targetPlatform: 'TikTok',
-      hook3Seconds: `Se você mora no Brasil e ainda não viu esse ${cleanName}, você tá vivendo errado!`,
-      bodyScript: `Eu vi essa invenção estourando no TikTok americano (${originalName || 'viral trend'}) e tive que pedir para testar. Olha só como funciona na prática... (demonstração rápida). Ele resolve exatamente aquilo que todo mundo reclama no dia a dia.`,
-      callToAction: 'Comenta "QUERO" que eu te envio o link exclusivo com frete grátis!',
+      hook3Seconds: `Se vocÃª mora no Brasil e ainda nÃ£o viu esse ${cleanName}, vocÃª tÃ¡ vivendo errado!`,
+      bodyScript: `Eu vi essa invenÃ§Ã£o estourando no TikTok americano (${originalName || 'viral trend'}) e tive que pedir para testar. Olha sÃ³ como funciona na prÃ¡tica... (demonstraÃ§Ã£o rÃ¡pida). Ele resolve exatamente aquilo que todo mundo reclama no dia a dia.`,
+      callToAction: 'Comenta "QUERO" que eu te envio o link exclusivo com frete grÃ¡tis!',
       visualDirections: [
-        '0-2s: Segure o produto perto da câmera com cara de espanto e curiosidade.',
-        '3-8s: Demonstre o problema clássico e em seguida a solução mágica.',
-        '9-15s: Mostre detalhes de acabamento e o botão de acionamento.',
+        '0-2s: Segure o produto perto da cÃ¢mera com cara de espanto e curiosidade.',
+        '3-8s: Demonstre o problema clÃ¡ssico e em seguida a soluÃ§Ã£o mÃ¡gica.',
+        '9-15s: Mostre detalhes de acabamento e o botÃ£o de acionamento.',
       ],
-      audioStyle: 'Áudio pop trending acelerado ou narração própria com entusiasmo dinâmico.',
+      audioStyle: 'Ãudio pop trending acelerado ou narraÃ§Ã£o prÃ³pria com entusiasmo dinÃ¢mico.',
     },
     {
       title: 'Gancho Comparativo (Antes vs Depois)',
       targetPlatform: 'Instagram Reels',
-      hook3Seconds: 'Nunca mais passe por esse perrengue! Olha a diferença de usar isso aqui.',
-      bodyScript: `Antes eu perdia um tempão tentando resolver isso. Agora levo menos de 10 segundos com esse ${cleanName}. O melhor de tudo é que custa uma fração do que cobram nos shoppings.`,
+      hook3Seconds: 'Nunca mais passe por esse perrengue! Olha a diferenÃ§a de usar isso aqui.',
+      bodyScript: `Antes eu perdia um tempÃ£o tentando resolver isso. Agora levo menos de 10 segundos com esse ${cleanName}. O melhor de tudo Ã© que custa uma fraÃ§Ã£o do que cobram nos shoppings.`,
       callToAction: 'Clica no link da bio antes que o estoque acabe!',
       visualDirections: [
-        'Tela dividida: lado esquerdo o método antigo demorado, lado direito o produto em ação.',
-        'Zoom rápido no resultado impecável.',
+        'Tela dividida: lado esquerdo o mÃ©todo antigo demorado, lado direito o produto em aÃ§Ã£o.',
+        'Zoom rÃ¡pido no resultado impecÃ¡vel.',
         'Chamada final mostrando a caixinha recebida em casa.',
       ],
       audioStyle: 'Batida eletro-chill com efeitos sonoros de "pop" e "swoosh".',
     },
     {
-      title: 'Gancho de Prova Social (A Invenção Mais Vendida)',
+      title: 'Gancho de Prova Social (A InvenÃ§Ã£o Mais Vendida)',
       targetPlatform: 'TikTok Shop / Reels',
-      hook3Seconds: 'Esse é oficialmente o produto mais vendido do mês lá fora e eu entendi o porquê!',
-      bodyScript: `Eu achei que era exagero dos gringos, mas quando chegou aqui em casa e eu testei pela primeira vez... fiquei chocado. É feito especialmente para quem busca praticidade e inovação.`,
-      callToAction: 'Salva esse vídeo para não esquecer e clica no botão aqui embaixo!',
+      hook3Seconds: 'Esse Ã© oficialmente o produto mais vendido do mÃªs lÃ¡ fora e eu entendi o porquÃª!',
+      bodyScript: `Eu achei que era exagero dos gringos, mas quando chegou aqui em casa e eu testei pela primeira vez... fiquei chocado. Ã‰ feito especialmente para quem busca praticidade e inovaÃ§Ã£o.`,
+      callToAction: 'Salva esse vÃ­deo para nÃ£o esquecer e clica no botÃ£o aqui embaixo!',
       visualDirections: [
-        '0-3s: Desembalando o produto rapidamente (unboxing satisfatório).',
-        '4-10s: Teste em tempo real com reação genuína na câmera.',
-        '11-15s: Segurando na mão mostrando o selo de qualidade.',
+        '0-3s: Desembalando o produto rapidamente (unboxing satisfatÃ³rio).',
+        '4-10s: Teste em tempo real com reaÃ§Ã£o genuÃ­na na cÃ¢mera.',
+        '11-15s: Segurando na mÃ£o mostrando o selo de qualidade.',
       ],
-      audioStyle: 'Trilha sonora motivacional suave com voz nítida em primeiro plano.',
+      audioStyle: 'Trilha sonora motivacional suave com voz nÃ­tida em primeiro plano.',
     },
   ];
 }
@@ -369,7 +417,7 @@ app.post('/api/scan', async (req: Request, res: Response) => {
       return res.status(200).json({
         success: true,
         source: 'radar_curated_dataset',
-        engine: 'Motor Autônomo Local (100% Gratuito)',
+        engine: 'Motor AutÃ´nomo Local (100% Gratuito)',
         cached: true,
         message: 'Utilizando base de dados de alta disponibilidade do radar TIKBLOX.',
         products: filtered,
@@ -377,51 +425,51 @@ app.post('/api/scan', async (req: Request, res: Response) => {
       });
     }
 
-    const prompt = `Você é o motor de inteligência e arbitragem de produtos do TIKBLOX.
-Sua missão é escanear a web AGORA e identificar 3 a 5 PRODUTOS FÍSICOS REAIS, ESPECÍFICOS e TANGÍVEIS que estão explodindo em vendas e engajamento viral no exterior (TikTok Shop US/UK, #TikTokMadeMeBuyIt, Amazon Movers & Shakers, Douyin/1688 na China, AliExpress Trending) e que ainda possuem BAIXA concorrência ou estão em fase de entrada no Brasil (Shopee BR, Mercado Livre, dropshipping nacional).
+    const prompt = `VocÃª Ã© o motor de inteligÃªncia e arbitragem de produtos do TIKBLOX.
+Sua missÃ£o Ã© escanear a web AGORA e identificar 3 a 5 PRODUTOS FÃSICOS REAIS, ESPECÃFICOS e TANGÃVEIS que estÃ£o explodindo em vendas e engajamento viral no exterior (TikTok Shop US/UK, #TikTokMadeMeBuyIt, Amazon Movers & Shakers, Douyin/1688 na China, AliExpress Trending) e que ainda possuem BAIXA concorrÃªncia ou estÃ£o em fase de entrada no Brasil (Shopee BR, Mercado Livre, dropshipping nacional).
 
-Diretrizes de Eficiência e Validação Rigorosa:
-1. NÃO invente conceitos vagos ou genéricos (NÃO traga apenas "garrafa de água" ou "fone bluetooth"). Traga modelos e produtos físicos reais que têm design único ou funcionalidade inovadora viral (ex: "Selador a Vácuo Portátil Magnético USB", "Mini Máquina de Limpeza Ultrassônica para Óculos/Joias", "Dispenser Automático de Sabão Espuma em Nuvem", "Fita de LED Inteligente COB com Sensor de Presença").
-2. Certifique-se de que são produtos físicos fabricados e prontamente fornecidos no AliExpress, 1688 ou CJ Dropshipping com custo de atacado realista abaixo de $20 USD.
-3. Avalie a margem de arbitragem no Brasil (Preço em R$ viável com margem líquida acima de 250%).
+Diretrizes de EficiÃªncia e ValidaÃ§Ã£o Rigorosa:
+1. NÃƒO invente conceitos vagos ou genÃ©ricos (NÃƒO traga apenas "garrafa de Ã¡gua" ou "fone bluetooth"). Traga modelos e produtos fÃ­sicos reais que tÃªm design Ãºnico ou funcionalidade inovadora viral (ex: "Selador a VÃ¡cuo PortÃ¡til MagnÃ©tico USB", "Mini MÃ¡quina de Limpeza UltrassÃ´nica para Ã“culos/Joias", "Dispenser AutomÃ¡tico de SabÃ£o Espuma em Nuvem", "Fita de LED Inteligente COB com Sensor de PresenÃ§a").
+2. Certifique-se de que sÃ£o produtos fÃ­sicos fabricados e prontamente fornecidos no AliExpress, 1688 ou CJ Dropshipping com custo de atacado realista abaixo de $20 USD.
+3. Avalie a margem de arbitragem no Brasil (PreÃ§o em R$ viÃ¡vel com margem lÃ­quida acima de 250%).
 
 Filtros de busca:
 - Nicho: ${niche}
-- Origem prioritária: ${originCountry}
-${query ? `- Busca específica do usuário: "${query}"` : ''}
+- Origem prioritÃ¡ria: ${originCountry}
+${query ? `- Busca especÃ­fica do usuÃ¡rio: "${query}"` : ''}
 
 Para cada produto identificado, retorne OBRIGATORIAMENTE um array JSON estruturado exatamente assim:
 [
   {
-    "id": "tb-live-" + hash único curto,
-    "name": "Nome comercial atraente e específico em português",
-    "originalName": "Nome em inglês exato como anunciado no TikTok Shop / Amazon US",
+    "id": "tb-live-" + hash Ãºnico curto,
+    "name": "Nome comercial atraente e especÃ­fico em portuguÃªs",
+    "originalName": "Nome em inglÃªs exato como anunciado no TikTok Shop / Amazon US",
     "niche": "tech" | "home" | "beauty" | "fitness" | "pets" | "accessories",
-    "nicheLabel": "Nome do nicho em português (ex: Casa Inteligente)",
+    "nicheLabel": "Nome do nicho em portuguÃªs (ex: Casa Inteligente)",
     "originCountry": "US" | "CN" | "KR" | "JP" | "EU",
     "originPlatform": "TikTok Shop US / Amazon Movers & Shakers / Douyin / AliExpress",
-    "waveStage": "early_wave" (raro ou ausente no BR) OU "rising_wave" (primeiros vendedores despontando) OU "peak_wave" (alta tração internacional),
+    "waveStage": "early_wave" (raro ou ausente no BR) OU "rising_wave" (primeiros vendedores despontando) OU "peak_wave" (alta traÃ§Ã£o internacional),
     "waveStageLabel": "Onda Inicial - Oceano Azul" OU "Onda Ascendente" OU "Pico Viral",
-    "viralityScore": número entre 88 e 99,
-    "saturationInBrazil": "Muito Baixa" | "Baixa" | "Média",
-    "estimatedCostUSD": número realista de custo de atacado em USD (ex: 8.50),
-    "estimatedPriceBRL": preço sugerido de venda em reais no Brasil (ex: 159.90),
+    "viralityScore": nÃºmero entre 88 e 99,
+    "saturationInBrazil": "Muito Baixa" | "Baixa" | "MÃ©dia",
+    "estimatedCostUSD": nÃºmero realista de custo de atacado em USD (ex: 8.50),
+    "estimatedPriceBRL": preÃ§o sugerido de venda em reais no Brasil (ex: 159.90),
     "estimatedProfitMarginPercent": porcentagem estimada de margem bruta (ex: 310),
     "culturalFitReason": "Por que o brasileiro tem forte impulso de compra por este item (efeito visual, dor do dia a dia, status)",
-    "brazilEntryStatus": "Diagnóstico do estado atual no Mercado Livre e Shopee Brasil",
-    "targetAudience": "Público comprador prioritário no Brasil",
+    "brazilEntryStatus": "DiagnÃ³stico do estado atual no Mercado Livre e Shopee Brasil",
+    "targetAudience": "PÃºblico comprador prioritÃ¡rio no Brasil",
     "iconType": "Zap" | "Sparkles" | "Wind" | "Tv" | "ShieldCheck" | "Activity" | "Flame",
     "highlights": ["Diferencial viral 1", "Diferencial viral 2", "Diferencial viral 3"],
     "adHooks": [
       "Gancho de 3 segundos para TikTok/Reels em tom informal brasileiro",
-      "Gancho de quebra de padrão que prende a atenção",
+      "Gancho de quebra de padrÃ£o que prende a atenÃ§Ã£o",
       "Gancho focado no problema que o produto resolve instantaneamente"
     ],
-    "supplierKeywords": ["termo exato de busca em inglês para AliExpress/1688", "termo secundário"],
-    "logisticsComplexity": "Fácil (Leve / Sem Bateria)" | "Médio (Bateria / Eletrônico)" | "Atenção (Volume / Frágil)",
+    "supplierKeywords": ["termo exato de busca em inglÃªs para AliExpress/1688", "termo secundÃ¡rio"],
+    "logisticsComplexity": "FÃ¡cil (Leve / Sem Bateria)" | "MÃ©dio (Bateria / EletrÃ´nico)" | "AtenÃ§Ã£o (Volume / FrÃ¡gil)",
     "trendingMetrics": {
-      "viewsLast30Days": "ex: 38M visualizações",
-      "growthRatePercent": número ex: 480,
+      "viewsLast30Days": "ex: 38M visualizaÃ§Ãµes",
+      "growthRatePercent": nÃºmero ex: 480,
       "searchVolumeBR": "Emergindo agora" | "Crescimento +320%" | "Disparada +580%" | "Primeiras Buscas"
     }
   }
@@ -474,12 +522,12 @@ Retorne EXCLUSIVAMENTE o array JSON sem delimitadores markdown adicionais.`;
       if (jsonMatch) {
         parsedProducts = JSON.parse(jsonMatch[0]);
       } else {
-        throw new Error('Formato de resposta não estruturado pelo scanner.');
+        throw new Error('Formato de resposta nÃ£o estruturado pelo scanner.');
       }
     }
 
-    // Attach grounding sources and discovery date
-    const finalProducts = (Array.isArray(parsedProducts) ? parsedProducts : []).map((prod, idx) => ({
+    // Attach grounding sources, TikTok Shop data and discovery date
+    const finalProducts = (Array.isArray(parsedProducts) ? parsedProducts : []).map((prod, idx) => enrichWithTikTokShopData({
       ...prod,
       id: prod.id || `tb-scan-${Date.now()}-${idx}`,
       discoveredAt: 'Escaneado em tempo real pelo Radar TIKBLOX',
@@ -531,7 +579,7 @@ app.post('/api/deep-dive', async (req: Request, res: Response) => {
   try {
     const { product } = req.body;
     if (!product || !product.name) {
-      return res.status(400).json({ error: 'Dados do produto obrigatórios.' });
+      return res.status(400).json({ error: 'Dados do produto obrigatÃ³rios.' });
     }
 
     // Check memory cache first
@@ -558,53 +606,53 @@ app.post('/api/deep-dive', async (req: Request, res: Response) => {
       });
     }
 
-    const prompt = `Faça um Raio-X aprofundado e inteligência de mercado para o seguinte produto internacional que está chegando ao Brasil:
+    const prompt = `FaÃ§a um Raio-X aprofundado e inteligÃªncia de mercado para o seguinte produto internacional que estÃ¡ chegando ao Brasil:
 Nome: ${product.name}
 Nome Original: ${product.originalName}
 Custo estimado USD: $${product.estimatedCostUSD}
-Preço sugerido BRL: R$ ${product.estimatedPriceBRL}
+PreÃ§o sugerido BRL: R$ ${product.estimatedPriceBRL}
 Nicho: ${product.nicheLabel}
 
-Realize uma busca no Google para verificar a presença desse produto no Brasil e retorne um JSON com os seguintes campos:
+Realize uma busca no Google para verificar a presenÃ§a desse produto no Brasil e retorne um JSON com os seguintes campos:
 {
   "productId": "${product.id}",
   "productName": "${product.name}",
   "marketPotentialSummary": "Resumo executivo do potencial no Brasil",
-  "brazilOpportunityScore": número de 80 a 99,
+  "brazilOpportunityScore": nÃºmero de 80 a 99,
   "competitionAnalysis": {
-    "shopeeStatus": "Situação na Shopee BR",
-    "mercadoLivreStatus": "Situação no Mercado Livre BR",
-    "tiktokShopBRStatus": "Situação no TikTok Shop Brasil"
+    "shopeeStatus": "SituaÃ§Ã£o na Shopee BR",
+    "mercadoLivreStatus": "SituaÃ§Ã£o no Mercado Livre BR",
+    "tiktokShopBRStatus": "SituaÃ§Ã£o no TikTok Shop Brasil"
   },
   "recommendedPriceBRL": {
-    "min": número,
-    "optimal": número,
-    "max": número
+    "min": nÃºmero,
+    "optimal": nÃºmero,
+    "max": nÃºmero
   },
   "recommendedAdAngles": [
     {
-      "angleName": "Nome do ângulo (ex: Prova Visual)",
+      "angleName": "Nome do Ã¢ngulo (ex: Prova Visual)",
       "hook": "Gancho exato de 3 segundos",
       "targetPainPoint": "Dor atacada",
       "visualSuggestion": "O que deve aparecer na tela no primeiro segundo"
     },
     {
-      "angleName": "Nome do segundo ângulo",
+      "angleName": "Nome do segundo Ã¢ngulo",
       "hook": "Gancho",
       "targetPainPoint": "Dor atacada",
       "visualSuggestion": "Visual"
     }
   ],
-  "logisticsAdvice": "Orientações sobre frete, alfândega brasileira (Remessa Conforme) e cuidados de embalagem",
+  "logisticsAdvice": "OrientaÃ§Ãµes sobre frete, alfÃ¢ndega brasileira (Remessa Conforme) e cuidados de embalagem",
   "actionChecklist": [
-    "Ação prática 1",
-    "Ação prática 2",
-    "Ação prática 3",
-    "Ação prática 4"
+    "AÃ§Ã£o prÃ¡tica 1",
+    "AÃ§Ã£o prÃ¡tica 2",
+    "AÃ§Ã£o prÃ¡tica 3",
+    "AÃ§Ã£o prÃ¡tica 4"
   ]
 }
 
-Responda SOMENTE com o JSON válido.`;
+Responda SOMENTE com o JSON vÃ¡lido.`;
 
     let cleanJson = '';
 
@@ -680,20 +728,20 @@ app.post('/api/creative-generator', async (req: Request, res: Response) => {
       });
     }
 
-    const prompt = `Crie 3 Roteiros Completos de Vídeos Virais no formato UGC (User Generated Content) para TikTok e Instagram Reels para vender este produto no Brasil:
+    const prompt = `Crie 3 Roteiros Completos de VÃ­deos Virais no formato UGC (User Generated Content) para TikTok e Instagram Reels para vender este produto no Brasil:
 Produto: ${productName} (${originalName})
 Nicho: ${niche}
-Público Alvo: ${targetAudience}
+PÃºblico Alvo: ${targetAudience}
 
 Retorne um array JSON com 3 objetos contendo:
 [
   {
-    "title": "Nome da estratégia do anúncio",
+    "title": "Nome da estratÃ©gia do anÃºncio",
     "targetPlatform": "TikTok" | "Instagram Reels",
-    "hook3Seconds": "Fala exata dos primeiros 3 segundos (crucial para prender retenção)",
-    "bodyScript": "Texto completo do corpo do vídeo falado de forma natural como consumidor real brasileiro",
-    "callToAction": "Chamada para ação para gerar cliques ou comentários",
-    "visualDirections": ["Instrução de cena 1", "Instrução de cena 2", "Instrução de cena 3"],
+    "hook3Seconds": "Fala exata dos primeiros 3 segundos (crucial para prender retenÃ§Ã£o)",
+    "bodyScript": "Texto completo do corpo do vÃ­deo falado de forma natural como consumidor real brasileiro",
+    "callToAction": "Chamada para aÃ§Ã£o para gerar cliques ou comentÃ¡rios",
+    "visualDirections": ["InstruÃ§Ã£o de cena 1", "InstruÃ§Ã£o de cena 2", "InstruÃ§Ã£o de cena 3"],
     "audioStyle": "Tipo de trilha sonoro ou tom de voz recomendado"
   }
 ]
@@ -746,19 +794,21 @@ app.post('/api/chat', async (req: Request, res: Response) => {
   try {
     const { messages } = req.body;
     if (!messages || !Array.isArray(messages)) {
-      return res.status(400).json({ error: 'Formato de mensagens inválido.' });
+      return res.status(400).json({ error: 'Formato de mensagens invÃ¡lido.' });
     }
 
     const ai = getGenAI();
-    const hasGroq = !!process.env.GROQ_API_KEY && !isRateLimited();
-    const hasGemini = !!process.env.GEMINI_API_KEY && !isRateLimited();
+    const groqKey = getCurrentGroqKey();
+    const geminiKey = getCurrentGeminiKey();
+    const hasGroq = !!groqKey && !isRateLimited();
+    const hasGemini = !!geminiKey && !isRateLimited();
 
     // Prepare history for Gemini/Groq
     const lastUserMessage = messages[messages.length - 1]?.content || '';
     
     if (!hasGroq && !hasGemini) {
       return res.json({
-        reply: "No momento estou operando no modo autônomo offline e não consigo processar conversas complexas. Verifique suas chaves de API (Gemini ou Groq) para habilitar o chat inteligente."
+        reply: "No momento estou operando no modo autÃ´nomo offline e nÃ£o consigo processar conversas complexas. Verifique suas chaves de API (Gemini ou Groq) para habilitar o chat inteligente."
       });
     }
 
@@ -767,14 +817,14 @@ app.post('/api/chat', async (req: Request, res: Response) => {
     if (hasGroq) {
       // Using Groq
       const groqMessages = [
-        { role: 'system', content: 'Você é a IA do TikBlox, um assistente especialista em e-commerce, dropshipping, mineração de produtos virais no TikTok e arbitragem. Responda sempre em português do Brasil de forma clara, direta e objetiva, mantendo um tom profissional mas empolgante e focado em lucro/estratégia. Nunca mencione que você é um modelo da Groq ou OpenAI.' },
+        { role: 'system', content: 'VocÃª Ã© a IA do TikBlox, um assistente especialista em e-commerce, dropshipping, mineraÃ§Ã£o de produtos virais no TikTok e arbitragem. Responda sempre em portuguÃªs do Brasil de forma clara, direta e objetiva, mantendo um tom profissional mas empolgante e focado em lucro/estratÃ©gia. Nunca mencione que vocÃª Ã© um modelo da Groq ou OpenAI.' },
         ...messages.map((m: any) => ({
           role: m.role === 'assistant' ? 'assistant' : 'user',
           content: m.content
         }))
       ];
       
-      const apiKey = process.env.GROQ_API_KEY;
+      const apiKey = groqKey;
       const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -795,17 +845,14 @@ app.post('/api/chat', async (req: Request, res: Response) => {
     }
 
     if (!replyText && hasGemini) {
-      // Setup chat session with Gemini
-      const chat = ai.chats.create({
-        model: 'gemini-1.5-flash',
+      // Use standard generateContent for single-turn or simple interaction
+      const response = await ai.models.generateContent({
+        model: 'gemini-3.8-flash',
+        contents: lastUserMessage,
         config: {
-          systemInstruction: 'Você é a IA do TikBlox, um assistente especialista em e-commerce, dropshipping, mineração de produtos virais no TikTok e arbitragem. Responda sempre em português do Brasil de forma clara, direta e objetiva, mantendo um tom profissional mas empolgante e focado em lucro/estratégia. Nunca mencione que você é um modelo do Google.',
+          systemInstruction: 'VocÃª Ã© a IA do TikBlox, um assistente especialista em e-commerce, dropshipping, mineraÃ§Ã£o de produtos virais no TikTok e arbitragem. Responda sempre em portuguÃªs do Brasil de forma clara, direta e objetiva, mantendo um tom profissional mas empolgante e focado em lucro/estratÃ©gia. Nunca mencione que vocÃª Ã© um modelo do Google.',
         }
       });
-      
-      // We pass the last user message to get a response
-      // For a more robust implementation we'd pass history, but for simplicity:
-      const response = await chat.sendMessage(lastUserMessage);
       replyText = response.text || '';
     }
 
@@ -818,7 +865,7 @@ app.post('/api/chat', async (req: Request, res: Response) => {
     console.error('Chat error:', error);
     triggerRateLimitCooldown(60000);
     return res.json({
-      reply: 'Desculpe, encontrei um erro temporário de conexão ou excedi o limite de mensagens. Por favor, tente novamente em alguns instantes.'
+      reply: 'Desculpe, encontrei um erro temporÃ¡rio de conexÃ£o ou excedi o limite de mensagens. Por favor, tente novamente em alguns instantes.'
     });
   }
 });
@@ -854,8 +901,8 @@ function calculateProductPriceCheck(product: {
 
   let costChangePercent = 0;
   let priceChangePercent = 0;
-  let supplierStatus = 'Fornecedor estável com estoque regularizado no hub internacional.';
-  let marketObservation = 'Preço de venda no mercado nacional dentro da média esperada.';
+  let supplierStatus = 'Fornecedor estÃ¡vel com estoque regularizado no hub internacional.';
+  let marketObservation = 'PreÃ§o de venda no mercado nacional dentro da mÃ©dia esperada.';
   let trend: 'cheaper_supplier' | 'more_expensive_supplier' | 'higher_resale' | 'lower_resale' | 'stable' = 'stable';
   let alertSeverity: 'opportunity' | 'warning' | 'neutral' = 'neutral';
 
@@ -870,8 +917,8 @@ function calculateProductPriceCheck(product: {
     priceChangePercent = (seed % 4) - 1; // -1% to +2%
     trend = 'cheaper_supplier';
     alertSeverity = 'opportunity';
-    supplierStatus = `Desconto de lote ativo no fornecedor (${seed % 2 === 0 ? 'AliExpress Dropshipping Center' : '1688 Factory Direct'}). Custo unitário reduzido em ${dropPercent}%.`;
-    marketObservation = 'Demanda alta no TikTok Brasil mantendo preço final de venda estável, ampliando a margem líquida.';
+    supplierStatus = `Desconto de lote ativo no fornecedor (${seed % 2 === 0 ? 'AliExpress Dropshipping Center' : '1688 Factory Direct'}). Custo unitÃ¡rio reduzido em ${dropPercent}%.`;
+    marketObservation = 'Demanda alta no TikTok Brasil mantendo preÃ§o final de venda estÃ¡vel, ampliando a margem lÃ­quida.';
   } else if (seed < 40) {
     // Increased resale price in Brazil due to viral scarcity
     const increasePercent = 6 + (seed % 9); // +6% to +14%
@@ -879,8 +926,8 @@ function calculateProductPriceCheck(product: {
     priceChangePercent = increasePercent;
     trend = 'higher_resale';
     alertSeverity = 'opportunity';
-    supplierStatus = 'Fornecedor mantém custos base em USD sem alterações.';
-    marketObservation = `Preço médio de venda nos marketplaces brasileiros (Shopee/ML) subiu +${increasePercent}% devido à escassez de concorrentes locais.`;
+    supplierStatus = 'Fornecedor mantÃ©m custos base em USD sem alteraÃ§Ãµes.';
+    marketObservation = `PreÃ§o mÃ©dio de venda nos marketplaces brasileiros (Shopee/ML) subiu +${increasePercent}% devido Ã  escassez de concorrentes locais.`;
   } else if (seed < 55) {
     // Supplier price increase (supply chain pressure)
     const hikePercent = 5 + (seed % 8); // +5% to +12%
@@ -888,8 +935,8 @@ function calculateProductPriceCheck(product: {
     priceChangePercent = 0;
     trend = 'more_expensive_supplier';
     alertSeverity = 'warning';
-    supplierStatus = `Reajuste de matéria-prima e taxa logística internacional no fornecedor (+${hikePercent}% em USD).`;
-    marketObservation = 'Recomendado recalcular preço de venda ou buscar fornecedores secundários para preservar a margem.';
+    supplierStatus = `Reajuste de matÃ©ria-prima e taxa logÃ­stica internacional no fornecedor (+${hikePercent}% em USD).`;
+    marketObservation = 'Recomendado recalcular preÃ§o de venda ou buscar fornecedores secundÃ¡rios para preservar a margem.';
   } else if (seed < 68) {
     // Minor price compression in local market
     const dropResale = 4 + (seed % 5);
@@ -898,15 +945,15 @@ function calculateProductPriceCheck(product: {
     trend = 'lower_resale';
     alertSeverity = 'warning';
     supplierStatus = 'Custo do fornecedor inalterado em USD.';
-    marketObservation = `Entrada de concorrentes pontuais levou a leve ajuste de -${dropResale}% no preço de venda sugerido.`;
+    marketObservation = `Entrada de concorrentes pontuais levou a leve ajuste de -${dropResale}% no preÃ§o de venda sugerido.`;
   } else {
     // Stable
     costChangePercent = Number(((seed % 5) * 0.4 - 0.8).toFixed(1)); // -0.8% to +0.8%
     priceChangePercent = Number(((seed % 4) * 0.5 - 0.5).toFixed(1));
     trend = 'stable';
     alertSeverity = 'neutral';
-    supplierStatus = 'Preço do fornecedor verificado hoje sem variações relevantes.';
-    marketObservation = 'Margem de lucro e ticket médio de venda validados e consistentes.';
+    supplierStatus = 'PreÃ§o do fornecedor verificado hoje sem variaÃ§Ãµes relevantes.';
+    marketObservation = 'Margem de lucro e ticket mÃ©dio de venda validados e consistentes.';
   }
 
   const currentCostUSD = Number(Math.max(1.0, origCost * (1 + costChangePercent / 100)).toFixed(2));
@@ -1017,23 +1064,23 @@ app.get('/api/free-tier-status', (req: Request, res: Response) => {
     options: [
       {
         id: 'autonomous_local',
-        name: 'Motor Autônomo Local TIKBLOX',
+        name: 'Motor AutÃ´nomo Local TIKBLOX',
         cost: 'R$ 0,00 Permanente',
-        setup: 'Zero configuração necessária. Funciona direto sem API Key e sem cartão.',
+        setup: 'Zero configuraÃ§Ã£o necessÃ¡ria. Funciona direto sem API Key e sem cartÃ£o.',
         active: engine.provider === 'autonomous_local',
       },
       {
         id: 'gemini_free',
         name: 'Google Gemini 2.5 Flash Free Tier',
         cost: 'R$ 0,00 Permanente',
-        setup: 'Chave gratuita em aistudio.google.com/app/apikey (15 req/min sem cartão).',
+        setup: 'Chave gratuita em aistudio.google.com/app/apikey (15 req/min sem cartÃ£o).',
         active: engine.provider === 'gemini_free',
       },
       {
         id: 'groq_free',
         name: 'Groq Cloud Llama 3.3 Free Tier',
         cost: 'R$ 0,00 Permanente',
-        setup: 'Chave gratuita em console.groq.com (Ultrarrápido sem cartão).',
+        setup: 'Chave gratuita em console.groq.com (UltrarrÃ¡pido sem cartÃ£o).',
         active: engine.provider === 'groq_free',
       },
     ],
@@ -1111,12 +1158,12 @@ app.post('/api/assistant-chat', async (req: Request, res: Response) => {
       ? products.slice(0, 15).map((p: any) => `- ${p.name} (Nicho: ${p.niche}, Custo: $${p.costUSD} USD, Venda Sugerida: R$ ${p.suggestedPriceBRL}, Margem: ${p.grossMargin}, Score Viral: ${p.trendVelocity?.score || 90}/100, Janela Brasil: ${p.arbitrageWindowDays || 21} dias)`).join('\n')
       : 'Nenhum produto no momento.';
 
-    const systemPrompt = `Você é o Assistente Pessoal de Inteligência de E-commerce da Duda no TIKBLOX. 
-Você tem acesso em tempo real ao radar de produtos virais importados (EUA/China para o Brasil).
+    const systemPrompt = `VocÃª Ã© o Assistente Pessoal de InteligÃªncia de E-commerce da Duda no TIKBLOX. 
+VocÃª tem acesso em tempo real ao radar de produtos virais importados (EUA/China para o Brasil).
 Produtos atualmente no radar da Duda:
 ${contextSummary}
 
-Responda à pergunta da Duda de forma objetiva, acolhedora, especialista em arbitragem e focada em conversão e lucro no Brasil. Se ela perguntar sobre margens, fornecedores ou estratégias, use os dados acima. Se faltar algum dado, faça uma estimativa realista baseada no mercado de dropshipping e TikTok Shop.`;
+Responda Ã  pergunta da Duda de forma objetiva, acolhedora, especialista em arbitragem e focada em conversÃ£o e lucro no Brasil. Se ela perguntar sobre margens, fornecedores ou estratÃ©gias, use os dados acima. Se faltar algum dado, faÃ§a uma estimativa realista baseada no mercado de dropshipping e TikTok Shop.`;
 
     const apiKey = IS_FROZEN ? '' : process.env.GEMINI_API_KEY;
     if (apiKey) {
@@ -1137,65 +1184,25 @@ Responda à pergunta da Duda de forma objetiva, acolhedora, especialista em arbi
       }
     }
 
-    let reply = `Olá Duda! Analisei o radar atual e sua pergunta ("${message}"). `;
+    let reply = `OlÃ¡ Duda! Analisei o radar atual e sua pergunta ("${message}"). `;
     const lower = message.toLowerCase();
     if (lower.includes('lucro') || lower.includes('margem') || lower.includes('melhor')) {
       const best = products?.[0];
       if (best) {
-        reply += `O destaque com maior margem no momento é o **${best.name}**, com custo estimado de $${best.costUSD} USD, preço de venda sugerido de R$ ${best.suggestedPriceBRL} e margem bruta de ${best.grossMargin}! Vale a pena priorizar esse no TikTok Ads.`;
+        reply += `O destaque com maior margem no momento Ã© o **${best.name}**, com custo estimado de $${best.costUSD} USD, preÃ§o de venda sugerido de R$ ${best.suggestedPriceBRL} e margem bruta de ${best.grossMargin}! Vale a pena priorizar esse no TikTok Ads.`;
       } else {
-        reply += `Os produtos do radar estão com margens médias superiores a 250%. Recomendo focar em itens com alta velocidade no TikTok US.`;
+        reply += `Os produtos do radar estÃ£o com margens mÃ©dias superiores a 250%. Recomendo focar em itens com alta velocidade no TikTok US.`;
       }
     } else if (lower.includes('mochila') || lower.includes('antifurto')) {
-      reply += `A Mochila Antifurto Impermeável está com Score de 98/100, custo de $14.50 USD e venda sugerida de R$ 269,90 (+280% de margem). O gancho matador para o TikTok é: "Nunca mais ande com medo de abrirem o zíper da sua mochila no metrô lotado!".`;
+      reply += `A Mochila Antifurto ImpermeÃ¡vel estÃ¡ com Score de 98/100, custo de $14.50 USD e venda sugerida de R$ 269,90 (+280% de margem). O gancho matador para o TikTok Ã©: "Nunca mais ande com medo de abrirem o zÃ­per da sua mochila no metrÃ´ lotado!".`;
     } else {
-      reply += `Para essa dúvida, o ideal é minerar os produtos listados no topo do app e testar criativos UGC nos primeiros 3 segundos. Quer que eu detalhe o plano de ação de algum produto específico?`;
+      reply += `Para essa dÃºvida, o ideal Ã© minerar os produtos listados no topo do app e testar criativos UGC nos primeiros 3 segundos. Quer que eu detalhe o plano de aÃ§Ã£o de algum produto especÃ­fico?`;
     }
 
     return res.json({ success: true, reply });
   } catch (error: any) {
     console.error('Error in /api/assistant-chat:', error);
     return res.status(500).json({ success: false, error: 'Failed to process assistant chat' });
-  }
-});
-
-app.post('/api/chat', async (req: Request, res: Response) => {
-  try {
-    const { messages } = req.body;
-    if (!messages || !Array.isArray(messages)) {
-      return res.status(400).json({ error: 'Messages array is required' });
-    }
-
-    if (!IS_FROZEN && process.env.GEMINI_API_KEY) {
-      try {
-        const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-        const systemInstruction = `Você é o Copiloto Estratégico IA do TikBlox Pro, especializado em Dropshipping Internacional, TikTok Ads, e eCommerce no Brasil. 
-Sua missão é ajudar os usuários a encontrar nichos lucrativos, dar ideias de tráfego orgânico, sugerir margens e preços ideais, e tirar dúvidas de mercado.
-Fale de forma objetiva, direta e focada em resultados. Se pedirem ideias de produtos, sugira 3 com margens de lucro estimadas e ganchos (hooks) de vendas. Use Markdown para formatar.`;
-        
-        const contents = messages.map((m: any) => ({
-          role: m.role === 'assistant' ? 'model' : 'user',
-          parts: [{ text: m.content }]
-        }));
-
-        const response = await ai.models.generateContent({
-          model: 'gemini-1.5-flash',
-          contents,
-          config: { systemInstruction }
-        });
-
-        const replyText = response.text || 'Não consegui processar a resposta.';
-        return res.json({ reply: replyText });
-      } catch (err) {
-        console.error('Error in /api/chat with Gemini:', err);
-        return res.status(500).json({ reply: 'Desculpe, ocorreu um erro ao consultar a IA. Tente novamente mais tarde.' });
-      }
-    } else {
-      return res.json({ reply: 'Desculpe, a chave do Gemini API não está configurada no backend. A funcionalidade Copiloto está indisponível.' });
-    }
-  } catch (error: any) {
-    console.error('Error in /api/chat:', error);
-    return res.status(500).json({ reply: 'Erro interno no servidor de Chat.' });
   }
 });
 
@@ -1230,3 +1237,4 @@ if (!process.env.VERCEL) {
 }
 
 export default app;
+

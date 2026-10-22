@@ -44,9 +44,6 @@ const OnboardingModal = React.lazy(() =>
 const WifeBotConfigModal = React.lazy(() =>
   import('./components/WifeBotConfigModal').then((m) => ({ default: m.WifeBotConfigModal }))
 );
-const AICopilotModal = React.lazy(() =>
-  import('./components/AICopilotModal').then((m) => ({ default: m.AICopilotModal }))
-);
 
 const ONBOARDING_STORAGE_KEY = 'tikblox_onboarding_completed_v1';
 import { TrendingProduct, ProductNiche, AppUpdateInfo, ProductPriceCheck, PriceMonitorSummary } from './types';
@@ -97,6 +94,8 @@ export default function App() {
   const [selectedNiche, setSelectedNiche] = useState<ProductNiche>('all');
   const [selectedOrigin, setSelectedOrigin] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [filterFreeSampleOnly, setFilterFreeSampleOnly] = useState<boolean>(false);
+  const [filterBlueOceanOnly, setFilterBlueOceanOnly] = useState<boolean>(false);
 
   // Modals state
   const [selectedProductForDetail, setSelectedProductForDetail] =
@@ -127,7 +126,6 @@ export default function App() {
   // Onboarding Welcome Tour state
   const [showOnboardingModal, setShowOnboardingModal] = useState(false);
   const [showWifeBotModal, setShowWifeBotModal] = useState(false);
-  const [showAICopilotModal, setShowAICopilotModal] = useState(false);
 
   // Auto-launch onboarding tour on first visit
   useEffect(() => {
@@ -408,15 +406,13 @@ export default function App() {
       const result = await scanTrends({
         niche: isDailyGlobalScan ? undefined : (selectedNiche !== 'all' ? selectedNiche : undefined),
         originCountry: isDailyGlobalScan ? undefined : (selectedOrigin !== 'all' ? selectedOrigin : undefined),
-        query: isDailyGlobalScan ? undefined : (searchQuery || undefined),
+        query: isDailyGlobalScan ? undefined : (searchQuery.trim() || undefined),
       });
 
       if (result.products && result.products.length > 0) {
         setProducts((prev) => {
           const map = new Map<string, TrendingProduct>();
           result.products.forEach((p) => {
-            // @ts-ignore
-            if (searchQuery) p._matchedQuery = searchQuery.trim().toLowerCase();
             map.set(p.id, p);
           });
           prev.forEach((p) => {
@@ -449,20 +445,19 @@ export default function App() {
     }
   };
 
-  // High-performance filter products based on activeTab, niche, origin, search
-  // Hoisting string normalizations and filter branches outside the loop for instantaneous 60fps throughput
+  // High-performance filter products based on activeTab, niche, origin, search, and TikTok Shop metrics
   const filteredProducts = useMemo(() => {
-    const rawQuery = searchQuery.trim().toLowerCase();
-    const hasQuery = rawQuery.length > 0;
     const isEarlyWave = activeTab === 'early_wave';
     const isHighMargin = activeTab === 'high_margin';
     const filterNiche = selectedNiche !== 'all' ? selectedNiche : null;
     const filterOrigin = selectedOrigin !== 'all' ? selectedOrigin : null;
+    const queryTrim = searchQuery.toLowerCase().trim();
+    const queryTokens = queryTrim ? queryTrim.split(' ').filter(Boolean) : [];
 
     return products.filter((p) => {
       // 1. Fast tab filter
-      if (isEarlyWave && p.waveStage !== 'early_wave') return false;
-      if (isHighMargin && p.estimatedProfitMarginPercent < 280) return false;
+      if (isEarlyWave && p.waveStage !== 'early_wave' && p.tiktokShop?.saturationLevel !== 'Oceano Azul') return false;
+      if (isHighMargin && (p.tiktokShop?.commissionRatePercent || 0) < 20 && p.estimatedProfitMarginPercent < 280) return false;
 
       // 2. Fast niche filter
       if (filterNiche && p.niche !== filterNiche) return false;
@@ -470,22 +465,20 @@ export default function App() {
       // 3. Fast origin filter
       if (filterOrigin && p.originCountry !== filterOrigin) return false;
 
-      // 4. Search query (only evaluated if query exists, fast-path checks)
-      if (hasQuery) {
-        return (
-          p.name.toLowerCase().includes(rawQuery) ||
-          p.originalName.toLowerCase().includes(rawQuery) ||
-          p.culturalFitReason.toLowerCase().includes(rawQuery) ||
-          p.targetAudience.toLowerCase().includes(rawQuery) ||
-          p.supplierKeywords?.some(k => k.toLowerCase().includes(rawQuery)) ||
-          // @ts-ignore - temporary property injected during AI scan
-          p._matchedQuery === rawQuery
-        );
+      // 4. TikTok Shop affiliate filters
+      if (filterFreeSampleOnly && !p.tiktokShop?.freeSampleAvailable) return false;
+      if (filterBlueOceanOnly && p.tiktokShop?.saturationLevel !== 'Oceano Azul' && p.waveStage !== 'early_wave') return false;
+
+      // 5. Search query matching
+      if (queryTokens.length > 0) {
+        const textToSearch = `${p.name} ${p.originalName} ${p.niche} ${p.nicheLabel} ${p.culturalFitReason} ${(p.supplierKeywords || []).join(' ')} ${p.tiktokShop?.topViralHook || ''} ${p.tiktokShop?.stockLocation || ''}`.toLowerCase();
+        const matches = queryTokens.some(token => textToSearch.includes(token));
+        if (!matches) return false;
       }
 
       return true;
     });
-  }, [products, activeTab, selectedNiche, selectedOrigin, searchQuery]);
+  }, [products, activeTab, selectedNiche, selectedOrigin, searchQuery, filterFreeSampleOnly, filterBlueOceanOnly]);
 
   // Progressive DOM Chunking / Windowing:
   // Rendering 3,000 cards simultaneously would block the main thread with >75k DOM nodes.
@@ -497,7 +490,7 @@ export default function App() {
   // Reset display chunk when active filters change so the user starts smoothly at the top
   useEffect(() => {
     setDisplayLimit(CHUNK_SIZE);
-  }, [activeTab, selectedNiche, selectedOrigin, searchQuery]);
+  }, [activeTab, selectedNiche, selectedOrigin]);
 
   const visibleProducts = useMemo(() => {
     return filteredProducts.slice(0, displayLimit);
@@ -599,9 +592,16 @@ export default function App() {
               setSelectedNiche={handleSetSelectedNiche}
               selectedOrigin={selectedOrigin}
               setSelectedOrigin={handleSetSelectedOrigin}
-              onOpenCopilot={() => setShowAICopilotModal(true)}
               totalProductsCount={products.length}
               onOpenTour={() => setShowOnboardingModal(true)}
+              searchQuery={searchQuery}
+              setSearchQuery={handleSetSearchQuery}
+              onTriggerScan={() => handleTriggerScan(false)}
+              filterFreeSampleOnly={filterFreeSampleOnly}
+              setFilterFreeSampleOnly={setFilterFreeSampleOnly}
+              filterBlueOceanOnly={filterBlueOceanOnly}
+              setFilterBlueOceanOnly={setFilterBlueOceanOnly}
+              isScanning={isScanning}
             />
           </motion.div>
         )}
@@ -927,11 +927,7 @@ export default function App() {
           onClose={() => setShowWifeBotModal(false)}
           products={products}
         />
-        {/* Copilot AI Modal */}
-        <AICopilotModal
-          isOpen={showAICopilotModal}
-          onClose={() => setShowAICopilotModal(false)}
-        />
+
       </Suspense>
 
       {/* Offline Toast Indicator */}

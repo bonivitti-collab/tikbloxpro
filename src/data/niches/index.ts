@@ -9,6 +9,10 @@ import { kidsTrends } from './kids';
 import { toolsTrends } from './tools';
 import { autoTrends } from './auto';
 import { healthTrends } from './health';
+import { gamingTrends } from './gaming';
+import { officeTrends } from './office';
+import { outdoorTrends } from './outdoor';
+import { travelTrends } from './travel';
 
 export {
   techTrends,
@@ -20,7 +24,11 @@ export {
   kidsTrends,
   toolsTrends,
   autoTrends,
-  healthTrends
+  healthTrends,
+  gamingTrends,
+  officeTrends,
+  outdoorTrends,
+  travelTrends
 };
 
 export const NICHE_TRENDS_MAP: Record<Exclude<ProductNiche, 'all'>, TrendingProduct[]> = {
@@ -34,9 +42,13 @@ export const NICHE_TRENDS_MAP: Record<Exclude<ProductNiche, 'all'>, TrendingProd
   tools: toolsTrends,
   auto: autoTrends,
   health: healthTrends,
+  gaming: gamingTrends,
+  office: officeTrends,
+  outdoor: outdoorTrends,
+  travel: travelTrends,
 };
 
-// All 300 curated trends across all 10 niches (30 items per niche)
+// All curated trends across all niches
 export const ALL_NICHE_TRENDS: TrendingProduct[] = [
   ...techTrends,
   ...homeTrends,
@@ -48,6 +60,10 @@ export const ALL_NICHE_TRENDS: TrendingProduct[] = [
   ...toolsTrends,
   ...autoTrends,
   ...healthTrends,
+  ...gamingTrends,
+  ...officeTrends,
+  ...outdoorTrends,
+  ...travelTrends,
 ];
 
 export function getNicheProducts(niche?: string): TrendingProduct[] {

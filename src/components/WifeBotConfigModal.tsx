@@ -115,6 +115,10 @@ export const WifeBotConfigModal: React.FC<WifeBotConfigModalProps> = ({
     { id: 'pets', label: 'Pets & Inovação', icon: '🐾' },
     { id: 'tech', label: 'Gadgets & Tech', icon: '⚡' },
     { id: 'kids', label: 'Infantil & Brinquedos', icon: '🧸' },
+    { id: 'gaming', label: 'Gamer & Setup', icon: '🎮' },
+    { id: 'office', label: 'Escritório & Desk', icon: '💻' },
+    { id: 'outdoor', label: 'Outdoor & Camping', icon: '🏕️' },
+    { id: 'travel', label: 'Viagem & Bagagem', icon: '✈️' },
   ];
 
   const handleSave = (e: React.FormEvent) => {

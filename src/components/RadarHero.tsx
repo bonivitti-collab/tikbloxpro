@@ -1,19 +1,24 @@
 import React, { useRef, useState, useEffect, useCallback, useMemo } from 'react';
-import { Search, Sparkles, Compass, Globe, Filter, ChevronLeft, ChevronRight, Clock } from 'lucide-react';
+import { Sparkles, Compass, Globe, Filter, ChevronLeft, ChevronRight, Clock, Search, X, Gift, RefreshCw } from 'lucide-react';
 import { ProductNiche } from '../types';
-import { useDebouncedSearch } from '../hooks/useDebouncedSearch';
 import { useTranslation } from '../i18n/LanguageContext';
-import { RecentSearchesDropdown } from './RecentSearchesDropdown';
-import { saveRecentSearch } from '../services/recentSearchesService';
 
 interface RadarHeroProps {
   selectedNiche: ProductNiche;
   setSelectedNiche: (niche: ProductNiche) => void;
   selectedOrigin: string;
   setSelectedOrigin: (origin: string) => void;
-  onOpenCopilot: () => void;
   totalProductsCount: number;
   onOpenTour?: () => void;
+  onOpenCopilot?: () => void;
+  searchQuery?: string;
+  setSearchQuery?: (q: string) => void;
+  onTriggerScan?: () => void;
+  filterFreeSampleOnly?: boolean;
+  setFilterFreeSampleOnly?: (val: boolean) => void;
+  filterBlueOceanOnly?: boolean;
+  setFilterBlueOceanOnly?: (val: boolean) => void;
+  isScanning?: boolean;
 }
 
 const NICHES: Array<{ id: ProductNiche; label: string; icon: string }> = [
@@ -35,14 +40,19 @@ export const RadarHero: React.FC<RadarHeroProps> = React.memo(({
   setSelectedNiche,
   selectedOrigin,
   setSelectedOrigin,
-  onOpenCopilot,
   totalProductsCount,
   onOpenTour,
+  onOpenCopilot,
+  searchQuery,
+  setSearchQuery,
+  onTriggerScan,
+  filterFreeSampleOnly = false,
+  setFilterFreeSampleOnly,
+  filterBlueOceanOnly = false,
+  setFilterBlueOceanOnly,
+  isScanning = false,
 }) => {
   const { t, language } = useTranslation();
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(true);
 
   const nichesList = useMemo(() => [
     { id: 'all' as ProductNiche, label: t('hero_niches_all'), icon: '🌐' },
@@ -56,78 +66,13 @@ export const RadarHero: React.FC<RadarHeroProps> = React.memo(({
     { id: 'tools' as ProductNiche, label: t('hero_niche_tools'), icon: '🔨' },
     { id: 'auto' as ProductNiche, label: t('hero_niche_auto'), icon: '🚗' },
     { id: 'health' as ProductNiche, label: t('hero_niche_health'), icon: '🩺' },
+    { id: 'gaming' as ProductNiche, label: t('hero_niche_gaming'), icon: '🎮' },
+    { id: 'office' as ProductNiche, label: t('hero_niche_office'), icon: '💻' },
+    { id: 'outdoor' as ProductNiche, label: t('hero_niche_outdoor'), icon: '🏕️' },
+    { id: 'travel' as ProductNiche, label: t('hero_niche_travel'), icon: '✈️' },
   ], [t]);
 
-  const checkScroll = () => {
-    if (scrollContainerRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
-      setCanScrollLeft(scrollLeft > 6);
-      setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 6);
-    }
-  };
 
-  useEffect(() => {
-    checkScroll();
-    window.addEventListener('resize', checkScroll);
-
-    // Enable mouse wheel horizontal scrolling on desktop
-    const el = scrollContainerRef.current;
-    if (!el) return;
-
-    const onWheel = (e: WheelEvent) => {
-      if (e.deltaY !== 0 && Math.abs(e.deltaX) < Math.abs(e.deltaY)) {
-        e.preventDefault();
-        el.scrollBy({
-          left: e.deltaY * 1.2,
-          behavior: 'auto',
-        });
-      }
-    };
-
-    el.addEventListener('wheel', onWheel, { passive: false });
-
-    return () => {
-      window.removeEventListener('resize', checkScroll);
-      el.removeEventListener('wheel', onWheel);
-    };
-  }, []);
-
-  const [timeLeft, setTimeLeft] = useState('');
-
-  useEffect(() => {
-    const calculateTimeLeft = () => {
-      const now = new Date();
-      const brtTime = new Date(now.toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
-      const nextMidnight = new Date(brtTime);
-      nextMidnight.setHours(24, 0, 0, 0);
-
-      const diff = nextMidnight.getTime() - brtTime.getTime();
-      if (diff <= 0) return "00h 00m 00s";
-
-      const hours = Math.floor(diff / (1000 * 60 * 60));
-      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-
-      return `${hours.toString().padStart(2, '0')}h ${minutes.toString().padStart(2, '0')}m ${seconds.toString().padStart(2, '0')}s`;
-    };
-
-    setTimeLeft(calculateTimeLeft());
-    const timer = setInterval(() => {
-      setTimeLeft(calculateTimeLeft());
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, []);
-
-  const handleScroll = (direction: 'left' | 'right') => {
-    if (scrollContainerRef.current) {
-      const scrollAmount = 260;
-      scrollContainerRef.current.scrollBy({
-        left: direction === 'left' ? -scrollAmount : scrollAmount,
-        behavior: 'smooth',
-      });
-    }
-  };
   return (
     <section className="relative overflow-hidden border-b border-white/10 bg-[#1A1D27] px-4 py-8 sm:py-12 sm:px-6 lg:px-8">
       {/* TikTok Dual Ambient Glow: Cyan on top-left, Pink on top-right */}
@@ -147,136 +92,139 @@ export const RadarHero: React.FC<RadarHeroProps> = React.memo(({
 
         {/* Title and Value Proposition */}
         <div className="max-w-3xl mb-5 sm:mb-8">
+          <div className="inline-flex items-center gap-2 rounded-full bg-[#FE2C55]/15 border border-[#FE2C55]/30 px-3 py-1 mb-3 text-xs font-black text-[#FE2C55]">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FE2C55] opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#FE2C55]"></span>
+            </span>
+            <span>🇧🇷 RADAR TIKTOK SHOP BRASIL • ESTOQUE NACIONAL & AFILIAÇÃO</span>
+          </div>
           <h1 className="text-xl sm:text-3xl lg:text-5xl font-black tracking-tight text-white leading-tight">
-            {language === 'en' ? (
-              <>
-                Discover viral trends abroad{' '}
-                <span className="bg-gradient-to-r from-white via-[#25F4EE] to-[#FE2C55] bg-clip-text text-transparent">
-                  before they explode in Brazil.
-                </span>
-              </>
-            ) : (
-              <>
-                Descubra produtos virais no exterior{' '}
-                <span className="bg-gradient-to-r from-white via-[#25F4EE] to-[#FE2C55] bg-clip-text text-transparent">
-                  antes de estourarem no Brasil.
-                </span>
-              </>
-            )}
+            Encontre produtos com{' '}
+            <span className="bg-gradient-to-r from-[#25F4EE] via-white to-[#FE2C55] bg-clip-text text-transparent">
+              alta demanda e pouca saturação
+            </span>{' '}
+            para vender no TikTok Shop.
           </h1>
           <p className="mt-2 sm:mt-3 text-xs sm:text-base text-[#C5C6D0] font-normal leading-relaxed">
-            {t('hero_subtitle')}
+            Minerador de produtos com <strong className="text-white">estoque no Brasil</strong>, <strong className="text-[#25F4EE]">amostra grátis liberada</strong> e <strong className="text-emerald-400">altas comissões</strong>. Pegue o link de afiliação e o gancho viral pronto para gravar hoje.
           </p>
-
-          {/* Global Scan Countdown */}
-          <div className="mt-4 flex items-center gap-2 bg-[#1A1D27]/80 backdrop-blur-sm border border-[#25F4EE]/30 rounded-full px-3.5 py-2 w-fit shadow-[0_0_15px_rgba(37,244,238,0.15)]">
-            <div className="flex items-center justify-center w-6 h-6 rounded-full bg-[#25F4EE]/20">
-              <Clock className="w-3.5 h-3.5 text-[#25F4EE] animate-pulse" />
-            </div>
-            <span className="text-xs font-semibold text-white/90">
-              {language === 'en' ? 'Next Global Radar Scan:' : 'Próxima Varredura Global:'}
-            </span>
-            <span className="text-sm font-bold text-[#25F4EE] font-mono tracking-widest bg-black/20 px-2 py-0.5 rounded border border-[#25F4EE]/20">
-              {timeLeft}
-            </span>
-          </div>
         </div>
 
         {/* Action & Filter Console */}
-        <div className="rounded-2xl border border-white/10 bg-[#2A3042]/90 backdrop-blur-xl p-3.5 sm:p-5 shadow-2xl">
-          <div className="flex flex-col md:flex-row items-stretch md:items-center gap-3">
-            
-            {/* Copilot AI Button (Replaces old Search Bar) */}
-            <button
-              onClick={onOpenCopilot}
-              className="flex-1 flex items-center justify-between gap-3 rounded-xl bg-[#262B3A] border border-[#25F4EE]/30 px-4 py-3 md:py-2.5 text-left text-sm text-white hover:border-[#25F4EE] hover:bg-[#2A3042] transition cursor-pointer group shadow-[0_0_15px_rgba(37,244,238,0.1)] hover:shadow-[0_0_20px_rgba(37,244,238,0.2)]"
-            >
-              <div className="flex items-center gap-3">
-                <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-[#25F4EE]/20 to-[#FE2C55]/20 text-[#25F4EE] group-hover:scale-110 transition-transform">
-                  <Sparkles className="w-4 h-4" />
-                </div>
-                <div>
-                  <span className="font-semibold block text-white group-hover:text-[#25F4EE] transition-colors">
-                    Consultar IA Especialista
-                  </span>
-                  <span className="text-[11px] text-[#A6A7B2]">
-                    Peça ideias de produtos, análise de margens e estratégias
-                  </span>
-                </div>
-              </div>
-              <div className="hidden sm:flex items-center justify-center px-2 py-1 rounded bg-white/5 text-[10px] font-mono text-[#A6A7B2] border border-white/10">
-                Novo ✨
-              </div>
-            </button>
+        <div className="rounded-2xl border border-white/10 bg-[#2A3042]/90 backdrop-blur-xl p-4 sm:p-5 shadow-2xl">
+          {/* Top Row: Search Input + Origin + Scan Button */}
+          <div className="flex flex-col md:flex-row items-stretch gap-3">
+            {/* Search Input */}
+            <div className="relative flex-1">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[#25F4EE]" />
+              <input
+                type="text"
+                value={searchQuery || ''}
+                onChange={(e) => setSearchQuery && setSearchQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && onTriggerScan) {
+                    onTriggerScan();
+                  }
+                }}
+                placeholder="Buscar produto ou nicho no TikTok Shop (ex: mini selador, corretor, garrafa, depilador)..."
+                className="w-full h-[52px] rounded-xl border border-white/10 bg-[#262B3A] pl-11 pr-10 text-sm font-medium text-white placeholder-[#757788] focus:border-[#25F4EE] focus:outline-none focus:ring-1 focus:ring-[#25F4EE] transition-colors"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery && setSearchQuery('')}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-lg text-[#757788] hover:text-white transition cursor-pointer"
+                  title="Limpar busca"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
 
             {/* Origin Selector */}
-            <div className="relative w-full md:w-[220px]">
-              <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#A6A7B2]" />
+            <div className="relative w-full md:w-[190px] shrink-0">
+              <Globe className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[#A6A7B2]" />
               <select
                 id="origin-country-select"
                 value={selectedOrigin}
                 onChange={(e) => setSelectedOrigin(e.target.value)}
-                aria-label="Filtrar por país ou plataforma de origem"
-                className="w-full rounded-xl border border-white/10 bg-[#262B3A] pl-9 pr-3.5 py-3 md:py-2.5 text-sm font-medium text-white focus:border-[#FE2C55] focus:outline-none focus:ring-1 focus:ring-[#FE2C55] cursor-pointer appearance-none"
+                aria-label="Filtrar por país de origem do viral"
+                className="w-full h-[52px] rounded-xl border border-white/10 bg-[#262B3A] pl-11 pr-4 text-xs font-medium text-white focus:border-[#FE2C55] focus:outline-none focus:ring-1 focus:ring-[#FE2C55] cursor-pointer appearance-none transition-colors hover:border-white/20"
               >
-                <option value="all">{t('hero_all_origins')}</option>
-                <option value="US">{t('hero_origin_us')}</option>
-                <option value="CN">{t('hero_origin_cn')}</option>
+                <option value="all">🌍 Todas Origens</option>
+                <option value="US">🇺🇸 Viral nos EUA</option>
+                <option value="CN">🇨🇳 Viral na Ásia/China</option>
               </select>
             </div>
+
+            {/* Scan Trigger Button */}
+            {onTriggerScan && (
+              <button
+                onClick={onTriggerScan}
+                disabled={isScanning}
+                className="h-[52px] px-5 rounded-xl bg-gradient-to-r from-[#FE2C55] via-[#FF0050] to-[#FF3B5C] hover:brightness-110 active:scale-98 text-white font-black text-xs sm:text-sm shadow-lg shadow-[#FE2C55]/30 flex items-center justify-center gap-2 transition cursor-pointer whitespace-nowrap shrink-0 disabled:opacity-60"
+              >
+                <RefreshCw className={`w-4 h-4 ${isScanning ? 'animate-spin' : ''}`} />
+                <span>{isScanning ? 'Minerando TikTok Shop...' : 'Escanear Tendências BR'}</span>
+              </button>
+            )}
           </div>
 
-          {/* Niches Carousel / Pills with Scroll Controls */}
-          <div className="mt-3.5 pt-3 border-t border-white/10 relative flex items-center">
-            {/* Left Scroll Button */}
-            {canScrollLeft && (
+          {/* Quick Filter Chips: Amostra Grátis, Oceano Azul, etc. */}
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <span className="text-[11px] font-bold text-[#A6A7B2] uppercase mr-1">Filtros Afiliados:</span>
+            
+            {setFilterFreeSampleOnly && (
               <button
-                type="button"
-                onClick={() => handleScroll('left')}
-                className="hidden sm:flex absolute -left-2 z-10 w-7 h-7 rounded-full bg-[#2A3042] border border-white/20 items-center justify-center text-white shadow-xl hover:bg-[#25F4EE] hover:text-black transition cursor-pointer"
-                title="Rolar para esquerda"
+                onClick={() => setFilterFreeSampleOnly(!filterFreeSampleOnly)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
+                  filterFreeSampleOnly
+                    ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20 font-black'
+                    : 'bg-[#161823] text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/10'
+                }`}
               >
-                <ChevronLeft className="w-4 h-4" />
+                <Gift className="w-3.5 h-3.5" />
+                <span>Amostra Grátis Liberada</span>
               </button>
             )}
 
-            {/* Scrollable Container with subtle scroll indicator */}
-            <div
-              ref={scrollContainerRef}
-              onScroll={checkScroll}
-              className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto scroll-smooth subtle-horizontal-scroll touch-pan-x w-full py-1.5 px-1"
-            >
-              <span className="text-[11px] font-bold text-[#A6A7B2] shrink-0 flex items-center gap-1 mr-1">
-                <Filter className="w-3 h-3 text-[#25F4EE]" />
-                <span className="hidden xs:inline">{language === 'en' ? 'Niche:' : 'Nicho:'}</span>
-              </span>
+            {setFilterBlueOceanOnly && (
+              <button
+                onClick={() => setFilterBlueOceanOnly(!filterBlueOceanOnly)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
+                  filterBlueOceanOnly
+                    ? 'bg-[#25F4EE] text-slate-950 shadow-md shadow-[#25F4EE]/20 font-black'
+                    : 'bg-[#161823] text-[#25F4EE] border border-[#25F4EE]/30 hover:bg-[#25F4EE]/10'
+                }`}
+              >
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>🌊 Oceano Azul (&lt;15 Criadores)</span>
+              </button>
+            )}
+          </div>
+
+          {/* Niches List */}
+          <div className="mt-4 pt-4 border-t border-white/10 flex flex-col sm:flex-row items-center gap-3">
+            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-white/5 border border-white/5 shrink-0 sm:mt-0.5">
+              <Filter className="w-3.5 h-3.5 text-[#25F4EE]" />
+            </div>
+            <div className="flex flex-wrap justify-center sm:justify-start gap-2 w-full">
               {nichesList.map((niche) => (
                 <button
                   key={niche.id}
                   onClick={() => setSelectedNiche(niche.id)}
-                  className={`flex items-center gap-1.5 rounded-lg px-2.5 sm:px-3 py-1 text-xs font-bold shrink-0 transition-all cursor-pointer whitespace-nowrap ${
+                  className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition-all cursor-pointer ${
                     selectedNiche === niche.id
                       ? 'bg-gradient-to-r from-[#FE2C55] to-[#FF0050] text-white shadow-md shadow-[#FE2C55]/30 border border-[#FE2C55]'
                       : 'bg-[#161823] text-[#A6A7B2] hover:bg-[#202230] hover:text-white border border-white/5'
                   }`}
                 >
-                  <span className="text-sm">{niche.icon}</span>
-                  <span>{niche.label}</span>
+                  <span className="text-sm leading-none">{niche.icon}</span>
+                  <span className="leading-none mt-0.5">{niche.label}</span>
                 </button>
               ))}
             </div>
 
-            {/* Right Scroll Button */}
-            {canScrollRight && (
-              <button
-                type="button"
-                onClick={() => handleScroll('right')}
-                className="hidden sm:flex absolute -right-2 z-10 w-7 h-7 rounded-full bg-[#2A3042] border border-white/20 items-center justify-center text-white shadow-xl hover:bg-[#25F4EE] hover:text-black transition cursor-pointer"
-                title="Rolar para direita"
-              >
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            )}
           </div>
 
         </div>

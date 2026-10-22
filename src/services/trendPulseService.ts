@@ -29,6 +29,10 @@ const NICHE_METADATA: Record<Exclude<ProductNiche, 'all'>, { label: string; icon
   tools: { label: 'Ferramentas & Obra', icon: '🔨' },
   auto: { label: 'Automotivo & Carros', icon: '🚗' },
   health: { label: 'Saúde & Bem-Estar', icon: '🩺' },
+  gaming: { label: 'Gamer & Setup', icon: '🎮' },
+  office: { label: 'Escritório & Home Office', icon: '💻' },
+  outdoor: { label: 'Camping & Lazer', icon: '🏕️' },
+  travel: { label: 'Viagem & Bagagem', icon: '✈️' },
 };
 
 /**

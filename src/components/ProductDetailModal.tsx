@@ -20,12 +20,15 @@ import {
   Activity,
   Flame,
   Radio,
+  Gift,
+  Users,
 } from 'lucide-react';
 import { TrendingProduct, DeepDiveAnalysis } from '../types';
 import { getProductDeepDive } from '../services/api';
 import { useTranslation } from '../i18n/LanguageContext';
 import { downloadProductViabilityPDF } from '../services/pdfExportService';
 import { SocialProofBadge } from './SocialProofBadge';
+import { enrichWithTikTokShopData } from '../data/tiktokShopEnricher';
 
 interface ProductDetailModalProps {
   product: TrendingProduct | null;
@@ -49,6 +52,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
   const [copiedLink, setCopiedLink] = useState(false);
   const [isExportingPdf, setIsExportingPdf] = useState(false);
   const [pdfExported, setPdfExported] = useState(false);
+  const tk = product ? (product.tiktokShop || enrichWithTikTokShopData(product).tiktokShop!) : null;
 
   const handleExportPDF = async () => {
     if (!product || isExportingPdf) return;
@@ -564,6 +568,77 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
               ))}
             </div>
           </div>
+
+          {/* TikTok Shop Brasil Affiliate & Free Sample Showcase Box */}
+          {tk && (
+            <div className="rounded-xl border border-[#FE2C55]/30 bg-gradient-to-br from-[#FE2C55]/10 via-[#202432] to-[#25F4EE]/10 p-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-white/10 mb-3">
+                <div className="flex items-center gap-2">
+                  <span className="p-1.5 rounded-lg bg-[#FE2C55]/20 text-[#FE2C55]">
+                    <ShoppingBag className="w-4 h-4" />
+                  </span>
+                  <div>
+                    <h3 className="text-sm font-black text-white flex items-center gap-1.5">
+                      <span>TikTok Shop Brasil • Centro de Afiliados</span>
+                      <span className="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-1.5 py-0.5 rounded font-bold">
+                        🇧🇷 Estoque Nacional
+                      </span>
+                    </h3>
+                    <p className="text-[11px] text-[#A6A7B2]">
+                      Local: {tk.stockLocation}
+                    </p>
+                  </div>
+                </div>
+
+                <a
+                  href={tk.tiktokShopAffiliateLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-[#FE2C55] to-[#FF0050] text-white text-xs font-black shadow-lg shadow-[#FE2C55]/30 hover:brightness-110 active:scale-95 transition cursor-pointer shrink-0"
+                >
+                  <ShoppingBag className="w-3.5 h-3.5" />
+                  <span>Abrir no TikTok Shop BR</span>
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+              </div>
+
+              {/* Commission & Sample Highlights */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs mb-3">
+                <div className="rounded-lg bg-[#161823] p-2.5 border border-white/5">
+                  <span className="block text-[10px] text-[#A6A7B2] font-semibold uppercase">Sua Comissão Estimada</span>
+                  <span className="text-sm font-black text-emerald-400">
+                    +{tk.commissionRatePercent}% (R$ {tk.commissionValueBRL.toFixed(2)})
+                  </span>
+                </div>
+                <div className="rounded-lg bg-[#161823] p-2.5 border border-white/5">
+                  <span className="block text-[10px] text-[#A6A7B2] font-semibold uppercase">Amostra Grátis</span>
+                  <span className="text-xs font-black text-white flex items-center gap-1 mt-0.5">
+                    {tk.freeSampleAvailable ? (
+                      <span className="text-emerald-300">✅ Liberada (+1k seguidores)</span>
+                    ) : (
+                      <span className="text-[#A6A7B2]">⚠️ Sob solicitação ao seller</span>
+                    )}
+                  </span>
+                </div>
+                <div className="rounded-lg bg-[#161823] p-2.5 border border-white/5">
+                  <span className="block text-[10px] text-[#A6A7B2] font-semibold uppercase">Saturação de Criadores</span>
+                  <span className="text-xs font-black text-[#25F4EE]">
+                    {tk.saturationLevel} ({tk.activeCreatorsCount} criadores ativos)
+                  </span>
+                </div>
+              </div>
+
+              {/* Sample Request Tip */}
+              {tk.sampleRequestTip && (
+                <div className="rounded-lg bg-emerald-500/10 border border-emerald-500/20 p-2.5 text-[11px] text-emerald-200 flex items-start gap-2">
+                  <Gift className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
+                  <span>
+                    <strong>Dica de Ouro para Aprovação de Amostra:</strong> {tk.sampleRequestTip}
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Direct Supplier Search Links */}
           <div className="rounded-xl border border-white/10 bg-[#202432] p-4">
