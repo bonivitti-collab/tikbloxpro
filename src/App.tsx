@@ -532,9 +532,9 @@ export default function App() {
   }, [hasMoreProducts, filteredProducts.length]);
 
   return (
-    <div className="h-full h-dvh w-full max-w-full bg-white text-[#1e293b] font-sans flex flex-col overflow-hidden select-none">
+    <div className="h-full h-dvh w-full max-w-full bg-[#12151F] text-[#F6F3EC] font-sans flex flex-col overflow-hidden select-none">
       
-      {/* 1. HEADER PRINCIPAL RESPONSIVO ESTILO ANTITRADER */}
+      {/* 1. HEADER PRINCIPAL RESPONSIVO */}
       <Header
         onScanTrends={() => handleTriggerScan(false)}
         isScanning={isScanning}
@@ -550,14 +550,14 @@ export default function App() {
         }}
       />
 
-      {/* 2. SELETOR DE ABAS MOBILE / TABLET (ESTILO ANTITRADER) */}
-      <nav className="grid grid-cols-3 lg:hidden w-full bg-slate-100 border-b border-slate-300 p-1 gap-1 shrink-0 text-xs font-bold select-none">
+      {/* 2. SELETOR DE ABAS MOBILE / TABLET */}
+      <nav className="grid grid-cols-3 lg:hidden w-full bg-[#1A1D28] border-b border-white/10 p-1.5 gap-1.5 shrink-0 text-xs font-bold select-none">
         <button
           onClick={() => setMobileTab('produtos')}
-          className={`py-1.5 rounded-md text-xs font-bold flex items-center justify-center gap-1 cursor-pointer transition-all border ${
+          className={`py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1 cursor-pointer transition-all border ${
             mobileTab === 'produtos'
-              ? 'bg-blue-600 text-white border-blue-600 shadow-2xs'
-              : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'
+              ? 'bg-[#25F4EE] text-[#0F121C] border-[#25F4EE] shadow-[0_0_12px_rgba(37,244,238,0.3)] font-black'
+              : 'bg-[#222738] text-slate-300 border-white/10 hover:bg-[#2A3042] hover:text-white'
           }`}
         >
           <span>🛍️ Tendências</span>
@@ -565,10 +565,10 @@ export default function App() {
 
         <button
           onClick={() => setMobileTab('terminal')}
-          className={`py-1.5 rounded-md text-xs font-bold flex items-center justify-center gap-1 cursor-pointer transition-all border ${
+          className={`py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1 cursor-pointer transition-all border ${
             mobileTab === 'terminal'
-              ? 'bg-blue-600 text-white border-blue-600 shadow-2xs'
-              : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'
+              ? 'bg-[#25F4EE] text-[#0F121C] border-[#25F4EE] shadow-[0_0_12px_rgba(37,244,238,0.3)] font-black'
+              : 'bg-[#222738] text-slate-300 border-white/10 hover:bg-[#2A3042] hover:text-white'
           }`}
         >
           <span>🔬 Raio-X Produto</span>
@@ -576,10 +576,10 @@ export default function App() {
 
         <button
           onClick={() => setMobileTab('copilot')}
-          className={`py-1.5 rounded-md text-xs font-bold flex items-center justify-center gap-1 cursor-pointer transition-all border ${
+          className={`py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1 cursor-pointer transition-all border ${
             mobileTab === 'copilot'
-              ? 'bg-blue-600 text-white border-blue-600 shadow-2xs'
-              : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'
+              ? 'bg-[#25F4EE] text-[#0F121C] border-[#25F4EE] shadow-[0_0_12px_rgba(37,244,238,0.3)] font-black'
+              : 'bg-[#222738] text-slate-300 border-white/10 hover:bg-[#2A3042] hover:text-white'
           }`}
         >
           <span>🤖 Copiloto IA</span>
@@ -587,7 +587,7 @@ export default function App() {
       </nav>
 
       {/* 3. ÁREA PRINCIPAL: THREE-PANEL TERMINAL (CUSTOMIZÁVEL NO NOTEBOOK/DESKTOP) */}
-      <div className="flex-1 flex flex-col lg:flex-row w-full max-w-full overflow-hidden min-h-0 bg-slate-100 relative">
+      <div className="flex-1 flex flex-col lg:flex-row w-full max-w-full overflow-hidden min-h-0 bg-[#12151F] relative">
         {/* PAINEL 1: Lista de Produtos */}
         <div className={`h-full ${mobileTab !== 'produtos' ? 'hidden lg:flex' : 'flex'}`}>
           <ProductListPanel
@@ -599,6 +599,8 @@ export default function App() {
             }}
             isCollapsed={painelEsquerdoRecolhido}
             onToggleCollapse={() => setPainelEsquerdoRecolhido(!painelEsquerdoRecolhido)}
+            selectedNiche={selectedNiche}
+            setSelectedNiche={setSelectedNiche}
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
             filterFreeSampleOnly={filterFreeSampleOnly}
@@ -640,21 +642,21 @@ export default function App() {
 
       {/* Modal de Produtos Salvos */}
       {showSavedModal && (
-        <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5">
-          <div className="bg-white rounded-2xl border border-slate-300 w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl">
-            <div className="p-3 border-b border-slate-200 flex items-center justify-between bg-slate-50">
-              <h3 className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
-                <Bookmark className="w-4 h-4 text-amber-500" />
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5">
+          <div className="bg-[#1A1D28] rounded-2xl border border-white/15 w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl text-white">
+            <div className="p-3 border-b border-white/10 flex items-center justify-between bg-[#222738]">
+              <h3 className="text-sm font-bold text-white flex items-center gap-1.5">
+                <Bookmark className="w-4 h-4 text-[#FE2C55]" />
                 <span>Produtos Salvos ({savedProductsList.length})</span>
               </h3>
               <button
                 onClick={() => setShowSavedModal(false)}
-                className="p-1 hover:bg-slate-200 rounded text-slate-500 hover:text-slate-800 transition cursor-pointer"
+                className="p-1 hover:bg-[#2A3042] rounded-lg text-slate-400 hover:text-white transition cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
-            <div className="flex-1 overflow-y-auto p-4">
+            <div className="flex-1 overflow-y-auto p-4 bg-[#141724]">
               <SavedRadarView
                 savedProducts={savedProductsList}
                 priceSummary={priceSummary}
