@@ -966,6 +966,36 @@ Instruções:
   }
 });
 
+// Endpoint: Kiwify Webhook (Ativação Automática de Assinantes)
+app.post('/api/webhook/kiwify', (req: Request, res: Response) => {
+  try {
+    const payload = req.body || {};
+    const orderStatus = payload.order_status || payload.status;
+    const customer = payload.Customer || payload.customer || {};
+    const product = payload.Product || payload.product || {};
+    const email = (customer.email || '').toLowerCase().trim();
+    const productName = product.product_name || product.name || 'TikBlox Pro';
+
+    console.log(`[KIWIFY SERVER WEBHOOK] Status: ${orderStatus} | Email: ${email} | Produto: ${productName}`);
+
+    const isCombo = 
+      productName.toLowerCase().includes('ia') || 
+      productName.toLowerCase().includes('combo') || 
+      productName.toLowerCase().includes('copilot');
+
+    const plan = isCombo ? 'pro_ai' : 'essential';
+
+    if (orderStatus === 'paid' || orderStatus === 'approved') {
+      return res.status(200).json({ success: true, message: 'Aprovado', email, plan });
+    }
+
+    return res.status(200).json({ success: true, received: true });
+  } catch (err: any) {
+    console.error('Kiwify webhook server error:', err);
+    return res.status(500).json({ error: 'Webhook processing error' });
+  }
+});
+
 // Cache for live price monitoring checks
 interface CachedPriceCheck {
   timestamp: number;

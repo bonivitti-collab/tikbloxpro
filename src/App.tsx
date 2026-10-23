@@ -12,6 +12,14 @@ import { ProductDetailTerminal } from './components/ConvictionTerminal/ProductDe
 import { AICopilotPanel } from './components/ConvictionTerminal/AICopilotPanel';
 import { SavedRadarView } from './components/SavedRadarView';
 import { AddCustomProductModal } from './components/ConvictionTerminal/AddCustomProductModal';
+import { LandingPage } from './components/LandingPage/LandingPage';
+import { LoginModal } from './components/Auth/LoginModal';
+import {
+  getCurrentSession,
+  clearSession,
+  startGuestDemoSession,
+  UserSession,
+} from './services/authService';
 
 // High-speed lazy loading: Keep initial bundle minimal so mobile devices render in under 1 second
 const ProductDetailModal = React.lazy(() =>
@@ -112,6 +120,16 @@ export default function App() {
   const [showSavedModal, setShowSavedModal] = useState<boolean>(false);
   const [showCalculatorModal, setShowCalculatorModal] = useState<boolean>(false);
   const [showAddCustomModal, setShowAddCustomModal] = useState<boolean>(false);
+
+  // Controle de Sessão de Assinante e Navegação Landing Page / App
+  const [session, setSession] = useState<UserSession | null>(() => getCurrentSession());
+  const [showLoginModal, setShowLoginModal] = useState<boolean>(false);
+  const [currentView, setCurrentView] = useState<'app' | 'landing'>(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('app') === '1' || urlParams.get('radar') === '1') return 'app';
+    const s = getCurrentSession();
+    return s ? 'app' : 'landing';
+  });
 
   // Redimensionamento dos painéis estilo TikBlox (com persistência no localStorage)
   const [redimensionando, setRedimensionando] = useState<'left' | 'right' | null>(null);
@@ -603,11 +621,56 @@ export default function App() {
     return () => observer.disconnect();
   }, [hasMoreProducts, filteredProducts.length]);
 
+  const handleLoginSuccess = (s: UserSession) => {
+    setSession(s);
+    setCurrentView('app');
+  };
+
+  const handleLogout = () => {
+    clearSession();
+    setSession(null);
+    setCurrentView('landing');
+  };
+
+  // =========================================================================
+  // LANDING PAGE (visitantes sem sessão)
+  // =========================================================================
+  if (currentView === 'landing') {
+    return (
+      <div className="h-dvh w-full overflow-y-auto">
+        <LandingPage
+          onOpenLogin={() => {
+            if (session) {
+              setCurrentView('app');
+            } else {
+              setShowLoginModal(true);
+            }
+          }}
+          onOpenAppDemo={() => {
+            const s = session || startGuestDemoSession();
+            handleLoginSuccess(s);
+          }}
+        />
+        <LoginModal
+          isOpen={showLoginModal}
+          onClose={() => setShowLoginModal(false)}
+          onLoginSuccess={handleLoginSuccess}
+          onOpenPricing={() => {
+            document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' });
+          }}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="h-full h-dvh w-full max-w-full bg-[#F8FAFC] text-[#0F172A] font-sans flex flex-col overflow-hidden select-none">
       
       {/* 1. HEADER PRINCIPAL RESPONSIVO */}
       <Header
+        userSession={session}
+        onLogout={handleLogout}
+        onViewLanding={() => setCurrentView('landing')}
         onScanTrends={() => handleTriggerScan(false)}
         isScanning={isScanning}
         savedCount={savedIds.length}

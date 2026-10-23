@@ -12,6 +12,7 @@ import {
   Zap,
 } from 'lucide-react';
 import { TikBloxLogo } from '../TikBloxLogo';
+import { UserSession } from '../../services/authService';
 
 interface HeaderProps {
   onScanTrends: () => void;
@@ -23,6 +24,9 @@ interface HeaderProps {
   painelDireitoRecolhido: boolean;
   setPainelDireitoRecolhido: (val: boolean) => void;
   onOpenCalculator: () => void;
+  userSession?: UserSession | null;
+  onLogout?: () => void;
+  onViewLanding?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -35,6 +39,9 @@ export const Header: React.FC<HeaderProps> = ({
   painelDireitoRecolhido,
   setPainelDireitoRecolhido,
   onOpenCalculator,
+  userSession,
+  onLogout,
+  onViewLanding,
 }) => {
   const [showScheduleModal, setShowScheduleModal] = useState(false);
 
@@ -122,6 +129,36 @@ export const Header: React.FC<HeaderProps> = ({
               <PanelRight className="w-3.5 h-3.5 text-[#FE2C55]" />
               <span className="text-[10px] hidden xl:inline">TIKBLOX AI</span>
             </button>
+
+            {/* Perfil do Assinante / Alternância para Landing Page */}
+            {userSession && (
+              <div className="flex items-center gap-1.5 pl-1.5 border-l border-slate-200">
+                <span className="text-[10px] font-mono font-bold bg-slate-100 text-slate-700 px-2 py-1 rounded-lg border border-slate-200 hidden sm:flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                  <span>{userSession.name}</span>
+                </span>
+
+                {onViewLanding && (
+                  <button
+                    onClick={onViewLanding}
+                    className="p-1 px-2 rounded-lg text-[10px] font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition cursor-pointer border border-slate-200"
+                    title="Ver Landing Page de Apresentação"
+                  >
+                    Landing Page
+                  </button>
+                )}
+
+                {onLogout && (
+                  <button
+                    onClick={onLogout}
+                    className="p-1 px-2 rounded-lg text-[10px] font-bold text-rose-600 hover:bg-rose-50 border border-rose-200 transition cursor-pointer"
+                    title="Encerrar sessão"
+                  >
+                    Sair
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </header>
