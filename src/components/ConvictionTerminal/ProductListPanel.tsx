@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { TrendingProduct, ProductNiche } from '../../types';
 import { enrichWithTikTokShopData } from '../../data/tiktokShopEnricher';
+import { isBlueOceanOpportunity } from '../../data/curatedTrends';
 
 interface CategoryOption {
   id: ProductNiche;
@@ -91,9 +92,11 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Enriquecer e filtrar produtos
+  // Enriquecer e filtrar produtos (Apenas Oceano Azul e Início de Onda)
   const enrichedProducts = useMemo(() => {
-    return (products || []).map(enrichWithTikTokShopData);
+    return (products || [])
+      .map(enrichWithTikTokShopData)
+      .filter(isBlueOceanOpportunity);
   }, [products]);
 
   // Contagem de produtos por categoria
@@ -266,7 +269,7 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
             type="button"
             onClick={onOpenAddCustomProduct}
             className="w-full flex items-center justify-between px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-bold transition-all cursor-pointer shadow-2xs active:scale-98"
-            title="Insira o produto que você encontrou no TikTok Shop para gerar o setup AntiTrader"
+            title="Insira o produto que você encontrou no TikTok Shop para gerar o diagnóstico TikBlox"
           >
             <span className="flex items-center gap-1.5">
               <span>💎</span>
@@ -321,29 +324,34 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
                     : 'bg-white border-slate-200/90 hover:border-[#25F4EE]/60 hover:shadow-xs'
                 }`}
               >
-                {/* Linha 1: Badges de Sinal AntiTrader e Nicho */}
+                {/* Linha 1: Badges de Sinal e Nicho (Layout Estável sem Quebra Feia) */}
                 <div className="mb-1.5">
-                  <div className="flex items-center gap-1.5 flex-wrap mb-1">
-                    <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.2 rounded bg-slate-100 text-slate-700 border border-slate-200">
-                      {prod.nicheLabel || 'Nicho'}
-                    </span>
+                  <div className="flex items-center justify-between gap-1.5 mb-1">
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <span
+                        className="text-[9px] font-extrabold uppercase px-1.5 py-0.2 rounded bg-slate-100 text-slate-700 border border-slate-200 truncate max-w-[110px]"
+                        title={prod.nicheLabel || 'Nicho'}
+                      >
+                        {prod.nicheLabel || 'Nicho'}
+                      </span>
 
-                    <span className={`text-[9px] font-mono font-black px-1.5 py-0.2 rounded border ${
-                      convictionScore >= 90
-                        ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
-                        : convictionScore >= 80
-                        ? 'bg-amber-50 text-amber-800 border-amber-300'
-                        : 'bg-rose-50 text-rose-800 border-rose-300'
-                    }`}>
-                      {convictionScore >= 90 ? '🟢' : convictionScore >= 80 ? '🟡' : '🔴'} {convictionScore}/100
-                    </span>
+                      <span className={`text-[9px] font-mono font-black px-1.5 py-0.2 rounded border shrink-0 ${
+                        convictionScore >= 90
+                          ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
+                          : convictionScore >= 80
+                          ? 'bg-amber-50 text-amber-800 border-amber-300'
+                          : 'bg-rose-50 text-rose-800 border-rose-300'
+                      }`}>
+                        {convictionScore >= 90 ? '🟢' : convictionScore >= 80 ? '🟡' : '🔴'} {convictionScore}/100
+                      </span>
+                    </div>
 
-                    <span className="text-[9px] font-mono font-bold px-1.5 py-0.2 rounded bg-sky-50 text-[#007A87] border border-sky-200 ml-auto">
+                    <span className="text-[9px] font-mono font-bold px-1.5 py-0.2 rounded bg-sky-50 text-[#007A87] border border-sky-200 shrink-0">
                       ~{videoCount} vídeos BR
                     </span>
                   </div>
 
-                  <h3 className="text-xs font-bold text-slate-900 leading-snug line-clamp-1">
+                  <h3 className="text-xs font-bold text-slate-900 leading-snug line-clamp-1" title={prod.name}>
                     {prod.name}
                   </h3>
                 </div>

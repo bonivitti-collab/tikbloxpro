@@ -66,17 +66,17 @@ export function enrichWithTikTokShopData(product: any): any {
 
   if (!product.tiktokShop && !product.creatorSaturationBR) {
     if (product.waveStage === 'early_wave') {
-      activeCreatorsCount = (charCodeSum % 9) + 4;
+      activeCreatorsCount = (charCodeSum % 7) + 3;
       recentSalesCount = ((charCodeSum * 37) % 2500) + 1200;
       saturationLevel = 'Oceano Azul';
     } else if (product.waveStage === 'rising_wave') {
-      activeCreatorsCount = (charCodeSum % 21) + 18;
+      activeCreatorsCount = (charCodeSum % 8) + 8;
       recentSalesCount = ((charCodeSum * 43) % 3500) + 3200;
       saturationLevel = 'Baixa';
     } else {
-      activeCreatorsCount = (charCodeSum % 70) + 75;
+      activeCreatorsCount = (charCodeSum % 8) + 6;
       recentSalesCount = ((charCodeSum * 51) % 6000) + 6500;
-      saturationLevel = 'Média';
+      saturationLevel = 'Baixa';
     }
   }
 
@@ -107,7 +107,7 @@ export function enrichWithTikTokShopData(product: any): any {
     (product.waveStage === 'early_wave' || (product.viralityScore || 0) >= 92);
 
   // =========================================================================
-  // MOTOR DE CONVICÇÃO ANTITRADER: UNIT ECONOMICS & SINAL DE ENTRADA DO AFILIADO
+  // MOTOR DE CONVICÇÃO TIKBLOX: UNIT ECONOMICS & SINAL DE ENTRADA DO AFILIADO
   // =========================================================================
   const sampleCostBRL = priceBRL;
   const breakEvenSales = Math.max(1, Math.ceil(sampleCostBRL / Math.max(1, commissionValueBRL)));
@@ -121,7 +121,7 @@ export function enrichWithTikTokShopData(product: any): any {
   else if (creatorVideoCountBR > 25) creatorCompetitionLevel = 'Concorrência Média (25-50 vídeos)';
   else if (creatorVideoCountBR >= 10) creatorCompetitionLevel = 'Baixa Concorrência (10-25 vídeos)';
 
-  // Score de Convicção e Veredito AntiTrader
+  // Score de Convicção e Veredito TikBlox
   let convictionScore = Math.min(99, Math.max(65, Math.round((product.viralityScore || 85) - (creatorVideoCountBR * 0.35))));
   if (product.waveStage === 'early_wave') convictionScore = Math.min(99, Math.max(91, convictionScore + 6));
 

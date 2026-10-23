@@ -18,16 +18,12 @@ import {
   HelpCircle,
   ChevronRight,
   RefreshCw,
-  Key,
-  X,
   ExternalLink
 } from 'lucide-react';
 import { TrendingProduct } from '../../types';
 import { enrichWithTikTokShopData } from '../../data/tiktokShopEnricher';
 import {
   verifyProductInTikTokShopBR,
-  getStoredRapidApiKey,
-  saveRapidApiKey,
   LiveVerificationResult
 } from '../../services/rapidApiTikTokService';
 
@@ -50,12 +46,9 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
   const [copiedTerm, setCopiedTerm] = useState(false);
   const [simulationSales, setSimulationSales] = useState<number>(25);
 
-  // RapidAPI Pay-as-you-go live check
+  // Live TikTok Shop check via backend intelligence
   const [liveCheckLoading, setLiveCheckLoading] = useState(false);
   const [liveCheckResult, setLiveCheckResult] = useState<LiveVerificationResult | null>(null);
-  const [showRapidKeyModal, setShowRapidKeyModal] = useState(false);
-  const [rapidKeyInput, setRapidKeyInput] = useState(() => getStoredRapidApiKey());
-  const [rapidApiKey, setRapidApiKey] = useState(() => getStoredRapidApiKey());
 
   useEffect(() => {
     setLiveCheckResult(null);
@@ -69,7 +62,7 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
         </div>
         <h3 className="text-base font-bold text-slate-800">Nenhum produto selecionado</h3>
         <p className="text-xs text-slate-500 max-w-sm mt-1">
-          Selecione qualquer produto na lista à esquerda para abrir o Terminal de Convicção AntiTrader com cálculo de risco e break-even.
+          Selecione qualquer produto na lista à esquerda para abrir o Terminal de Convicção TikBlox com cálculo de risco e break-even.
         </p>
       </div>
     );
@@ -356,7 +349,7 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
       </div>
 
       {/* ========================================================= */}
-      {/* 2. O TERMINAL DE CONVICÇÃO DE ENTRADA (SETUP ANTITRADER)  */}
+      {/* 2. O TERMINAL DE CONVICÇÃO DE ENTRADA (SETUP TIKBLOX)     */}
       {/* ========================================================= */}
       <div className="bg-white border-2 border-[#25F4EE]/60 rounded-2xl p-5 shadow-sm space-y-4 relative overflow-hidden">
         
@@ -386,7 +379,7 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
 
           <div className="flex items-center gap-3 shrink-0 bg-slate-50 px-3.5 py-2 rounded-xl border border-slate-200">
             <div className="text-right">
-              <span className="text-[10px] uppercase font-bold text-slate-400 block">Convicção AntiTrader</span>
+              <span className="text-[10px] uppercase font-bold text-slate-400 block">Convicção TikBlox</span>
               <span className="text-lg font-mono font-black text-slate-900 leading-none">
                 {tc.convictionScore}/100
               </span>
@@ -462,23 +455,23 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
         </div>
 
         {/* ========================================================= */}
-        {/* CHECAGEM EM TEMPO REAL VIA RAPIDAPI (PAY-AS-YOU-GO)       */}
+        {/* AUDITORIA AO VIVO NO FEED BRASILEIRO (INTELIGÊNCIA REAL) */}
         {/* ========================================================= */}
         <div className="p-4 rounded-xl bg-slate-900 text-white space-y-3 shadow-xs">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div className="space-y-0.5">
               <div className="flex items-center gap-2">
                 <span className="inline-flex items-center gap-1 text-[10px] font-mono font-black uppercase px-2 py-0.5 rounded bg-[#25F4EE] text-[#0F121C]">
-                  ⚡ RapidAPI Conectada
+                  ⚡ Inteligência em Tempo Real
                 </span>
                 <span className="text-xs font-bold text-white">
-                  Verificação ao Vivo no TikTok Brasil
+                  Auditoria ao Vivo no Feed do TikTok Brasil
                 </span>
               </div>
               <p className="text-[11px] text-slate-300">
                 {liveCheckResult
                   ? liveCheckResult.message
-                  : 'Consulte em tempo real quantos vídeos deste produto foram postados no feed brasileiro com cota gratuita ativa.'}
+                  : 'Consulte em tempo real quantos criadores e vídeos já foram publicados promovendo este produto hoje no feed brasileiro.'}
               </p>
             </div>
 
@@ -489,15 +482,7 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
                 className="flex-1 sm:flex-none px-4 py-2 rounded-xl bg-gradient-to-r from-[#25F4EE] to-[#00D2C4] hover:brightness-105 text-[#0F121C] font-extrabold text-xs transition cursor-pointer flex items-center justify-center gap-1.5 active:scale-95 disabled:opacity-50 shadow-sm"
               >
                 <RefreshCw className={`w-3.5 h-3.5 ${liveCheckLoading ? 'animate-spin' : ''}`} />
-                <span>{liveCheckLoading ? 'Checando no TikTok BR...' : 'Checar ao Vivo (API)'}</span>
-              </button>
-
-              <button
-                onClick={() => setShowRapidKeyModal(true)}
-                className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition cursor-pointer border border-white/20"
-                title="Configurar ou alterar chave RapidAPI"
-              >
-                <Key className="w-4 h-4 text-[#25F4EE]" />
+                <span>{liveCheckLoading ? 'Auditando Feed TikTok BR...' : 'Auditar Feed Brasileiro Agora'}</span>
               </button>
             </div>
           </div>
@@ -524,7 +509,7 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
         <div className="bg-slate-50/80 rounded-xl p-4 border border-slate-200/80 space-y-2">
           <h4 className="text-xs font-black uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
             <ShieldCheck className="w-4 h-4 text-emerald-600" />
-            <span>Tese de Convicção AntiTrader (Por que comprar este produto agora?):</span>
+            <span>Tese de Entrada e Assimetria TikBlox (Por que este produto agora?):</span>
           </h4>
 
           <div className="space-y-2 pt-1 text-xs text-slate-700">
@@ -725,7 +710,7 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
           <div className="text-xs text-slate-700 pt-1 flex items-start gap-1.5">
             <span className="text-sm">🎯</span>
             <div>
-              <strong className="text-slate-900">Diretriz AntiTrader:</strong>{' '}
+              <strong className="text-slate-900">Diretriz Tática:</strong>{' '}
               <span>{lifecycle.recommendation}</span>
             </div>
           </div>
@@ -803,68 +788,6 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
           </p>
         </div>
       </div>
-
-      {/* Modal de Configuração RapidAPI */}
-      {showRapidKeyModal && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none animate-in fade-in">
-          <div className="bg-white rounded-2xl border border-slate-200 w-full max-w-md shadow-2xl overflow-hidden flex flex-col text-slate-900">
-            <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
-              <div className="flex items-center gap-2">
-                <Key className="w-4 h-4 text-[#007A87]" />
-                <h3 className="text-xs font-black text-slate-900 uppercase tracking-wider">
-                  Configurar Chave RapidAPI (Pay-As-You-Go)
-                </h3>
-              </div>
-              <button
-                onClick={() => setShowRapidKeyModal(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-800 transition cursor-pointer"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            <div className="p-4 space-y-3 text-xs">
-              <p className="text-slate-600 leading-relaxed">
-                Você pode criar uma conta gratuita no <strong>RapidAPI.com</strong> para receber <strong>100 consultas grátis por mês</strong>. Cole sua chave abaixo para consultar ao vivo a quantidade de vídeos no feed do TikTok Brasil por frações de centavos (~R$ 0,03/busca):
-              </p>
-
-              <div>
-                <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
-                  Sua Chave RapidAPI (x-rapidapi-key):
-                </label>
-                <input
-                  type="password"
-                  value={rapidKeyInput}
-                  onChange={(e) => setRapidKeyInput(e.target.value)}
-                  placeholder="Cole sua chave aqui..."
-                  className="w-full px-3 py-2 rounded-xl border border-slate-300 font-mono text-xs outline-none focus:border-[#25F4EE]"
-                />
-              </div>
-
-              <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
-                <button
-                  type="button"
-                  onClick={() => setShowRapidKeyModal(false)}
-                  className="px-3 py-1.5 rounded-lg border border-slate-300 text-slate-600 font-bold transition cursor-pointer"
-                >
-                  Fechar
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    saveRapidApiKey(rapidKeyInput);
-                    setRapidApiKey(rapidKeyInput.trim());
-                    setShowRapidKeyModal(false);
-                  }}
-                  className="px-4 py-1.5 rounded-lg bg-slate-900 hover:bg-black text-white font-bold transition cursor-pointer shadow-2xs"
-                >
-                  Salvar Chave
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
     </main>
   );

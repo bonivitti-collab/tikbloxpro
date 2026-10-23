@@ -5,7 +5,7 @@ import {
   ProductPriceCheck,
   PriceMonitorSummary,
 } from '../types';
-import { INITIAL_CURATED_TRENDS } from '../data/curatedTrends';
+import { INITIAL_CURATED_TRENDS, isBlueOceanOpportunity } from '../data/curatedTrends';
 import {
   saveProductToIndexedDB,
   removeProductFromIndexedDB,
@@ -16,7 +16,7 @@ import {
 } from './indexedDbService';
 
 const LOCAL_STORAGE_KEY_SAVED = 'tikblox_saved_products_v1';
-const LOCAL_STORAGE_KEY_SCAN_CACHE = 'tikblox_scan_cache_v1';
+const LOCAL_STORAGE_KEY_SCAN_CACHE = 'tikblox_scan_cache_v3_blueocean';
 
 export async function scanTrends(params: {
   niche?: string;
@@ -73,7 +73,7 @@ export async function scanTrends(params: {
     // Continue with curated trends
   }
 
-  let filtered = sourceProducts;
+  let filtered = sourceProducts.filter(isBlueOceanOpportunity);
   if (params.niche && params.niche !== 'all') {
     filtered = filtered.filter((p) => p.niche === params.niche);
   }
@@ -263,7 +263,7 @@ export function cacheScannedProducts(products: TrendingProduct[]) {
   try {
     const existing = getCachedScannedProducts();
     const map = new Map<string, TrendingProduct>();
-    products.forEach((p) => map.set(p.id, p));
+    products.filter(isBlueOceanOpportunity).forEach((p) => map.set(p.id, p));
     existing.forEach((p) => {
       if (!map.has(p.id)) map.set(p.id, p);
     });
@@ -277,7 +277,11 @@ export function cacheScannedProducts(products: TrendingProduct[]) {
 export function getCachedScannedProducts(): TrendingProduct[] {
   try {
     const raw = localStorage.getItem(LOCAL_STORAGE_KEY_SCAN_CACHE);
-    return raw ? JSON.parse(raw) : [];
+    localStorage.removeItem('tikblox_scan_cache_v1');
+    localStorage.removeItem('tikblox_scan_cache_v2');
+    if (!raw) return [];
+    const parsed: TrendingProduct[] = JSON.parse(raw);
+    return parsed.filter(isBlueOceanOpportunity);
   } catch {
     return [];
   }

@@ -45,7 +45,6 @@ export const AICopilotPanel: React.FC<AICopilotPanelProps> = ({
   const [apiKey, setApiKey] = useState<string>(() => {
     return (
       localStorage.getItem('tikblox_gemini_key') ||
-      localStorage.getItem('antitrader_gemini_key') ||
       localStorage.getItem('antigravity_gemini_key') ||
       ''
     );
@@ -74,7 +73,7 @@ export const AICopilotPanel: React.FC<AICopilotPanelProps> = ({
     setShowKeyModal(false);
   };
 
-  // Sugestões Dinâmicas de Continuidade de Conversa (Padrão AntiTrader)
+  // Sugestões Dinâmicas de Continuidade de Conversa (Padrão TikBlox)
   const followUpSuggestions = useMemo(() => {
     if (messages.length === 0) return [];
     const lastMsg = messages[messages.length - 1];
@@ -159,7 +158,7 @@ export const AICopilotPanel: React.FC<AICopilotPanelProps> = ({
         },
       ]);
     } catch {
-      // Fallback institucional autônomo offline instantâneo (Padrão AntiTrader - 100% disponibilidade)
+      // Fallback institucional autônomo offline instantâneo (Motor Analítico TikBlox)
       const fallback = generateAutonomousTikTokShopReply(text, activeProduct);
       setMessages((prev) => [
         ...prev,
@@ -425,7 +424,7 @@ export const AICopilotPanel: React.FC<AICopilotPanelProps> = ({
         <div ref={chatScrollRef} />
       </div>
 
-      {/* Sugestões Dinâmicas de Continuidade (Padrão AntiTrader) */}
+      {/* Sugestões Dinâmicas de Continuidade (Padrão TikBlox) */}
       <div className="px-2.5 py-1.5 border-t border-slate-200 bg-slate-50 shrink-0 flex items-center gap-1.5 overflow-x-auto no-scrollbar">
         <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider shrink-0 flex items-center gap-1">
           <Sparkles className="w-3 h-3 text-[#007A87]" />

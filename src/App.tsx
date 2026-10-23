@@ -6,12 +6,12 @@ import { ProductCard } from './components/ProductCard';
 import { OfflineIndicator } from './components/OfflineIndicator';
 import { EarlyWaveDashboard } from './components/EarlyWaveDashboard';
 import { TrendPulseSection } from './components/TrendPulseSection';
-import { Header } from './components/AntiTraderStyle/Header';
-import { ProductListPanel } from './components/AntiTraderStyle/ProductListPanel';
-import { ProductDetailTerminal } from './components/AntiTraderStyle/ProductDetailTerminal';
-import { AICopilotPanel } from './components/AntiTraderStyle/AICopilotPanel';
+import { Header } from './components/ConvictionTerminal/Header';
+import { ProductListPanel } from './components/ConvictionTerminal/ProductListPanel';
+import { ProductDetailTerminal } from './components/ConvictionTerminal/ProductDetailTerminal';
+import { AICopilotPanel } from './components/ConvictionTerminal/AICopilotPanel';
 import { SavedRadarView } from './components/SavedRadarView';
-import { AddCustomProductModal } from './components/AntiTraderStyle/AddCustomProductModal';
+import { AddCustomProductModal } from './components/ConvictionTerminal/AddCustomProductModal';
 
 // High-speed lazy loading: Keep initial bundle minimal so mobile devices render in under 1 second
 const ProductDetailModal = React.lazy(() =>
@@ -51,7 +51,7 @@ const WifeBotConfigModal = React.lazy(() =>
 
 const ONBOARDING_STORAGE_KEY = 'tikblox_onboarding_completed_v1';
 import { TrendingProduct, ProductNiche, AppUpdateInfo, ProductPriceCheck, PriceMonitorSummary } from './types';
-import { INITIAL_CURATED_TRENDS } from './data/curatedTrends';
+import { INITIAL_CURATED_TRENDS, isBlueOceanOpportunity } from './data/curatedTrends';
 import {
   scanTrends,
   getSavedProductIds,
@@ -84,14 +84,18 @@ export default function App() {
     'all' | 'early_wave' | 'high_margin' | 'saved' | 'calculator'
   >('all');
   const [products, setProducts] = useState<TrendingProduct[]>(() => {
-    const cached = getCachedScannedProducts();
+    try {
+      localStorage.removeItem('tikblox_scan_cache_v1');
+      localStorage.removeItem('tikblox_scan_cache_v2');
+    } catch {}
+    const cached = getCachedScannedProducts().filter(isBlueOceanOpportunity);
     if (cached.length > 0) {
       // Merge unique
       const ids = new Set(cached.map((p) => p.id));
-      const rest = INITIAL_CURATED_TRENDS.filter((p) => !ids.has(p.id));
+      const rest = INITIAL_CURATED_TRENDS.filter((p) => !ids.has(p.id) && isBlueOceanOpportunity(p));
       return [...cached, ...rest];
     }
-    return INITIAL_CURATED_TRENDS;
+    return INITIAL_CURATED_TRENDS.filter(isBlueOceanOpportunity);
   });
 
   const [savedIds, setSavedIds] = useState<string[]>(() => getSavedProductIds());
@@ -109,7 +113,7 @@ export default function App() {
   const [showCalculatorModal, setShowCalculatorModal] = useState<boolean>(false);
   const [showAddCustomModal, setShowAddCustomModal] = useState<boolean>(false);
 
-  // Redimensionamento dos painéis estilo AntiTrader (com persistência no localStorage)
+  // Redimensionamento dos painéis estilo TikBlox (com persistência no localStorage)
   const [redimensionando, setRedimensionando] = useState<'left' | 'right' | null>(null);
   const [isDesktop, setIsDesktop] = useState(false);
 
@@ -233,16 +237,17 @@ export default function App() {
           setSavedIds(merged);
         }
 
-        // 2. Hydrate trend history from IndexedDB if available
+        // 2. Hydrate trend history from IndexedDB if available (Strict Blue Ocean Only)
         const offlineTrends = await getAllCachedTrendsFromIndexedDB();
         if (isMounted && offlineTrends && offlineTrends.length > 0) {
+          const validTrends = offlineTrends.filter(isBlueOceanOpportunity);
           setProducts((prev) => {
             const map = new Map<string, TrendingProduct>();
-            offlineTrends.forEach((p) => map.set(p.id, p));
-            prev.forEach((p) => {
+            validTrends.forEach((p) => map.set(p.id, p));
+            prev.filter(isBlueOceanOpportunity).forEach((p) => {
               if (!map.has(p.id)) map.set(p.id, p);
             });
-            return Array.from(map.values());
+            return Array.from(map.values()).filter(isBlueOceanOpportunity);
           });
         }
 

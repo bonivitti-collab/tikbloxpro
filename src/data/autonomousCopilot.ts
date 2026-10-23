@@ -151,12 +151,12 @@ ${tableRows}
   }
 
   // =========================================================================
-  // 3. DIAGNÓSTICO DE CONVICÇÃO DE ENTRADA & COMPRA DE AMOSTRA (ESTILO ANTITRADER)
+  // 3. DIAGNÓSTICO DE CONVICÇÃO DE ENTRADA & COMPRA DE AMOSTRA (TIKBLOX CONVICTION)
   // =========================================================================
   if (
     q.includes('vale a pena comprar') || q.includes('comprar amostra') || q.includes('devo comprar') ||
-    q.includes('certeza') || q.includes('risco') || q.includes('antitrader') || q.includes('setup') ||
-    q.includes('trade') || q.includes('meu dinheiro') || q.includes('do meu bolso') ||
+    q.includes('certeza') || q.includes('risco') || q.includes('conviccao') || q.includes('setup') ||
+    q.includes('viabilidade') || q.includes('meu dinheiro') || q.includes('do meu bolso') ||
     q.includes('posso comprar') || q.includes('vai vender')
   ) {
     const itemTitle = p ? prodName : 'Produto Selecionado no Radar';
@@ -164,7 +164,7 @@ ${tableRows}
     const videoCount = p ? (p.tradeConviction?.creatorVideoCountBR || (p.creatorSaturationBR === 'Baixa' ? 6 : 18)) : 8;
     const score = p ? (p.tradeConviction?.convictionScore || 94) : 94;
 
-    return `### Diagnóstico de Convicção AntiTrader: Compra de Amostra & Risco Financeiro
+    return `### Diagnóstico de Convicção TikBlox: Compra de Amostra & Risco Financeiro
 
 1. **Veredito de Entrada:**
    - **Ativo Analisado:** ${itemTitle}

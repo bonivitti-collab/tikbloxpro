@@ -239,7 +239,7 @@ export const AddCustomProductModal: React.FC<AddCustomProductModalProps> = ({
               className="px-5 py-2 rounded-xl bg-gradient-to-r from-[#FE2C55] to-[#FF0050] text-white font-extrabold shadow-sm hover:brightness-105 transition cursor-pointer flex items-center gap-1.5 active:scale-95"
             >
               <Plus className="w-4 h-4" />
-              <span>Gerar Setup AntiTrader</span>
+              <span>Gerar Diagnóstico TikBlox</span>
             </button>
           </div>
         </form>
