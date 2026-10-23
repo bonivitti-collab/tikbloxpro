@@ -5,6 +5,7 @@ import {
   Copy,
   Check,
   Package,
+  ShoppingBag,
   Flame,
   ShieldCheck,
   TrendingUp,
@@ -86,6 +87,16 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
   const stockLoc = String(tk.stockLocationBrazil || tc.stockLocation || 'São Paulo - SP (Pronta Entrega)');
   const hookText = String(tk.hookViral3s || tk.tiktokShop?.topViralHook || tk.adHooks?.[0] || 'Oportunidade em alta no TikTok Shop!');
   const affiliateTerm = String(tk.exactAffiliateSearchTerm || tk.originalName || tk.name);
+
+  const tiktokShopUrl =
+    tk.customProductUrl ||
+    tk.tiktokShop?.productUrl ||
+    `https://www.tiktok.com/search?q=${encodeURIComponent(affiliateTerm)}`;
+
+  const sampleDeliveryUrl =
+    tk.supplierUrl ||
+    (tk as any).shopeeUrl ||
+    `https://lista.mercadolivre.com.br/${encodeURIComponent(affiliateTerm + ' pronta entrega')}`;
 
   // =========================================================================
   // SIMULAÇÃO DINÂMICA DE RETORNO DO CRIADOR
@@ -258,42 +269,58 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
           </div>
         </div>
 
-        {/* Barra de Ações Práticas Focadas no Criador (SEM LINKS EXTERNOS QUE QUEBRAM) */}
-        <div className="flex items-center gap-2.5 flex-wrap pt-1">
-          {(tk.customProductUrl || tk.tiktokShop?.customProductUrl) && (
-            <a
-              href={tk.customProductUrl || tk.tiktokShop?.customProductUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs transition cursor-pointer shadow-2xs active:scale-95 whitespace-nowrap"
-              title="Abrir o link direto cadastrado deste produto"
-            >
-              <ExternalLink className="w-3.5 h-3.5" />
-              <span>Abrir Loja / Produto</span>
-            </a>
-          )}
+        {/* Barra de Ações Práticas Focadas no Criador com Links Diretos */}
+        <div className="flex items-center gap-2.5 flex-wrap pt-2">
+          {/* 1. Ver Produto no TikTok Shop */}
+          <a
+            href={tiktokShopUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#0F121C] hover:bg-black text-white font-black text-xs transition cursor-pointer shadow-md active:scale-95 whitespace-nowrap border border-white/10 group"
+            title="Abrir página oficial do produto ou busca no TikTok Shop Brasil"
+          >
+            <ShoppingBag className="w-3.5 h-3.5 text-[#25F4EE]" />
+            <span>Ver no TikTok Shop</span>
+            <ExternalLink className="w-3 h-3 text-slate-400 group-hover:text-white transition-colors ml-0.5" />
+          </a>
 
+          {/* 2. Comprar Amostra Pronta Entrega (SP) */}
+          <a
+            href={sampleDeliveryUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:brightness-105 text-white font-black text-xs transition cursor-pointer shadow-md shadow-emerald-900/10 active:scale-95 whitespace-nowrap group"
+            title="Comprar amostra física com envio imediato de São Paulo (2 a 4 dias úteis)"
+          >
+            <Package className="w-3.5 h-3.5 text-white" />
+            <span>Comprar Amostra (SP)</span>
+            <ExternalLink className="w-3 h-3 text-emerald-200 group-hover:text-white transition-colors ml-0.5" />
+          </a>
+
+          {/* 3. Copiar Termo p/ Vitrine (App TikTok) */}
           <button
             onClick={handleCopyTerm}
-            className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-[#FE2C55] via-[#FF0050] to-[#FF3B5C] hover:brightness-105 text-white font-extrabold text-xs transition cursor-pointer shadow-[0_4px_16px_rgba(254,44,85,0.25)] active:scale-95 whitespace-nowrap"
+            className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-300 text-slate-800 font-extrabold text-xs transition cursor-pointer shadow-2xs active:scale-95 whitespace-nowrap"
             title="Copiar nome do modelo para colar na vitrine de produtos do TikTok Shop"
           >
-            {copiedTerm ? <Check className="w-3.5 h-3.5 text-white" /> : <Copy className="w-3.5 h-3.5 text-white/90" />}
-            <span>{copiedTerm ? '✓ Termo Copiado!' : 'Copiar Termo p/ Vitrine (App TikTok)'}</span>
+            {copiedTerm ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5 text-slate-500" />}
+            <span>{copiedTerm ? '✓ Termo Copiado!' : 'Copiar Termo Vitrine'}</span>
           </button>
 
+          {/* 4. Copiar Gancho Viral */}
           <button
             onClick={handleCopyHook}
-            className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 border border-slate-300 text-slate-800 font-bold text-xs transition cursor-pointer shadow-2xs active:scale-95 whitespace-nowrap"
+            className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-300 text-slate-800 font-bold text-xs transition cursor-pointer shadow-2xs active:scale-95 whitespace-nowrap"
             title="Copiar o gancho viral de 3 segundos para gravar seu vídeo"
           >
             {copiedHook ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Zap className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />}
-            <span>{copiedHook ? 'Gancho Copiado!' : 'Copiar Gancho Viral'}</span>
+            <span>{copiedHook ? 'Gancho Copiado!' : 'Gancho 3s'}</span>
           </button>
 
+          {/* 5. Salvar Bookmark */}
           <button
             onClick={() => onToggleSave(tk.id)}
-            className={`p-2 rounded-xl border transition cursor-pointer active:scale-95 shadow-2xs ${
+            className={`p-2.5 rounded-xl border transition cursor-pointer active:scale-95 shadow-2xs ${
               isSaved
                 ? 'bg-rose-50 border-rose-300 text-rose-600'
                 : 'bg-white border-slate-300 text-slate-600 hover:text-slate-900 hover:bg-slate-50'
@@ -303,11 +330,12 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
             <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-current' : ''}`} />
           </button>
 
+          {/* 6. Consultar IA */}
           <button
             onClick={() => onOpenInCopilot(product)}
-            className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-black text-white font-bold text-xs transition cursor-pointer shadow-2xs active:scale-95 whitespace-nowrap ml-auto"
+            className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#25F4EE] to-[#00D2C4] hover:brightness-105 text-[#0F121C] font-black text-xs transition cursor-pointer shadow-sm active:scale-95 whitespace-nowrap ml-auto"
           >
-            <Sparkles className="w-3.5 h-3.5 text-[#25F4EE]" />
+            <Sparkles className="w-3.5 h-3.5 text-[#0F121C]" />
             <span>Consultar IA</span>
           </button>
         </div>
