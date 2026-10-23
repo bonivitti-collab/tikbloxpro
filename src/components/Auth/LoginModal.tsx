@@ -2,8 +2,8 @@
 // Modal de Login do Assinante integrado ao ecossistema Kiwify
 
 import React, { useState } from 'react';
-import { Bot, Mail, Lock, ArrowRight, ShieldCheck, CheckCircle2, Sparkles, X, ExternalLink } from 'lucide-react';
-import { loginWithEmail, startGuestDemoSession, UserSession } from '../../services/authService';
+import { Mail, ArrowRight, ShieldCheck, CheckCircle2, Lock, X, ExternalLink } from 'lucide-react';
+import { loginWithEmail, UserSession } from '../../services/authService';
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -38,12 +38,6 @@ export const LoginModal: React.FC<LoginModalProps> = ({
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleDemoAccess = () => {
-    const session = startGuestDemoSession();
-    onLoginSuccess(session);
-    onClose();
   };
 
   return (
@@ -114,25 +108,6 @@ export const LoginModal: React.FC<LoginModalProps> = ({
           </button>
         </form>
 
-        {/* Divisor */}
-        <div className="relative flex items-center justify-center">
-          <div className="border-t border-white/10 w-full" />
-          <span className="bg-[#0F121C] px-3 text-[10px] uppercase font-bold text-slate-500 shrink-0">
-            Ou teste sem compromisso
-          </span>
-          <div className="border-t border-white/10 w-full" />
-        </div>
-
-        {/* Botão de Degustação / Demo */}
-        <button
-          type="button"
-          onClick={handleDemoAccess}
-          className="w-full py-2.5 px-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 font-bold text-xs transition cursor-pointer flex items-center justify-center gap-2 active:scale-95"
-        >
-          <Sparkles className="w-3.5 h-3.5 text-[#25F4EE]" />
-          <span>Acessar Modo Demonstração (Grátis)</span>
-        </button>
-
         {/* Rodapé / Link para comprar se não tiver conta */}
         <div className="pt-2 text-center text-xs text-slate-400 space-y-1">
           <p>Ainda não é assinante do TikBlox Pro?</p>
@@ -144,7 +119,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
             }}
             className="font-bold text-[#25F4EE] hover:underline inline-flex items-center gap-1 cursor-pointer"
           >
-            <span>Ver Planos a partir de R$ 37/mês</span>
+            <span>Assinar Agora na Kiwify (a partir de R$ 37/mês)</span>
             <ExternalLink className="w-3 h-3" />
           </button>
         </div>

@@ -17,7 +17,6 @@ import { LoginModal } from './components/Auth/LoginModal';
 import {
   getCurrentSession,
   clearSession,
-  startGuestDemoSession,
   UserSession,
 } from './services/authService';
 
@@ -125,10 +124,10 @@ export default function App() {
   const [session, setSession] = useState<UserSession | null>(() => getCurrentSession());
   const [showLoginModal, setShowLoginModal] = useState<boolean>(false);
   const [currentView, setCurrentView] = useState<'app' | 'landing'>(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('app') === '1' || urlParams.get('radar') === '1') return 'app';
     const s = getCurrentSession();
-    return s ? 'app' : 'landing';
+    // Apenas assinantes reais com plano ativo têm acesso ao terminal
+    if (s && s.isAuthenticated && s.plan !== 'guest') return 'app';
+    return 'landing';
   });
 
   // Redimensionamento dos painéis estilo TikBlox (com persistência no localStorage)
@@ -635,20 +634,16 @@ export default function App() {
   // =========================================================================
   // LANDING PAGE (visitantes sem sessão)
   // =========================================================================
-  if (currentView === 'landing') {
+  if (currentView === 'landing' || !session || !session.isAuthenticated || session.plan === 'guest') {
     return (
       <div className="h-dvh w-full overflow-y-auto">
         <LandingPage
           onOpenLogin={() => {
-            if (session) {
+            if (session && session.isAuthenticated && session.plan !== 'guest') {
               setCurrentView('app');
             } else {
               setShowLoginModal(true);
             }
-          }}
-          onOpenAppDemo={() => {
-            const s = session || startGuestDemoSession();
-            handleLoginSuccess(s);
           }}
         />
         <LoginModal

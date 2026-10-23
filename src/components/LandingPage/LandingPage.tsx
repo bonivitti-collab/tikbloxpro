@@ -21,19 +21,16 @@ import {
   Clock,
   DollarSign,
   HelpCircle,
-  Play
 } from 'lucide-react';
 import { getKiwifyCheckoutUrls } from '../../services/authService';
 import { InteractiveScreensCarousel } from './InteractiveScreensCarousel';
 
 interface LandingPageProps {
   onOpenLogin: () => void;
-  onOpenAppDemo: () => void;
 }
 
 export const LandingPage: React.FC<LandingPageProps> = ({
   onOpenLogin,
-  onOpenAppDemo,
 }) => {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const checkoutUrls = getKiwifyCheckoutUrls();
@@ -67,7 +64,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
           {/* Navegação Desktop */}
           <nav className="hidden md:flex items-center gap-6 text-xs font-bold text-slate-300">
-            <a href="#demonstracao" className="hover:text-[#25F4EE] transition">Telas do Sistema</a>
+            <a href="#demonstracao" className="hover:text-[#25F4EE] transition">Como Funciona</a>
             <a href="#diferencial" className="hover:text-white transition">Oceano Azul</a>
             <a href="#pilares" className="hover:text-white transition">Pronta Entrega SP</a>
             <a href="#pricing" className="hover:text-[#25F4EE] transition">Planos & Preços</a>
@@ -126,26 +123,32 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             Identifique produtos validados com estoque nacional em São Paulo (chega em 2 a 4 dias), concorrência zerada (&lt; 10 vídeos no feed BR), ponto de equilíbrio em 3 vendas e <strong>Copiloto IA para gerar ganchos virais de 3 segundos</strong>.
           </p>
 
-          {/* Botões de Ação Hero */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-4">
+          {/* Botão de Ação Hero Principal */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
             <button
               onClick={scrollToPricing}
-              className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-gradient-to-r from-[#25F4EE] via-[#00D2C4] to-[#25F4EE] hover:brightness-105 text-[#0F121C] font-black text-sm uppercase tracking-wider transition cursor-pointer shadow-[0_8px_30px_rgba(37,244,238,0.4)] active:scale-95 flex items-center justify-center gap-2"
+              className="w-full sm:w-auto px-10 py-5 rounded-2xl bg-gradient-to-r from-[#25F4EE] via-[#00D2C4] to-[#25F4EE] hover:brightness-110 text-[#090D16] font-black text-base sm:text-lg uppercase tracking-wider transition cursor-pointer shadow-[0_12px_40px_rgba(37,244,238,0.45)] active:scale-95 flex items-center justify-center gap-3 group"
             >
-              <span>Acessar o Radar por R$ 37/mês</span>
-              <ArrowRight className="w-4 h-4" />
+              <span>Quero Minerar Produtos Vencedores Agora</span>
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1.5 transition-transform" />
             </button>
+          </div>
 
-            <button
-              onClick={() => {
-                const el = document.getElementById('demonstracao');
-                if (el) el.scrollIntoView({ behavior: 'smooth' });
-              }}
-              className="w-full sm:w-auto px-6 py-4 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold text-sm transition cursor-pointer flex items-center justify-center gap-2 active:scale-95 group shadow-sm"
-            >
-              <Play className="w-4 h-4 text-[#25F4EE] fill-current group-hover:scale-110 transition-transform" />
-              <span>Ver Telas do Sistema (Carrossel)</span>
-            </button>
+          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-xs text-slate-400 pt-1 font-medium">
+            <span className="flex items-center gap-1.5 text-slate-300">
+              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+              <span>Acesso Imediato ao Radar</span>
+            </span>
+            <span className="hidden sm:inline text-slate-600">•</span>
+            <span className="flex items-center gap-1.5 text-slate-300">
+              <ShieldCheck className="w-4 h-4 text-[#25F4EE]" />
+              <span>Checkout Seguro Kiwify</span>
+            </span>
+            <span className="hidden sm:inline text-slate-600">•</span>
+            <span className="flex items-center gap-1.5 text-slate-300">
+              <Sparkles className="w-4 h-4 text-amber-400" />
+              <span>Garantia de 7 Dias</span>
+            </span>
           </div>
 
           {/* Selos de Confiança */}
@@ -205,7 +208,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </p>
           </div>
 
-          <InteractiveScreensCarousel onOpenAppDemo={onOpenAppDemo} />
+          <InteractiveScreensCarousel onSelectPlan={scrollToPricing} />
         </div>
       </section>
 

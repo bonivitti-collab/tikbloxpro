@@ -35,6 +35,11 @@ export function getCurrentSession(): UserSession | null {
     const raw = localStorage.getItem(STORAGE_SESSION_KEY);
     if (!raw) return null;
     const session: UserSession = JSON.parse(raw);
+    // Bloqueia qualquer sessão de visitante antigo e garante autenticação real
+    if (!session || session.plan === 'guest' || !session.isAuthenticated) {
+      localStorage.removeItem(STORAGE_SESSION_KEY);
+      return null;
+    }
     return session;
   } catch {
     return null;
@@ -88,22 +93,6 @@ export async function loginWithEmail(email: string, passwordOrToken?: string): P
     source: 'kiwify',
   };
 
-  saveSession(session);
-  return session;
-}
-
-/**
- * Inicia sessão de demonstração para visitantes da Landing Page
- */
-export function startGuestDemoSession(): UserSession {
-  const session: UserSession = {
-    email: 'visitante@demonstracao.com',
-    name: 'Visitante (Degustação)',
-    plan: 'guest',
-    isAuthenticated: true,
-    subscriptionStatus: 'trial',
-    source: 'direct',
-  };
   saveSession(session);
   return session;
 }

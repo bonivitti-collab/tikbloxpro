@@ -99,11 +99,11 @@ const SLIDES: SlideData[] = [
 ];
 
 interface InteractiveScreensCarouselProps {
-  onOpenAppDemo?: () => void;
+  onSelectPlan?: () => void;
 }
 
 export const InteractiveScreensCarousel: React.FC<InteractiveScreensCarouselProps> = ({
-  onOpenAppDemo,
+  onSelectPlan,
 }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
 
@@ -113,6 +113,15 @@ export const InteractiveScreensCarousel: React.FC<InteractiveScreensCarouselProp
 
   const nextSlide = () => {
     setCurrentSlide((prev) => (prev === SLIDES.length - 1 ? 0 : prev + 1));
+  };
+
+  const handlePlanClick = () => {
+    if (onSelectPlan) {
+      onSelectPlan();
+    } else {
+      const el = document.getElementById('pricing');
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   const slide = SLIDES[currentSlide];
@@ -200,20 +209,18 @@ export const InteractiveScreensCarousel: React.FC<InteractiveScreensCarouselProp
             </ul>
 
             {/* Botões de Ação do Slide */}
-            <div className="pt-3 flex items-center gap-3">
-              {onOpenAppDemo && (
-                <button
-                  type="button"
-                  onClick={onOpenAppDemo}
-                  className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#25F4EE] to-[#00D2C4] hover:brightness-105 text-[#0F121C] font-black text-xs transition cursor-pointer flex items-center gap-1.5 active:scale-95 shadow-md shadow-[#25F4EE]/20"
-                >
-                  <span>Explorar Esta Tela no App</span>
-                  <ExternalLink className="w-3.5 h-3.5" />
-                </button>
-              )}
+            <div className="pt-3 flex flex-wrap items-center gap-3">
+              <button
+                type="button"
+                onClick={handlePlanClick}
+                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#25F4EE] to-[#00D2C4] hover:brightness-105 text-[#0F121C] font-black text-xs transition cursor-pointer flex items-center gap-2 active:scale-95 shadow-md shadow-[#25F4EE]/20 group"
+              >
+                <span>Quero Desbloquear Esse Painel</span>
+                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+              </button>
 
               <span className="text-[11px] text-slate-400 font-mono hidden sm:inline">
-                Passo {currentSlide + 1} de {SLIDES.length}
+                Tela {currentSlide + 1} de {SLIDES.length}
               </span>
             </div>
 
