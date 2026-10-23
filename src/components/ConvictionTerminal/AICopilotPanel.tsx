@@ -11,7 +11,9 @@ import {
   Key,
   X,
   ExternalLink,
-  RotateCcw
+  RotateCcw,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { TrendingProduct } from '../../types';
@@ -52,10 +54,24 @@ export const AICopilotPanel: React.FC<AICopilotPanelProps> = ({
   const [tempKeyInput, setTempKeyInput] = useState('');
 
   const chatScrollRef = useRef<HTMLDivElement>(null);
+  const topicsScrollRef = useRef<HTMLDivElement>(null);
   const tk = activeProduct ? enrichWithTikTokShopData(activeProduct) : null;
 
   const scrollToBottom = () => {
     chatScrollRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const scrollTopics = (direction: 'left' | 'right') => {
+    if (topicsScrollRef.current) {
+      const scrollAmount = direction === 'left' ? -200 : 200;
+      topicsScrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+  };
+
+  const handleTopicsWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+    if (topicsScrollRef.current && e.deltaY !== 0) {
+      topicsScrollRef.current.scrollLeft += e.deltaY;
+    }
   };
 
   useEffect(() => {
@@ -261,106 +277,14 @@ export const AICopilotPanel: React.FC<AICopilotPanelProps> = ({
       {/* Área de Conversa e Mensagens */}
       <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 min-h-0 bg-[#F8FAFC]">
         {messages.length === 0 ? (
-          <div className="space-y-2.5 py-1">
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block px-1">
-              Sugestões de Análise para o Produto em Foco:
-            </span>
-
-            {/* Card 1: Diagnóstico de Convicção (Verde Esmeralda) */}
-            <button
-              type="button"
-              onClick={() =>
-                handleSendMessage(
-                  `Vale a pena comprar a amostra de ${tk?.name || 'este produto'} com meu próprio dinheiro hoje? Analise o risco, concorrência no TikTok BR e break-even.`
-                )
-              }
-              className="w-full p-3 rounded-2xl border-2 border-emerald-300/80 bg-gradient-to-r from-emerald-50/90 to-white hover:from-emerald-100/90 hover:to-emerald-50/50 text-slate-700 transition-all cursor-pointer shadow-2xs group flex items-start gap-2.5 active:scale-98"
-            >
-              <div className="min-w-0 flex-1 text-left">
-                <div className="text-xs font-black text-emerald-900 group-hover:text-emerald-950 flex items-center justify-between">
-                  <span className="flex items-center gap-1.5">
-                    <span>🟢</span>
-                    <span>Diagnóstico de Convicção & Risco de Compra</span>
-                  </span>
-                  <ArrowUpRight className="w-3.5 h-3.5 text-emerald-600 group-hover:translate-x-0.5 transition-transform" />
-                </div>
-                <div className="text-[11px] text-emerald-800/80 truncate mt-0.5">
-                  Avalia se o produto se paga e quantos criadores já estão competindo no feed BR.
-                </div>
-              </div>
-            </button>
-
-            {/* Card 2: 3 Roteiros Técnicos de Vídeo (Ciano / Sky) */}
-            <button
-              type="button"
-              onClick={() =>
-                handleSendMessage(
-                  `Gere 3 roteiros técnicos de 30 segundos no TikTok para ${tk?.name || 'este produto'}, detalhando o gancho exato de 3s para prender o scroll no Brasil.`
-                )
-              }
-              className="w-full p-3 rounded-2xl border-2 border-sky-300/80 bg-gradient-to-r from-sky-50/90 to-white hover:from-sky-100/90 hover:to-sky-50/50 text-slate-700 transition-all cursor-pointer shadow-2xs group flex items-start gap-2.5 active:scale-98"
-            >
-              <div className="min-w-0 flex-1 text-left">
-                <div className="text-xs font-black text-sky-900 group-hover:text-sky-950 flex items-center justify-between">
-                  <span className="flex items-center gap-1.5">
-                    <span>🎬</span>
-                    <span>3 Roteiros Técnicos de Vídeo (30s)</span>
-                  </span>
-                  <ArrowUpRight className="w-3.5 h-3.5 text-sky-600 group-hover:translate-x-0.5 transition-transform" />
-                </div>
-                <div className="text-[11px] text-sky-800/80 truncate mt-0.5">
-                  Ganchos de retenção imediata nos primeiros 3 segundos para viralizar.
-                </div>
-              </div>
-            </button>
-
-            {/* Card 3: Simulação de Unit Economics & Lucro (Âmbar / Laranja) */}
-            <button
-              type="button"
-              onClick={() =>
-                handleSendMessage(
-                  `Simular a estrutura completa de unit economics e projeção de lucro líquido com 50 vendas para ${tk?.name || 'este produto'} no TikTok Shop.`
-                )
-              }
-              className="w-full p-3 rounded-2xl border-2 border-amber-300/80 bg-gradient-to-r from-amber-50/90 to-white hover:from-amber-100/90 hover:to-amber-50/50 text-slate-700 transition-all cursor-pointer shadow-2xs group flex items-start gap-2.5 active:scale-98"
-            >
-              <div className="min-w-0 flex-1 text-left">
-                <div className="text-xs font-black text-amber-900 group-hover:text-amber-950 flex items-center justify-between">
-                  <span className="flex items-center gap-1.5">
-                    <span>💰</span>
-                    <span>Simulação de Unit Economics & Lucro</span>
-                  </span>
-                  <ArrowUpRight className="w-3.5 h-3.5 text-amber-600 group-hover:translate-x-0.5 transition-transform" />
-                </div>
-                <div className="text-[11px] text-amber-800/80 truncate mt-0.5">
-                  Projeção de retorno líquido e ciclo de liberação Pix (D+7).
-                </div>
-              </div>
-            </button>
-
-            {/* Card 4: Quebrar Objeções nos Comentários (Rosa Neon) */}
-            <button
-              type="button"
-              onClick={() =>
-                handleSendMessage(
-                  `Quais as 3 maiores objeções de compradores no TikTok para ${tk?.name || 'produtos desta categoria'} e como quebrar nos comentários?`
-                )
-              }
-              className="w-full p-3 rounded-2xl border-2 border-rose-300/80 bg-gradient-to-r from-rose-50/90 to-white hover:from-rose-100/90 hover:to-rose-50/50 text-slate-700 transition-all cursor-pointer shadow-2xs group flex items-start gap-2.5 active:scale-98"
-            >
-              <div className="min-w-0 flex-1 text-left">
-                <div className="text-xs font-black text-rose-900 group-hover:text-rose-950 flex items-center justify-between">
-                  <span className="flex items-center gap-1.5">
-                    <span>🛡️</span>
-                    <span>Quebrar Objeções nos Comentários</span>
-                  </span>
-                  <ArrowUpRight className="w-3.5 h-3.5 text-rose-600 group-hover:translate-x-0.5 transition-transform" />
-                </div>
-                <div className="text-[11px] text-rose-800/80 truncate mt-0.5">
-                  Respostas prontas para frete, prazo e confiança do comprador.
-                </div>
-              </div>
-            </button>
+          <div className="h-full flex flex-col items-center justify-center text-center p-6 select-none opacity-40">
+            <div className="w-12 h-12 rounded-2xl bg-white border border-slate-200 shadow-2xs flex items-center justify-center text-xl mb-2 text-slate-700">
+              ⚡
+            </div>
+            <p className="text-xs font-bold text-slate-700">TIKBLOX Copilot</p>
+            <p className="text-[11px] text-slate-500 mt-0.5 max-w-[240px]">
+              Selecione um tópico abaixo ou digite qualquer pergunta sobre o produto.
+            </p>
           </div>
         ) : (
           messages.map((msg, i) => (
@@ -425,96 +349,149 @@ export const AICopilotPanel: React.FC<AICopilotPanelProps> = ({
         <div ref={chatScrollRef} />
       </div>
 
-      {/* Sugestões Dinâmicas de Continuidade e Tópicos com Cores Vivas (Foto 2 & 3) */}
-      <div className="px-3 py-2 border-t border-slate-200 bg-slate-50/90 shrink-0 flex items-center gap-2 overflow-x-auto no-scrollbar">
-        <span className="text-[10px] font-black text-slate-500 uppercase tracking-wider shrink-0 flex items-center gap-1">
-          <Sparkles className="w-3.5 h-3.5 text-[#007A87]" />
-          <span>{messages.length > 0 ? 'Prosseguir:' : 'Tópicos:'}</span>
-        </span>
+      {/* Barra de Tópicos com Scroll Horizontal Fluído e Detalhes de Cor Elegantes */}
+      <div className="relative border-t border-slate-200 bg-slate-50/90 shrink-0 select-none">
+        <div className="flex items-center px-2 py-2 gap-1.5">
+          {/* Label de Tópicos */}
+          <div className="flex items-center gap-1 text-[10px] font-black text-slate-500 uppercase tracking-wider shrink-0 pl-1">
+            <Sparkles className="w-3.5 h-3.5 text-[#007A87]" />
+            <span className="hidden sm:inline">{messages.length > 0 ? 'Prosseguir:' : 'Tópicos:'}</span>
+          </div>
 
-        {messages.length === 0 ? (
-          <>
-            <button
-              type="button"
-              onClick={() =>
-                handleSendMessage(
-                  `Vale a pena comprar a amostra de ${tk?.name || 'este produto'} com meu próprio dinheiro hoje? Analise o risco, concorrência no TikTok BR e break-even.`
-                )
-              }
-              disabled={isLoading}
-              className="text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-300 hover:bg-emerald-100 hover:border-emerald-400 rounded-full px-3 py-1 whitespace-nowrap cursor-pointer transition-all font-sans shadow-2xs shrink-0 flex items-center gap-1.5 disabled:opacity-50 active:scale-95"
-            >
-              <span>🟢 Diagnóstico & Risco</span>
-              <ArrowUpRight className="w-3 h-3 text-emerald-600" />
-            </button>
+          {/* Seta Scroll Esquerda */}
+          <button
+            type="button"
+            onClick={() => scrollTopics('left')}
+            className="p-1 rounded-md text-slate-400 hover:text-slate-800 hover:bg-slate-200 transition cursor-pointer shrink-0"
+            title="Rolar tópicos para a esquerda"
+          >
+            <ChevronLeft className="w-3.5 h-3.5" />
+          </button>
 
-            <button
-              type="button"
-              onClick={() =>
-                handleSendMessage(
-                  `Gere 3 roteiros técnicos de 30 segundos no TikTok para ${tk?.name || 'este produto'}, detalhando o gancho exato de 3s para prender o scroll no Brasil.`
-                )
-              }
-              disabled={isLoading}
-              className="text-xs font-bold bg-sky-50 text-sky-800 border border-sky-300 hover:bg-sky-100 hover:border-sky-400 rounded-full px-3 py-1 whitespace-nowrap cursor-pointer transition-all font-sans shadow-2xs shrink-0 flex items-center gap-1.5 disabled:opacity-50 active:scale-95"
-            >
-              <span>🎬 3 Roteiros (30s)</span>
-              <ArrowUpRight className="w-3 h-3 text-sky-600" />
-            </button>
+          {/* Container Scrollável de Tópicos (Com Mousewheel e Touch) */}
+          <div
+            ref={topicsScrollRef}
+            onWheel={handleTopicsWheel}
+            className="flex-1 flex items-center gap-2 overflow-x-auto scroll-smooth py-0.5 no-scrollbar"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
+            {messages.length === 0 ? (
+              <>
+                <button
+                  type="button"
+                  onClick={() =>
+                    handleSendMessage(
+                      `Vale a pena comprar a amostra de ${tk?.name || 'este produto'} com meu próprio dinheiro hoje? Analise o risco, concorrência no TikTok BR e break-even.`
+                    )
+                  }
+                  disabled={isLoading}
+                  className="text-xs font-semibold bg-white text-slate-800 border border-slate-200 hover:border-emerald-400 hover:text-emerald-700 rounded-full px-3 py-1 whitespace-nowrap cursor-pointer transition-all shadow-2xs shrink-0 flex items-center gap-1.5 disabled:opacity-50 active:scale-95 group"
+                >
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
+                  <span>Diagnóstico & Risco</span>
+                  <ArrowUpRight className="w-3 h-3 text-slate-400 group-hover:text-emerald-600 transition-colors" />
+                </button>
 
-            <button
-              type="button"
-              onClick={() =>
-                handleSendMessage(
-                  `Simular a estrutura completa de unit economics e projeção de lucro líquido com 50 vendas para ${tk?.name || 'este produto'} no TikTok Shop.`
-                )
-              }
-              disabled={isLoading}
-              className="text-xs font-bold bg-amber-50 text-amber-800 border border-amber-300 hover:bg-amber-100 hover:border-amber-400 rounded-full px-3 py-1 whitespace-nowrap cursor-pointer transition-all font-sans shadow-2xs shrink-0 flex items-center gap-1.5 disabled:opacity-50 active:scale-95"
-            >
-              <span>💰 Simular Lucro & Break-Even</span>
-              <ArrowUpRight className="w-3 h-3 text-amber-600" />
-            </button>
+                <button
+                  type="button"
+                  onClick={() =>
+                    handleSendMessage(
+                      `Gere 3 roteiros técnicos de 30 segundos no TikTok para ${tk?.name || 'este produto'}, detalhando o gancho exato de 3s para prender o scroll no Brasil.`
+                    )
+                  }
+                  disabled={isLoading}
+                  className="text-xs font-semibold bg-white text-slate-800 border border-slate-200 hover:border-sky-400 hover:text-sky-700 rounded-full px-3 py-1 whitespace-nowrap cursor-pointer transition-all shadow-2xs shrink-0 flex items-center gap-1.5 disabled:opacity-50 active:scale-95 group"
+                >
+                  <span className="w-2 h-2 rounded-full bg-sky-500 shrink-0" />
+                  <span>3 Roteiros (30s)</span>
+                  <ArrowUpRight className="w-3 h-3 text-slate-400 group-hover:text-sky-600 transition-colors" />
+                </button>
 
-            <button
-              type="button"
-              onClick={() =>
-                handleSendMessage(
-                  `Quais as 3 maiores objeções de compradores no TikTok para ${tk?.name || 'produtos desta categoria'} e como quebrar nos comentários?`
-                )
-              }
-              disabled={isLoading}
-              className="text-xs font-bold bg-rose-50 text-rose-800 border border-rose-300 hover:bg-rose-100 hover:border-rose-400 rounded-full px-3 py-1 whitespace-nowrap cursor-pointer transition-all font-sans shadow-2xs shrink-0 flex items-center gap-1.5 disabled:opacity-50 active:scale-95"
-            >
-              <span>🛡️ Quebrar Objeções</span>
-              <ArrowUpRight className="w-3 h-3 text-rose-600" />
-            </button>
-          </>
-        ) : (
-          followUpSuggestions.map((sugestao, idx) => {
-            const colorClasses = [
-              'bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100',
-              'bg-sky-50 text-sky-800 border-sky-300 hover:bg-sky-100',
-              'bg-amber-50 text-amber-800 border-amber-300 hover:bg-amber-100',
-              'bg-purple-50 text-purple-800 border-purple-300 hover:bg-purple-100',
-              'bg-rose-50 text-rose-800 border-rose-300 hover:bg-rose-100',
-            ];
-            const cls = colorClasses[idx % colorClasses.length];
+                <button
+                  type="button"
+                  onClick={() =>
+                    handleSendMessage(
+                      `Simular a estrutura completa de unit economics e projeção de lucro líquido com 50 vendas para ${tk?.name || 'este produto'} no TikTok Shop.`
+                    )
+                  }
+                  disabled={isLoading}
+                  className="text-xs font-semibold bg-white text-slate-800 border border-slate-200 hover:border-amber-400 hover:text-amber-700 rounded-full px-3 py-1 whitespace-nowrap cursor-pointer transition-all shadow-2xs shrink-0 flex items-center gap-1.5 disabled:opacity-50 active:scale-95 group"
+                >
+                  <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0" />
+                  <span>Simular Lucro & Break-Even</span>
+                  <ArrowUpRight className="w-3 h-3 text-slate-400 group-hover:text-amber-600 transition-colors" />
+                </button>
 
-            return (
-              <button
-                key={idx}
-                type="button"
-                onClick={() => handleSendMessage(sugestao)}
-                disabled={isLoading}
-                className={`text-xs font-bold border rounded-full px-3 py-1 whitespace-nowrap cursor-pointer transition-colors shadow-2xs shrink-0 flex items-center gap-1.5 disabled:opacity-50 active:scale-95 ${cls}`}
-              >
-                <span>{sugestao}</span>
-                <ArrowUpRight className="w-3 h-3 opacity-60" />
-              </button>
-            );
-          })
-        )}
+                <button
+                  type="button"
+                  onClick={() =>
+                    handleSendMessage(
+                      `Quais as 3 maiores objeções de compradores no TikTok para ${tk?.name || 'produtos desta categoria'} e como quebrar nos comentários?`
+                    )
+                  }
+                  disabled={isLoading}
+                  className="text-xs font-semibold bg-white text-slate-800 border border-slate-200 hover:border-rose-400 hover:text-rose-700 rounded-full px-3 py-1 whitespace-nowrap cursor-pointer transition-all shadow-2xs shrink-0 flex items-center gap-1.5 disabled:opacity-50 active:scale-95 group"
+                >
+                  <span className="w-2 h-2 rounded-full bg-rose-500 shrink-0" />
+                  <span>Quebrar Objeções</span>
+                  <ArrowUpRight className="w-3 h-3 text-slate-400 group-hover:text-rose-600 transition-colors" />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    handleSendMessage(
+                      `Quais os melhores ganchos virais de 3 segundos para reter atenção no feed para ${tk?.name || 'este produto'}?`
+                    )
+                  }
+                  disabled={isLoading}
+                  className="text-xs font-semibold bg-white text-slate-800 border border-slate-200 hover:border-purple-400 hover:text-purple-700 rounded-full px-3 py-1 whitespace-nowrap cursor-pointer transition-all shadow-2xs shrink-0 flex items-center gap-1.5 disabled:opacity-50 active:scale-95 group"
+                >
+                  <span className="w-2 h-2 rounded-full bg-purple-500 shrink-0" />
+                  <span>Ganchos de 3s</span>
+                  <ArrowUpRight className="w-3 h-3 text-slate-400 group-hover:text-purple-600 transition-colors" />
+                </button>
+              </>
+            ) : (
+              followUpSuggestions.map((sugestao, idx) => {
+                const dotColors = ['bg-emerald-500', 'bg-sky-500', 'bg-amber-500', 'bg-purple-500', 'bg-rose-500'];
+                const hoverBorders = [
+                  'hover:border-emerald-400 hover:text-emerald-700',
+                  'hover:border-sky-400 hover:text-sky-700',
+                  'hover:border-amber-400 hover:text-amber-700',
+                  'hover:border-purple-400 hover:text-purple-700',
+                  'hover:border-rose-400 hover:text-rose-700',
+                ];
+                const dot = dotColors[idx % dotColors.length];
+                const hov = hoverBorders[idx % hoverBorders.length];
+
+                return (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => handleSendMessage(sugestao)}
+                    disabled={isLoading}
+                    className={`text-xs font-semibold bg-white text-slate-800 border border-slate-200 ${hov} rounded-full px-3 py-1 whitespace-nowrap cursor-pointer transition-all shadow-2xs shrink-0 flex items-center gap-1.5 disabled:opacity-50 active:scale-95 group`}
+                  >
+                    <span className={`w-2 h-2 rounded-full ${dot} shrink-0`} />
+                    <span>{sugestao}</span>
+                    <ArrowUpRight className="w-3 h-3 text-slate-400 group-hover:text-slate-700 transition-colors" />
+                  </button>
+                );
+              })
+            )}
+          </div>
+
+          {/* Seta Scroll Direita */}
+          <button
+            type="button"
+            onClick={() => scrollTopics('right')}
+            className="p-1 rounded-md text-slate-400 hover:text-slate-800 hover:bg-slate-200 transition cursor-pointer shrink-0"
+            title="Rolar tópicos para a direita"
+          >
+            <ChevronRight className="w-3.5 h-3.5" />
+          </button>
+        </div>
       </div>
 
       {/* Caixa de Digitação do Chat Ampliada e Robusta (Foto 1) */}
