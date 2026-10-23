@@ -180,53 +180,65 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
     <main className="flex-1 min-w-0 bg-[#F8FAFC] overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-5 text-slate-900 select-none">
       
       {/* ========================================================= */}
-      {/* 1. CABEÇALHO LIMPO (SEM FOTOS, FOCO EM DADOS & AÇÕES)      */}
+      {/* 1. CABEÇALHO EXECUTIVO INSTITUCIONAL (ANTI-TRADER / LINEAR) */}
       {/* ========================================================= */}
-      <div className="bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-5 shadow-xs relative overflow-hidden space-y-3.5">
+      <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-xs relative overflow-hidden space-y-4">
         
-        {/* Barra Decorativa Superior com Gradiente do Logo */}
+        {/* Barra de Acento Superior Refinada */}
         <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-[#25F4EE] via-[#FE2C55] to-[#25F4EE]" />
 
-        {/* Linha 1: Identificação do Produto e Botões Principais */}
-        <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2 flex-wrap mb-1.5">
-              <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-[#25F4EE]/10 text-[#007A87] border border-[#25F4EE]/40">
-                {tk.nicheLabel || 'Nicho'}
+        {/* Linha Superior: Metadados Harmoniosos e Unificados em 1 Linha */}
+        <div className="flex items-center gap-2 text-xs flex-wrap text-slate-500">
+          <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-slate-900 text-white shadow-2xs">
+            {tk.nicheLabel || 'Nicho'}
+          </span>
+          <span className="text-slate-300">•</span>
+          <span className="inline-flex items-center gap-1 font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200/60 text-[11px]">
+            <span>📦</span>
+            <span>{stockLoc.replace(' - SP', ', SP')}</span>
+          </span>
+          <span className="text-slate-300">•</span>
+          <span className="inline-flex items-center gap-1 font-medium text-slate-600 text-[11px]">
+            <Clock className="w-3 h-3 text-[#007A87]" />
+            <span>Há {lifecycle.daysActive} dias no radar</span>
+          </span>
+          {tk.originCountry && (
+            <>
+              <span className="text-slate-300">•</span>
+              <span className="text-[11px] font-medium text-slate-600">
+                {tk.originCountry === 'US' ? '🇺🇸 Origem EUA' : '🇨🇳 Origem China'}
               </span>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-300">
-                📦 {stockLoc}
-              </span>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200 flex items-center gap-1">
-                <Clock className="w-3 h-3 text-[#007A87]" />
-                <span>No Radar há {lifecycle.daysActive} dias</span>
-              </span>
-              {tk.originCountry && (
-                <span className="text-[10px] font-semibold text-slate-500">
-                  Origem: {tk.originCountry === 'US' ? '🇺🇸 EUA' : '🇨🇳 China / Global'}
-                </span>
-              )}
-            </div>
+            </>
+          )}
+          <span className="text-slate-300">•</span>
+          <span className="text-[11px] font-bold text-rose-600 flex items-center gap-0.5">
+            <Flame className="w-3 h-3 fill-current text-[#FE2C55]" />
+            <span>Score {tk.viralityScore}/100</span>
+          </span>
+        </div>
 
-            <h1 className="text-lg sm:text-2xl font-black text-slate-900 leading-tight">
+        {/* Título Principal & Ações em Layout Perfeito */}
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pt-1">
+          <div className="space-y-1.5 flex-1 min-w-0 pr-0 lg:pr-4">
+            <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-snug">
               {tk.name}
             </h1>
-            <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-              <span className="text-[11px] font-bold text-slate-500">Modelo Exato da Onda:</span>
-              <span className="text-[11px] font-mono font-bold bg-slate-100 text-slate-800 px-2 py-0.5 rounded border border-slate-200">
+            <div className="flex items-center gap-2 flex-wrap text-xs text-slate-500">
+              <span className="font-medium text-slate-400">Modelo Global:</span>
+              <span className="font-mono text-slate-800 font-semibold bg-slate-100 px-2 py-0.5 rounded border border-slate-200/80 text-[11px]">
                 {tk.exactAffiliateSearchTerm || tk.originalName || tk.name}
               </span>
             </div>
           </div>
 
-          {/* Botões de Ação Imediata */}
+          {/* Grupo de Ações Alinhadas */}
           <div className="flex items-center gap-2 shrink-0 flex-wrap">
             <a
               href={affLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-[#FE2C55] via-[#FF0050] to-[#FF3B5C] hover:brightness-105 text-white font-extrabold text-xs transition cursor-pointer shadow-[0_4px_18px_rgba(254,44,85,0.35)] active:scale-95 whitespace-nowrap"
-              title="Abre a busca do TikTok com a assinatura exata do modelo para assistir aos criativos e reviews virais deste produto"
+              className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#FE2C55] via-[#FF0050] to-[#FF3B5C] hover:brightness-105 text-white font-extrabold text-xs transition cursor-pointer shadow-[0_4px_16px_rgba(254,44,85,0.30)] active:scale-95 whitespace-nowrap"
+              title="Abre a busca do TikTok com a assinatura exata do modelo para assistir aos criativos virais"
             >
               <Play className="w-3.5 h-3.5 fill-current" />
               <span>Vídeos Virais no TikTok</span>
@@ -235,16 +247,16 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
 
             <button
               onClick={handleCopyTerm}
-              className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-white hover:bg-slate-50 border border-slate-300 text-slate-800 font-bold text-xs transition cursor-pointer shadow-2xs active:scale-95 whitespace-nowrap"
+              className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-300 text-slate-800 font-bold text-xs transition cursor-pointer shadow-2xs active:scale-95 whitespace-nowrap"
               title="Copie o termo exato para colar no app do TikTok Shop (Centro de Criadores / Vitrine)"
             >
-              {copiedTerm ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5 text-slate-500" />}
+              {copiedTerm ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5 text-slate-400" />}
               <span>{copiedTerm ? 'Copiado!' : 'Copiar Termo p/ Vitrine'}</span>
             </button>
 
             <button
               onClick={() => onToggleSave(tk.id)}
-              className={`p-2 rounded-xl border transition cursor-pointer active:scale-95 shadow-2xs ${
+              className={`p-2.5 rounded-xl border transition cursor-pointer active:scale-95 shadow-2xs ${
                 isSaved
                   ? 'bg-rose-50 border-rose-300 text-rose-600'
                   : 'bg-white border-slate-300 text-slate-600 hover:text-slate-900 hover:bg-slate-50'
@@ -256,41 +268,44 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
           </div>
         </div>
 
-        {/* Linha 2: Barra de Validação Multicanal Direta (Shopee / AliExpress / Mercado Livre) */}
-        <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500 flex-wrap gap-2">
+        {/* Rodapé do Card: Faixa de Validação de Fornecedores Discreta & Elegante */}
+        <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500 flex-wrap gap-2">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="font-bold text-slate-700">Validar Estoque & Fornecedores:</span>
+            <span className="font-bold text-slate-700">Validar Estoque & Preço:</span>
             <a
               href={tk.shopeeSearchUrl || `https://shopee.com.br/search?keyword=${encodeURIComponent(tk.name.split(' ').slice(0, 3).join(' '))}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-2 py-0.5 rounded bg-orange-50 text-orange-700 border border-orange-200 hover:bg-orange-100 font-bold flex items-center gap-1 transition whitespace-nowrap"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-orange-50/80 hover:bg-orange-100 border border-orange-200/70 text-orange-700 font-bold transition whitespace-nowrap"
             >
+              <span className="w-1.5 h-1.5 rounded-full bg-orange-500" />
               <span>Shopee (Pronta Entrega SP)</span>
-              <ExternalLink className="w-2.5 h-2.5" />
+              <ExternalLink className="w-2.5 h-2.5 opacity-60" />
             </a>
             <a
               href={tk.aliExpressSearchUrl || `https://www.aliexpress.com/wholesale?SearchText=${encodeURIComponent(tk.exactViralSearchQuery || tk.originalName || tk.name)}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-2 py-0.5 rounded bg-red-50 text-red-700 border border-red-200 hover:bg-red-100 font-bold flex items-center gap-1 transition whitespace-nowrap"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-red-50/80 hover:bg-red-100 border border-red-200/70 text-red-700 font-bold transition whitespace-nowrap"
             >
+              <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
               <span>AliExpress (Atacado Direto)</span>
-              <ExternalLink className="w-2.5 h-2.5" />
+              <ExternalLink className="w-2.5 h-2.5 opacity-60" />
             </a>
             <a
               href={tk.mercadoLivreSearchUrl || `https://lista.mercadolivre.com.br/${encodeURIComponent(tk.name.split(' ').slice(0, 3).join(' '))}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-2 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100 font-bold flex items-center gap-1 transition whitespace-nowrap"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-50/80 hover:bg-amber-100 border border-amber-200/70 text-amber-800 font-bold transition whitespace-nowrap"
             >
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
               <span>Mercado Livre</span>
-              <ExternalLink className="w-2.5 h-2.5" />
+              <ExternalLink className="w-2.5 h-2.5 opacity-60" />
             </a>
           </div>
 
           <span className="text-[10px] text-slate-400 font-mono">
-            {copiedTerm ? '✓ Termo pronto na área de transferência!' : 'Dica: Cole o termo exato na busca da Vitrine do App TikTok'}
+            {copiedTerm ? '✓ Termo copiado!' : 'Cole o termo no app TikTok Shop para afiliar-se'}
           </span>
         </div>
       </div>

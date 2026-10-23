@@ -107,37 +107,13 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
   const filtered = useMemo(() => {
     let list = enrichedProducts;
 
-    // 1. Filtro por Categoria / Nicho
+    // Filtro por Categoria / Nicho
     if (selectedNiche && selectedNiche !== 'all') {
       list = list.filter((p) => p.niche === selectedNiche);
     }
 
-    // 2. Busca textual opcional
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase().trim();
-      list = list.filter(
-        (p) =>
-          (p.name || '').toLowerCase().includes(q) ||
-          (p.nicheLabel || '').toLowerCase().includes(q) ||
-          (p.culturalFitReason || '').toLowerCase().includes(q)
-      );
-    }
-
-    // 3. Filtros rápidos de afiliado
-    if (filterFreeSampleOnly) {
-      list = list.filter((p) => p.freeSampleAvailable || p.tiktokShop?.freeSampleAvailable);
-    }
-
-    if (filterBlueOceanOnly) {
-      list = list.filter((p) => p.creatorSaturationBR === 'Baixa' || p.tiktokShop?.saturationLevel === 'Oceano Azul');
-    }
-
-    if (filterHighCommissionOnly) {
-      list = list.filter((p) => (p.commissionPercent || p.tiktokShop?.commissionRatePercent || 0) >= 20);
-    }
-
     return list;
-  }, [enrichedProducts, selectedNiche, searchQuery, filterFreeSampleOnly, filterBlueOceanOnly, filterHighCommissionOnly]);
+  }, [enrichedProducts, selectedNiche]);
 
   const activeCategoryObj = CATEGORIES.find((c) => c.id === selectedNiche) || CATEGORIES[0];
 
@@ -199,12 +175,12 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
 
         {/* Linha 2: SELETOR DE CATEGORIAS CUSTOMIZADO (SEM SCROLL LATERAL) */}
         <div className="relative" ref={dropdownRef}>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1.5">
             {/* Botão de Categoria Principal */}
             <button
               type="button"
               onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
-              className={`flex-1 flex items-center justify-between px-2.5 py-1.5 rounded-lg border text-xs font-bold transition-all cursor-pointer shadow-2xs ${
+              className={`flex-1 flex items-center justify-between px-3 py-2 rounded-xl border text-xs font-bold transition-all cursor-pointer shadow-2xs ${
                 selectedNiche !== 'all'
                   ? 'bg-[#25F4EE]/10 border-[#25F4EE] text-[#007A87]'
                   : 'bg-white border-slate-300 text-slate-800 hover:border-[#25F4EE]/60'
@@ -228,56 +204,20 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
               <button
                 type="button"
                 onClick={() => setSelectedNiche('all')}
-                className="p-1.5 rounded-lg bg-white border border-slate-300 hover:bg-slate-50 text-slate-500 hover:text-slate-800 transition cursor-pointer"
-                title="Limpar filtro de categoria"
+                className="p-2 rounded-xl bg-white border border-slate-300 hover:bg-slate-50 text-slate-500 hover:text-slate-800 transition cursor-pointer shadow-2xs"
+                title="Mostrar todas as categorias"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
             )}
-
-            {/* Ícone de busca por palavra-chave opcional */}
-            <button
-              type="button"
-              onClick={() => setShowSearchInput(!showSearchInput)}
-              className={`p-1.5 rounded-lg border transition cursor-pointer ${
-                showSearchInput || searchQuery
-                  ? 'bg-[#25F4EE]/15 border-[#25F4EE] text-[#007A87]'
-                  : 'bg-white border-slate-300 text-slate-500 hover:text-slate-800 hover:border-[#25F4EE]/60'
-              }`}
-              title="Buscar por palavra-chave (ex: bolsa, fone)"
-            >
-              <Search className="w-3.5 h-3.5" />
-            </button>
           </div>
-
-          {/* Campo de Busca Opcional quando ativado pela lupa */}
-          {showSearchInput && (
-            <div className="mt-1.5 relative flex items-center">
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Filtrar por nome (ex: bolsa, relógio)..."
-                autoFocus
-                className="w-full py-1 pl-2.5 pr-7 text-xs bg-slate-50 border border-slate-300 rounded-lg text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#25F4EE] focus:bg-white focus:ring-1 focus:ring-[#25F4EE]/40"
-              />
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery('')}
-                  className="absolute right-2 text-slate-400 hover:text-slate-700"
-                >
-                  <X className="w-3 h-3" />
-                </button>
-              )}
-            </div>
-          )}
 
           {/* Menu Dropdown de Categorias */}
           {isCategoryDropdownOpen && (
             <div className="absolute top-full left-0 right-0 mt-1.5 z-50 bg-white border border-slate-200 rounded-xl shadow-xl p-2 animate-in fade-in slide-in-from-top-2">
               <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-1 pb-1 mb-1 border-b border-slate-100 flex items-center justify-between">
                 <span>Escolha uma Categoria</span>
-                <span className="text-[9px] text-[#007A87] font-bold">Sem rolagem lateral</span>
+                <span className="text-[9px] text-[#007A87] font-bold">312 produtos</span>
               </div>
 
               <div className="grid grid-cols-2 gap-1 max-h-60 overflow-y-auto pr-0.5">
@@ -316,61 +256,6 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
               </div>
             </div>
           )}
-        </div>
-
-        {/* Linha 3: Filtros de Afiliado em 1 Linha com Cores Vivas do Logo */}
-        <div className="flex items-center gap-1 text-[11px] select-none">
-          <button
-            type="button"
-            onClick={() => {
-              setFilterFreeSampleOnly(false);
-              setFilterBlueOceanOnly(false);
-              setFilterHighCommissionOnly(false);
-            }}
-            className={`px-2 py-0.5 rounded-md font-bold cursor-pointer transition-colors whitespace-nowrap ${
-              !filterFreeSampleOnly && !filterBlueOceanOnly && !filterHighCommissionOnly
-                ? 'bg-[#0F172A] text-white shadow-2xs'
-                : 'text-slate-600 bg-slate-100 hover:bg-slate-200'
-            }`}
-          >
-            TODOS
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setFilterFreeSampleOnly(!filterFreeSampleOnly)}
-            className={`px-2 py-0.5 rounded-md font-bold cursor-pointer transition-colors whitespace-nowrap flex items-center gap-1 ${
-              filterFreeSampleOnly
-                ? 'bg-emerald-600 text-white font-black shadow-2xs'
-                : 'text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200/60'
-            }`}
-          >
-            <span>🎁 Amostra</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setFilterBlueOceanOnly(!filterBlueOceanOnly)}
-            className={`px-2 py-0.5 rounded-md font-bold cursor-pointer transition-colors whitespace-nowrap flex items-center gap-1 ${
-              filterBlueOceanOnly
-                ? 'bg-gradient-to-r from-[#25F4EE] to-[#00B4D8] text-[#0F121C] font-black shadow-2xs'
-                : 'text-[#007A87] bg-[#25F4EE]/10 hover:bg-[#25F4EE]/20 border border-[#25F4EE]/30'
-            }`}
-          >
-            <span>🌊 Oceano</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setFilterHighCommissionOnly(!filterHighCommissionOnly)}
-            className={`px-2 py-0.5 rounded-md font-bold cursor-pointer transition-colors whitespace-nowrap flex items-center gap-1 ${
-              filterHighCommissionOnly
-                ? 'bg-gradient-to-r from-[#FE2C55] to-[#FF3B5C] text-white font-black shadow-2xs'
-                : 'text-[#C1123A] bg-[#FE2C55]/10 hover:bg-[#FE2C55]/20 border border-[#FE2C55]/30'
-            }`}
-          >
-            <span>💰 +20%</span>
-          </button>
         </div>
       </div>
 
