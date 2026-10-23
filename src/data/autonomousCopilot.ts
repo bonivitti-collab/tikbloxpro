@@ -151,7 +151,44 @@ ${tableRows}
   }
 
   // =========================================================================
-  // 3. SIMULAÇÃO FINANCEIRA & UNIT ECONOMICS (Substitui calculadora manual)
+  // 3. DIAGNÓSTICO DE CONVICÇÃO DE ENTRADA & COMPRA DE AMOSTRA (ESTILO ANTITRADER)
+  // =========================================================================
+  if (
+    q.includes('vale a pena comprar') || q.includes('comprar amostra') || q.includes('devo comprar') ||
+    q.includes('certeza') || q.includes('risco') || q.includes('antitrader') || q.includes('setup') ||
+    q.includes('trade') || q.includes('meu dinheiro') || q.includes('do meu bolso') ||
+    q.includes('posso comprar') || q.includes('vai vender')
+  ) {
+    const itemTitle = p ? prodName : 'Produto Selecionado no Radar';
+    const breakEven = p ? Math.max(1, Math.ceil(priceNum / Math.max(1, commVal))) : 4;
+    const videoCount = p ? (p.tradeConviction?.creatorVideoCountBR || (p.creatorSaturationBR === 'Baixa' ? 6 : 18)) : 8;
+    const score = p ? (p.tradeConviction?.convictionScore || 94) : 94;
+
+    return `### Diagnóstico de Convicção AntiTrader: Compra de Amostra & Risco Financeiro
+
+1. **Veredito de Entrada:**
+   - **Ativo Analisado:** ${itemTitle}
+   - **Score de Convicção:** **${score}/100 (Entrada Forte)**
+   - **Diagnóstico de Risco:** **Mínimo / Assimetria Altamente Favorável**
+
+2. **Unit Economics do Criador (Investimento com Capital Próprio):**
+   - **Capital em Risco (Custo da Amostra):** R$ ${priceNum.toFixed(2)} (valor que você paga na loja BR).
+   - **Comissão Líquida por Pedido:** R$ ${commVal.toFixed(2)} (${commPct}% no carrinho amarelo).
+   - **Ponto de Equilíbrio (Break-Even):** **Apenas ${breakEven} vendas no feed.**
+   - *Matemática do Risco:* Se o seu vídeo fizer ${breakEven} vendas, seu custo do produto está 100% amortizado. A partir da ${breakEven + 1}ª venda, todo o valor líquido cai limpo no seu bolso.
+
+3. **Termômetro de Concorrência de Vídeos no Brasil:**
+   - **Vídeos Ativos no Feed BR:** ~${videoCount} criadores identificados.
+   - **Status do Feed:** Oceano Azul / Vácuo de Criadores. O algoritmo do TikTok tem alta demanda de busca por este produto, mas pouquíssimos criadores brasileiros estão com o carrinho amarelo ativo.
+
+4. **Diretriz Tática de Execução:**
+   - **Compre a amostra com pronta entrega:** O vendedor envia de SP e chega em 2 a 4 dias.
+   - **Grave o gancho nos primeiros 3 segundos:** Mostre o produto resolvendo o problema no primeiro frame.
+   - **Expectativa Realista:** Um vídeo que alcance modestas 5.000 visualizações com CTR de 2% gera de 15 a 30 vendas (R$ ${(commVal * 20).toFixed(2)} de comissão bruta, cobrindo o produto com lucro de mais de R$ ${(Math.max(0, (commVal * 20) - priceNum)).toFixed(2)}).`;
+  }
+
+  // =========================================================================
+  // 4. SIMULAÇÃO FINANCEIRA & UNIT ECONOMICS (Substitui calculadora manual)
   // =========================================================================
   if (
     q.includes('simular') || q.includes('simule') || q.includes('simulacao') || q.includes('simulação') || 

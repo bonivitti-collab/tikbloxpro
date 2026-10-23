@@ -285,6 +285,26 @@ export const AICopilotPanel: React.FC<AICopilotPanelProps> = ({
                 type="button"
                 onClick={() =>
                   handleSendMessage(
+                    `Vale a pena comprar a amostra de ${tk?.name || 'este produto'} com meu próprio dinheiro hoje? Analise o risco, concorrência no TikTok BR e break-even.`
+                  )
+                }
+                className="w-full p-2.5 rounded-xl border border-slate-200/90 border-l-4 border-l-emerald-500 bg-white hover:bg-slate-50 text-slate-700 transition-all cursor-pointer shadow-2xs group flex items-start gap-2.5 active:scale-98"
+              >
+                <div className="min-w-0 flex-1 text-left">
+                  <div className="text-xs font-bold text-slate-900 group-hover:text-emerald-800 flex items-center justify-between">
+                    <span>🟢 Diagnóstico de Convicção & Risco de Compra</span>
+                    <ArrowUpRight className="w-3 h-3 text-slate-400 group-hover:text-emerald-800" />
+                  </div>
+                  <div className="text-[10px] text-slate-500 truncate mt-0.5">
+                    Avalia se o produto se paga e quantos criadores já estão competindo.
+                  </div>
+                </div>
+              </button>
+
+              <button
+                type="button"
+                onClick={() =>
+                  handleSendMessage(
                     `Gere 3 roteiros técnicos de 30 segundos no TikTok para ${tk?.name || 'este produto'}, detalhando o gancho exato de 3s para prender o scroll no Brasil.`
                   )
                 }

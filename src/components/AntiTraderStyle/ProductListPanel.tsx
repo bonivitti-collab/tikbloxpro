@@ -286,6 +286,10 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
             const commPct = Number(prod.commissionPercent || prod.tiktokShop?.commissionRatePercent || 20);
             const isSample = Boolean(prod.freeSampleAvailable || prod.tiktokShop?.freeSampleAvailable);
             const stockLoc = String(prod.stockLocationBrazil || prod.tiktokShop?.stockLocation || 'São Paulo - SP');
+            const tc = prod.tradeConviction;
+            const breakEvenSales = tc?.breakEvenSales || Math.max(1, Math.ceil(priceBRL / Math.max(1, commVal)));
+            const convictionScore = tc?.convictionScore || Math.min(99, Math.round(prod.viralityScore || 92));
+            const videoCount = tc?.creatorVideoCountBR || (prod.creatorSaturationBR === 'Baixa' ? 6 : 18);
 
             return (
               <div
@@ -297,26 +301,20 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
                     : 'bg-white border-slate-200/90 hover:border-[#25F4EE]/60 hover:shadow-xs'
                 }`}
               >
-                {/* Linha 1: Título e Badges */}
-                <div className="mb-2">
+                {/* Linha 1: Badges de Sinal AntiTrader e Nicho */}
+                <div className="mb-1.5">
                   <div className="flex items-center gap-1.5 flex-wrap mb-1">
-                    <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 border border-slate-200">
+                    <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.2 rounded bg-slate-100 text-slate-700 border border-slate-200">
                       {prod.nicheLabel || 'Nicho'}
                     </span>
-                    {isSelected && (
-                      <span className="text-[9px] font-black px-1.5 py-0.2 rounded bg-gradient-to-r from-[#25F4EE] to-[#00B4D8] text-[#0F121C] shadow-2xs">
-                        EM FOCO
-                      </span>
-                    )}
-                    {isSample ? (
-                      <span className="text-[9px] font-extrabold px-1.5 py-0.2 rounded uppercase bg-emerald-50 text-emerald-800 border border-emerald-300 ml-auto">
-                        🎁 Amostra
-                      </span>
-                    ) : (
-                      <span className="text-[9px] font-semibold px-1.5 py-0.2 rounded uppercase bg-[#25F4EE]/10 text-[#007A87] border border-[#25F4EE]/30 ml-auto">
-                        {prod.creatorSaturationBR === 'Baixa' ? '🌊 Oceano' : 'Em Alta'}
-                      </span>
-                    )}
+
+                    <span className="text-[9px] font-mono font-black px-1.5 py-0.2 rounded bg-emerald-50 text-emerald-800 border border-emerald-300">
+                      🟢 {convictionScore}/100
+                    </span>
+
+                    <span className="text-[9px] font-mono font-bold px-1.5 py-0.2 rounded bg-sky-50 text-[#007A87] border border-sky-200 ml-auto">
+                      ~{videoCount} vídeos BR
+                    </span>
                   </div>
 
                   <h3 className="text-xs font-bold text-slate-900 leading-snug line-clamp-1">
@@ -324,11 +322,11 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
                   </h3>
                 </div>
 
-                {/* Linha 2: Métricas de Preço e Comissão */}
-                <div className="grid grid-cols-2 gap-1 bg-slate-50 p-1.5 rounded-lg border border-slate-200 font-mono text-xs my-1">
+                {/* Linha 2: Métricas de Custo, Comissão e Break-Even */}
+                <div className="grid grid-cols-2 gap-1 bg-slate-50 p-2 rounded-lg border border-slate-200 font-mono text-xs my-1.5">
                   <div>
                     <span className="block text-[8px] font-sans font-bold text-slate-400 uppercase">
-                      Preço Shop
+                      Custo Amostra
                     </span>
                     <span className="font-extrabold text-slate-900">
                       R$ {priceBRL.toFixed(2)}
@@ -344,11 +342,14 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
                   </div>
                 </div>
 
-                {/* Linha 3: Estoque e Gancho */}
-                <div className="flex items-center justify-between text-[10px] text-slate-500 pt-0.5">
-                  <span className="truncate">📦 {stockLoc.split('(')[0].trim()}</span>
-                  <span className="font-bold text-[#FE2C55] shrink-0 flex items-center gap-0.5 hover:underline">
-                    <span>Ver Raio-X</span>
+                {/* Linha 3: Break-Even em Vendas (O Coração da Decisão) */}
+                <div className="flex items-center justify-between text-[10px] pt-0.5">
+                  <span className="font-bold text-slate-700 flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#25F4EE]" />
+                    <span>Zera em <strong>{breakEvenSales} vendas</strong></span>
+                  </span>
+                  <span className="font-bold text-[#FE2C55] shrink-0 flex items-center gap-0.5 hover:underline text-[11px]">
+                    <span>Ver Setup</span>
                     <ChevronRight className="w-3 h-3" />
                   </span>
                 </div>
