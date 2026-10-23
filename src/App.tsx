@@ -108,6 +108,71 @@ export default function App() {
   const [showSavedModal, setShowSavedModal] = useState<boolean>(false);
   const [showCalculatorModal, setShowCalculatorModal] = useState<boolean>(false);
 
+  // Redimensionamento dos painéis estilo AntiTrader (com persistência no localStorage)
+  const [redimensionando, setRedimensionando] = useState<'left' | 'right' | null>(null);
+  const [isDesktop, setIsDesktop] = useState(false);
+
+  const [leftWidth, setLeftWidth] = useState<number>(() => {
+    try {
+      const saved = localStorage.getItem('tikblox_panel_left_width');
+      if (saved) return Math.max(260, Math.min(500, Number(saved)));
+    } catch {}
+    return 340;
+  });
+
+  const [rightWidth, setRightWidth] = useState<number>(() => {
+    try {
+      const saved = localStorage.getItem('tikblox_panel_right_width');
+      if (saved) return Math.max(280, Math.min(600, Number(saved)));
+    } catch {}
+    return 380;
+  });
+
+  useEffect(() => {
+    const check = () => setIsDesktop(window.innerWidth >= 1024);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('tikblox_panel_left_width', String(leftWidth));
+      localStorage.setItem('tikblox_panel_right_width', String(rightWidth));
+    } catch {}
+  }, [leftWidth, rightWidth]);
+
+  useEffect(() => {
+    if (!redimensionando) return;
+
+    const handlePointerMove = (e: MouseEvent | TouchEvent) => {
+      const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+      if (redimensionando === 'left') {
+        const novo = Math.max(240, Math.min(Math.min(500, window.innerWidth - 650), clientX));
+        setLeftWidth(novo);
+      } else if (redimensionando === 'right') {
+        const novo = Math.max(280, Math.min(Math.min(580, window.innerWidth - 650), window.innerWidth - clientX));
+        setRightWidth(novo);
+      }
+    };
+
+    const handlePointerUp = () => {
+      setRedimensionando(null);
+    };
+
+    window.addEventListener('mousemove', handlePointerMove);
+    window.addEventListener('mouseup', handlePointerUp);
+    window.addEventListener('touchmove', handlePointerMove);
+    window.addEventListener('touchend', handlePointerUp);
+
+    return () => {
+      window.removeEventListener('mousemove', handlePointerMove);
+      window.removeEventListener('mouseup', handlePointerUp);
+      window.removeEventListener('touchmove', handlePointerMove);
+      window.removeEventListener('touchend', handlePointerUp);
+    };
+  }, [redimensionando]);
+
   // Modals state
   const [selectedProductForDetail, setSelectedProductForDetail] =
     useState<TrendingProduct | null>(null);
@@ -586,11 +651,19 @@ export default function App() {
         </button>
       </nav>
 
-      {/* 3. ÁREA PRINCIPAL: THREE-PANEL TERMINAL (CUSTOMIZÁVEL NO NOTEBOOK/DESKTOP) */}
-      <div className="flex-1 flex flex-col lg:flex-row w-full max-w-full overflow-hidden min-h-0 bg-[#F1F5F9] relative">
+      {/* 3. ÁREA PRINCIPAL: THREE-PANEL TERMINAL (REDIMENSIONÁVEL NO NOTEBOOK/DESKTOP) */}
+      <div
+        className={`flex-1 flex flex-col lg:flex-row w-full max-w-full overflow-hidden min-h-0 bg-[#F1F5F9] relative ${
+          redimensionando ? 'select-none cursor-col-resize' : ''
+        }`}
+      >
         {/* PAINEL 1: Lista de Produtos */}
-        <div className={`h-full ${mobileTab !== 'produtos' ? 'hidden lg:flex' : 'flex'}`}>
+        <div
+          style={{ width: isDesktop && !painelEsquerdoRecolhido ? `${leftWidth}px` : undefined }}
+          className={`h-full shrink-0 ${mobileTab !== 'produtos' ? 'hidden lg:flex' : 'flex'}`}
+        >
           <ProductListPanel
+            width={isDesktop && !painelEsquerdoRecolhido ? leftWidth : undefined}
             products={products}
             activeProduct={activeProduct}
             onSelectProduct={(p) => {
@@ -612,6 +685,22 @@ export default function App() {
           />
         </div>
 
+        {/* Divisor / Splitter Esquerdo Redimensionável */}
+        {!painelEsquerdoRecolhido && (
+          <div
+            onMouseDown={(e) => {
+              e.preventDefault();
+              setRedimensionando('left');
+            }}
+            onTouchStart={() => setRedimensionando('left')}
+            onDoubleClick={() => setLeftWidth(340)}
+            className="hidden lg:flex w-[5px] hover:w-[7px] bg-slate-200 hover:bg-[#007A87] cursor-col-resize shrink-0 transition-all z-10 items-center justify-center group relative select-none"
+            title="Arraste para redimensionar o painel de produtos. Clique duplo para redefinir para 340px."
+          >
+            <div className="w-1 h-8 rounded-full bg-slate-400 group-hover:bg-white transition-colors" />
+          </div>
+        )}
+
         {/* PAINEL 2: Terminal de Raio-X & Destrinchamento do Produto em Foco */}
         <div className={`h-full flex-1 overflow-hidden min-w-0 ${mobileTab !== 'terminal' ? 'hidden lg:flex' : 'flex'}`}>
           <ProductDetailTerminal
@@ -630,9 +719,29 @@ export default function App() {
           />
         </div>
 
+        {/* Divisor / Splitter Direito Redimensionável */}
+        {!painelDireitoRecolhido && (
+          <div
+            onMouseDown={(e) => {
+              e.preventDefault();
+              setRedimensionando('right');
+            }}
+            onTouchStart={() => setRedimensionando('right')}
+            onDoubleClick={() => setRightWidth(380)}
+            className="hidden lg:flex w-[5px] hover:w-[7px] bg-slate-200 hover:bg-[#007A87] cursor-col-resize shrink-0 transition-all z-10 items-center justify-center group relative select-none"
+            title="Arraste para redimensionar a TIKBLOX AI. Clique duplo para redefinir para 380px."
+          >
+            <div className="w-1 h-8 rounded-full bg-slate-400 group-hover:bg-white transition-colors" />
+          </div>
+        )}
+
         {/* PAINEL 3: TIKBLOX AI Especialista em TikTok Shop */}
-        <div className={`h-full ${mobileTab !== 'copilot' ? 'hidden lg:flex' : 'flex'}`}>
+        <div
+          style={{ width: isDesktop && !painelDireitoRecolhido ? `${rightWidth}px` : undefined }}
+          className={`h-full shrink-0 ${mobileTab !== 'copilot' ? 'hidden lg:flex' : 'flex'}`}
+        >
           <AICopilotPanel
+            width={isDesktop && !painelDireitoRecolhido ? rightWidth : undefined}
             activeProduct={activeProduct}
             isCollapsed={painelDireitoRecolhido}
             onToggleCollapse={() => setPainelDireitoRecolhido(!painelDireitoRecolhido)}

@@ -25,12 +25,14 @@ interface Message {
 }
 
 interface AICopilotPanelProps {
+  width?: number;
   activeProduct: TrendingProduct | null;
   isCollapsed: boolean;
   onToggleCollapse: () => void;
 }
 
 export const AICopilotPanel: React.FC<AICopilotPanelProps> = ({
+  width,
   activeProduct,
   isCollapsed,
   onToggleCollapse,
@@ -199,7 +201,10 @@ export const AICopilotPanel: React.FC<AICopilotPanelProps> = ({
   }
 
   return (
-    <aside className="w-full lg:w-96 xl:w-[390px] shrink-0 bg-[#F8FAFC] flex flex-col border-t lg:border-t-0 lg:border-l border-slate-200 overflow-hidden h-full select-none text-slate-900">
+    <aside
+      style={{ width: width ? `${width}px` : undefined }}
+      className="w-full shrink-0 bg-[#F8FAFC] flex flex-col border-t lg:border-t-0 lg:border-l border-slate-200 overflow-hidden h-full select-none text-slate-900"
+    >
       
       {/* Header Institucional da IA */}
       <div className="p-2.5 sm:p-3 border-b border-slate-200 bg-white flex items-center justify-between shrink-0 shadow-2xs">

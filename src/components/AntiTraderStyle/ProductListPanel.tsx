@@ -38,6 +38,7 @@ const CATEGORIES: CategoryOption[] = [
 ];
 
 interface ProductListPanelProps {
+  width?: number;
   products: TrendingProduct[];
   activeProduct: TrendingProduct | null;
   onSelectProduct: (p: TrendingProduct) => void;
@@ -56,6 +57,7 @@ interface ProductListPanelProps {
 }
 
 export const ProductListPanel: React.FC<ProductListPanelProps> = ({
+  width,
   products,
   activeProduct,
   onSelectProduct,
@@ -162,7 +164,10 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
   }
 
   return (
-    <section className="w-full lg:w-80 xl:w-[340px] shrink-0 bg-[#F8FAFC] flex flex-col border-r border-slate-200 h-full overflow-hidden select-none text-slate-900">
+    <section
+      style={{ width: width ? `${width}px` : undefined }}
+      className="w-full shrink-0 bg-[#F8FAFC] flex flex-col border-r border-slate-200 h-full overflow-hidden select-none text-slate-900"
+    >
       
       {/* Topo: Cabeçalho com Seletor de Categoria e Acentos TikBlox */}
       <div className="bg-white border-b border-slate-200 p-2.5 sm:p-3 space-y-2 shrink-0 shadow-2xs">
