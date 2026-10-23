@@ -123,12 +123,8 @@ export default function App() {
   // Controle de Sessão de Assinante e Navegação Landing Page / App
   const [session, setSession] = useState<UserSession | null>(() => getCurrentSession());
   const [showLoginModal, setShowLoginModal] = useState<boolean>(false);
-  const [currentView, setCurrentView] = useState<'app' | 'landing'>(() => {
-    const s = getCurrentSession();
-    // Apenas assinantes reais com plano ativo têm acesso ao terminal
-    if (s && s.isAuthenticated && s.plan !== 'guest') return 'app';
-    return 'landing';
-  });
+  // Abre OBRIGATORIAMENTE na Landing Page por padrão conforme solicitado
+  const [currentView, setCurrentView] = useState<'app' | 'landing'>('landing');
 
   // Redimensionamento dos painéis estilo TikBlox (com persistência no localStorage)
   const [redimensionando, setRedimensionando] = useState<'left' | 'right' | null>(null);
@@ -638,6 +634,7 @@ export default function App() {
     return (
       <div className="h-dvh w-full overflow-y-auto">
         <LandingPage
+          isLoggedIn={Boolean(session && session.isAuthenticated && session.plan !== 'guest')}
           onOpenLogin={() => {
             if (session && session.isAuthenticated && session.plan !== 'guest') {
               setCurrentView('app');

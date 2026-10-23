@@ -83,7 +83,9 @@ export interface TrendingProduct {
     shopeeSearchUrl?: string;
     aliExpressSearchUrl?: string;
     mercadoLivreSearchUrl?: string;
+    customProductUrl?: string;
   };
+  creatorSaturationBR?: string;
   groundingSources?: Array<{
     title: string;
     uri: string;

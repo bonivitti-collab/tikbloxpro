@@ -21,16 +21,19 @@ import {
   Clock,
   DollarSign,
   HelpCircle,
+  CheckCircle2,
 } from 'lucide-react';
 import { getKiwifyCheckoutUrls } from '../../services/authService';
 import { InteractiveScreensCarousel } from './InteractiveScreensCarousel';
 
 interface LandingPageProps {
   onOpenLogin: () => void;
+  isLoggedIn?: boolean;
 }
 
 export const LandingPage: React.FC<LandingPageProps> = ({
   onOpenLogin,
+  isLoggedIn = false,
 }) => {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const checkoutUrls = getKiwifyCheckoutUrls();
@@ -75,9 +78,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <div className="flex items-center gap-2 sm:gap-3">
             <button
               onClick={onOpenLogin}
-              className="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-200 hover:text-white hover:bg-white/5 transition cursor-pointer border border-transparent hover:border-white/10"
+              className="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-200 hover:text-white hover:bg-white/5 transition cursor-pointer border border-transparent hover:border-white/10 flex items-center gap-1.5"
             >
-              Já sou assinante
+              {isLoggedIn ? (
+                <>
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span>Acessar Meu Painel</span>
+                </>
+              ) : (
+                'Já sou assinante'
+              )}
             </button>
 
             <button
