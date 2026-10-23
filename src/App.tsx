@@ -11,6 +11,7 @@ import { ProductListPanel } from './components/AntiTraderStyle/ProductListPanel'
 import { ProductDetailTerminal } from './components/AntiTraderStyle/ProductDetailTerminal';
 import { AICopilotPanel } from './components/AntiTraderStyle/AICopilotPanel';
 import { SavedRadarView } from './components/SavedRadarView';
+import { AddCustomProductModal } from './components/AntiTraderStyle/AddCustomProductModal';
 
 // High-speed lazy loading: Keep initial bundle minimal so mobile devices render in under 1 second
 const ProductDetailModal = React.lazy(() =>
@@ -101,11 +102,12 @@ export default function App() {
   const [filterBlueOceanOnly, setFilterBlueOceanOnly] = useState<boolean>(false);
   const [activeProduct, setActiveProduct] = useState<TrendingProduct | null>(() => INITIAL_CURATED_TRENDS[0] || null);
   const [painelEsquerdoRecolhido, setPainelEsquerdoRecolhido] = useState(false);
-  const [painelDireitoRecolhido, setPainelDireitoRecolhido] = useState(false);
+  const [painelDireitoRecolhido, setPainelDireitoRecolhido] = useState(true);
   const [mobileTab, setMobileTab] = useState<'produtos' | 'terminal' | 'copilot'>('produtos');
   const [filterHighCommissionOnly, setFilterHighCommissionOnly] = useState<boolean>(false);
   const [showSavedModal, setShowSavedModal] = useState<boolean>(false);
   const [showCalculatorModal, setShowCalculatorModal] = useState<boolean>(false);
+  const [showAddCustomModal, setShowAddCustomModal] = useState<boolean>(false);
 
   // Redimensionamento dos painéis estilo AntiTrader (com persistência no localStorage)
   const [redimensionando, setRedimensionando] = useState<'left' | 'right' | null>(null);
@@ -682,6 +684,7 @@ export default function App() {
             setFilterBlueOceanOnly={setFilterBlueOceanOnly}
             filterHighCommissionOnly={filterHighCommissionOnly}
             setFilterHighCommissionOnly={setFilterHighCommissionOnly}
+            onOpenAddCustomProduct={() => setShowAddCustomModal(true)}
           />
         </div>
 
@@ -748,6 +751,20 @@ export default function App() {
           />
         </div>
       </div>
+
+      {/* Modal de Análise de Produto Próprio (Oceano Azul) */}
+      {showAddCustomModal && (
+        <AddCustomProductModal
+          isOpen={showAddCustomModal}
+          onClose={() => setShowAddCustomModal(false)}
+          onAddProduct={(newProd) => {
+            setProducts((prev) => [newProd, ...prev]);
+            setActiveProduct(newProd);
+            saveProductToIndexedDB(newProd);
+            setMobileTab('terminal');
+          }}
+        />
+      )}
 
       {/* Modal de Produtos Salvos */}
       {showSavedModal && (

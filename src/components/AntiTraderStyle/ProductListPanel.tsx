@@ -54,6 +54,7 @@ interface ProductListPanelProps {
   setFilterBlueOceanOnly: (val: boolean) => void;
   filterHighCommissionOnly: boolean;
   setFilterHighCommissionOnly: (val: boolean) => void;
+  onOpenAddCustomProduct?: () => void;
 }
 
 export const ProductListPanel: React.FC<ProductListPanelProps> = ({
@@ -73,6 +74,7 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
   setFilterBlueOceanOnly,
   filterHighCommissionOnly,
   setFilterHighCommissionOnly,
+  onOpenAddCustomProduct,
 }) => {
   const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
   const [showSearchInput, setShowSearchInput] = useState(false);
@@ -217,7 +219,7 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
             <div className="absolute top-full left-0 right-0 mt-1.5 z-50 bg-white border border-slate-200 rounded-xl shadow-xl p-2 animate-in fade-in slide-in-from-top-2">
               <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-1 pb-1 mb-1 border-b border-slate-100 flex items-center justify-between">
                 <span>Escolha uma Categoria</span>
-                <span className="text-[9px] text-[#007A87] font-bold">312 produtos</span>
+                <span className="text-[9px] text-[#007A87] font-bold">Oceano Azul BR</span>
               </div>
 
               <div className="grid grid-cols-2 gap-1 max-h-60 overflow-y-auto pr-0.5">
@@ -257,6 +259,24 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
             </div>
           )}
         </div>
+
+        {/* Linha 3: Botão de Inserção de Produto Próprio (Oceano Azul) */}
+        {onOpenAddCustomProduct && (
+          <button
+            type="button"
+            onClick={onOpenAddCustomProduct}
+            className="w-full flex items-center justify-between px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-bold transition-all cursor-pointer shadow-2xs active:scale-98"
+            title="Insira o produto que você encontrou no TikTok Shop para gerar o setup AntiTrader"
+          >
+            <span className="flex items-center gap-1.5">
+              <span>💎</span>
+              <span>Analisar Meu Produto</span>
+            </span>
+            <span className="text-[10px] font-mono text-[#25F4EE] font-bold">
+              + Inserir
+            </span>
+          </button>
+        )}
       </div>
 
       {/* Lista Rolável de Cards com Foto Real e Identidade TikBlox */}
@@ -308,8 +328,14 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
                       {prod.nicheLabel || 'Nicho'}
                     </span>
 
-                    <span className="text-[9px] font-mono font-black px-1.5 py-0.2 rounded bg-emerald-50 text-emerald-800 border border-emerald-300">
-                      🟢 {convictionScore}/100
+                    <span className={`text-[9px] font-mono font-black px-1.5 py-0.2 rounded border ${
+                      convictionScore >= 90
+                        ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
+                        : convictionScore >= 80
+                        ? 'bg-amber-50 text-amber-800 border-amber-300'
+                        : 'bg-rose-50 text-rose-800 border-rose-300'
+                    }`}>
+                      {convictionScore >= 90 ? '🟢' : convictionScore >= 80 ? '🟡' : '🔴'} {convictionScore}/100
                     </span>
 
                     <span className="text-[9px] font-mono font-bold px-1.5 py-0.2 rounded bg-sky-50 text-[#007A87] border border-sky-200 ml-auto">

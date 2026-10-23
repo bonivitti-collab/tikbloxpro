@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   Sparkles,
   Bookmark,
@@ -16,10 +16,20 @@ import {
   Zap,
   DollarSign,
   HelpCircle,
-  ChevronRight
+  ChevronRight,
+  RefreshCw,
+  Key,
+  X,
+  ExternalLink
 } from 'lucide-react';
 import { TrendingProduct } from '../../types';
 import { enrichWithTikTokShopData } from '../../data/tiktokShopEnricher';
+import {
+  verifyProductInTikTokShopBR,
+  getStoredRapidApiKey,
+  saveRapidApiKey,
+  LiveVerificationResult
+} from '../../services/rapidApiTikTokService';
 
 interface ProductDetailTerminalProps {
   product: TrendingProduct | null;
@@ -39,6 +49,17 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
   const [copiedHook, setCopiedHook] = useState(false);
   const [copiedTerm, setCopiedTerm] = useState(false);
   const [simulationSales, setSimulationSales] = useState<number>(25);
+
+  // RapidAPI Pay-as-you-go live check
+  const [liveCheckLoading, setLiveCheckLoading] = useState(false);
+  const [liveCheckResult, setLiveCheckResult] = useState<LiveVerificationResult | null>(null);
+  const [showRapidKeyModal, setShowRapidKeyModal] = useState(false);
+  const [rapidKeyInput, setRapidKeyInput] = useState(() => getStoredRapidApiKey());
+  const [rapidApiKey, setRapidApiKey] = useState(() => getStoredRapidApiKey());
+
+  useEffect(() => {
+    setLiveCheckResult(null);
+  }, [product?.id]);
 
   if (!product) {
     return (
@@ -91,7 +112,18 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
   const simGrossCommission = simulationSales * commissionVal;
   const simNetProfit = Math.max(0, simGrossCommission - priceBRL);
   const simRoi = priceBRL > 0 ? Math.round((simNetProfit / priceBRL) * 100) : 0;
-  const isAmortized = simulationSales >= tc.breakEvenSales;
+
+  const handleRunLiveCheck = async () => {
+    setLiveCheckLoading(true);
+    try {
+      const res = await verifyProductInTikTokShopBR(affiliateTerm, rapidApiKey);
+      setLiveCheckResult(res);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLiveCheckLoading(false);
+    }
+  };
 
   // =========================================================================
   // CICLO DE VIDA NO RADAR: Acompanhamento da Entrada até a Saturação
@@ -341,68 +373,108 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
           </div>
         </div>
 
-        {/* Os 4 Pilares Financeiros do Trade de Amostra */}
+        {/* Os 4 Pilares Financeiros do Trade de Amostra (SEM QUEBRA DE LINHA DE NÚMEROS) */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           
           {/* Pilar 1: Custo de Compra (Seu Bolso) */}
-          <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
-            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
-              Custo da Amostra (Seu Bolso)
+          <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 min-w-0">
+            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block truncate">
+              Custo Amostra (Seu Bolso)
             </span>
-            <div className="text-xl sm:text-2xl font-black text-slate-900 font-mono mt-1">
+            <div className="text-lg sm:text-xl font-black text-slate-900 font-mono mt-1 whitespace-nowrap overflow-hidden">
               R$ {priceBRL.toFixed(2)}
             </div>
-            <span className="text-[10px] text-slate-500 mt-0.5 block">
-              Preço pago na loja BR p/ gravar
+            <span className="text-[10px] text-slate-500 mt-0.5 block truncate">
+              Preço pago na loja BR
             </span>
           </div>
 
           {/* Pilar 2: Sua Comissão por Venda */}
-          <div className="p-3.5 rounded-xl bg-emerald-50/60 border border-emerald-200">
-            <span className="text-[10px] font-bold text-emerald-800 uppercase tracking-wider block">
+          <div className="p-3.5 rounded-xl bg-emerald-50/60 border border-emerald-200 min-w-0">
+            <span className="text-[10px] font-bold text-emerald-800 uppercase tracking-wider block truncate">
               Comissão por Venda
             </span>
-            <div className="flex items-baseline gap-1 mt-1">
-              <span className="text-xl sm:text-2xl font-black text-emerald-700 font-mono">
+            <div className="flex items-baseline gap-1 mt-1 whitespace-nowrap overflow-hidden">
+              <span className="text-lg sm:text-xl font-black text-emerald-700 font-mono">
                 R$ {commissionVal.toFixed(2)}
               </span>
               <span className="text-xs font-bold text-emerald-600 font-mono">
                 ({commissionPct}%)
               </span>
             </div>
-            <span className="text-[10px] text-emerald-700 mt-0.5 block">
-              Líquido no carrinho amarelo
+            <span className="text-[10px] text-emerald-700 mt-0.5 block truncate">
+              Líquido no carrinho
             </span>
           </div>
 
           {/* Pilar 3: Ponto de Equilíbrio (Break-Even) */}
-          <div className="p-3.5 rounded-xl bg-gradient-to-b from-sky-50 to-white border-2 border-[#25F4EE] shadow-2xs">
-            <span className="text-[10px] font-bold text-[#007A87] uppercase tracking-wider block">
-              Ponto de Equilíbrio (Break-Even)
+          <div className="p-3.5 rounded-xl bg-gradient-to-b from-sky-50 to-white border-2 border-[#25F4EE] shadow-2xs min-w-0">
+            <span className="text-[10px] font-bold text-[#007A87] uppercase tracking-wider block truncate">
+              Break-Even (Ponto Zero)
             </span>
-            <div className="text-xl sm:text-2xl font-black text-[#0F172A] font-mono mt-1 flex items-baseline gap-1">
+            <div className="text-lg sm:text-xl font-black text-[#0F172A] font-mono mt-1 flex items-baseline gap-1 whitespace-nowrap overflow-hidden">
               <span>{tc.breakEvenSales}</span>
-              <span className="text-xs font-extrabold text-slate-600 font-sans">vendas no feed</span>
+              <span className="text-xs font-extrabold text-slate-600 font-sans">vendas</span>
             </div>
-            <span className="text-[10px] text-[#007A87] font-semibold mt-0.5 block">
-              Risco 100% zerado após {tc.breakEvenSales} vendas
+            <span className="text-[10px] text-[#007A87] font-semibold mt-0.5 block truncate">
+              Risco 100% zerado
             </span>
           </div>
 
           {/* Pilar 4: Concorrência no Feed BR */}
-          <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
-            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
-              Vídeos Ativos no Brasil
+          <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 min-w-0">
+            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block truncate">
+              Vídeos no TikTok BR
             </span>
-            <div className="text-xl sm:text-2xl font-black text-slate-900 font-mono mt-1 flex items-baseline gap-1">
-              <span>~{tc.creatorVideoCountBR}</span>
-              <span className="text-xs font-bold text-slate-500 font-sans">criadores</span>
+            <div className="text-lg sm:text-xl font-black text-slate-900 font-mono mt-1 flex items-baseline gap-1 whitespace-nowrap overflow-hidden">
+              <span>~{liveCheckResult ? liveCheckResult.videoCountBR : tc.creatorVideoCountBR}</span>
+              <span className="text-xs font-bold text-slate-500 font-sans">vídeos</span>
             </div>
-            <span className="text-[10px] font-bold text-emerald-700 mt-0.5 block">
-              {tc.creatorCompetitionLevel}
+            <span className="text-[10px] font-bold text-emerald-700 mt-0.5 block truncate">
+              {liveCheckResult ? liveCheckResult.verdictLabel : tc.creatorCompetitionLevel}
             </span>
           </div>
 
+        </div>
+
+        {/* ========================================================= */}
+        {/* CHECAGEM EM TEMPO REAL VIA RAPIDAPI (PAY-AS-YOU-GO)       */}
+        {/* ========================================================= */}
+        <div className="p-3.5 rounded-xl bg-slate-900 text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
+          <div className="space-y-0.5">
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center gap-1 text-[10px] font-mono font-black uppercase px-2 py-0.5 rounded bg-[#25F4EE] text-[#0F121C]">
+                ⚡ RapidAPI Pay-as-you-go
+              </span>
+              <span className="text-xs font-bold text-white">
+                Verificação ao Vivo no TikTok Brasil
+              </span>
+            </div>
+            <p className="text-[11px] text-slate-300">
+              {liveCheckResult
+                ? liveCheckResult.message
+                : 'Consulte em tempo real quantos vídeos deste produto foram postados no feed brasileiro (~R$ 0,03/busca).'}
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto">
+            <button
+              onClick={handleRunLiveCheck}
+              disabled={liveCheckLoading}
+              className="flex-1 sm:flex-none px-3.5 py-2 rounded-xl bg-gradient-to-r from-[#25F4EE] to-[#00D2C4] hover:brightness-105 text-[#0F121C] font-extrabold text-xs transition cursor-pointer flex items-center justify-center gap-1.5 active:scale-95 disabled:opacity-50"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${liveCheckLoading ? 'animate-spin' : ''}`} />
+              <span>{liveCheckLoading ? 'Checando no Feed BR...' : 'Checar ao Vivo (API)'}</span>
+            </button>
+
+            <button
+              onClick={() => setShowRapidKeyModal(true)}
+              className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition cursor-pointer border border-white/20"
+              title="Configurar chave RapidAPI (100 buscas grátis)"
+            >
+              <Key className="w-4 h-4 text-[#25F4EE]" />
+            </button>
+          </div>
         </div>
 
         {/* As 3 Teses Objetivas de Entrada */}
@@ -477,30 +549,30 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
 
           {/* Resultado da Simulação */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 border-t border-slate-200/70 text-xs">
-            <div className="p-2 rounded-lg bg-white border border-slate-200">
-              <span className="text-[10px] text-slate-400 uppercase font-bold block">Comissão Bruta</span>
-              <span className="font-mono font-extrabold text-slate-900 text-sm">
+            <div className="p-2 rounded-lg bg-white border border-slate-200 min-w-0">
+              <span className="text-[10px] text-slate-400 uppercase font-bold block truncate">Comissão Bruta</span>
+              <span className="font-mono font-extrabold text-slate-900 text-sm block whitespace-nowrap">
                 R$ {simGrossCommission.toFixed(2)}
               </span>
             </div>
 
-            <div className="p-2 rounded-lg bg-white border border-slate-200">
-              <span className="text-[10px] text-slate-400 uppercase font-bold block">Custo Amostra</span>
-              <span className="font-mono font-bold text-rose-600 text-sm">
+            <div className="p-2 rounded-lg bg-white border border-slate-200 min-w-0">
+              <span className="text-[10px] text-slate-400 uppercase font-bold block truncate">Custo Amostra</span>
+              <span className="font-mono font-bold text-rose-600 text-sm block whitespace-nowrap">
                 -R$ {priceBRL.toFixed(2)}
               </span>
             </div>
 
-            <div className="p-2 rounded-lg bg-emerald-50 border border-emerald-300">
-              <span className="text-[10px] text-emerald-800 uppercase font-black block">Lucro Líquido no Bolso</span>
-              <span className="font-mono font-black text-emerald-700 text-sm">
+            <div className="p-2 rounded-lg bg-emerald-50 border border-emerald-300 min-w-0">
+              <span className="text-[10px] text-emerald-800 uppercase font-black block truncate">Lucro no Bolso</span>
+              <span className="font-mono font-black text-emerald-700 text-sm block whitespace-nowrap">
                 R$ {simNetProfit.toFixed(2)}
               </span>
             </div>
 
-            <div className="p-2 rounded-lg bg-white border border-slate-200">
-              <span className="text-[10px] text-slate-400 uppercase font-bold block">Retorno (ROI)</span>
-              <span className="font-mono font-black text-[#007A87] text-sm">
+            <div className="p-2 rounded-lg bg-white border border-slate-200 min-w-0">
+              <span className="text-[10px] text-slate-400 uppercase font-bold block truncate">Retorno (ROI)</span>
+              <span className="font-mono font-black text-[#007A87] text-sm block whitespace-nowrap">
                 +{simRoi}%
               </span>
             </div>
@@ -689,29 +761,67 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
         </div>
       </div>
 
-      {/* Bloco 6: Chamada de Consultoria TIKBLOX AI */}
-      <div className="p-4 rounded-xl bg-gradient-to-r from-[#25F4EE]/10 via-white to-[#FE2C55]/10 border border-[#25F4EE]/30 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xs">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#25F4EE] to-[#FE2C55] text-white flex items-center justify-center font-bold text-base shrink-0 shadow-2xs">
-            🤖
-          </div>
-          <div>
-            <h4 className="text-xs font-bold text-slate-900">
-              Quer uma segunda opinião sobre o risco deste produto antes de comprar?
-            </h4>
-            <p className="text-[11px] text-slate-600 mt-0.5">
-              A TIKBLOX AI analisa se o estoque é confiável e como estruturar a gravação do primeiro vídeo.
-            </p>
+      {/* Modal de Configuração RapidAPI */}
+      {showRapidKeyModal && (
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 select-none animate-in fade-in">
+          <div className="bg-white rounded-2xl border border-slate-200 w-full max-w-md shadow-2xl overflow-hidden flex flex-col text-slate-900">
+            <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+              <div className="flex items-center gap-2">
+                <Key className="w-4 h-4 text-[#007A87]" />
+                <h3 className="text-xs font-black text-slate-900 uppercase tracking-wider">
+                  Configurar Chave RapidAPI (Pay-As-You-Go)
+                </h3>
+              </div>
+              <button
+                onClick={() => setShowRapidKeyModal(false)}
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-800 transition cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="p-4 space-y-3 text-xs">
+              <p className="text-slate-600 leading-relaxed">
+                Você pode criar uma conta gratuita no <strong>RapidAPI.com</strong> para receber <strong>100 consultas grátis por mês</strong>. Cole sua chave abaixo para consultar ao vivo a quantidade de vídeos no feed do TikTok Brasil por frações de centavos (~R$ 0,03/busca):
+              </p>
+
+              <div>
+                <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
+                  Sua Chave RapidAPI (x-rapidapi-key):
+                </label>
+                <input
+                  type="password"
+                  value={rapidKeyInput}
+                  onChange={(e) => setRapidKeyInput(e.target.value)}
+                  placeholder="Cole sua chave aqui..."
+                  className="w-full px-3 py-2 rounded-xl border border-slate-300 font-mono text-xs outline-none focus:border-[#25F4EE]"
+                />
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setShowRapidKeyModal(false)}
+                  className="px-3 py-1.5 rounded-lg border border-slate-300 text-slate-600 font-bold transition cursor-pointer"
+                >
+                  Fechar
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    saveRapidApiKey(rapidKeyInput);
+                    setRapidApiKey(rapidKeyInput.trim());
+                    setShowRapidKeyModal(false);
+                  }}
+                  className="px-4 py-1.5 rounded-lg bg-slate-900 hover:bg-black text-white font-bold transition cursor-pointer shadow-2xs"
+                >
+                  Salvar Chave
+                </button>
+              </div>
+            </div>
           </div>
         </div>
-
-        <button
-          onClick={() => onOpenInCopilot(product)}
-          className="w-full sm:w-auto px-4 py-2 rounded-xl bg-[#0F172A] hover:bg-black text-white font-bold text-xs transition cursor-pointer shadow-xs whitespace-nowrap active:scale-95 border border-white/10"
-        >
-          Consultar Inteligência de Risco ⚡
-        </button>
-      </div>
+      )}
 
     </main>
   );
