@@ -440,41 +440,60 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
         {/* ========================================================= */}
         {/* CHECAGEM EM TEMPO REAL VIA RAPIDAPI (PAY-AS-YOU-GO)       */}
         {/* ========================================================= */}
-        <div className="p-3.5 rounded-xl bg-slate-900 text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
-          <div className="space-y-0.5">
-            <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1 text-[10px] font-mono font-black uppercase px-2 py-0.5 rounded bg-[#25F4EE] text-[#0F121C]">
-                ⚡ RapidAPI Pay-as-you-go
-              </span>
-              <span className="text-xs font-bold text-white">
-                Verificação ao Vivo no TikTok Brasil
-              </span>
+        <div className="p-4 rounded-xl bg-slate-900 text-white space-y-3 shadow-xs">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div className="space-y-0.5">
+              <div className="flex items-center gap-2">
+                <span className="inline-flex items-center gap-1 text-[10px] font-mono font-black uppercase px-2 py-0.5 rounded bg-[#25F4EE] text-[#0F121C]">
+                  ⚡ RapidAPI Conectada
+                </span>
+                <span className="text-xs font-bold text-white">
+                  Verificação ao Vivo no TikTok Brasil
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-300">
+                {liveCheckResult
+                  ? liveCheckResult.message
+                  : 'Consulte em tempo real quantos vídeos deste produto foram postados no feed brasileiro com cota gratuita ativa.'}
+              </p>
             </div>
-            <p className="text-[11px] text-slate-300">
-              {liveCheckResult
-                ? liveCheckResult.message
-                : 'Consulte em tempo real quantos vídeos deste produto foram postados no feed brasileiro (~R$ 0,03/busca).'}
-            </p>
+
+            <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto">
+              <button
+                onClick={handleRunLiveCheck}
+                disabled={liveCheckLoading}
+                className="flex-1 sm:flex-none px-4 py-2 rounded-xl bg-gradient-to-r from-[#25F4EE] to-[#00D2C4] hover:brightness-105 text-[#0F121C] font-extrabold text-xs transition cursor-pointer flex items-center justify-center gap-1.5 active:scale-95 disabled:opacity-50 shadow-sm"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${liveCheckLoading ? 'animate-spin' : ''}`} />
+                <span>{liveCheckLoading ? 'Checando no TikTok BR...' : 'Checar ao Vivo (API)'}</span>
+              </button>
+
+              <button
+                onClick={() => setShowRapidKeyModal(true)}
+                className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition cursor-pointer border border-white/20"
+                title="Configurar ou alterar chave RapidAPI"
+              >
+                <Key className="w-4 h-4 text-[#25F4EE]" />
+              </button>
+            </div>
           </div>
 
-          <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto">
-            <button
-              onClick={handleRunLiveCheck}
-              disabled={liveCheckLoading}
-              className="flex-1 sm:flex-none px-3.5 py-2 rounded-xl bg-gradient-to-r from-[#25F4EE] to-[#00D2C4] hover:brightness-105 text-[#0F121C] font-extrabold text-xs transition cursor-pointer flex items-center justify-center gap-1.5 active:scale-95 disabled:opacity-50"
-            >
-              <RefreshCw className={`w-3.5 h-3.5 ${liveCheckLoading ? 'animate-spin' : ''}`} />
-              <span>{liveCheckLoading ? 'Checando no Feed BR...' : 'Checar ao Vivo (API)'}</span>
-            </button>
-
-            <button
-              onClick={() => setShowRapidKeyModal(true)}
-              className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition cursor-pointer border border-white/20"
-              title="Configurar chave RapidAPI (100 buscas grátis)"
-            >
-              <Key className="w-4 h-4 text-[#25F4EE]" />
-            </button>
-          </div>
+          {/* Amostras Reais de Vídeos Detectados ao Vivo */}
+          {liveCheckResult?.sampleVideos && liveCheckResult.sampleVideos.length > 0 && (
+            <div className="pt-2 border-t border-white/10 grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+              {liveCheckResult.sampleVideos.map((vid, idx) => (
+                <div key={idx} className="p-2 rounded-lg bg-white/5 border border-white/10 space-y-0.5">
+                  <div className="flex items-center justify-between text-[10px] text-[#25F4EE] font-mono">
+                    <span className="truncate">@{vid.author}</span>
+                    <span className="font-bold">{vid.views}</span>
+                  </div>
+                  <p className="text-[11px] text-slate-300 line-clamp-1 italic">
+                    "{vid.title}"
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* As 3 Teses Objetivas de Entrada */}
