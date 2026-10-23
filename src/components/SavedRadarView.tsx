@@ -147,7 +147,7 @@ export const SavedRadarView: React.FC<SavedRadarViewProps> = ({
     };
   }, []);
 
-  const activeList = viewMode === 'saved' ? savedProducts : cachedHistory;
+  const activeList = viewMode === 'saved' ? (savedProducts || []) : (cachedHistory || []);
   const savedIdsSet = React.useMemo(() => new Set(savedProducts.map((p) => p.id)), [savedProducts]);
 
   const filteredList = React.useMemo(() => {
@@ -155,10 +155,10 @@ export const SavedRadarView: React.FC<SavedRadarViewProps> = ({
     if (!q) return activeList;
     return activeList.filter(
       (p) =>
-        p.name.toLowerCase().includes(q) ||
-        p.originalName.toLowerCase().includes(q) ||
-        p.nicheLabel.toLowerCase().includes(q) ||
-        p.culturalFitReason.toLowerCase().includes(q)
+        (p?.name || '').toLowerCase().includes(q) ||
+        (p?.originalName || '').toLowerCase().includes(q) ||
+        (p?.nicheLabel || p?.niche || '').toLowerCase().includes(q) ||
+        (p?.culturalFitReason || '').toLowerCase().includes(q)
     );
   }, [activeList, filterQuery]);
 

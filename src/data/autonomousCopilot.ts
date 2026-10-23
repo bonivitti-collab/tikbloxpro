@@ -59,7 +59,7 @@ function searchCatalogProducts(query: string): TrendingProduct[] {
       prod.name,
       prod.originalName,
       prod.nicheLabel,
-      prod.category,
+      prod.niche,
       prod.culturalFitReason,
       ...(prod.supplierKeywords || []),
     ]
@@ -127,7 +127,7 @@ Como posso orientar sua estratégia operacional no TikTok Shop hoje?`;
       const itemPrice = Number(en.estimatedPriceBRL || 79.90).toFixed(2);
       const itemComm = Number(en.commissionEstimatedBRL || 20).toFixed(2);
       const itemLoc = en.stockLocationBrazil ? en.stockLocationBrazil.split('-')[0].trim() : 'São Paulo';
-      const saturation = item.creatorSaturationBR || 'Oceano Azul';
+      const saturation = (item as any).creatorSaturationBR || item.tiktokShop?.saturationLevel || item.saturationInBrazil || 'Oceano Azul';
 
       return `| **${item.name}** | R$ ${itemPrice} | R$ ${itemComm} (${en.commissionPercent || 25}%) | ${itemLoc} | [${saturation.toUpperCase()}] |`;
     }).join('\n');

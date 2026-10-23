@@ -10,6 +10,7 @@ import { Header } from './components/AntiTraderStyle/Header';
 import { ProductListPanel } from './components/AntiTraderStyle/ProductListPanel';
 import { ProductDetailTerminal } from './components/AntiTraderStyle/ProductDetailTerminal';
 import { AICopilotPanel } from './components/AntiTraderStyle/AICopilotPanel';
+import { SavedRadarView } from './components/SavedRadarView';
 
 // High-speed lazy loading: Keep initial bundle minimal so mobile devices render in under 1 second
 const ProductDetailModal = React.lazy(() =>
@@ -24,9 +25,7 @@ const AdCreativeModal = React.lazy(() =>
 const LiveScannerFeed = React.lazy(() =>
   import('./components/LiveScannerFeed').then((m) => ({ default: m.LiveScannerFeed }))
 );
-const SavedRadarView = React.lazy(() =>
-  import('./components/SavedRadarView').then((m) => ({ default: m.SavedRadarView }))
-);
+
 const OfflineStorageModal = React.lazy(() =>
   import('./components/OfflineStorageModal').then((m) => ({ default: m.OfflineStorageModal }))
 );
@@ -76,7 +75,7 @@ import {
 import { usePushNotifications } from './hooks/usePushNotifications';
 import { useDynamicSeo } from './hooks/useDynamicSeo';
 import { useTranslation } from './i18n/LanguageContext';
-import { Radio, Sparkles, Filter, AlertCircle, BellRing, FolderUp, Download, ChevronDown, CheckCircle2, TrendingDown, X } from 'lucide-react';
+import { Radio, Sparkles, Filter, AlertCircle, BellRing, FolderUp, Download, ChevronDown, CheckCircle2, TrendingDown, X, Bookmark } from 'lucide-react';
 
 export default function App() {
   const { t, language } = useTranslation();
@@ -342,6 +341,7 @@ export default function App() {
   }, [products]);
 
   const handleOpenDeepDive = useCallback((product: TrendingProduct) => {
+    setActiveProduct(product);
     setSelectedProductForDetail(product);
   }, []);
 
@@ -766,22 +766,24 @@ export default function App() {
               </button>
             </div>
             <div className="flex-1 overflow-y-auto p-4 bg-[#141724]">
-              <SavedRadarView
-                savedProducts={savedProductsList}
-                priceSummary={priceSummary}
-                isCheckingPrices={isCheckingPrices}
-                onRefreshPrices={handleRefreshPrices}
-                onApplyPriceUpdate={handleApplyPriceUpdate}
-                onToggleSave={handleToggleSave}
-                onOpenDeepDive={handleOpenDeepDive}
-                onOpenCalculator={(p) => {
-                  setSelectedProductForCalc(p);
-                  setShowCalculatorModal(true);
-                }}
-                onOpenCreativeGenerator={handleOpenCreativeGenerator}
-                onBackToRadar={() => setShowSavedModal(false)}
-                initialSubTab={savedInitialSubTab}
-              />
+              <Suspense fallback={<div className="p-8 text-center text-slate-400 text-xs">Carregando painel de salvos...</div>}>
+                <SavedRadarView
+                  savedProducts={savedProductsList}
+                  priceSummary={priceSummary}
+                  isCheckingPrices={isCheckingPrices}
+                  onRefreshPrices={handleRefreshPrices}
+                  onApplyPriceUpdate={handleApplyPriceUpdate}
+                  onToggleSave={handleToggleSave}
+                  onOpenDeepDive={handleOpenDeepDive}
+                  onOpenCalculator={(p) => {
+                    setSelectedProductForCalc(p);
+                    setShowCalculatorModal(true);
+                  }}
+                  onOpenCreativeGenerator={handleOpenCreativeGenerator}
+                  onBackToRadar={() => setShowSavedModal(false)}
+                  initialSubTab={savedInitialSubTab}
+                />
+              </Suspense>
             </div>
           </div>
         </div>
