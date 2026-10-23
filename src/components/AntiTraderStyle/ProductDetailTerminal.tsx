@@ -19,7 +19,8 @@ import {
   Clock,
   Activity,
   AlertTriangle,
-  Compass
+  Compass,
+  Play
 } from 'lucide-react';
 import { TrendingProduct } from '../../types';
 import { enrichWithTikTokShopData } from '../../data/tiktokShopEnricher';
@@ -40,6 +41,7 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
   onOpenCalculator,
 }) => {
   const [copiedHook, setCopiedHook] = useState(false);
+  const [copiedTerm, setCopiedTerm] = useState(false);
 
   if (!product) {
     return (
@@ -167,6 +169,13 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
     setTimeout(() => setCopiedHook(false), 2000);
   };
 
+  const handleCopyTerm = () => {
+    const term = String(tk.exactAffiliateSearchTerm || tk.originalName || tk.name);
+    navigator.clipboard.writeText(term);
+    setCopiedTerm(true);
+    setTimeout(() => setCopiedTerm(false), 2000);
+  };
+
   return (
     <main className="flex-1 min-w-0 bg-[#F8FAFC] overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-5 text-slate-900 select-none">
       
@@ -200,9 +209,12 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
           <h1 className="text-lg sm:text-2xl font-black text-slate-900 leading-tight">
             {tk.name}
           </h1>
-          <p className="text-xs text-slate-500 mt-1 font-medium line-clamp-1">
-            {tk.originalName || tk.name}
-          </p>
+          <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+            <span className="text-[11px] font-bold text-slate-500">Modelo Exato da Onda:</span>
+            <span className="text-[11px] font-mono font-bold bg-slate-100 text-slate-800 px-2 py-0.5 rounded border border-slate-200">
+              {tk.exactAffiliateSearchTerm || tk.originalName || tk.name}
+            </span>
+          </div>
         </div>
 
         {/* Botões de Ação Imediata */}
@@ -212,11 +224,21 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
             target="_blank"
             rel="noopener noreferrer"
             className="flex-1 md:flex-none flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-[#FE2C55] via-[#FF0050] to-[#FF3B5C] hover:brightness-105 text-white font-extrabold text-xs transition cursor-pointer shadow-[0_4px_18px_rgba(254,44,85,0.35)] active:scale-95"
+            title="Abre a busca do TikTok com a assinatura exata do modelo para assistir aos criativos e reviews virais deste produto"
           >
-            <ShoppingBag className="w-3.5 h-3.5" />
-            <span>Ver no TikTok Shop</span>
+            <Play className="w-3.5 h-3.5 fill-current" />
+            <span>Vídeos Virais no TikTok</span>
             <ExternalLink className="w-3 h-3 opacity-80" />
           </a>
+
+          <button
+            onClick={handleCopyTerm}
+            className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-white hover:bg-slate-50 border border-slate-300 text-slate-800 font-bold text-xs transition cursor-pointer shadow-2xs active:scale-95"
+            title="Copie o termo exato para colar no app do TikTok Shop (Centro de Criadores / Vitrine)"
+          >
+            {copiedTerm ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5 text-slate-500" />}
+            <span>{copiedTerm ? 'Copiado!' : 'Copiar Termo p/ Vitrine'}</span>
+          </button>
 
           <button
             onClick={() => onToggleSave(tk.id)}
@@ -229,6 +251,44 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
           >
             <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-current' : ''}`} />
           </button>
+        </div>
+
+        {/* Barra de Validação Multicanal Direta (Shopee / AliExpress / Mercado Livre) */}
+        <div className="w-full pt-2.5 mt-1 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500 flex-wrap gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="font-bold text-slate-700">Validar Estoque & Fornecedores:</span>
+            <a
+              href={tk.shopeeSearchUrl || `https://shopee.com.br/search?keyword=${encodeURIComponent(tk.name.split(' ').slice(0, 3).join(' '))}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-2 py-0.5 rounded bg-orange-50 text-orange-700 border border-orange-200 hover:bg-orange-100 font-bold flex items-center gap-1 transition"
+            >
+              <span>Shopee (Pronta Entrega SP)</span>
+              <ExternalLink className="w-2.5 h-2.5" />
+            </a>
+            <a
+              href={tk.aliExpressSearchUrl || `https://www.aliexpress.com/wholesale?SearchText=${encodeURIComponent(tk.exactViralSearchQuery || tk.originalName || tk.name)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-2 py-0.5 rounded bg-red-50 text-red-700 border border-red-200 hover:bg-red-100 font-bold flex items-center gap-1 transition"
+            >
+              <span>AliExpress (Atacado Direto)</span>
+              <ExternalLink className="w-2.5 h-2.5" />
+            </a>
+            <a
+              href={tk.mercadoLivreSearchUrl || `https://lista.mercadolivre.com.br/${encodeURIComponent(tk.name.split(' ').slice(0, 3).join(' '))}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-2 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100 font-bold flex items-center gap-1 transition"
+            >
+              <span>Mercado Livre</span>
+              <ExternalLink className="w-2.5 h-2.5" />
+            </a>
+          </div>
+
+          <span className="text-[10px] text-slate-400 font-mono">
+            {copiedTerm ? '✓ Termo pronto na área de transferência!' : 'Dica: Cole o termo exato na busca da Vitrine do App TikTok'}
+          </span>
         </div>
       </div>
 

@@ -59,6 +59,11 @@ export interface TrendingProduct {
     tiktokShopAffiliateLink: string;
     topViralHook: string;
     sampleRequestTip?: string;
+    exactViralSearchQuery?: string;
+    exactAffiliateSearchTerm?: string;
+    shopeeSearchUrl?: string;
+    aliExpressSearchUrl?: string;
+    mercadoLivreSearchUrl?: string;
   };
   groundingSources?: Array<{
     title: string;
@@ -66,6 +71,11 @@ export interface TrendingProduct {
   }>;
   discoveredAt: string;
   priceCheck?: ProductPriceCheck;
+  exactViralSearchQuery?: string;
+  exactAffiliateSearchTerm?: string;
+  shopeeSearchUrl?: string;
+  aliExpressSearchUrl?: string;
+  mercadoLivreSearchUrl?: string;
 }
 
 export interface DeepDiveAnalysis {

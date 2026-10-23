@@ -145,7 +145,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
     product.name.split(' ').slice(0, 3).join(' ')
   )}`;
   const tiktokViralUrl = `https://www.tiktok.com/search?q=${encodeURIComponent(
-    product.originalName
+    product.exactViralSearchQuery || (product.supplierKeywords && product.supplierKeywords[0]) || product.originalName
   )}`;
 
   return (

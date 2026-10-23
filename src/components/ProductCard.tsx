@@ -324,7 +324,7 @@ export const ProductCard: React.FC<ProductCardProps> = React.memo(({
           className="w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#FE2C55] via-[#FF0050] to-[#25F4EE] hover:brightness-110 text-white font-black py-2.5 text-xs shadow-lg shadow-[#FE2C55]/25 active:scale-98 transition-all cursor-pointer"
         >
           <ShoppingBag className="w-4 h-4 text-white" />
-          <span>Afiliar-se no TikTok Shop BR</span>
+          <span>Vídeos Virais & Afiliar no TikTok</span>
           <ExternalLink className="w-3.5 h-3.5 text-white/90" />
         </a>
 

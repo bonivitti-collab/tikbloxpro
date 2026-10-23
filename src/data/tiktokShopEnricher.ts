@@ -1,6 +1,45 @@
 import { resolveRealProductImage } from './productImageResolver';
 import { TrendingProduct } from '../types';
 
+export function extractSharpProductIdentifiers(product: any): {
+  exactViralSearchQuery: string;
+  exactAffiliateSearchTerm: string;
+  shopeeSearchUrl: string;
+  aliExpressSearchUrl: string;
+  mercadoLivreSearchUrl: string;
+} {
+  const primarySupplierKw = (product.supplierKeywords && product.supplierKeywords.length > 0 && product.supplierKeywords[0]) || '';
+  const orig = (product.originalName || '').trim();
+  const ptName = (product.name || '').trim();
+
+  // 1. TikTok Viral Query:
+  // Prioritiza o modelo exato gringo ou palavra-chave de atacado que encontra diretamente os unboxings virais
+  let exactViralSearchQuery = product.exactSearchQuery || primarySupplierKw || orig || ptName;
+
+  // 2. Termo conciso para a barra de pesquisa de afiliados no app móvel do TikTok Shop:
+  let exactAffiliateSearchTerm = '';
+  if (orig) {
+    const words = orig.split(' ').filter(Boolean);
+    exactAffiliateSearchTerm = words.slice(0, 4).join(' ');
+  } else if (primarySupplierKw) {
+    exactAffiliateSearchTerm = primarySupplierKw;
+  } else {
+    exactAffiliateSearchTerm = ptName.split(' ').slice(0, 4).join(' ');
+  }
+
+  // 3. Links de validação multicanal para cross-check de preço e pronta entrega nacional
+  const ptQueryShort = ptName.split(' ').slice(0, 4).join(' ');
+  const globalQuery = primarySupplierKw || orig || ptName;
+
+  return {
+    exactViralSearchQuery,
+    exactAffiliateSearchTerm,
+    shopeeSearchUrl: `https://shopee.com.br/search?keyword=${encodeURIComponent(ptQueryShort)}`,
+    aliExpressSearchUrl: `https://www.aliexpress.com/wholesale?SearchText=${encodeURIComponent(globalQuery)}`,
+    mercadoLivreSearchUrl: `https://lista.mercadolivre.com.br/${encodeURIComponent(ptQueryShort)}`,
+  };
+}
+
 export function enrichWithTikTokShopData(product: any): any {
   if (!product) return product;
 
@@ -51,10 +90,12 @@ export function enrichWithTikTokShopData(product: any): any {
     product.stockLocationBrazil || 
     stockLocations[charCodeSum % stockLocations.length];
 
-  const cleanKeyword = (product.name || '').split(' ').slice(0, 3).join(' ');
+  // Identificadores de precisão cirúrgica (substitui busca genérica de 3 palavras)
+  const sharp = extractSharpProductIdentifiers(product);
+
   const tiktokShopAffiliateLink = product.tiktokShop?.tiktokShopAffiliateLink || 
     product.tiktokShopAffiliateLink ||
-    `https://www.tiktok.com/search?q=${encodeURIComponent(cleanKeyword + ' tiktok shop')}`;
+    `https://www.tiktok.com/search?q=${encodeURIComponent(sharp.exactViralSearchQuery)}`;
 
   const topViralHook = product.tiktokShop?.topViralHook || 
     product.hookViral3s ||
@@ -74,6 +115,11 @@ export function enrichWithTikTokShopData(product: any): any {
     freeSampleAvailable: isFreeSample,
     creatorSaturationBR: saturationLevel,
     tiktokShopAffiliateLink,
+    exactViralSearchQuery: sharp.exactViralSearchQuery,
+    exactAffiliateSearchTerm: sharp.exactAffiliateSearchTerm,
+    shopeeSearchUrl: sharp.shopeeSearchUrl,
+    aliExpressSearchUrl: sharp.aliExpressSearchUrl,
+    mercadoLivreSearchUrl: sharp.mercadoLivreSearchUrl,
     hookViral3s: topViralHook,
     imageUrl: resolveRealProductImage(product),
     tiktokShop: {
@@ -87,6 +133,11 @@ export function enrichWithTikTokShopData(product: any): any {
       recentSalesCount,
       saturationLevel,
       tiktokShopAffiliateLink,
+      exactViralSearchQuery: sharp.exactViralSearchQuery,
+      exactAffiliateSearchTerm: sharp.exactAffiliateSearchTerm,
+      shopeeSearchUrl: sharp.shopeeSearchUrl,
+      aliExpressSearchUrl: sharp.aliExpressSearchUrl,
+      mercadoLivreSearchUrl: sharp.mercadoLivreSearchUrl,
       topViralHook,
       sampleRequestTip: 'Solicite amostra grátis no Centro de Criadores do TikTok Shop mencionando que você vai gravar 3 vídeos verticais e fazer 1 live na semana da entrega.',
     },
