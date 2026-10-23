@@ -263,9 +263,10 @@ export const AICopilotPanel: React.FC<AICopilotPanelProps> = ({
         {messages.length === 0 ? (
           <div className="space-y-2.5 py-1">
             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block px-1">
-              Sugestões Rápidas:
+              Sugestões de Análise para o Produto em Foco:
             </span>
 
+            {/* Card 1: Diagnóstico de Convicção (Verde Esmeralda) */}
             <button
               type="button"
               onClick={() =>
@@ -273,79 +274,94 @@ export const AICopilotPanel: React.FC<AICopilotPanelProps> = ({
                   `Vale a pena comprar a amostra de ${tk?.name || 'este produto'} com meu próprio dinheiro hoje? Analise o risco, concorrência no TikTok BR e break-even.`
                 )
               }
-              className="w-full p-2.5 rounded-xl border border-slate-200/90 border-l-4 border-l-emerald-500 bg-white hover:bg-slate-50 text-slate-700 transition-all cursor-pointer shadow-2xs group flex items-start gap-2.5 active:scale-98"
+              className="w-full p-3 rounded-2xl border-2 border-emerald-300/80 bg-gradient-to-r from-emerald-50/90 to-white hover:from-emerald-100/90 hover:to-emerald-50/50 text-slate-700 transition-all cursor-pointer shadow-2xs group flex items-start gap-2.5 active:scale-98"
             >
-                <div className="min-w-0 flex-1 text-left">
-                  <div className="text-xs font-bold text-slate-900 group-hover:text-emerald-800 flex items-center justify-between">
-                    <span>🟢 Diagnóstico de Convicção & Risco de Compra</span>
-                    <ArrowUpRight className="w-3 h-3 text-slate-400 group-hover:text-emerald-800" />
-                  </div>
-                  <div className="text-[10px] text-slate-500 truncate mt-0.5">
-                    Avalia se o produto se paga e quantos criadores já estão competindo.
-                  </div>
+              <div className="min-w-0 flex-1 text-left">
+                <div className="text-xs font-black text-emerald-900 group-hover:text-emerald-950 flex items-center justify-between">
+                  <span className="flex items-center gap-1.5">
+                    <span>🟢</span>
+                    <span>Diagnóstico de Convicção & Risco de Compra</span>
+                  </span>
+                  <ArrowUpRight className="w-3.5 h-3.5 text-emerald-600 group-hover:translate-x-0.5 transition-transform" />
                 </div>
-              </button>
+                <div className="text-[11px] text-emerald-800/80 truncate mt-0.5">
+                  Avalia se o produto se paga e quantos criadores já estão competindo no feed BR.
+                </div>
+              </div>
+            </button>
 
-              <button
-                type="button"
-                onClick={() =>
-                  handleSendMessage(
-                    `Gere 3 roteiros técnicos de 30 segundos no TikTok para ${tk?.name || 'este produto'}, detalhando o gancho exato de 3s para prender o scroll no Brasil.`
-                  )
-                }
-                className="w-full p-2.5 rounded-xl border border-slate-200/90 border-l-4 border-l-[#007A87] bg-white hover:bg-slate-50 text-slate-700 transition-all cursor-pointer shadow-2xs group flex items-start gap-2.5 active:scale-98"
-              >
-                <div className="min-w-0 flex-1 text-left">
-                  <div className="text-xs font-bold text-slate-900 group-hover:text-[#007A87] flex items-center justify-between">
+            {/* Card 2: 3 Roteiros Técnicos de Vídeo (Ciano / Sky) */}
+            <button
+              type="button"
+              onClick={() =>
+                handleSendMessage(
+                  `Gere 3 roteiros técnicos de 30 segundos no TikTok para ${tk?.name || 'este produto'}, detalhando o gancho exato de 3s para prender o scroll no Brasil.`
+                )
+              }
+              className="w-full p-3 rounded-2xl border-2 border-sky-300/80 bg-gradient-to-r from-sky-50/90 to-white hover:from-sky-100/90 hover:to-sky-50/50 text-slate-700 transition-all cursor-pointer shadow-2xs group flex items-start gap-2.5 active:scale-98"
+            >
+              <div className="min-w-0 flex-1 text-left">
+                <div className="text-xs font-black text-sky-900 group-hover:text-sky-950 flex items-center justify-between">
+                  <span className="flex items-center gap-1.5">
+                    <span>🎬</span>
                     <span>3 Roteiros Técnicos de Vídeo (30s)</span>
-                    <ArrowUpRight className="w-3 h-3 text-slate-400 group-hover:text-[#007A87]" />
-                  </div>
-                  <div className="text-[10px] text-slate-500 truncate mt-0.5">
-                    Ganchos de retenção imediata nos primeiros 3 segundos.
-                  </div>
+                  </span>
+                  <ArrowUpRight className="w-3.5 h-3.5 text-sky-600 group-hover:translate-x-0.5 transition-transform" />
                 </div>
-              </button>
+                <div className="text-[11px] text-sky-800/80 truncate mt-0.5">
+                  Ganchos de retenção imediata nos primeiros 3 segundos para viralizar.
+                </div>
+              </div>
+            </button>
 
-              <button
-                type="button"
-                onClick={() =>
-                  handleSendMessage(
-                    `Simular a estrutura completa de unit economics e projeção de lucro líquido com 50 vendas para ${tk?.name || 'este produto'} no TikTok Shop.`
-                  )
-                }
-                className="w-full p-2.5 rounded-xl border border-slate-200/90 border-l-4 border-l-amber-500 bg-white hover:bg-slate-50 text-slate-700 transition-all cursor-pointer shadow-2xs group flex items-start gap-2.5 active:scale-98"
-              >
-                <div className="min-w-0 flex-1 text-left">
-                  <div className="text-xs font-bold text-slate-900 group-hover:text-amber-800 flex items-center justify-between">
+            {/* Card 3: Simulação de Unit Economics & Lucro (Âmbar / Laranja) */}
+            <button
+              type="button"
+              onClick={() =>
+                handleSendMessage(
+                  `Simular a estrutura completa de unit economics e projeção de lucro líquido com 50 vendas para ${tk?.name || 'este produto'} no TikTok Shop.`
+                )
+              }
+              className="w-full p-3 rounded-2xl border-2 border-amber-300/80 bg-gradient-to-r from-amber-50/90 to-white hover:from-amber-100/90 hover:to-amber-50/50 text-slate-700 transition-all cursor-pointer shadow-2xs group flex items-start gap-2.5 active:scale-98"
+            >
+              <div className="min-w-0 flex-1 text-left">
+                <div className="text-xs font-black text-amber-900 group-hover:text-amber-950 flex items-center justify-between">
+                  <span className="flex items-center gap-1.5">
+                    <span>💰</span>
                     <span>Simulação de Unit Economics & Lucro</span>
-                    <ArrowUpRight className="w-3 h-3 text-slate-400 group-hover:text-amber-800" />
-                  </div>
-                  <div className="text-[10px] text-slate-500 truncate mt-0.5">
-                    Projeção de retorno líquido e ciclo de liberação Pix (D+7).
-                  </div>
+                  </span>
+                  <ArrowUpRight className="w-3.5 h-3.5 text-amber-600 group-hover:translate-x-0.5 transition-transform" />
                 </div>
-              </button>
+                <div className="text-[11px] text-amber-800/80 truncate mt-0.5">
+                  Projeção de retorno líquido e ciclo de liberação Pix (D+7).
+                </div>
+              </div>
+            </button>
 
-              <button
-                type="button"
-                onClick={() =>
-                  handleSendMessage(
-                    `Quais as 3 maiores objeções de compradores no TikTok para ${tk?.name || 'produtos desta categoria'} e como quebrar nos comentários?`
-                  )
-                }
-                className="w-full p-2.5 rounded-xl border border-slate-200/90 border-l-4 border-l-[#FE2C55] bg-white hover:bg-slate-50 text-slate-700 transition-all cursor-pointer shadow-2xs group flex items-start gap-2.5 active:scale-98"
-              >
-                <div className="min-w-0 flex-1 text-left">
-                  <div className="text-xs font-bold text-slate-900 group-hover:text-[#FE2C55] flex items-center justify-between">
+            {/* Card 4: Quebrar Objeções nos Comentários (Rosa Neon) */}
+            <button
+              type="button"
+              onClick={() =>
+                handleSendMessage(
+                  `Quais as 3 maiores objeções de compradores no TikTok para ${tk?.name || 'produtos desta categoria'} e como quebrar nos comentários?`
+                )
+              }
+              className="w-full p-3 rounded-2xl border-2 border-rose-300/80 bg-gradient-to-r from-rose-50/90 to-white hover:from-rose-100/90 hover:to-rose-50/50 text-slate-700 transition-all cursor-pointer shadow-2xs group flex items-start gap-2.5 active:scale-98"
+            >
+              <div className="min-w-0 flex-1 text-left">
+                <div className="text-xs font-black text-rose-900 group-hover:text-rose-950 flex items-center justify-between">
+                  <span className="flex items-center gap-1.5">
+                    <span>🛡️</span>
                     <span>Quebrar Objeções nos Comentários</span>
-                    <ArrowUpRight className="w-3 h-3 text-slate-400 group-hover:text-[#FE2C55]" />
-                  </div>
-                  <div className="text-[10px] text-slate-500 truncate mt-0.5">
-                    Respostas prontas para frete, prazo e confiança.
-                  </div>
+                  </span>
+                  <ArrowUpRight className="w-3.5 h-3.5 text-rose-600 group-hover:translate-x-0.5 transition-transform" />
                 </div>
-              </button>
-            </div>
+                <div className="text-[11px] text-rose-800/80 truncate mt-0.5">
+                  Respostas prontas para frete, prazo e confiança do comprador.
+                </div>
+              </div>
+            </button>
+          </div>
         ) : (
           messages.map((msg, i) => (
             <div
@@ -409,41 +425,105 @@ export const AICopilotPanel: React.FC<AICopilotPanelProps> = ({
         <div ref={chatScrollRef} />
       </div>
 
-      {/* Sugestões Dinâmicas de Continuidade (Padrão TikBlox) */}
-      <div className="px-2.5 py-1.5 border-t border-slate-200 bg-slate-50 shrink-0 flex items-center gap-1.5 overflow-x-auto no-scrollbar">
-        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider shrink-0 flex items-center gap-1">
-          <Sparkles className="w-3 h-3 text-[#007A87]" />
+      {/* Sugestões Dinâmicas de Continuidade e Tópicos com Cores Vivas (Foto 2 & 3) */}
+      <div className="px-3 py-2 border-t border-slate-200 bg-slate-50/90 shrink-0 flex items-center gap-2 overflow-x-auto no-scrollbar">
+        <span className="text-[10px] font-black text-slate-500 uppercase tracking-wider shrink-0 flex items-center gap-1">
+          <Sparkles className="w-3.5 h-3.5 text-[#007A87]" />
           <span>{messages.length > 0 ? 'Prosseguir:' : 'Tópicos:'}</span>
         </span>
-        {(messages.length > 0 && followUpSuggestions.length > 0
-          ? followUpSuggestions
-          : [
-              tk ? `Diagnóstico de ${tk.name.split(' ')[0]}` : 'Pesquisar Bolsas Femininas',
-              'Simular Margem & Lucro',
-              'Mecânica do Algoritmo & 3s',
-              'Regras de Cadastro & Pix D+7',
-            ]
-        ).map((sugestao, idx) => (
-          <button
-            key={idx}
-            type="button"
-            onClick={() => handleSendMessage(sugestao)}
-            disabled={isLoading}
-            className="text-[10.5px] text-slate-700 bg-white hover:bg-slate-100 border border-slate-300 hover:border-[#007A87] hover:text-[#007A87] rounded-full px-2.5 py-0.5 whitespace-nowrap cursor-pointer transition-colors font-medium shadow-2xs shrink-0 flex items-center gap-1 disabled:opacity-50 active:scale-95"
-          >
-            <span>{sugestao}</span>
-            <ArrowUpRight className="w-2.5 h-2.5 opacity-50 text-[#007A87]" />
-          </button>
-        ))}
+
+        {messages.length === 0 ? (
+          <>
+            <button
+              type="button"
+              onClick={() =>
+                handleSendMessage(
+                  `Vale a pena comprar a amostra de ${tk?.name || 'este produto'} com meu próprio dinheiro hoje? Analise o risco, concorrência no TikTok BR e break-even.`
+                )
+              }
+              disabled={isLoading}
+              className="text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-300 hover:bg-emerald-100 hover:border-emerald-400 rounded-full px-3 py-1 whitespace-nowrap cursor-pointer transition-all font-sans shadow-2xs shrink-0 flex items-center gap-1.5 disabled:opacity-50 active:scale-95"
+            >
+              <span>🟢 Diagnóstico & Risco</span>
+              <ArrowUpRight className="w-3 h-3 text-emerald-600" />
+            </button>
+
+            <button
+              type="button"
+              onClick={() =>
+                handleSendMessage(
+                  `Gere 3 roteiros técnicos de 30 segundos no TikTok para ${tk?.name || 'este produto'}, detalhando o gancho exato de 3s para prender o scroll no Brasil.`
+                )
+              }
+              disabled={isLoading}
+              className="text-xs font-bold bg-sky-50 text-sky-800 border border-sky-300 hover:bg-sky-100 hover:border-sky-400 rounded-full px-3 py-1 whitespace-nowrap cursor-pointer transition-all font-sans shadow-2xs shrink-0 flex items-center gap-1.5 disabled:opacity-50 active:scale-95"
+            >
+              <span>🎬 3 Roteiros (30s)</span>
+              <ArrowUpRight className="w-3 h-3 text-sky-600" />
+            </button>
+
+            <button
+              type="button"
+              onClick={() =>
+                handleSendMessage(
+                  `Simular a estrutura completa de unit economics e projeção de lucro líquido com 50 vendas para ${tk?.name || 'este produto'} no TikTok Shop.`
+                )
+              }
+              disabled={isLoading}
+              className="text-xs font-bold bg-amber-50 text-amber-800 border border-amber-300 hover:bg-amber-100 hover:border-amber-400 rounded-full px-3 py-1 whitespace-nowrap cursor-pointer transition-all font-sans shadow-2xs shrink-0 flex items-center gap-1.5 disabled:opacity-50 active:scale-95"
+            >
+              <span>💰 Simular Lucro & Break-Even</span>
+              <ArrowUpRight className="w-3 h-3 text-amber-600" />
+            </button>
+
+            <button
+              type="button"
+              onClick={() =>
+                handleSendMessage(
+                  `Quais as 3 maiores objeções de compradores no TikTok para ${tk?.name || 'produtos desta categoria'} e como quebrar nos comentários?`
+                )
+              }
+              disabled={isLoading}
+              className="text-xs font-bold bg-rose-50 text-rose-800 border border-rose-300 hover:bg-rose-100 hover:border-rose-400 rounded-full px-3 py-1 whitespace-nowrap cursor-pointer transition-all font-sans shadow-2xs shrink-0 flex items-center gap-1.5 disabled:opacity-50 active:scale-95"
+            >
+              <span>🛡️ Quebrar Objeções</span>
+              <ArrowUpRight className="w-3 h-3 text-rose-600" />
+            </button>
+          </>
+        ) : (
+          followUpSuggestions.map((sugestao, idx) => {
+            const colorClasses = [
+              'bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100',
+              'bg-sky-50 text-sky-800 border-sky-300 hover:bg-sky-100',
+              'bg-amber-50 text-amber-800 border-amber-300 hover:bg-amber-100',
+              'bg-purple-50 text-purple-800 border-purple-300 hover:bg-purple-100',
+              'bg-rose-50 text-rose-800 border-rose-300 hover:bg-rose-100',
+            ];
+            const cls = colorClasses[idx % colorClasses.length];
+
+            return (
+              <button
+                key={idx}
+                type="button"
+                onClick={() => handleSendMessage(sugestao)}
+                disabled={isLoading}
+                className={`text-xs font-bold border rounded-full px-3 py-1 whitespace-nowrap cursor-pointer transition-colors shadow-2xs shrink-0 flex items-center gap-1.5 disabled:opacity-50 active:scale-95 ${cls}`}
+              >
+                <span>{sugestao}</span>
+                <ArrowUpRight className="w-3 h-3 opacity-60" />
+              </button>
+            );
+          })
+        )}
       </div>
 
-      {/* Caixa de Digitação do Chat */}
+      {/* Caixa de Digitação do Chat Ampliada e Robusta (Foto 1) */}
       <form
         onSubmit={(e) => {
           e.preventDefault();
           handleSendMessage();
         }}
-        className="p-2.5 sm:p-3 border-t border-slate-200 bg-white flex items-center gap-2 shrink-0"
+        className="p-3 sm:p-3.5 border-t border-slate-200 bg-white flex items-center gap-2.5 shrink-0"
       >
         <input
           type="text"
@@ -451,15 +531,16 @@ export const AICopilotPanel: React.FC<AICopilotPanelProps> = ({
           onChange={(e) => setInput(e.target.value)}
           placeholder="Pergunte sobre nichos, métricas ou simule lucros..."
           disabled={isLoading}
-          className="flex-1 py-1.5 px-3 text-xs bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:border-[#25F4EE] focus:ring-1 focus:ring-[#25F4EE]/40 focus:bg-white transition-all text-slate-900 placeholder:text-slate-400 disabled:opacity-50"
+          className="flex-1 py-3 px-4 text-sm font-medium bg-slate-50 border border-slate-300 rounded-2xl focus:outline-none focus:border-[#25F4EE] focus:ring-2 focus:ring-[#25F4EE]/30 focus:bg-white transition-all text-slate-900 placeholder:text-slate-400 disabled:opacity-50 shadow-2xs"
         />
 
         <button
           type="submit"
           disabled={!input.trim() || isLoading}
-          className="p-2 rounded-xl bg-gradient-to-r from-[#25F4EE] to-[#00D2C4] hover:brightness-105 disabled:bg-slate-200 text-[#0F121C] disabled:text-slate-400 font-bold transition cursor-pointer active:scale-95 shadow-[0_0_12px_rgba(37,244,238,0.25)] shrink-0"
+          className="w-12 h-12 rounded-2xl bg-gradient-to-r from-[#25F4EE] to-[#00D2C4] hover:brightness-105 disabled:bg-slate-200 text-[#0F121C] disabled:text-slate-400 font-bold transition cursor-pointer active:scale-95 shadow-[0_0_16px_rgba(37,244,238,0.3)] shrink-0 flex items-center justify-center"
+          title="Enviar pergunta para o Copilot"
         >
-          <Send className="w-3.5 h-3.5" />
+          <Send className="w-5 h-5 text-[#0F121C]" />
         </button>
       </form>
 
