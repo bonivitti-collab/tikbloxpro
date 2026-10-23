@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Sparkles,
   Bookmark,
@@ -17,15 +17,10 @@ import {
   DollarSign,
   HelpCircle,
   ChevronRight,
-  RefreshCw,
   ExternalLink
 } from 'lucide-react';
 import { TrendingProduct } from '../../types';
 import { enrichWithTikTokShopData } from '../../data/tiktokShopEnricher';
-import {
-  verifyProductInTikTokShopBR,
-  LiveVerificationResult
-} from '../../services/rapidApiTikTokService';
 
 interface ProductDetailTerminalProps {
   product: TrendingProduct | null;
@@ -46,13 +41,6 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
   const [copiedTerm, setCopiedTerm] = useState(false);
   const [simulationSales, setSimulationSales] = useState<number>(25);
 
-  // Live TikTok Shop check via backend intelligence
-  const [liveCheckLoading, setLiveCheckLoading] = useState(false);
-  const [liveCheckResult, setLiveCheckResult] = useState<LiveVerificationResult | null>(null);
-
-  useEffect(() => {
-    setLiveCheckResult(null);
-  }, [product?.id]);
 
   if (!product) {
     return (
@@ -106,17 +94,6 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
   const simNetProfit = Math.max(0, simGrossCommission - priceBRL);
   const simRoi = priceBRL > 0 ? Math.round((simNetProfit / priceBRL) * 100) : 0;
 
-  const handleRunLiveCheck = async () => {
-    setLiveCheckLoading(true);
-    try {
-      const res = await verifyProductInTikTokShopBR(affiliateTerm, rapidApiKey);
-      setLiveCheckResult(res);
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setLiveCheckLoading(false);
-    }
-  };
 
   // =========================================================================
   // CICLO DE VIDA NO RADAR: Acompanhamento da Entrada até a Saturação
@@ -444,65 +421,14 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
               Vídeos no TikTok BR
             </span>
             <div className="text-lg sm:text-xl font-black text-slate-900 font-mono mt-1 flex items-baseline gap-1 whitespace-nowrap overflow-hidden">
-              <span>~{liveCheckResult ? liveCheckResult.videoCountBR : tc.creatorVideoCountBR}</span>
+              <span>~{tc.creatorVideoCountBR}</span>
               <span className="text-xs font-bold text-slate-500 font-sans">vídeos</span>
             </div>
             <span className="text-[10px] font-bold text-emerald-700 mt-0.5 block truncate">
-              {liveCheckResult ? liveCheckResult.verdictLabel : tc.creatorCompetitionLevel}
+              {tc.creatorCompetitionLevel}
             </span>
           </div>
 
-        </div>
-
-        {/* ========================================================= */}
-        {/* AUDITORIA AO VIVO NO FEED BRASILEIRO (INTELIGÊNCIA REAL) */}
-        {/* ========================================================= */}
-        <div className="p-4 rounded-xl bg-slate-900 text-white space-y-3 shadow-xs">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-            <div className="space-y-0.5">
-              <div className="flex items-center gap-2">
-                <span className="inline-flex items-center gap-1 text-[10px] font-mono font-black uppercase px-2 py-0.5 rounded bg-[#25F4EE] text-[#0F121C]">
-                  ⚡ Inteligência em Tempo Real
-                </span>
-                <span className="text-xs font-bold text-white">
-                  Auditoria ao Vivo no Feed do TikTok Brasil
-                </span>
-              </div>
-              <p className="text-[11px] text-slate-300">
-                {liveCheckResult
-                  ? liveCheckResult.message
-                  : 'Consulte em tempo real quantos criadores e vídeos já foram publicados promovendo este produto hoje no feed brasileiro.'}
-              </p>
-            </div>
-
-            <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto">
-              <button
-                onClick={handleRunLiveCheck}
-                disabled={liveCheckLoading}
-                className="flex-1 sm:flex-none px-4 py-2 rounded-xl bg-gradient-to-r from-[#25F4EE] to-[#00D2C4] hover:brightness-105 text-[#0F121C] font-extrabold text-xs transition cursor-pointer flex items-center justify-center gap-1.5 active:scale-95 disabled:opacity-50 shadow-sm"
-              >
-                <RefreshCw className={`w-3.5 h-3.5 ${liveCheckLoading ? 'animate-spin' : ''}`} />
-                <span>{liveCheckLoading ? 'Auditando Feed TikTok BR...' : 'Auditar Feed Brasileiro Agora'}</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Amostras Reais de Vídeos Detectados ao Vivo */}
-          {liveCheckResult?.sampleVideos && liveCheckResult.sampleVideos.length > 0 && (
-            <div className="pt-2 border-t border-white/10 grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-              {liveCheckResult.sampleVideos.map((vid, idx) => (
-                <div key={idx} className="p-2 rounded-lg bg-white/5 border border-white/10 space-y-0.5">
-                  <div className="flex items-center justify-between text-[10px] text-[#25F4EE] font-mono">
-                    <span className="truncate">@{vid.author}</span>
-                    <span className="font-bold">{vid.views}</span>
-                  </div>
-                  <p className="text-[11px] text-slate-300 line-clamp-1 italic">
-                    "{vid.title}"
-                  </p>
-                </div>
-              ))}
-            </div>
-          )}
         </div>
 
         {/* As 3 Teses Objetivas de Entrada */}
