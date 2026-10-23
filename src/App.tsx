@@ -106,7 +106,7 @@ export default function App() {
   const [filterBlueOceanOnly, setFilterBlueOceanOnly] = useState<boolean>(false);
   const [activeProduct, setActiveProduct] = useState<TrendingProduct | null>(() => INITIAL_CURATED_TRENDS[0] || null);
   const [painelEsquerdoRecolhido, setPainelEsquerdoRecolhido] = useState(false);
-  const [painelDireitoRecolhido, setPainelDireitoRecolhido] = useState(true);
+  const [painelDireitoRecolhido, setPainelDireitoRecolhido] = useState(false);
   const [mobileTab, setMobileTab] = useState<'produtos' | 'terminal' | 'copilot'>('produtos');
   const [filterHighCommissionOnly, setFilterHighCommissionOnly] = useState<boolean>(false);
   const [showSavedModal, setShowSavedModal] = useState<boolean>(false);
