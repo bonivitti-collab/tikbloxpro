@@ -8,9 +8,6 @@ import {
   PanelRight,
   ArrowUpRight,
   Sparkles,
-  Key,
-  X,
-  ExternalLink,
   RotateCcw,
   ChevronLeft,
   ChevronRight
@@ -43,15 +40,6 @@ export const AICopilotPanel: React.FC<AICopilotPanelProps> = ({
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
-  const [showKeyModal, setShowKeyModal] = useState(false);
-  const [apiKey, setApiKey] = useState<string>(() => {
-    return (
-      localStorage.getItem('tikblox_gemini_key') ||
-      localStorage.getItem('antigravity_gemini_key') ||
-      ''
-    );
-  });
-  const [tempKeyInput, setTempKeyInput] = useState('');
 
   const chatScrollRef = useRef<HTMLDivElement>(null);
   const topicsScrollRef = useRef<HTMLDivElement>(null);
@@ -77,17 +65,6 @@ export const AICopilotPanel: React.FC<AICopilotPanelProps> = ({
   useEffect(() => {
     scrollToBottom();
   }, [messages, isLoading]);
-
-  const handleSaveApiKey = () => {
-    const clean = tempKeyInput.trim();
-    setApiKey(clean);
-    if (clean) {
-      localStorage.setItem('tikblox_gemini_key', clean);
-    } else {
-      localStorage.removeItem('tikblox_gemini_key');
-    }
-    setShowKeyModal(false);
-  };
 
   // Sugestões Dinâmicas de Continuidade de Conversa (Padrão TikBlox)
   const followUpSuggestions = useMemo(() => {
@@ -151,12 +128,10 @@ export const AICopilotPanel: React.FC<AICopilotPanelProps> = ({
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...(apiKey ? { 'x-gemini-key': apiKey } : {}),
         },
         body: JSON.stringify({
           messages: newMessages,
           productContext: tk || undefined,
-          customApiKey: apiKey || undefined,
         }),
       });
 
@@ -170,7 +145,7 @@ export const AICopilotPanel: React.FC<AICopilotPanelProps> = ({
         {
           role: 'assistant',
           content: data.reply || 'Não consegui processar a resposta agora.',
-          source: data.usedSource || (apiKey ? 'Gemini 2.5 Flash' : 'TIKBLOX AI'),
+          source: data.usedSource || 'TIKBLOX AI Pro',
         },
       ]);
     } catch {
@@ -230,21 +205,10 @@ export const AICopilotPanel: React.FC<AICopilotPanelProps> = ({
           <div className="min-w-0">
             <div className="flex items-center gap-1.5 leading-none">
               <span className="font-bold text-xs text-slate-900 truncate">TIKBLOX AI</span>
-              <button
-                type="button"
-                onClick={() => {
-                  setTempKeyInput(apiKey);
-                  setShowKeyModal(true);
-                }}
-                className={`text-[9px] font-mono px-1.5 py-0.2 rounded-full font-bold border transition-colors cursor-pointer ${
-                  apiKey
-                    ? 'bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-emerald-100'
-                    : 'bg-slate-100 text-slate-600 border-slate-300 hover:bg-slate-200'
-                }`}
-                title="Configurar Chave Google AI Studio (Gratuita)"
-              >
-                {apiKey ? 'Gemini Ativo' : 'Conectar IA'}
-              </button>
+              <span className="text-[9px] font-mono px-2 py-0.5 rounded-full font-bold bg-emerald-50 text-emerald-700 border border-emerald-300 flex items-center gap-1 select-none shadow-2xs">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span>PRO ATIVO</span>
+              </span>
             </div>
             <span className="text-[10px] text-slate-500 truncate block mt-0.5 font-medium">
               Inteligência de Mercado & Algoritmo TikTok Shop
@@ -519,77 +483,6 @@ export const AICopilotPanel: React.FC<AICopilotPanelProps> = ({
         </button>
       </form>
 
-      {/* Modal de Configuração de Chave Gemini Gratuita */}
-      {showKeyModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl border border-slate-300 max-w-md w-full p-5 shadow-2xl space-y-4 text-slate-900">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <div className="flex items-center gap-2">
-                <div className="p-2 rounded-lg bg-[#25F4EE]/20 text-[#007A87]">
-                  <Key className="w-4 h-4" />
-                </div>
-                <div>
-                  <h3 className="text-sm font-bold text-slate-900">Conectar Cérebro Gemini (100% Gratuito)</h3>
-                  <span className="text-[11px] text-slate-500">Google AI Studio • 1.500 requisições/dia</span>
-                </div>
-              </div>
-              <button
-                onClick={() => setShowKeyModal(false)}
-                className="p-1 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-700"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            <p className="text-xs text-slate-600 leading-relaxed">
-              Para ativar o raciocínio livre do <strong>Gemini 2.5 Flash</strong> sem respostas pré-fabricadas e sem pagar nada, insira sua chave gratuita do Google AI Studio.
-            </p>
-
-            <div className="space-y-1.5">
-              <label className="text-[11px] font-bold text-slate-700 block">
-                Sua Chave de API (AIzaSy...):
-              </label>
-              <input
-                type="password"
-                value={tempKeyInput}
-                onChange={(e) => setTempKeyInput(e.target.value)}
-                placeholder="Cole sua chave AIzaSy... aqui"
-                className="w-full py-2 px-3 text-xs bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:border-[#007A87] font-mono text-slate-900"
-              />
-            </div>
-
-            <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200 text-[11px] text-slate-600 flex items-center justify-between">
-              <span>Ainda não tem chave? É gratuita e leva 30 segundos:</span>
-              <a
-                href="https://aistudio.google.com/apikey"
-                target="_blank"
-                rel="noreferrer"
-                className="font-bold text-[#007A87] hover:underline flex items-center gap-1 shrink-0 ml-2"
-              >
-                <span>Criar Chave</span>
-                <ExternalLink className="w-3 h-3" />
-              </a>
-            </div>
-
-            <div className="flex items-center justify-end gap-2 pt-2">
-              <button
-                type="button"
-                onClick={() => setShowKeyModal(false)}
-                className="px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-100 rounded-xl font-medium"
-              >
-                Cancelar
-              </button>
-              <button
-                type="button"
-                onClick={handleSaveApiKey}
-                className="px-4 py-1.5 text-xs bg-[#007A87] hover:bg-[#00606B] text-white rounded-xl font-bold shadow-xs transition"
-              >
-                Salvar & Conectar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </aside>
   );
 };
