@@ -217,55 +217,53 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
           </span>
         </div>
 
-        {/* Título Principal & Ações em Layout Perfeito */}
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pt-1">
-          <div className="space-y-1.5 flex-1 min-w-0 pr-0 lg:pr-4">
-            <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-snug">
-              {tk.name}
-            </h1>
-            <div className="flex items-center gap-2 flex-wrap text-xs text-slate-500">
-              <span className="font-medium text-slate-400">Modelo Global:</span>
-              <span className="font-mono text-slate-800 font-semibold bg-slate-100 px-2 py-0.5 rounded border border-slate-200/80 text-[11px]">
-                {tk.exactAffiliateSearchTerm || tk.originalName || tk.name}
-              </span>
-            </div>
+        {/* Título Principal (100% da Largura, sem espremer) */}
+        <div className="space-y-1.5 pt-1">
+          <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-snug">
+            {tk.name}
+          </h1>
+          <div className="flex items-center gap-2 flex-wrap text-xs text-slate-500">
+            <span className="font-medium text-slate-400">Modelo Global:</span>
+            <span className="font-mono text-slate-800 font-semibold bg-slate-100 px-2 py-0.5 rounded border border-slate-200/80 text-[11px]">
+              {tk.exactAffiliateSearchTerm || tk.originalName || tk.name}
+            </span>
           </div>
+        </div>
 
-          {/* Grupo de Ações Alinhadas */}
-          <div className="flex items-center gap-2 shrink-0 flex-wrap">
-            <a
-              href={affLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#FE2C55] via-[#FF0050] to-[#FF3B5C] hover:brightness-105 text-white font-extrabold text-xs transition cursor-pointer shadow-[0_4px_16px_rgba(254,44,85,0.30)] active:scale-95 whitespace-nowrap"
-              title="Abre a busca do TikTok com a assinatura exata do modelo para assistir aos criativos virais"
-            >
-              <Play className="w-3.5 h-3.5 fill-current" />
-              <span>Vídeos Virais no TikTok</span>
-              <ExternalLink className="w-3 h-3 opacity-80" />
-            </a>
+        {/* Barra de Ações Dedicada (Abaixo do Título) */}
+        <div className="flex items-center gap-2.5 flex-wrap pt-1">
+          <a
+            href={affLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-[#FE2C55] via-[#FF0050] to-[#FF3B5C] hover:brightness-105 text-white font-extrabold text-xs transition cursor-pointer shadow-[0_4px_16px_rgba(254,44,85,0.30)] active:scale-95 whitespace-nowrap"
+            title="Abre a busca do TikTok com a assinatura exata do modelo para assistir aos criativos virais"
+          >
+            <Play className="w-3.5 h-3.5 fill-current" />
+            <span>Vídeos Virais no TikTok</span>
+            <ExternalLink className="w-3 h-3 opacity-80" />
+          </a>
 
-            <button
-              onClick={handleCopyTerm}
-              className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-300 text-slate-800 font-bold text-xs transition cursor-pointer shadow-2xs active:scale-95 whitespace-nowrap"
-              title="Copie o termo exato para colar no app do TikTok Shop (Centro de Criadores / Vitrine)"
-            >
-              {copiedTerm ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5 text-slate-400" />}
-              <span>{copiedTerm ? 'Copiado!' : 'Copiar Termo p/ Vitrine'}</span>
-            </button>
+          <button
+            onClick={handleCopyTerm}
+            className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 border border-slate-300 text-slate-800 font-bold text-xs transition cursor-pointer shadow-2xs active:scale-95 whitespace-nowrap"
+            title="Copie o termo exato para colar no app do TikTok Shop (Centro de Criadores / Vitrine)"
+          >
+            {copiedTerm ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5 text-slate-400" />}
+            <span>{copiedTerm ? 'Copiado!' : 'Copiar Termo p/ Vitrine'}</span>
+          </button>
 
-            <button
-              onClick={() => onToggleSave(tk.id)}
-              className={`p-2.5 rounded-xl border transition cursor-pointer active:scale-95 shadow-2xs ${
-                isSaved
-                  ? 'bg-rose-50 border-rose-300 text-rose-600'
-                  : 'bg-white border-slate-300 text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-              }`}
-              title={isSaved ? 'Remover dos salvos' : 'Salvar produto'}
-            >
-              <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-current' : ''}`} />
-            </button>
-          </div>
+          <button
+            onClick={() => onToggleSave(tk.id)}
+            className={`p-2 rounded-xl border transition cursor-pointer active:scale-95 shadow-2xs ${
+              isSaved
+                ? 'bg-rose-50 border-rose-300 text-rose-600'
+                : 'bg-white border-slate-300 text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+            }`}
+            title={isSaved ? 'Remover dos salvos' : 'Salvar produto'}
+          >
+            <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-current' : ''}`} />
+          </button>
         </div>
 
         {/* Rodapé do Card: Faixa de Validação de Fornecedores Discreta & Elegante */}
