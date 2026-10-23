@@ -63,12 +63,16 @@ export const LoginModal: React.FC<LoginModalProps> = ({
         </button>
 
         {/* Header do Login */}
-        <div className="space-y-2 text-center pt-2">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#25F4EE] to-[#007A87] text-[#0F121C] flex items-center justify-center font-black mx-auto shadow-[0_0_24px_rgba(37,244,238,0.4)]">
-            <Bot className="w-6 h-6 text-[#0F121C]" />
+        <div className="space-y-3 text-center pt-2">
+          <div className="flex justify-center">
+            <img
+              src="/tikblox-logo.png"
+              alt="TIKBLOX PRO"
+              className="h-10 sm:h-11 w-auto object-contain drop-shadow-[0_2px_16px_rgba(0,0,0,0.6)]"
+            />
           </div>
-          <h2 className="text-xl font-black tracking-tight text-white">
-            Acessar TIKBLOX PRO
+          <h2 className="text-lg font-black tracking-tight text-white">
+            Acessar Painel de Membro
           </h2>
           <p className="text-xs text-slate-400 max-w-xs mx-auto">
             Digite o mesmo e-mail que você utilizou ao assinar na <strong>Kiwify</strong> para liberar seu painel.

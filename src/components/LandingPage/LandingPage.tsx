@@ -24,6 +24,7 @@ import {
   Play
 } from 'lucide-react';
 import { getKiwifyCheckoutUrls } from '../../services/authService';
+import { InteractiveScreensCarousel } from './InteractiveScreensCarousel';
 
 interface LandingPageProps {
   onOpenLogin: () => void;
@@ -55,31 +56,20 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       <header className="fixed top-0 left-0 right-0 z-40 bg-[#090D16]/80 backdrop-blur-md border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between">
           
-          {/* Logo TikBlox */}
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-[#25F4EE] via-[#00D2C4] to-[#FE2C55] p-0.5 shadow-[0_0_20px_rgba(37,244,238,0.3)]">
-              <div className="w-full h-full bg-[#090D16] rounded-[10px] flex items-center justify-center font-black text-sm text-[#25F4EE]">
-                ⚡
-              </div>
-            </div>
-            <div>
-              <div className="flex items-center gap-1.5 leading-none">
-                <span className="font-black text-base sm:text-lg tracking-wider text-white">TIKBLOX</span>
-                <span className="text-[10px] font-mono font-black uppercase px-1.5 py-0.5 rounded bg-gradient-to-r from-[#FE2C55] to-[#FF0050] text-white">
-                  PRO
-                </span>
-              </div>
-              <span className="text-[9px] font-mono text-slate-400 block tracking-widest uppercase mt-0.5">
-                TikTok Shop Brasil Radar
-              </span>
-            </div>
-          </div>
+          {/* Logo TikBlox Oficial */}
+          <a href="#" className="flex items-center gap-2 group cursor-pointer" title="TIKBLOX PRO">
+            <img
+              src="/tikblox-logo.png"
+              alt="TIKBLOX PRO - TikTok Shop Brasil Radar"
+              className="h-9 sm:h-10 w-auto object-contain transition-transform duration-200 group-hover:scale-105"
+            />
+          </a>
 
           {/* Navegação Desktop */}
           <nav className="hidden md:flex items-center gap-6 text-xs font-bold text-slate-300">
+            <a href="#demonstracao" className="hover:text-[#25F4EE] transition">Telas do Sistema</a>
             <a href="#diferencial" className="hover:text-white transition">Oceano Azul</a>
             <a href="#pilares" className="hover:text-white transition">Pronta Entrega SP</a>
-            <a href="#copilot" className="hover:text-white transition">Copiloto IA</a>
             <a href="#pricing" className="hover:text-[#25F4EE] transition">Planos & Preços</a>
             <a href="#faq" className="hover:text-white transition">Dúvidas</a>
           </nav>
@@ -147,11 +137,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </button>
 
             <button
-              onClick={onOpenAppDemo}
-              className="w-full sm:w-auto px-6 py-4 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold text-sm transition cursor-pointer flex items-center justify-center gap-2 active:scale-95"
+              onClick={() => {
+                const el = document.getElementById('demonstracao');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="w-full sm:w-auto px-6 py-4 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold text-sm transition cursor-pointer flex items-center justify-center gap-2 active:scale-95 group shadow-sm"
             >
-              <Play className="w-4 h-4 text-[#25F4EE] fill-current" />
-              <span>Ver Demonstração Interativa</span>
+              <Play className="w-4 h-4 text-[#25F4EE] fill-current group-hover:scale-110 transition-transform" />
+              <span>Ver Telas do Sistema (Carrossel)</span>
             </button>
           </div>
 
@@ -192,6 +185,28 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
         </div>
 
+      </section>
+
+      {/* ========================================================= */}
+      {/* 2.5 CARROSSEL EXPLICATIVO DE TELAS DO TIKBLOX PRO         */}
+      {/* ========================================================= */}
+      <section id="demonstracao" className="py-12 sm:py-20 px-4 sm:px-6 relative border-t border-white/5 bg-[#090D16]">
+        <div className="max-w-6xl mx-auto space-y-8 text-center">
+          <div className="space-y-3 max-w-2xl mx-auto">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#25F4EE]/10 border border-[#25F4EE]/30 text-xs font-bold text-[#25F4EE]">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Tour Visual Interativo</span>
+            </div>
+            <h2 className="text-2xl sm:text-4xl font-black text-white">
+              Conheça as Telas do TikBlox Pro por Dentro
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-300">
+              Passe o carrossel abaixo e veja exatamente como o radar, o raio-x financeiro e o copiloto funcionam antes de assinar:
+            </p>
+          </div>
+
+          <InteractiveScreensCarousel onOpenAppDemo={onOpenAppDemo} />
+        </div>
       </section>
 
       {/* ========================================================= */}
@@ -530,9 +545,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* 7. FOOTER                                                 */}
       {/* ========================================================= */}
       <footer className="py-12 px-4 sm:px-6 border-t border-white/10 text-center text-xs text-slate-500 space-y-4">
-        <div className="flex items-center justify-center gap-2">
-          <span className="font-black text-sm text-white">TIKBLOX PRO</span>
-          <span>•</span>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+          <img
+            src="/tikblox-logo.png"
+            alt="TIKBLOX PRO"
+            className="h-7 w-auto object-contain opacity-90 hover:opacity-100 transition"
+          />
+          <span className="hidden sm:inline text-slate-600">•</span>
           <span>Radar de Tendências e Inteligência TikTok Shop Brasil</span>
         </div>
         <p className="max-w-md mx-auto text-[11px] text-slate-500">
