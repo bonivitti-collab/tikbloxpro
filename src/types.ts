@@ -96,6 +96,7 @@ export interface TrendingProduct {
   aliExpressSearchUrl?: string;
   mercadoLivreSearchUrl?: string;
   tradeConviction?: TradeConviction;
+  customProductUrl?: string;
 }
 
 export interface DeepDiveAnalysis {

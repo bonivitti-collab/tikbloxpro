@@ -15,6 +15,7 @@ export const AddCustomProductModal: React.FC<AddCustomProductModalProps> = ({
   onAddProduct,
 }) => {
   const [name, setName] = useState('');
+  const [productUrl, setProductUrl] = useState('');
   const [niche, setNiche] = useState<ProductNiche>('beauty');
   const [priceBRL, setPriceBRL] = useState('59.90');
   const [commissionPct, setCommissionPct] = useState('22');
@@ -62,6 +63,7 @@ export const AddCustomProductModal: React.FC<AddCustomProductModalProps> = ({
         searchVolumeBR: 'Emergindo agora',
       },
       discoveredAt: new Date().toISOString(),
+      customProductUrl: productUrl.trim() || undefined,
       tiktokShop: {
         hasBrazilStock: true,
         stockLocation,
@@ -72,8 +74,9 @@ export const AddCustomProductModal: React.FC<AddCustomProductModalProps> = ({
         activeCreatorsCount: numVideos,
         recentSalesCount: 1850,
         saturationLevel: 'Oceano Azul',
-        tiktokShopAffiliateLink: 'https://seller-br.tiktok.com',
+        tiktokShopAffiliateLink: productUrl.trim() || 'https://seller-br.tiktok.com',
         topViralHook: `O motivo pelo qual o ${name.split(' ')[0]} está esgotando nas lojas de São Paulo:`,
+        customProductUrl: productUrl.trim() || undefined,
       },
     };
 
@@ -125,6 +128,22 @@ export const AddCustomProductModal: React.FC<AddCustomProductModalProps> = ({
               placeholder="Ex: Mini Seladora Térmica Portátil de Alimentos"
               className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:border-[#25F4EE] focus:ring-2 focus:ring-[#25F4EE]/20 outline-none font-medium"
             />
+          </div>
+
+          <div>
+            <label className="block text-[11px] font-bold text-slate-700 uppercase mb-1">
+              Endereço / Link do Produto (TikTok Shop ou Loja Nacional):
+            </label>
+            <input
+              type="url"
+              value={productUrl}
+              onChange={(e) => setProductUrl(e.target.value)}
+              placeholder="Ex: https://shop.tiktok.com/... ou https://shopee.com.br/..."
+              className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:border-[#25F4EE] focus:ring-2 focus:ring-[#25F4EE]/20 outline-none font-medium text-xs text-slate-800"
+            />
+            <span className="text-[10px] text-slate-400 mt-0.5 block">
+              Cole o link direto do produto para abrir com 1 clique quando for comprar a amostra.
+            </span>
           </div>
 
           <div className="grid grid-cols-2 gap-3">

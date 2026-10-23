@@ -274,11 +274,35 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
             <span className="font-mono text-slate-800 font-semibold bg-slate-100 px-2 py-0.5 rounded border border-slate-200/80 text-[11px]">
               {affiliateTerm}
             </span>
+            {(tk.customProductUrl || tk.tiktokShop?.customProductUrl) && (
+              <a
+                href={tk.customProductUrl || tk.tiktokShop?.customProductUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 font-mono text-[11px] text-emerald-800 hover:underline bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200"
+              >
+                <ExternalLink className="w-3 h-3 text-emerald-600" />
+                <span className="truncate max-w-[240px]">Link Original Cadastrado</span>
+              </a>
+            )}
           </div>
         </div>
 
         {/* Barra de Ações Práticas Focadas no Criador (SEM LINKS EXTERNOS QUE QUEBRAM) */}
         <div className="flex items-center gap-2.5 flex-wrap pt-1">
+          {(tk.customProductUrl || tk.tiktokShop?.customProductUrl) && (
+            <a
+              href={tk.customProductUrl || tk.tiktokShop?.customProductUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs transition cursor-pointer shadow-2xs active:scale-95 whitespace-nowrap"
+              title="Abrir o link direto cadastrado deste produto"
+            >
+              <ExternalLink className="w-3.5 h-3.5" />
+              <span>Abrir Loja / Produto</span>
+            </a>
+          )}
+
           <button
             onClick={handleCopyTerm}
             className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-[#FE2C55] via-[#FF0050] to-[#FF3B5C] hover:brightness-105 text-white font-extrabold text-xs transition cursor-pointer shadow-[0_4px_16px_rgba(254,44,85,0.25)] active:scale-95 whitespace-nowrap"
