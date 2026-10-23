@@ -15,7 +15,7 @@ import {
   ChevronLeft,
   ChevronRight
 } from 'lucide-react';
-import ReactMarkdown from 'react-markdown';
+import { FormattedMarkdownMessage } from '../FormattedMarkdownMessage';
 import { TrendingProduct } from '../../types';
 import { enrichWithTikTokShopData } from '../../data/tiktokShopEnricher';
 import { generateAutonomousTikTokShopReply } from '../../data/autonomousCopilot';
@@ -305,9 +305,7 @@ export const AICopilotPanel: React.FC<AICopilotPanelProps> = ({
               >
                 {msg.role === 'assistant' ? (
                   <>
-                    <div className="prose prose-xs max-w-none text-slate-800 prose-headings:text-slate-900 prose-strong:text-slate-900 prose-blockquote:border-[#007A87] prose-blockquote:bg-cyan-50/40 prose-blockquote:py-1 prose-blockquote:px-2 prose-blockquote:rounded">
-                      <ReactMarkdown>{msg.content}</ReactMarkdown>
-                    </div>
+                    <FormattedMarkdownMessage content={msg.content} variant="light" />
 
                     {msg.source && (
                       <div className="mt-2.5 pt-1.5 border-t border-slate-100 text-[9px] font-mono text-slate-400 flex items-center justify-between">

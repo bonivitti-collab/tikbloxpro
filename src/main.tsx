@@ -58,9 +58,7 @@ if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
       const isTopLevel = window.self === window.top;
       if (isTopLevel) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js').catch((err) => {
-            console.warn('PWA service worker registration notice:', err);
-          });
+          navigator.serviceWorker.register('/sw.js').then((reg) => { reg.update(); }).catch((err) => { console.warn('PWA service worker registration notice:', err); });
         });
       }
     } else {

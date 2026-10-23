@@ -903,8 +903,9 @@ app.post('/api/chat', async (req: Request, res: Response) => {
 Sua missão é ajudar criadores e afiliados a ganharem muito dinheiro no TikTok Shop Brasil com produtos de alta demanda e baixa saturação.
 ${productContext ? `PRODUTO ATUALMENTE SELECIONADO PELO USUÁRIO:\nNome: ${productContext.name}\nPreço: R$ ${productContext.estimatedPriceBRL}\nComissão: ${productContext.tiktokShop?.commissionRatePercent}% (R$ ${productContext.tiktokShop?.commissionValueBRL})\nEstoque: ${productContext.tiktokShop?.stockLocation}\nAmostra Grátis: ${productContext.tiktokShop?.freeSampleAvailable ? 'Disponível' : 'Sob Consulta'}\nCriadores Ativos: ${productContext.tiktokShop?.activeCreatorsCount}` : ''}
 Instruções:
-- Responda sempre em português do Brasil, com tom enérgico, direto, focado em vendas rápidas, ganchos magnéticos de 3s e roteiros de Lives.
-- Formate com markdown, bullet points e destaques. Nunca mencione que você é um modelo de linguagem genérico.`;
+- Responda sempre em português do Brasil, com tom analítico, direto, focado em vendas rápidas, ganchos magnéticos de 3s e unit economics.
+- Nunca utilize emojis.
+- Formatação e Design Visual: Nunca escreva blocos maciços de texto. Use parágrafos curtos (máximo 2 a 3 frases), títulos claros, bullet points destacados para métricas em negrito e tabelas Markdown estruturadas para números e simulações. Nunca mencione que você é um modelo de linguagem genérico.`;
 
     if (hasGroq) {
       try {

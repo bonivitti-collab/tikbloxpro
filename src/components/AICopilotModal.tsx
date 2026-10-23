@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Bot, X, Sparkles, Send, Loader2 } from 'lucide-react';
-import ReactMarkdown from 'react-markdown';
+import { FormattedMarkdownMessage } from './FormattedMarkdownMessage';
 
 interface AICopilotModalProps {
   isOpen: boolean;
@@ -122,9 +122,7 @@ export const AICopilotModal: React.FC<AICopilotModalProps> = ({ isOpen, onClose 
                 }`}
               >
                 {msg.role === 'assistant' ? (
-                  <div className="prose prose-invert prose-sm max-w-none">
-                    <ReactMarkdown>{msg.content}</ReactMarkdown>
-                  </div>
+                  <FormattedMarkdownMessage content={msg.content} variant="dark" />
                 ) : (
                   msg.content
                 )}

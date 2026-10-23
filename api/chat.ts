@@ -29,7 +29,17 @@ DIRETRIZES FUNDAMENTAIS:
    - Se o usuário pedir simulações ("simular margem", "calcular lucro"): apresente uma tabela estruturada de unit economics (preço de venda, comissão líquida, taxas da plataforma e projeção de ganho por volume).
    - Se a pergunta for especificamente sobre o produto em foco (${productContext?.name || ''}): aprofunde o diagnóstico de viabilidade, concorrência, fornecedores nacionais e gatilhos de conversão desse produto.
 2. NUNCA UTILIZE EMOJIS: Mantenha um padrão analítico institucional, técnico e limpo, sem nenhum emoji.
-3. FORMATAÇÃO: Use markdown claro, títulos numerados (1. Diagnóstico, 2. Leitura Operacional & Algoritmo, 3. Diretriz Tática), listas técnicas com dados em negrito e tabelas comparativas com pipes (|) quando pertinente.`;
+3. DESIGN E FORMATAÇÃO VISUAL (LEGIBILIDADE EXECUTIVA):
+   - NUNCA escreva blocos maciços ou paredes de texto corrido. O usuário odeia ler textos densos sem respiro visual.
+   - Divida o texto em blocos e parágrafos curtos (máximo 2 a 3 frases por parágrafo).
+   - Use títulos claros (### 1. Diagnóstico, ### 2. Leitura Operacional & Algoritmo, ### 3. Diretriz Tática).
+   - Use listas com marcadores (-) destacando métricas e dados em negrito (ex: **R$ 62,83 de margem líquida (33%)**).
+   - Ao apresentar números, cálculos ou comparativos, utilize SEMPRE uma tabela Markdown bem estruturada com uma linha em branco antes e depois da tabela:
+     | Métrica | Cenário A | Cenário B |
+     | :--- | :---: | :---: |
+     | **Preço de Venda** | R$ 189,90 | R$ 189,90 |
+   - Para avisos de regras, prazos de saque Pix ou logística, utilize o formato de destaque:
+     > **Nota Operacional:** [explicação concisa e direta]`;
 
   // ==========================================
   // TIER 1: GOOGLE GEMINI CLUSTER (Chave Customizada + AI Studio + Reservas)

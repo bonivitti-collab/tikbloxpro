@@ -16,7 +16,7 @@ import {
   ShoppingBag,
   Trash2
 } from 'lucide-react';
-import ReactMarkdown from 'react-markdown';
+import { FormattedMarkdownMessage } from '../FormattedMarkdownMessage';
 import { TrendingProduct } from '../../types';
 import { generateAutonomousTikTokShopReply } from '../../data/autonomousCopilot';
 
@@ -265,9 +265,7 @@ Estou aqui para tirar qualquer dúvida e criar **ganchos virais de 3 segundos**,
                 </div>
               )}
 
-              <div className="prose prose-invert prose-xs max-w-none leading-relaxed break-words font-normal">
-                <ReactMarkdown>{msg.content}</ReactMarkdown>
-              </div>
+              <FormattedMarkdownMessage content={msg.content} variant="dark" />
             </div>
           </div>
         ))}
