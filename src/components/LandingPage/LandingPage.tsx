@@ -1,7 +1,8 @@
 // src/components/LandingPage/LandingPage.tsx
 // Landing Page Institucional de Alta Conversão do TIKBLOX PRO
+// Otimizada com Padrões Avançados de UI/UX, Navegação Fluida e Interatividade
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Sparkles,
   Bot,
@@ -22,9 +23,14 @@ import {
   DollarSign,
   HelpCircle,
   CheckCircle2,
+  Menu,
+  X,
+  ChevronUp,
 } from 'lucide-react';
 import { getKiwifyCheckoutUrls } from '../../services/authService';
 import { InteractiveScreensCarousel } from './InteractiveScreensCarousel';
+import { ProfitSimulator } from './ProfitSimulator';
+import { SocialProofSection } from './SocialProofSection';
 
 interface LandingPageProps {
   onOpenLogin: () => void;
@@ -36,42 +42,121 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   isLoggedIn = false,
 }) => {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showFloatingCta, setShowFloatingCta] = useState(false);
+  const [floatingCtaDismissed, setFloatingCtaDismissed] = useState(false);
+  const [countdown, setCountdown] = useState<string>('00h 00m 00s');
+
   const checkoutUrls = getKiwifyCheckoutUrls();
+
+  // Contador regressivo em tempo real até a próxima varredura das 06:00 BRT (09:00 UTC)
+  useEffect(() => {
+    const updateCountdown = () => {
+      const now = new Date();
+      // Converte para horário de Brasília (UTC-3)
+      const brtHours = (now.getUTCHours() - 3 + 24) % 24;
+      const brtMinutes = now.getUTCMinutes();
+      const brtSeconds = now.getUTCSeconds();
+
+      const targetHours = 6;
+      let diffSeconds = (targetHours - brtHours) * 3600 - brtMinutes * 60 - brtSeconds;
+      if (diffSeconds <= 0) {
+        diffSeconds += 24 * 3600;
+      }
+
+      const h = Math.floor(diffSeconds / 3600);
+      const m = Math.floor((diffSeconds % 3600) / 60);
+      const s = diffSeconds % 60;
+      setCountdown(
+        `${String(h).padStart(2, '0')}h ${String(m).padStart(2, '0')}m ${String(s).padStart(2, '0')}s`
+      );
+    };
+
+    updateCountdown();
+    const interval = setInterval(updateCountdown, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Monitora scroll para exibir o Floating Action Bar e o botão de voltar ao topo
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 480) {
+        setShowFloatingCta(true);
+      } else {
+        setShowFloatingCta(false);
+      }
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const toggleFaq = (index: number) => {
     setOpenFaq(openFaq === index ? null : index);
   };
 
   const scrollToPricing = () => {
+    setMobileMenuOpen(false);
     const el = document.getElementById('pricing');
     if (el) el.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const scrollToSection = (id: string) => {
+    setMobileMenuOpen(false);
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
     <div className="min-h-screen bg-[#090D16] text-white selection:bg-[#25F4EE] selection:text-[#090D16] font-sans antialiased overflow-x-hidden">
       
       {/* ========================================================= */}
-      {/* 1. NAVBAR INSTITUCIONAL                                   */}
+      {/* 1. NAVBAR INSTITUCIONAL RESPONSIVA                         */}
       {/* ========================================================= */}
-      <header className="fixed top-0 left-0 right-0 z-40 bg-[#090D16]/80 backdrop-blur-md border-b border-white/10">
+      <header className="fixed top-0 left-0 right-0 z-40 bg-[#090D16]/90 backdrop-blur-md border-b border-white/10 transition-all">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between">
           
           {/* Logo TikBlox Oficial */}
-          <a href="#" className="flex items-center gap-2 group cursor-pointer" title="TIKBLOX PRO">
+          <a
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              scrollToTop();
+            }}
+            className="flex items-center gap-2 group cursor-pointer"
+            title="TIKBLOX PRO"
+          >
             <img
               src="/tikblox-logo.png"
               alt="TIKBLOX PRO - TikTok Shop Brasil Radar"
-              className="h-9 sm:h-10 w-auto object-contain transition-transform duration-200 group-hover:scale-105"
+              className="h-8 sm:h-10 w-auto object-contain transition-transform duration-200 group-hover:scale-105"
             />
           </a>
 
           {/* Navegação Desktop */}
-          <nav className="hidden md:flex items-center gap-6 text-xs font-bold text-slate-300">
-            <a href="#demonstracao" className="hover:text-[#25F4EE] transition">Como Funciona</a>
-            <a href="#diferencial" className="hover:text-white transition">Oceano Azul</a>
-            <a href="#pilares" className="hover:text-white transition">Pronta Entrega SP</a>
-            <a href="#pricing" className="hover:text-[#25F4EE] transition">Planos & Preços</a>
-            <a href="#faq" className="hover:text-white transition">Dúvidas</a>
+          <nav className="hidden lg:flex items-center gap-6 text-xs font-bold text-slate-300">
+            <button onClick={() => scrollToSection('demonstracao')} className="hover:text-[#25F4EE] transition cursor-pointer">
+              Como Funciona
+            </button>
+            <button onClick={() => scrollToSection('diferencial')} className="hover:text-white transition cursor-pointer">
+              Oceano Azul
+            </button>
+            <button onClick={() => scrollToSection('simulador')} className="hover:text-[#25F4EE] transition cursor-pointer flex items-center gap-1">
+              <span>Simulador de Lucro</span>
+              <span className="px-1.5 py-0.2 rounded bg-[#25F4EE]/10 text-[9px] text-[#25F4EE] border border-[#25F4EE]/30">NOVO</span>
+            </button>
+            <button onClick={() => scrollToSection('pilares')} className="hover:text-white transition cursor-pointer">
+              Pronta Entrega SP
+            </button>
+            <button onClick={() => scrollToSection('pricing')} className="hover:text-[#25F4EE] transition cursor-pointer">
+              Planos & Preços
+            </button>
+            <button onClick={() => scrollToSection('faq')} className="hover:text-white transition cursor-pointer">
+              Dúvidas
+            </button>
           </nav>
 
           {/* Ações / Login */}
@@ -92,31 +177,99 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
             <button
               onClick={scrollToPricing}
-              className="px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl bg-gradient-to-r from-[#25F4EE] to-[#00D2C4] hover:brightness-105 text-[#0F121C] font-black text-xs transition cursor-pointer shadow-[0_0_20px_rgba(37,244,238,0.3)] active:scale-95 whitespace-nowrap"
+              className="hidden sm:inline-flex px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl bg-gradient-to-r from-[#25F4EE] to-[#00D2C4] hover:brightness-105 text-[#0F121C] font-black text-xs transition cursor-pointer shadow-[0_0_20px_rgba(37,244,238,0.3)] active:scale-95 whitespace-nowrap"
             >
               Começar Agora
+            </button>
+
+            {/* Botão Hambúrguer Mobile */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="lg:hidden p-2 rounded-xl bg-white/5 border border-white/10 text-slate-300 hover:text-white cursor-pointer"
+              aria-label="Abrir menu de navegação"
+            >
+              {mobileMenuOpen ? <X className="w-5 h-5 text-[#25F4EE]" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
 
         </div>
+
+        {/* Menu Dropdown Mobile com Transição Fluida */}
+        {mobileMenuOpen && (
+          <div className="lg:hidden bg-[#0C101C] border-b border-white/10 px-4 py-5 space-y-4 animate-in slide-in-from-top-2 duration-200">
+            <nav className="flex flex-col space-y-3 text-sm font-bold text-slate-200">
+              <button
+                onClick={() => scrollToSection('demonstracao')}
+                className="text-left py-2 px-3 rounded-lg hover:bg-white/5 hover:text-[#25F4EE] transition"
+              >
+                📱 Como Funciona (Telas do Sistema)
+              </button>
+              <button
+                onClick={() => scrollToSection('diferencial')}
+                className="text-left py-2 px-3 rounded-lg hover:bg-white/5 hover:text-white transition"
+              >
+                🌊 Método Oceano Azul vs Tradicional
+              </button>
+              <button
+                onClick={() => scrollToSection('simulador')}
+                className="text-left py-2 px-3 rounded-lg hover:bg-white/5 hover:text-[#25F4EE] transition flex items-center justify-between"
+              >
+                <span>🧮 Simulador de Lucro Líquido</span>
+                <span className="text-[10px] px-2 py-0.5 rounded bg-[#25F4EE]/20 text-[#25F4EE] font-mono">NOVO</span>
+              </button>
+              <button
+                onClick={() => scrollToSection('pilares')}
+                className="text-left py-2 px-3 rounded-lg hover:bg-white/5 hover:text-white transition"
+              >
+                📦 Pronta Entrega São Paulo
+              </button>
+              <button
+                onClick={() => scrollToSection('pricing')}
+                className="text-left py-2 px-3 rounded-lg hover:bg-white/5 hover:text-[#25F4EE] transition"
+              >
+                💎 Planos & Preços Kiwify
+              </button>
+              <button
+                onClick={() => scrollToSection('faq')}
+                className="text-left py-2 px-3 rounded-lg hover:bg-white/5 hover:text-white transition"
+              >
+                ❓ Dúvidas Frequentes
+              </button>
+            </nav>
+
+            <button
+              onClick={scrollToPricing}
+              className="w-full py-3.5 rounded-xl bg-gradient-to-r from-[#25F4EE] to-[#00D2C4] text-[#0F121C] font-black text-xs uppercase tracking-wider text-center shadow-lg shadow-[#25F4EE]/20 block"
+            >
+              Quero Acessar o Radar por R$ 37/mês
+            </button>
+          </div>
+        )}
       </header>
 
       {/* ========================================================= */}
       {/* 2. HERO SECTION COM PROPOSTA DE VALOR MATADORA            */}
       {/* ========================================================= */}
-      <section className="relative pt-32 sm:pt-40 pb-20 px-4 sm:px-6 overflow-hidden">
+      <section className="relative pt-28 sm:pt-40 pb-16 sm:pb-24 px-4 sm:px-6 overflow-hidden">
         
         {/* Efeitos de Luz de Fundo */}
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-gradient-to-tr from-[#25F4EE]/15 to-[#FE2C55]/15 rounded-full blur-[120px] pointer-events-none" />
 
         <div className="max-w-5xl mx-auto text-center space-y-6 relative z-10">
           
-          {/* Badge de Destaque */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs font-semibold text-slate-200 shadow-2xs backdrop-blur-md">
-            <span className="w-2 h-2 rounded-full bg-[#25F4EE] animate-pulse" />
-            <span className="text-[#25F4EE] font-black">VARREDURA AUTOMÁTICA DAS 06:00 BRT</span>
-            <span className="text-slate-400">•</span>
-            <span>140+ Produtos Pronta Entrega Brasil</span>
+          {/* Badge de Destaque com Contador Dinâmico das 06:00 BRT */}
+          <div className="inline-flex flex-wrap items-center justify-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs font-semibold text-slate-200 shadow-2xs backdrop-blur-md max-w-full">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#25F4EE] opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#25F4EE]" />
+            </span>
+            <span className="text-[#25F4EE] font-black uppercase">VARREDURA 06:00 BRT CONCLUÍDA</span>
+            <span className="hidden sm:inline text-slate-500">•</span>
+            <span className="hidden sm:inline">140+ Oportunidades Pronta Entrega SP</span>
+            <span className="hidden md:inline text-slate-500">•</span>
+            <span className="hidden md:inline font-mono text-emerald-400 font-bold">
+              Próxima em: {countdown}
+            </span>
           </div>
 
           {/* Título Principal */}
@@ -144,6 +297,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </button>
           </div>
 
+          {/* Selos de Garantia e Confiança */}
           <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-xs text-slate-400 pt-1 font-medium">
             <span className="flex items-center gap-1.5 text-slate-300">
               <CheckCircle2 className="w-4 h-4 text-emerald-400" />
@@ -157,42 +311,46 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <span className="hidden sm:inline text-slate-600">•</span>
             <span className="flex items-center gap-1.5 text-slate-300">
               <Sparkles className="w-4 h-4 text-amber-400" />
-              <span>Garantia de 7 Dias</span>
+              <span>Garantia Incondicional de 7 Dias</span>
             </span>
           </div>
 
-          {/* Selos de Confiança */}
+          {/* Selos dos 4 Pilares Principais em Cards Interativos */}
           <div className="pt-8 grid grid-cols-2 sm:grid-cols-4 gap-3 text-left max-w-4xl mx-auto">
-            <div className="p-3 rounded-xl bg-white/5 border border-white/10 space-y-1">
+            <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 space-y-1 hover:border-emerald-500/40 transition">
               <span className="text-[10px] uppercase font-bold text-slate-400 block">Estoque Local</span>
-              <span className="text-xs font-black text-white flex items-center gap-1">
+              <span className="text-xs font-black text-white flex items-center gap-1.5">
                 <Package className="w-3.5 h-3.5 text-emerald-400" />
                 <span>Pronta Entrega SP</span>
               </span>
+              <span className="text-[10px] text-slate-400 block font-mono">2 a 4 dias na sua casa</span>
             </div>
 
-            <div className="p-3 rounded-xl bg-white/5 border border-white/10 space-y-1">
+            <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 space-y-1 hover:border-[#25F4EE]/40 transition">
               <span className="text-[10px] uppercase font-bold text-slate-400 block">Concorrência</span>
-              <span className="text-xs font-black text-white flex items-center gap-1">
+              <span className="text-xs font-black text-white flex items-center gap-1.5">
                 <ShieldCheck className="w-3.5 h-3.5 text-[#25F4EE]" />
                 <span>&lt; 10 Vídeos no Feed</span>
               </span>
+              <span className="text-[10px] text-slate-400 block font-mono">Vácuo de conteúdo</span>
             </div>
 
-            <div className="p-3 rounded-xl bg-white/5 border border-white/10 space-y-1">
+            <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 space-y-1 hover:border-amber-500/40 transition">
               <span className="text-[10px] uppercase font-bold text-slate-400 block">Risco Mínimo</span>
-              <span className="text-xs font-black text-white flex items-center gap-1">
+              <span className="text-xs font-black text-white flex items-center gap-1.5">
                 <Target className="w-3.5 h-3.5 text-amber-400" />
-                <span>Break-Even 3 a 5 Vendas</span>
+                <span>Break-Even 3 Vendas</span>
               </span>
+              <span className="text-[10px] text-slate-400 block font-mono">Retorno ultra rápido</span>
             </div>
 
-            <div className="p-3 rounded-xl bg-white/5 border border-white/10 space-y-1">
+            <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 space-y-1 hover:border-[#FE2C55]/40 transition">
               <span className="text-[10px] uppercase font-bold text-slate-400 block">Inteligência</span>
-              <span className="text-xs font-black text-white flex items-center gap-1">
+              <span className="text-xs font-black text-white flex items-center gap-1.5">
                 <Bot className="w-3.5 h-3.5 text-[#FE2C55]" />
-                <span>Gemini 3.8 Flash Nativo</span>
+                <span>Gemini 3.8 Flash</span>
               </span>
+              <span className="text-[10px] text-slate-400 block font-mono">Roteiros de 30s prontos</span>
             </div>
           </div>
 
@@ -203,7 +361,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* ========================================================= */}
       {/* 2.5 CARROSSEL EXPLICATIVO DE TELAS DO TIKBLOX PRO         */}
       {/* ========================================================= */}
-      <section id="demonstracao" className="py-12 sm:py-20 px-4 sm:px-6 relative border-t border-white/5 bg-[#090D16]">
+      <section id="demonstracao" className="py-12 sm:py-20 px-4 sm:px-6 relative border-t border-white/5 bg-[#090D16] scroll-mt-24">
         <div className="max-w-6xl mx-auto space-y-8 text-center">
           <div className="space-y-3 max-w-2xl mx-auto">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#25F4EE]/10 border border-[#25F4EE]/30 text-xs font-bold text-[#25F4EE]">
@@ -225,7 +383,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* ========================================================= */}
       {/* 3. O GRANDE DIFERENCIAL: O ERRO COMUM VS O MÉTODO TIKBLOX  */}
       {/* ========================================================= */}
-      <section id="diferencial" className="py-20 px-4 sm:px-6 bg-[#0E1322] border-y border-white/5">
+      <section id="diferencial" className="py-20 px-4 sm:px-6 bg-[#0E1322] border-y border-white/5 scroll-mt-24">
         <div className="max-w-6xl mx-auto space-y-12">
           
           <div className="text-center space-y-3 max-w-2xl mx-auto">
@@ -289,9 +447,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       </section>
 
       {/* ========================================================= */}
+      {/* 3.5 SIMULADOR INTERATIVO DE LUCRO LÍQUIDO                  */}
+      {/* ========================================================= */}
+      <ProfitSimulator onSelectPlan={scrollToPricing} />
+
+      {/* ========================================================= */}
       {/* 4. OS 4 PILARES DA PLATAFORMA                            */}
       {/* ========================================================= */}
-      <section id="pilares" className="py-20 px-4 sm:px-6">
+      <section id="pilares" className="py-20 px-4 sm:px-6 scroll-mt-24">
         <div className="max-w-6xl mx-auto space-y-12">
           
           <div className="text-center space-y-3 max-w-2xl mx-auto">
@@ -307,7 +470,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             
             {/* Pilar 1 */}
             <div className="p-6 rounded-3xl bg-white/5 border border-white/10 space-y-3 hover:border-[#25F4EE]/50 transition group">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#25F4EE] to-[#007A87] text-[#0F121C] flex items-center justify-center font-black text-xl shadow-md">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#25F4EE] to-[#00D2C4] text-[#0F121C] flex items-center justify-center font-black text-xl shadow-md">
                 ⚡
               </div>
               <h4 className="text-base font-black text-white group-hover:text-[#25F4EE] transition">
@@ -350,9 +513,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       </section>
 
       {/* ========================================================= */}
+      {/* 4.5 CASOS REAIS DE SUCESSO & ASSIMETRIA                    */}
+      {/* ========================================================= */}
+      <SocialProofSection />
+
+      {/* ========================================================= */}
       {/* 5. TABELA DE PREÇOS (CHECKOUT KIWIFY)                      */}
       {/* ========================================================= */}
-      <section id="pricing" className="py-20 px-4 sm:px-6 bg-[#0E1322] border-t border-white/5">
+      <section id="pricing" className="py-20 px-4 sm:px-6 bg-[#0E1322] border-t border-white/5 scroll-mt-24">
         <div className="max-w-5xl mx-auto space-y-12">
           
           <div className="text-center space-y-3 max-w-xl mx-auto">
@@ -416,9 +584,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 href={checkoutUrls.radar}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full py-3.5 px-4 rounded-xl bg-white/10 hover:bg-white/15 text-white font-black text-xs uppercase tracking-wider text-center transition cursor-pointer active:scale-95 border border-white/10"
+                className="w-full py-4 px-4 rounded-xl bg-white/10 hover:bg-white/15 text-white font-black text-xs uppercase tracking-wider text-center transition cursor-pointer active:scale-95 border border-white/10 block"
               >
-                Assinar Radar Essential
+                Assinar Radar Essential por R$ 37/mês
               </a>
             </div>
 
@@ -483,7 +651,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 rel="noopener noreferrer"
                 className="w-full py-4 px-4 rounded-xl bg-gradient-to-r from-[#25F4EE] via-[#00D2C4] to-[#25F4EE] hover:brightness-105 text-[#0F121C] font-black text-xs uppercase tracking-wider text-center transition cursor-pointer active:scale-95 shadow-[0_4px_25px_rgba(37,244,238,0.4)] block"
               >
-                Garantir Combo PRO com Desconto
+                Garantir Combo PRO com Desconto por R$ 57/mês
               </a>
             </div>
 
@@ -495,7 +663,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* ========================================================= */}
       {/* 6. FAQ (PERGUNTAS FREQUENTES DOS AFILIADOS)               */}
       {/* ========================================================= */}
-      <section id="faq" className="py-20 px-4 sm:px-6">
+      <section id="faq" className="py-20 px-4 sm:px-6 scroll-mt-24">
         <div className="max-w-3xl mx-auto space-y-8">
           
           <div className="text-center space-y-2">
@@ -555,7 +723,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       </section>
 
       {/* ========================================================= */}
-      {/* 7. FOOTER                                                 */}
+      {/* 7. FOOTER INSTITUCIONAL                                   */}
       {/* ========================================================= */}
       <footer className="py-12 px-4 sm:px-6 border-t border-white/10 text-center text-xs text-slate-500 space-y-4">
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -571,14 +739,69 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           Este site não é afiliado ou endossado pelo TikTok ou ByteDance. Todas as marcas e logotipos são de propriedade de seus respectivos titulares.
         </p>
         <div className="flex items-center justify-center gap-4 text-[11px] text-slate-400 pt-2">
-          <button onClick={onOpenLogin} className="hover:text-white transition cursor-pointer">Área de Assinantes (Login)</button>
+          <button onClick={onOpenLogin} className="hover:text-white transition cursor-pointer">
+            Área de Assinantes (Login)
+          </button>
           <span>•</span>
-          <a href="#pricing" className="hover:text-white transition">Planos Kiwify</a>
+          <button onClick={scrollToPricing} className="hover:text-white transition cursor-pointer">
+            Planos Kiwify
+          </button>
         </div>
         <p className="text-[10px] text-slate-600">
           © {new Date().getFullYear()} TIKBLOX PRO. Todos os direitos reservados.
         </p>
       </footer>
+
+      {/* ========================================================= */}
+      {/* 8. BARRA FLUTUANTE DE CONVERSÃO RÁPIDA (STICKY CTA BAR)   */}
+      {/* ========================================================= */}
+      {showFloatingCta && !floatingCtaDismissed && (
+        <div className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-6 sm:bottom-6 z-40 max-w-md w-full mx-auto sm:mx-0 animate-in fade-in slide-in-from-bottom-4 duration-300">
+          <div className="rounded-2xl bg-[#0F1424]/95 border border-[#25F4EE]/40 p-3 sm:p-3.5 shadow-2xl backdrop-blur-xl flex items-center justify-between gap-3 text-xs">
+            <div className="flex items-center gap-2.5 truncate">
+              <span className="relative flex h-2 w-2 shrink-0">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+              </span>
+              <div className="truncate">
+                <span className="font-extrabold text-white block truncate">
+                  ⚡ 140+ Itens Pronta Entrega SP
+                </span>
+                <span className="text-[10px] text-slate-400 font-mono hidden sm:inline">
+                  Varredura das 06:00 BRT
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                onClick={scrollToPricing}
+                className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-[#25F4EE] to-[#00D2C4] text-[#0F121C] font-black text-xs uppercase tracking-wider hover:brightness-110 active:scale-95 transition shadow-sm cursor-pointer whitespace-nowrap"
+              >
+                Assinar R$ 37
+              </button>
+              <button
+                onClick={() => setFloatingCtaDismissed(true)}
+                className="p-1 rounded-lg text-slate-400 hover:text-white transition cursor-pointer"
+                title="Fechar aviso flutuante"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Botão Flutuante Voltar ao Topo */}
+      {showFloatingCta && (
+        <button
+          onClick={scrollToTop}
+          className="fixed bottom-20 sm:bottom-6 left-4 sm:left-6 z-30 p-2.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/10 text-white backdrop-blur-md transition-all cursor-pointer shadow-lg active:scale-95 hidden sm:flex items-center justify-center"
+          title="Voltar ao Topo"
+        >
+          <ChevronUp className="w-4 h-4" />
+        </button>
+      )}
 
     </div>
   );

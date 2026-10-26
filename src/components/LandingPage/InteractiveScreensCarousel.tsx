@@ -106,6 +106,17 @@ export const InteractiveScreensCarousel: React.FC<InteractiveScreensCarouselProp
   onSelectPlan,
 }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
+
+  // Rotação automática suave a cada 7 segundos quando o usuário não estiver com o mouse em cima
+  useEffect(() => {
+    if (isPaused) return;
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev === SLIDES.length - 1 ? 0 : prev + 1));
+    }, 7000);
+    return () => clearInterval(timer);
+  }, [isPaused]);
 
   const prevSlide = () => {
     setCurrentSlide((prev) => (prev === 0 ? SLIDES.length - 1 : prev - 1));
@@ -113,6 +124,21 @@ export const InteractiveScreensCarousel: React.FC<InteractiveScreensCarouselProp
 
   const nextSlide = () => {
     setCurrentSlide((prev) => (prev === SLIDES.length - 1 ? 0 : prev + 1));
+  };
+
+  // Suporte a swipe no celular
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStartX(e.touches[0].clientX);
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX === null) return;
+    const diff = touchStartX - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 45) {
+      if (diff > 0) nextSlide();
+      else prevSlide();
+    }
+    setTouchStartX(null);
   };
 
   const handlePlanClick = () => {
@@ -127,7 +153,13 @@ export const InteractiveScreensCarousel: React.FC<InteractiveScreensCarouselProp
   const slide = SLIDES[currentSlide];
 
   return (
-    <div className="w-full max-w-6xl mx-auto space-y-8 select-none">
+    <div
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+      className="w-full max-w-6xl mx-auto space-y-8 select-none"
+    >
       
       {/* Abas Superiores de Navegação das Telas */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
