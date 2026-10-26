@@ -31,6 +31,7 @@ import { getKiwifyCheckoutUrls } from '../../services/authService';
 import { InteractiveScreensCarousel } from './InteractiveScreensCarousel';
 import { ProfitSimulator } from './ProfitSimulator';
 import { SocialProofSection } from './SocialProofSection';
+import { TikBloxLogo } from '../TikBloxLogo';
 
 interface LandingPageProps {
   onOpenLogin: () => void;
@@ -129,11 +130,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             className="flex items-center gap-2 group cursor-pointer"
             title="TIKBLOX PRO"
           >
-            <img
-              src="/tikblox-logo.png"
-              alt="TIKBLOX PRO - TikTok Shop Brasil Radar"
-              className="h-8 sm:h-10 w-auto object-contain transition-transform duration-200 group-hover:scale-105"
-            />
+            <TikBloxLogo size="md" theme="dark" animate={true} />
           </a>
 
           {/* Navegação Desktop */}
@@ -727,11 +724,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* ========================================================= */}
       <footer className="py-12 px-4 sm:px-6 border-t border-white/10 text-center text-xs text-slate-500 space-y-4">
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-          <img
-            src="/tikblox-logo.png"
-            alt="TIKBLOX PRO - Radar de Tendências TikTok Shop Brasil"
-            className="h-7 w-auto object-contain opacity-90 hover:opacity-100 transition"
-          />
+          <TikBloxLogo size="sm" theme="dark" animate={false} />
           <span className="hidden sm:inline text-slate-600">•</span>
           <span>Radar de Tendências e Inteligência TikTok Shop Brasil</span>
         </div>

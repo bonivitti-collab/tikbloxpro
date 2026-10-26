@@ -1,39 +1,48 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
   <defs>
     <!-- Border Gradient: Cyan to Pink (TikTok Signature) -->
-    <linearGradient id="tbBorderGrad512" x1="0%" y1="100%" x2="100%" y2="0%">
+    <linearGradient id="pwaBorderGrad" x1="0%" y1="100%" x2="100%" y2="0%">
       <stop offset="0%" stop-color="#25F4EE" />
       <stop offset="50%" stop-color="#00D2C4" />
       <stop offset="100%" stop-color="#FE2C55" />
     </linearGradient>
 
     <!-- Bolt Gradient: Bright Amber to Energetic Orange -->
-    <linearGradient id="tbBoltGrad512" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#FFC107" />
-      <stop offset="45%" stop-color="#FF9800" />
+    <linearGradient id="pwaBoltGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFD54F" />
+      <stop offset="40%" stop-color="#FF9800" />
       <stop offset="100%" stop-color="#FF5722" />
     </linearGradient>
 
-    <!-- Neon Glow on border & bolt -->
-    <filter id="tbGlow512" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="6" result="blur" />
+    <!-- Glow Effect -->
+    <filter id="pwaGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
       <feComposite in="SourceGraphic" in2="blur" operator="over" />
     </filter>
   </defs>
 
-  <!-- Solid App Canvas Background #090D16 -->
-  <rect width="512" height="512" rx="112" fill="#090D16" />
+  <!-- Solid App Background #090D16 to prevent white borders on Android/iOS -->
+  <rect width="512" height="512" fill="#090D16" />
 
-  <!-- Squircle Container with TikTok Gradient Border -->
-  <rect x="36" y="36" width="440" height="440" rx="110" fill="#0B0F19" stroke="url(#tbBorderGrad512)" stroke-width="16" filter="url(#tbGlow512)" />
+  <!-- Squircle Container -->
+  <rect
+    x="66"
+    y="66"
+    width="380"
+    height="380"
+    rx="98"
+    fill="#0B0F19"
+    stroke="url(#pwaBorderGrad)"
+    stroke-width="16"
+    filter="url(#pwaGlow)"
+  />
 
-  <!-- Center Lightning Bolt (Proportionate to Official Design) -->
+  <!-- Center Lightning Bolt -->
   <path
-    d="M278 116 L188 252 H258 L236 388 L344 220 H266 L278 116 Z"
-    fill="url(#tbBoltGrad512)"
-    stroke="#FFA000"
+    d="M280 120 L185 260 H260 L232 392 L340 226 H268 L280 120 Z"
+    fill="url(#pwaBoltGrad)"
+    stroke="#FFB300"
     stroke-width="2"
     stroke-linejoin="round"
-    filter="url(#tbGlow512)"
   />
 </svg>

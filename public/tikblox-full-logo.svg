@@ -1,66 +1,56 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 170" width="540" height="170">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 160" width="1080" height="320">
   <defs>
-    <!-- Background Gradient -->
-    <radialGradient id="fullLogoBg2" cx="30%" cy="50%" r="75%">
-      <stop offset="0%" stop-color="#0F121C" />
-      <stop offset="100%" stop-color="#090D16" />
-    </radialGradient>
-
-    <!-- Border Gradient: Cyan to Pink -->
-    <linearGradient id="tbBorderGradFull" x1="0%" y1="100%" x2="100%" y2="0%">
+    <!-- Border Gradient: Cyan to Pink (TikTok Signature) -->
+    <linearGradient id="fullBorderGrad" x1="0%" y1="100%" x2="100%" y2="0%">
       <stop offset="0%" stop-color="#25F4EE" />
       <stop offset="50%" stop-color="#00D2C4" />
       <stop offset="100%" stop-color="#FE2C55" />
     </linearGradient>
 
-    <!-- Bolt Gradient: Amber to Orange -->
-    <linearGradient id="tbBoltGradFull" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#FFC107" />
-      <stop offset="45%" stop-color="#FF9800" />
+    <!-- Bolt Gradient: Bright Amber to Energetic Orange -->
+    <linearGradient id="fullBoltGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFD54F" />
+      <stop offset="40%" stop-color="#FF9800" />
       <stop offset="100%" stop-color="#FF5722" />
     </linearGradient>
 
     <!-- PRO Badge Gradient -->
-    <linearGradient id="tbBadgeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#FF004F" />
-      <stop offset="100%" stop-color="#FE2C55" />
+    <linearGradient id="badgeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FE2C55" />
+      <stop offset="100%" stop-color="#FF004F" />
     </linearGradient>
 
-    <filter id="tbGlowFull" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="3" result="blur" />
+    <filter id="fullGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="4" result="blur" />
       <feComposite in="SourceGraphic" in2="blur" operator="over" />
     </filter>
-
-    <style>
-      @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@800;900&amp;family=JetBrains+Mono:wght@700&amp;display=swap');
-      .brand-title { font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 900; letter-spacing: -0.02em; }
-      .badge-text { font-family: 'Outfit', sans-serif; font-weight: 900; }
-      .sub-text { font-family: 'JetBrains Mono', monospace; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; }
-    </style>
   </defs>
 
-  <!-- Container -->
-  <rect width="540" height="170" rx="28" fill="url(#fullLogoBg2)" />
-  <rect width="538" height="168" x="1" y="1" rx="27" fill="none" stroke="rgba(255, 255, 255, 0.08)" stroke-width="1.5" />
+  <!-- Dark Background #090D16 -->
+  <rect width="540" height="160" fill="#090D16" />
 
-  <!-- 1. SQUIRCLE ICON ON LEFT -->
-  <g transform="translate(35, 35)">
-    <rect width="100" height="100" rx="28" fill="#0B0F19" stroke="url(#tbBorderGradFull)" stroke-width="4.5" />
+  <!-- 1. SQUIRCLE ICON -->
+  <g transform="translate(24, 25)">
+    <rect width="110" height="110" rx="30" fill="#0B0F19" stroke="url(#fullBorderGrad)" stroke-width="5" filter="url(#fullGlow)" />
+    <!-- Center Lightning Bolt -->
     <path
-      d="M53 22L36 49H49L45 74L64 43H50L53 22Z"
-      fill="url(#tbBoltGradFull)"
-      filter="url(#tbGlowFull)"
+      d="M60 25 L38 60 H56 L49 92 L75 52 H58 L60 25 Z"
+      fill="url(#fullBoltGrad)"
+      stroke="#FFB300"
+      stroke-width="0.8"
+      stroke-linejoin="round"
     />
   </g>
 
-  <!-- 2. BRAND TYPOGRAPHY -->
-  <!-- TIKBLOX -->
-  <text x="160" y="94" fill="#FFFFFF" font-size="58" class="brand-title">TIKBLOX</text>
+  <!-- 2. BRAND NAME: TIKBLOX -->
+  <text x="156" y="88" fill="#FFFFFF" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="52" letter-spacing="-0.03em">TIKBLOX</text>
 
-  <!-- PRO BADGE -->
-  <rect x="425" y="55" width="76" height="42" rx="12" fill="url(#tbBadgeGrad)" />
-  <text x="463" y="84" fill="#FFFFFF" font-size="22" text-anchor="middle" dominant-baseline="middle" class="badge-text">PRO</text>
+  <!-- 3. PRO BADGE -->
+  <g transform="translate(400, 52)">
+    <rect width="80" height="42" rx="12" fill="url(#badgeGrad)" />
+    <text x="40" y="27" fill="#FFFFFF" font-family="system-ui, -apple-system, BlinkMacSystemFont, sans-serif" font-weight="900" font-size="20" text-anchor="middle" dominant-baseline="middle" letter-spacing="0.05em">PRO</text>
+  </g>
 
-  <!-- SUBTITLE -->
-  <text x="162" y="125" fill="#8B9BB4" font-size="14" class="sub-text">TIKTOK SHOP BRASIL RADAR</text>
+  <!-- 4. SUBTITLE: TIKTOK SHOP BRASIL RADAR -->
+  <text x="158" y="118" fill="#8B9BB4" font-family="'JetBrains Mono', monospace, Consolas, sans-serif" font-weight="700" font-size="14" letter-spacing="0.22em">TIKTOK SHOP BRASIL RADAR</text>
 </svg>

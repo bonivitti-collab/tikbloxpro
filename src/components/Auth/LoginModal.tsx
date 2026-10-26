@@ -4,6 +4,7 @@
 import React, { useState } from 'react';
 import { Mail, Lock, Eye, EyeOff, ArrowRight, ShieldCheck, X, ExternalLink } from 'lucide-react';
 import { loginWithEmailAndPassword, UserSession } from '../../services/authService';
+import { TikBloxLogo } from '../TikBloxLogo';
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -61,11 +62,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
         {/* Header do Login */}
         <div className="space-y-3 text-center pt-2">
           <div className="flex justify-center">
-            <img
-              src="/tikblox-logo.png"
-              alt="TIKBLOX PRO"
-              className="h-10 sm:h-11 w-auto object-contain drop-shadow-[0_2px_16px_rgba(0,0,0,0.6)]"
-            />
+            <TikBloxLogo size="lg" theme="dark" animate={false} />
           </div>
           <h2 className="text-lg font-black tracking-tight text-white">
             Acessar Terminal TIKBLOX PRO

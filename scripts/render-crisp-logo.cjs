@@ -1,0 +1,77 @@
+const sharp = require('sharp');
+const fs = require('fs');
+const path = require('path');
+
+const publicDir = path.resolve(__dirname, '..', 'public');
+
+// Vector Full Logo SVG with text converted to paths / clean SVG
+const fullLogoSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 160" width="1080" height="320">
+  <defs>
+    <!-- Border Gradient: Cyan to Pink (TikTok Signature) -->
+    <linearGradient id="fullBorderGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#25F4EE" />
+      <stop offset="50%" stop-color="#00D2C4" />
+      <stop offset="100%" stop-color="#FE2C55" />
+    </linearGradient>
+
+    <!-- Bolt Gradient: Bright Amber to Energetic Orange -->
+    <linearGradient id="fullBoltGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFD54F" />
+      <stop offset="40%" stop-color="#FF9800" />
+      <stop offset="100%" stop-color="#FF5722" />
+    </linearGradient>
+
+    <!-- PRO Badge Gradient -->
+    <linearGradient id="badgeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FE2C55" />
+      <stop offset="100%" stop-color="#FF004F" />
+    </linearGradient>
+
+    <filter id="fullGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="4" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Dark Background #090D16 -->
+  <rect width="540" height="160" fill="#090D16" />
+
+  <!-- 1. SQUIRCLE ICON -->
+  <g transform="translate(24, 25)">
+    <rect width="110" height="110" rx="30" fill="#0B0F19" stroke="url(#fullBorderGrad)" stroke-width="5" filter="url(#fullGlow)" />
+    <!-- Center Lightning Bolt -->
+    <path
+      d="M60 25 L38 60 H56 L49 92 L75 52 H58 L60 25 Z"
+      fill="url(#fullBoltGrad)"
+      stroke="#FFB300"
+      stroke-width="0.8"
+      stroke-linejoin="round"
+    />
+  </g>
+
+  <!-- 2. BRAND NAME: TIKBLOX -->
+  <text x="156" y="88" fill="#FFFFFF" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="52" letter-spacing="-0.03em">TIKBLOX</text>
+
+  <!-- 3. PRO BADGE -->
+  <g transform="translate(400, 52)">
+    <rect width="80" height="42" rx="12" fill="url(#badgeGrad)" />
+    <text x="40" y="27" fill="#FFFFFF" font-family="system-ui, -apple-system, BlinkMacSystemFont, sans-serif" font-weight="900" font-size="20" text-anchor="middle" dominant-baseline="middle" letter-spacing="0.05em">PRO</text>
+  </g>
+
+  <!-- 4. SUBTITLE: TIKTOK SHOP BRASIL RADAR -->
+  <text x="158" y="118" fill="#8B9BB4" font-family="'JetBrains Mono', monospace, Consolas, sans-serif" font-weight="700" font-size="14" letter-spacing="0.22em">TIKTOK SHOP BRASIL RADAR</text>
+</svg>`;
+
+async function run() {
+  fs.writeFileSync(path.join(publicDir, 'tikblox-full-logo.svg'), fullLogoSvg, 'utf8');
+
+  // Render ultra-high-definition PNG (1080x320)
+  await sharp(Buffer.from(fullLogoSvg))
+    .resize(1080, 320)
+    .png({ compressionLevel: 9 })
+    .toFile(path.join(publicDir, 'tikblox-logo.png'));
+
+  console.log('✓ 1080x320 Ultra HD tikblox-logo.png generated successfully!');
+}
+
+run().catch(console.error);
