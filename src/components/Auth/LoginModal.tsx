@@ -29,12 +29,19 @@ export const LoginModal: React.FC<LoginModalProps> = ({
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const verifiedDevice = getVerifiedDeviceSession();
 
-  // Campos de Formulário
+  // Campos de Formulário (Pré-carrega e-mail salvo se o usuário marcou "Salvar meu login")
   const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState(() => {
+    try {
+      return localStorage.getItem('tikblox_remembered_email_v1') || verifiedDevice?.email || '';
+    } catch {
+      return '';
+    }
+  });
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(true);
 
   const [loading, setLoading] = useState(false);
   const [socialLoading, setSocialLoading] = useState<'google' | 'apple' | null>(null);
@@ -88,15 +95,25 @@ export const LoginModal: React.FC<LoginModalProps> = ({
     setLoading(true);
 
     try {
+      if (rememberMe) {
+        try {
+          localStorage.setItem('tikblox_remembered_email_v1', email.trim().toLowerCase());
+        } catch {}
+      } else {
+        try {
+          localStorage.removeItem('tikblox_remembered_email_v1');
+        } catch {}
+      }
+
       if (mode === 'register') {
         if (password !== confirmPassword) {
           throw new Error('As senhas digitadas não coincidem.');
         }
-        const session = await registerWithEmailAndPassword(name, email, password);
+        const session = await registerWithEmailAndPassword(name, email, password, rememberMe);
         onLoginSuccess(session);
         onClose();
       } else {
-        const session = await loginWithEmailAndPassword(email, password);
+        const session = await loginWithEmailAndPassword(email, password, rememberMe);
         onLoginSuccess(session);
         onClose();
       }
@@ -280,6 +297,8 @@ export const LoginModal: React.FC<LoginModalProps> = ({
               <Mail className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 ref={emailInputRef}
+                name="email"
+                autoComplete="username email"
                 type="email"
                 required
                 value={email}
@@ -298,6 +317,8 @@ export const LoginModal: React.FC<LoginModalProps> = ({
             <div className="relative">
               <Lock className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
+                name="password"
+                autoComplete={mode === 'register' ? 'new-password' : 'current-password'}
                 type={showPassword ? 'text' : 'password'}
                 required
                 value={password}
@@ -335,6 +356,22 @@ export const LoginModal: React.FC<LoginModalProps> = ({
               </div>
             </div>
           )}
+
+          {/* Opção de Salvar Meu Login neste Aparelho */}
+          <label className="flex items-center justify-between gap-2 pt-0.5 cursor-pointer select-none group">
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                className="w-4 h-4 rounded border-white/20 bg-white/5 accent-[#25F4EE] cursor-pointer"
+              />
+              <span className="text-[11px] font-semibold text-slate-300 group-hover:text-white transition">
+                Salvar meu login e manter conectado neste aparelho
+              </span>
+            </div>
+            <ShieldCheck className="w-3.5 h-3.5 text-[#25F4EE] shrink-0 opacity-80" />
+          </label>
 
           {error && (
             <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs leading-relaxed animate-in fade-in">

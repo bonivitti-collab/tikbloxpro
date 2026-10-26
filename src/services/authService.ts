@@ -94,11 +94,13 @@ export function getCurrentSession(): UserSession | null {
 /**
  * Salva a sessão ativa do usuário e guarda o token verificado no dispositivo
  */
-export function saveSession(session: UserSession): void {
+export function saveSession(session: UserSession, rememberDevice: boolean = true): void {
   try {
     localStorage.setItem(STORAGE_SESSION_KEY, JSON.stringify(session));
-    if (session.token) {
+    if (rememberDevice && session.token) {
       localStorage.setItem(STORAGE_VERIFIED_TOKEN_SESSION_KEY, JSON.stringify(session));
+    } else if (!rememberDevice) {
+      localStorage.removeItem(STORAGE_VERIFIED_TOKEN_SESSION_KEY);
     }
   } catch (e) {
     console.error('Erro ao salvar sessão local:', e);
@@ -138,7 +140,8 @@ export function clearSession(): void {
 export async function registerWithEmailAndPassword(
   name: string,
   email: string,
-  password: string
+  password: string,
+  rememberDevice: boolean = true
 ): Promise<UserSession> {
   const res = await fetch('/api/auth', {
     method: 'POST',
@@ -156,7 +159,7 @@ export async function registerWithEmailAndPassword(
     throw new Error(data.error || 'Não foi possível criar a conta.');
   }
 
-  saveSession(data.session);
+  saveSession(data.session, rememberDevice);
   return data.session;
 }
 
@@ -165,7 +168,8 @@ export async function registerWithEmailAndPassword(
  */
 export async function loginWithEmailAndPassword(
   email: string,
-  password?: string
+  password?: string,
+  rememberDevice: boolean = true
 ): Promise<UserSession> {
   const res = await fetch('/api/auth', {
     method: 'POST',
@@ -182,7 +186,7 @@ export async function loginWithEmailAndPassword(
     throw new Error(data.error || 'E-mail ou senha inválidos.');
   }
 
-  saveSession(data.session);
+  saveSession(data.session, rememberDevice);
   return data.session;
 }
 
