@@ -216,72 +216,102 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
     <main className="flex-1 min-w-0 bg-[#F8FAFC] overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-5 text-slate-900 select-none">
       
       {/* ========================================================= */}
-      {/* 1. CABEÇALHO EXECUTIVO INSTITUCIONAL (ANTI-TRADER / LINEAR) */}
+      {/* 1. CABEÇALHO EXECUTIVO INSTITUCIONAL (GRID SIMÉTRICO PRO) */}
       {/* ========================================================= */}
-      <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-xs relative overflow-hidden space-y-4">
+      <div className="bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-6 shadow-xs relative overflow-hidden space-y-4">
         
         {/* Barra de Acento Superior Refinada */}
         <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-[#25F4EE] via-[#FE2C55] to-[#25F4EE]" />
 
-        {/* Linha Superior: Metadados Harmoniosos e Unificados */}
-        <div className="flex items-center gap-2 text-xs flex-wrap text-slate-500">
-          <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-slate-900 text-white shadow-2xs">
-            {tk.nicheLabel || 'Nicho'}
-          </span>
-          <span className="text-slate-300">•</span>
-          <span className="inline-flex items-center gap-1 font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200/60 text-[11px]">
-            <Package className="w-3 h-3 text-emerald-600" />
-            <span>{stockLoc.replace(' - SP', ', SP')}</span>
-          </span>
-          <span className="text-slate-300">•</span>
-          <span className="inline-flex items-center gap-1 font-medium text-slate-600 text-[11px]">
-            <Clock className="w-3 h-3 text-[#007A87]" />
-            <span>Há {lifecycle.daysActive} dias no radar</span>
-          </span>
-          <span className="text-slate-300">•</span>
-          <span className="text-[11px] font-bold text-rose-600 flex items-center gap-0.5">
-            <Flame className="w-3 h-3 fill-current text-[#FE2C55]" />
-            <span>Viralidade {tk.viralityScore}/100</span>
-          </span>
+        {/* Linha 1: Metadados Limpos + Botão Salvar no Canto Direito */}
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+            <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full bg-slate-900 text-white shadow-2xs">
+              {tk.nicheLabel || 'Nicho'}
+            </span>
+            <span className="inline-flex items-center gap-1 font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200 text-[10.5px]">
+              <Package className="w-3 h-3 text-emerald-600 shrink-0" />
+              <span>{stockLoc.replace(' - SP', ', SP')}</span>
+            </span>
+            <span className="inline-flex items-center gap-1 font-semibold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-full border border-slate-200/80 text-[10.5px]">
+              <Clock className="w-3 h-3 text-[#007A87] shrink-0" />
+              <span>Há {lifecycle.daysActive} dias no radar</span>
+            </span>
+            <span className="inline-flex items-center gap-1 text-[10.5px] font-extrabold text-rose-600 bg-rose-50 px-2.5 py-1 rounded-full border border-rose-200">
+              <Flame className="w-3 h-3 fill-current text-[#FE2C55] shrink-0" />
+              <span>Viralidade {tk.viralityScore}/100</span>
+            </span>
+          </div>
+
+          {/* Botão Salvar fixado no topo direito */}
+          <button
+            onClick={() => onToggleSave(tk.id)}
+            className={`p-2 rounded-xl border transition cursor-pointer active:scale-95 shadow-2xs shrink-0 ${
+              isSaved
+                ? 'bg-rose-50 border-rose-300 text-rose-600'
+                : 'bg-white border-slate-200 text-slate-500 hover:text-slate-900 hover:bg-slate-50'
+            }`}
+            title={isSaved ? 'Remover dos salvos' : 'Salvar produto'}
+          >
+            <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-current' : ''}`} />
+          </button>
         </div>
 
-        {/* Título Principal (100% da Largura, sem espremer) */}
-        <div className="space-y-1.5 pt-1">
+        {/* Linha 2: Título Principal de Alto Impacto */}
+        <div>
           <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-snug">
             {tk.name}
           </h1>
-          <div className="flex items-center gap-2 flex-wrap text-xs text-slate-500">
-            <span className="font-medium text-slate-400">Termo de Busca para Vitrine:</span>
-            <span className="font-mono text-slate-800 font-semibold bg-slate-100 px-2 py-0.5 rounded border border-slate-200/80 text-[11px]">
-              {affiliateTerm}
-            </span>
-            {(tk.customProductUrl || tk.tiktokShop?.customProductUrl) && (
-              <a
-                href={tk.customProductUrl || tk.tiktokShop?.customProductUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 font-mono text-[11px] text-emerald-800 hover:underline bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200"
-              >
-                <ExternalLink className="w-3 h-3 text-emerald-600" />
-                <span className="truncate max-w-[240px]">Link Original Cadastrado</span>
-              </a>
-            )}
-          </div>
+          {(tk.customProductUrl || tk.tiktokShop?.customProductUrl) && (
+            <a
+              href={tk.customProductUrl || tk.tiktokShop?.customProductUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-2 inline-flex items-center gap-1 font-mono text-[11px] text-emerald-800 hover:underline bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200"
+            >
+              <ExternalLink className="w-3 h-3 text-emerald-600" />
+              <span className="truncate max-w-[260px]">Link Original Cadastrado</span>
+            </a>
+          )}
         </div>
 
-        {/* Barra de Ações Práticas Focadas no Criador com Links Diretos */}
-        <div className="flex items-center gap-2.5 flex-wrap pt-2">
+        {/* Linha 3: Box Interativo de Termo de Busca para Vitrine (1-Clique para Copiar) */}
+        <div className="bg-slate-50/90 border border-slate-200/90 rounded-xl p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+          <div className="min-w-0">
+            <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block">
+              Termo de Busca para Vitrine (TikTok Shop):
+            </span>
+            <div className="font-mono text-xs sm:text-sm font-black text-slate-900 truncate mt-0.5 select-all">
+              {affiliateTerm}
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={handleCopyTerm}
+            className={`px-3.5 py-2 rounded-lg font-extrabold text-xs transition cursor-pointer flex items-center justify-center gap-1.5 shrink-0 border shadow-2xs active:scale-95 ${
+              copiedTerm
+                ? 'bg-emerald-600 text-white border-emerald-600'
+                : 'bg-white hover:bg-slate-100 text-slate-800 border-slate-300'
+            }`}
+          >
+            {copiedTerm ? <Check className="w-3.5 h-3.5 text-white" /> : <Copy className="w-3.5 h-3.5 text-slate-500" />}
+            <span>{copiedTerm ? 'Termo Copiado!' : 'Copiar Termo Vitrine'}</span>
+          </button>
+        </div>
+
+        {/* Linha 4: Grid Simétrico de Ações (Alinhamento Perfeito no Celular e Notebook) */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 pt-0.5">
           {/* 1. Ver Produto no TikTok Shop */}
           <a
             href={tiktokShopUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#0F121C] hover:bg-black text-white font-black text-xs transition cursor-pointer shadow-md active:scale-95 whitespace-nowrap border border-white/10 group"
+            className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-[#0F121C] hover:bg-black text-white font-black text-xs transition cursor-pointer shadow-sm active:scale-98 whitespace-nowrap border border-slate-800 group"
             title="Abrir página oficial do produto ou busca no TikTok Shop Brasil"
           >
-            <ShoppingBag className="w-3.5 h-3.5 text-[#25F4EE]" />
+            <ShoppingBag className="w-4 h-4 text-[#25F4EE] shrink-0" />
             <span>Ver no TikTok Shop</span>
-            <ExternalLink className="w-3 h-3 text-slate-400 group-hover:text-white transition-colors ml-0.5" />
+            <ExternalLink className="w-3 h-3 text-slate-400 group-hover:text-white transition-colors shrink-0" />
           </a>
 
           {/* 2. Comprar Amostra Pronta Entrega (SP) */}
@@ -289,66 +319,51 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
             href={sampleDeliveryUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:brightness-105 text-white font-black text-xs transition cursor-pointer shadow-md shadow-emerald-900/10 active:scale-95 whitespace-nowrap group"
+            className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:brightness-105 text-white font-black text-xs transition cursor-pointer shadow-sm active:scale-98 whitespace-nowrap group"
             title="Comprar amostra física com envio imediato de São Paulo (2 a 4 dias úteis)"
           >
-            <Package className="w-3.5 h-3.5 text-white" />
+            <Package className="w-4 h-4 text-white shrink-0" />
             <span>Comprar Amostra (SP)</span>
-            <ExternalLink className="w-3 h-3 text-emerald-200 group-hover:text-white transition-colors ml-0.5" />
+            <ExternalLink className="w-3 h-3 text-emerald-200 group-hover:text-white transition-colors shrink-0" />
           </a>
 
-          {/* 3. Copiar Termo p/ Vitrine (App TikTok) */}
+          {/* 3. Copiar Gancho Viral 3s */}
           <button
-            onClick={handleCopyTerm}
-            className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-300 text-slate-800 font-extrabold text-xs transition cursor-pointer shadow-2xs active:scale-95 whitespace-nowrap"
-            title="Copiar nome do modelo para colar na vitrine de produtos do TikTok Shop"
-          >
-            {copiedTerm ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5 text-slate-500" />}
-            <span>{copiedTerm ? '✓ Termo Copiado!' : 'Copiar Termo Vitrine'}</span>
-          </button>
-
-          {/* 4. Copiar Gancho Viral */}
-          <button
+            type="button"
             onClick={handleCopyHook}
-            className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-300 text-slate-800 font-bold text-xs transition cursor-pointer shadow-2xs active:scale-95 whitespace-nowrap"
+            className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-amber-50/80 hover:bg-amber-100/80 border border-amber-300 text-amber-950 font-black text-xs transition cursor-pointer shadow-2xs active:scale-98 whitespace-nowrap"
             title="Copiar o gancho viral de 3 segundos para gravar seu vídeo"
           >
-            {copiedHook ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Zap className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />}
-            <span>{copiedHook ? 'Gancho Copiado!' : 'Gancho 3s'}</span>
+            {copiedHook ? (
+              <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+            ) : (
+              <Zap className="w-4 h-4 text-amber-500 fill-amber-500 shrink-0" />
+            )}
+            <span>{copiedHook ? 'Gancho Copiado!' : 'Copiar Gancho 3s'}</span>
           </button>
 
-          {/* 5. Salvar Bookmark */}
+          {/* 4. Consultar IA (TikBlox AI Pro) */}
           <button
-            onClick={() => onToggleSave(tk.id)}
-            className={`p-2.5 rounded-xl border transition cursor-pointer active:scale-95 shadow-2xs ${
-              isSaved
-                ? 'bg-rose-50 border-rose-300 text-rose-600'
-                : 'bg-white border-slate-300 text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-            }`}
-            title={isSaved ? 'Remover dos salvos' : 'Salvar produto'}
-          >
-            <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-current' : ''}`} />
-          </button>
-
-          {/* 6. Consultar IA */}
-          <button
+            type="button"
             onClick={() => onOpenInCopilot(product)}
-            className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#25F4EE] to-[#00D2C4] hover:brightness-105 text-[#0F121C] font-black text-xs transition cursor-pointer shadow-sm active:scale-95 whitespace-nowrap ml-auto"
+            className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-[#25F4EE] to-[#00D2C4] hover:brightness-105 text-[#0F121C] font-black text-xs transition cursor-pointer shadow-sm active:scale-98 whitespace-nowrap"
           >
-            <Sparkles className="w-3.5 h-3.5 text-[#0F121C]" />
-            <span>Consultar IA</span>
+            <Sparkles className="w-4 h-4 text-[#0F121C] shrink-0" />
+            <span>Gerar Roteiro com IA</span>
           </button>
         </div>
 
-        {/* Guia Rápido de Afiliação no App Móvel */}
-        <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-600 flex-wrap gap-2 bg-slate-50/70 p-2.5 rounded-xl border border-slate-200/60">
-          <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
-            <strong className="text-slate-800">Como afiliar no celular:</strong>
-            <span>Abra o <strong>App TikTok &gt; Perfil &gt; Vitrine &gt; Adicionar Produtos</strong> e cole o termo copiado.</span>
+        {/* Linha 5: Guia Rápido de Afiliação Limpo e Bem Formatado */}
+        <div className="bg-slate-50/80 rounded-xl p-3 border border-slate-200/70 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div className="flex items-start sm:items-center gap-2 text-xs text-slate-600 leading-relaxed">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0 mt-1.5 sm:mt-0" />
+            <p>
+              <strong className="text-slate-900">Como afiliar no celular:</strong> Abra o{' '}
+              <strong className="text-slate-800">App TikTok &gt; Perfil &gt; Vitrine &gt; Adicionar Produtos</strong> e cole o termo acima.
+            </p>
           </div>
-          <span className="text-[10px] text-slate-400 font-mono">
-            Estoque confirmado no Brasil • Entrega 2 a 4 dias
+          <span className="text-[10px] text-emerald-700 bg-emerald-50 border border-emerald-200/80 px-2.5 py-1 rounded-md font-mono font-bold shrink-0 self-start sm:self-auto">
+            ✓ Estoque BR • Entrega 2 a 4 dias
           </span>
         </div>
       </div>
@@ -644,12 +659,12 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
 
         {/* Barra de Progresso e Métricas Detalhadas do Ciclo */}
         <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2.5">
-          <div className="flex items-center justify-between text-xs font-bold text-slate-700">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 text-xs font-bold text-slate-700">
             <span className="flex items-center gap-1.5">
-              <Compass className="w-3.5 h-3.5 text-[#007A87]" />
+              <Compass className="w-3.5 h-3.5 text-[#007A87] shrink-0" />
               <span>Entrada no Radar: <strong>{lifecycle.formattedEntryDate}</strong> (há {lifecycle.daysActive} dias)</span>
             </span>
-            <span className="text-emerald-700 font-mono">
+            <span className="text-emerald-700 font-mono text-[11px] sm:text-xs">
               Janela de Entrada: ~{lifecycle.remainingDays} dias ideais para lucrar
             </span>
           </div>
@@ -662,7 +677,7 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
           </div>
 
           <div className="text-xs text-slate-700 pt-1 flex items-start gap-1.5">
-            <span className="text-sm">🎯</span>
+            <span className="text-sm shrink-0">🎯</span>
             <div>
               <strong className="text-slate-900">Diretriz Tática:</strong>{' '}
               <span>{lifecycle.recommendation}</span>
