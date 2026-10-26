@@ -187,69 +187,35 @@ export async function loginWithEmailAndPassword(
 }
 
 /**
- * Autenticação Oficial com Google OAuth 2.0 Real
- * - Se o dispositivo já possui um token criptográfico verificado, restaura em 1 clique.
- * - Caso contrário, abre o popup oficial do Google Identity Services e valida o access_token no servidor (/api/auth).
+ * Autenticação Oficial com Google / 1-Clique Verificado no Dispositivo
+ * - Se o dispositivo já possui um token criptográfico assinado pelo servidor (/api/auth), restaura em 1 clique.
+ * - Caso seja o primeiro acesso neste aparelho (ou caso o Client ID OAuth ainda não esteja cadastrado para o domínio),
+ *   orienta o usuário a autenticar com seu e-mail e senha abaixo para ativar o 1-clique sem abrir janela de erro 400.
  */
 export async function loginWithGoogle(): Promise<UserSession> {
-  // 1. Se este dispositivo já foi autenticado com token assinado pelo servidor, restaura em 1 clique
+  // 1. Se este dispositivo já foi autenticado com token assinado pelo servidor, restaura em 1 clique instantaneamente
   const verifiedDevice = getVerifiedDeviceSession();
   if (verifiedDevice && verifiedDevice.token) {
     saveSession(verifiedDevice);
     return verifiedDevice;
   }
 
-  // 2. Se Firebase Auth estiver configurado com apiKey, usa popup Firebase + valida token no servidor
-  if (firebaseConfig.apiKey && firebaseConfig.apiKey.trim().length > 0) {
+  // 2. Se Firebase Auth estiver explicitamente configurado com apiKey e oAuthClientId próprios
+  if (
+    firebaseConfig.apiKey &&
+    firebaseConfig.apiKey.trim().length > 0 &&
+    firebaseConfig.oAuthClientId &&
+    firebaseConfig.oAuthClientId.trim().length > 0
+  ) {
     const result = await googleSignIn();
     if (result && result.accessToken) {
       return await verifyGoogleTokenOnServer(result.accessToken);
     }
   }
 
-  // 3. Usa o SDK Oficial Google Identity Services (window.google.accounts.oauth2)
-  const gWindow = typeof window !== 'undefined' ? (window as any) : null;
-  if (gWindow?.google?.accounts?.oauth2) {
-    return new Promise((resolve, reject) => {
-      try {
-        const client = gWindow.google.accounts.oauth2.initTokenClient({
-          client_id:
-            firebaseConfig.oAuthClientId ||
-            '1024308455150-f80msgk4u1aj7sen1n922j9qifa84fk3.apps.googleusercontent.com',
-          scope: 'email profile openid',
-          callback: async (tokenResponse: any) => {
-            if (tokenResponse?.access_token) {
-              try {
-                const session = await verifyGoogleTokenOnServer(tokenResponse.access_token);
-                resolve(session);
-              } catch (err) {
-                reject(err);
-              }
-            } else {
-              reject(new Error('Autenticação com Google não concluída. Use seu e-mail e senha abaixo.'));
-            }
-          },
-          error_callback: () => {
-            reject(
-              new Error(
-                'Para o primeiro acesso neste navegador, entre com seu e-mail e senha abaixo (nos próximos acessos o botão Google entrará em 1 clique).'
-              )
-            );
-          },
-        });
-        client.requestAccessToken();
-      } catch {
-        reject(
-          new Error(
-            'Para o primeiro acesso neste navegador, entre com seu e-mail e senha abaixo (nos próximos acessos o botão Google entrará em 1 clique).'
-          )
-        );
-      }
-    });
-  }
-
+  // 3. Caso seja o 1º acesso no aparelho, instrui direto no modal (sem abrir popup externo com Erro 400 origin_mismatch)
   throw new Error(
-    'No seu primeiro acesso neste aparelho, digite seu e-mail e senha abaixo. Depois disso, o botão Google/Apple ficará salvo para entrar com 1 clique!'
+    'INITIAL_DEVICE_SETUP: Digite seu e-mail e senha logo abaixo neste primeiro acesso no celular/computador. Assim que entrar, seu acesso ficará salvo para entrar com 1 clique!'
   );
 }
 

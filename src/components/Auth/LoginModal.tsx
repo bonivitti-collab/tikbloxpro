@@ -40,9 +40,11 @@ export const LoginModal: React.FC<LoginModalProps> = ({
   const [socialLoading, setSocialLoading] = useState<'google' | 'apple' | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  const emailInputRef = React.useRef<HTMLInputElement>(null);
+
   if (!isOpen) return null;
 
-  // Login com Google (Token OAuth Real verificado no servidor ou sessão criptográfica salva no aparelho)
+  // Login com Google (Restaura sessão criptográfica verificada no aparelho ou foca no campo de e-mail no 1º acesso)
   const handleGoogleLogin = async () => {
     setError(null);
     setSocialLoading('google');
@@ -52,7 +54,9 @@ export const LoginModal: React.FC<LoginModalProps> = ({
       onClose();
     } catch (err: any) {
       if (err?.message && !err.message.includes('cancelado')) {
-        setError(err.message);
+        const cleanMsg = err.message.replace('INITIAL_DEVICE_SETUP: ', '');
+        setError(cleanMsg);
+        setTimeout(() => emailInputRef.current?.focus(), 100);
       }
     } finally {
       setSocialLoading(null);
@@ -70,6 +74,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
     } catch (err: any) {
       if (err?.message && !err.message.includes('cancelado')) {
         setError(err.message);
+        setTimeout(() => emailInputRef.current?.focus(), 100);
       }
     } finally {
       setSocialLoading(null);
@@ -274,6 +279,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
             <div className="relative">
               <Mail className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
+                ref={emailInputRef}
                 type="email"
                 required
                 value={email}
