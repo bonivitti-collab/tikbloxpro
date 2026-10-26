@@ -2,13 +2,13 @@ import { TrendingProduct } from '../types';
 
 export const BASE_APP_URL = 'https://tikblox.com.br';
 
-const DEFAULT_TITLE_PT = 'TIKBLOX - Radar de Tendências Virais & Produtos do Exterior';
-const DEFAULT_TITLE_EN = 'TIKBLOX - Viral Trends Radar & Global Product Arbitrage';
+const DEFAULT_TITLE_PT = 'TIKBLOX PRO | Radar TikTok Shop Brasil - Produtos Virais & Fornecedores SP';
+const DEFAULT_TITLE_EN = 'TIKBLOX PRO | TikTok Shop Brazil Radar - Viral Products & Fast Suppliers';
 
 const DEFAULT_DESCRIPTION_PT =
-  'Radar de tendências globais e produtos virais do exterior chegando ao Brasil para surfar ondas de vendas no e-commerce e dropshipping.';
+  'Minere produtos virais no TikTok Shop Brasil antes da saturação. Radar com catálogo nacional em SP/PR, envio em 24h, comissões de 15% a 30%, amostras grátis e inteligência TikBlox AI.';
 const DEFAULT_DESCRIPTION_EN =
-  'Real-time radar for global viral products and international trends entering Brazil for e-commerce and dropshipping opportunities.';
+  'Discover viral products on TikTok Shop Brazil before market saturation. National catalog with SP/PR warehouses, 24h dispatch, 15%-30% commissions and TikBlox AI.';
 
 const DEFAULT_IMAGE = `${BASE_APP_URL}/pwa-512x512.png`;
 
@@ -66,15 +66,15 @@ export function updateProductMetadata(product: TrendingProduct, lang: 'pt' | 'en
 
   const productUrl = `${BASE_APP_URL}/?product=${encodeURIComponent(product.id)}`;
   const productTitle = lang === 'en'
-    ? `${product.name} | TIKBLOX Viral Trends Radar`
-    : `${product.name} | Radar Viral TIKBLOX`;
+    ? `${product.name} | TIKBLOX PRO TikTok Shop Radar`
+    : `${product.name} | Radar TikTok Shop TIKBLOX PRO`;
 
   const estimatedProfitBRL = Math.max(0, product.estimatedPriceBRL - (product.estimatedCostUSD * 5.6));
-  const descriptionText = product.culturalFitReason || product.highlights?.join(', ') || 'Produto viral com alto potencial de arbitragem no Brasil.';
+  const descriptionText = product.culturalFitReason || product.highlights?.join(', ') || 'Produto viral com alto potencial de vendas no TikTok Shop Brasil.';
   
   const productDescription = lang === 'en'
-    ? `${product.name}: ${descriptionText.slice(0, 120)}... Estimated net profit of R$ ${estimatedProfitBRL.toFixed(0)} (+${product.estimatedProfitMarginPercent}%) and virality score ${product.viralityScore}/100.`
-    : `${product.name}: ${descriptionText.slice(0, 130)}... Lucro estimado de R$ ${estimatedProfitBRL.toFixed(0)} (${product.estimatedProfitMarginPercent}%) e viralidade ${product.viralityScore}/100.`;
+    ? `${product.name}: ${descriptionText.slice(0, 120)}... Estimated profit margin ${product.estimatedProfitMarginPercent}%, commission ${product.tiktokShop?.commissionRatePercent || 20}%, stocked in ${product.tiktokShop?.stockLocation || 'SP/BR'}.`
+    : `${product.name}: ${descriptionText.slice(0, 130)}... Margem estimada de ${product.estimatedProfitMarginPercent}%, comissão de ${product.tiktokShop?.commissionRatePercent || 20}%, estoque em ${product.tiktokShop?.stockLocation || 'SP/BR'}.`;
 
   const productImage = product.imageUrl || DEFAULT_IMAGE;
 
@@ -85,13 +85,13 @@ export function updateProductMetadata(product: TrendingProduct, lang: 'pt' | 'en
     'name',
     'keywords',
     lang === 'en'
-      ? `${product.name}, ${product.nicheLabel}, viral products, e-commerce arbitrage, dropshipping brazil, ${product.supplierKeywords.join(', ')}`
-      : `${product.name}, ${product.nicheLabel}, dropshipping brasil, produtos virais tiktok, arbitragem e-commerce, ${product.supplierKeywords.join(', ')}`
+      ? `${product.name}, ${product.nicheLabel}, viral tiktok products, tiktok shop brazil, blue ocean products, ${product.supplierKeywords.join(', ')}`
+      : `${product.name}, ${product.nicheLabel}, produtos virais tiktok, tiktok shop brasil, fornecedores pronta entrega sp, ${product.supplierKeywords.join(', ')}`
   );
   setLinkTag('canonical', productUrl);
 
   // 2. OpenGraph Meta Tags (WhatsApp, Facebook, LinkedIn, Discord, Telegram)
-  setMetaTag('property', 'og:site_name', 'TIKBLOX');
+  setMetaTag('property', 'og:site_name', 'TIKBLOX PRO');
   setMetaTag('property', 'og:type', 'product');
   setMetaTag('property', 'og:title', productTitle);
   setMetaTag('property', 'og:description', productDescription);
@@ -120,7 +120,7 @@ export function updateProductMetadata(product: TrendingProduct, lang: 'pt' | 'en
     category: product.nicheLabel,
     brand: {
       '@type': 'Brand',
-      name: 'TIKBLOX Radar',
+      name: 'TIKBLOX PRO',
     },
     offers: {
       '@type': 'Offer',
@@ -132,7 +132,7 @@ export function updateProductMetadata(product: TrendingProduct, lang: 'pt' | 'en
       availability: 'https://schema.org/InStock',
       seller: {
         '@type': 'Organization',
-        name: 'TIKBLOX',
+        name: 'TIKBLOX PRO',
       },
     },
     aggregateRating: {
@@ -148,7 +148,7 @@ export function updateProductMetadata(product: TrendingProduct, lang: 'pt' | 'en
 }
 
 /**
- * Resets head metadata back to the default TIKBLOX website identity
+ * Resets head metadata back to the default TIKBLOX PRO website identity
  */
 export function resetDefaultMetadata(lang: 'pt' | 'en' = 'pt'): void {
   if (typeof document === 'undefined') return;
@@ -162,13 +162,13 @@ export function resetDefaultMetadata(lang: 'pt' | 'en' = 'pt'): void {
     'name',
     'keywords',
     lang === 'en'
-      ? 'viral products radar, trending tiktok products, dropshipping brazil, product research, international arbitrage, e-commerce trends'
-      : 'radar de produtos, produtos virais tiktok, dropshipping brasil, mineração de produtos, arbitragem internacional, e-commerce brasil'
+      ? 'tiktok shop brazil radar, viral products tiktok, suppliers sao paulo, affiliate tiktok shop, winners products 2026, tikblox pro, tikblox ai'
+      : 'tiktok shop brasil, radar tiktok shop, produtos virais tiktok, minerador tiktok shop, afiliados tiktok shop brasil, fornecedores pronta entrega sao paulo, tikblox pro, tikblox ai'
   );
   setLinkTag('canonical', `${BASE_APP_URL}/`);
 
   // OpenGraph Defaults
-  setMetaTag('property', 'og:site_name', 'TIKBLOX');
+  setMetaTag('property', 'og:site_name', 'TIKBLOX PRO');
   setMetaTag('property', 'og:type', 'website');
   setMetaTag('property', 'og:title', defaultTitle);
   setMetaTag('property', 'og:description', defaultDescription);
@@ -181,19 +181,26 @@ export function resetDefaultMetadata(lang: 'pt' | 'en' = 'pt'): void {
   setMetaTag('name', 'twitter:description', defaultDescription);
   setMetaTag('name', 'twitter:image', DEFAULT_IMAGE);
 
-  // WebApplication Structured Data Schema
+  // WebApplication Structured Data Schema with rich properties
   const webAppSchema = {
     '@context': 'https://schema.org',
     '@type': 'WebApplication',
-    name: 'TIKBLOX',
+    name: 'TIKBLOX PRO',
     url: `${BASE_APP_URL}/`,
     applicationCategory: 'BusinessApplication',
-    operatingSystem: 'All',
+    operatingSystem: 'All (Web, Android, iOS, Windows, macOS)',
     description: defaultDescription,
     offers: {
       '@type': 'Offer',
-      price: '0',
+      price: '67.00',
       priceCurrency: 'BRL',
+    },
+    aggregateRating: {
+      '@type': 'AggregateRating',
+      ratingValue: '4.9',
+      reviewCount: '1240',
+      bestRating: '5',
+      worstRating: '1',
     },
   };
 

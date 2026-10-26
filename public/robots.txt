@@ -1,0 +1,18 @@
+# robots.txt for TIKBLOX PRO - Radar TikTok Shop Brasil
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /private/
+Disallow: /admin/
+
+# Googlebot specific optimizations
+User-agent: Googlebot
+Allow: /
+Allow: /*.js$
+Allow: /*.css$
+Allow: /*.png$
+Allow: /*.svg$
+Allow: /*.webp$
+
+# Sitemap declaration
+Sitemap: https://tikblox.com.br/sitemap.xml

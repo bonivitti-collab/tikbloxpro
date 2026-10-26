@@ -729,7 +729,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
           <img
             src="/tikblox-logo.png"
-            alt="TIKBLOX PRO"
+            alt="TIKBLOX PRO - Radar de Tendências TikTok Shop Brasil"
             className="h-7 w-auto object-contain opacity-90 hover:opacity-100 transition"
           />
           <span className="hidden sm:inline text-slate-600">•</span>

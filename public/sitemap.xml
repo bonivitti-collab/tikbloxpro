@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  <url>
+    <loc>https://tikblox.com.br/</loc>
+    <lastmod>2026-10-26</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://tikblox.com.br/" />
+    <image:image>
+      <image:loc>https://tikblox.com.br/pwa-512x512.png</image:loc>
+      <image:title>TIKBLOX PRO - Radar TikTok Shop Brasil</image:title>
+      <image:caption>Radar de produtos virais e tendências do TikTok Shop Brasil com fornecedores em São Paulo</image:caption>
+    </image:image>
+  </url>
+</urlset>
