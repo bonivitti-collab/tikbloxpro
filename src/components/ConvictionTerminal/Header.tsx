@@ -27,6 +27,8 @@ interface HeaderProps {
   userSession?: UserSession | null;
   onLogout?: () => void;
   onViewLanding?: () => void;
+  onOpenAdmin?: () => void;
+  onOpenCreatorVIP?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -42,6 +44,8 @@ export const Header: React.FC<HeaderProps> = ({
   userSession,
   onLogout,
   onViewLanding,
+  onOpenAdmin,
+  onOpenCreatorVIP,
 }) => {
   const [showScheduleModal, setShowScheduleModal] = useState(false);
 
@@ -133,9 +137,36 @@ export const Header: React.FC<HeaderProps> = ({
             {/* Perfil do Assinante / Alternância para Landing Page */}
             {userSession && (
               <div className="flex items-center gap-1.5 pl-1.5 border-l border-slate-200">
+                
+                {/* Botão Painel ADM se for Admin */}
+                {userSession.plan === 'admin' && onOpenAdmin && (
+                  <button
+                    type="button"
+                    onClick={onOpenAdmin}
+                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-amber-300 bg-amber-50 hover:bg-amber-100 text-[11px] font-black text-amber-900 transition shadow-2xs cursor-pointer active:scale-95"
+                    title="Abrir Painel Executivo do Administrador"
+                  >
+                    <span>👑</span>
+                    <span>Painel ADM</span>
+                  </button>
+                )}
+
+                {/* Botão Central de Divulgação se for Duda */}
+                {(userSession.role === 'creator_vip' || userSession.email === 'contato.dudavitti@gmail.com') && onOpenCreatorVIP && (
+                  <button
+                    type="button"
+                    onClick={onOpenCreatorVIP}
+                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-rose-300 bg-rose-50 hover:bg-rose-100 text-[11px] font-black text-rose-900 transition shadow-2xs cursor-pointer active:scale-95"
+                    title="Abrir Central de Divulgação da Duda"
+                  >
+                    <span>📣</span>
+                    <span>Divulgação</span>
+                  </button>
+                )}
+
                 <span className="text-[10px] font-mono font-bold bg-slate-100 text-slate-700 px-2 py-1 rounded-lg border border-slate-200 hidden sm:flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                  <span>{userSession.name}</span>
+                  <span className="truncate max-w-[120px]">{userSession.name}</span>
                 </span>
 
                 {onViewLanding && (
@@ -144,7 +175,7 @@ export const Header: React.FC<HeaderProps> = ({
                     className="p-1 px-2 rounded-lg text-[10px] font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition cursor-pointer border border-slate-200"
                     title="Ver Landing Page de Apresentação"
                   >
-                    Landing Page
+                    Landing
                   </button>
                 )}
 

@@ -348,7 +348,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <span className="text-[10px] uppercase font-bold text-slate-400 block">Inteligência</span>
               <span className="text-xs font-black text-white flex items-center gap-1.5">
                 <Bot className="w-3.5 h-3.5 text-[#FE2C55]" />
-                <span>Gemini 3.8 Flash</span>
+                <span>TikBlox AI Pro</span>
               </span>
               <span className="text-[10px] text-slate-400 block font-mono">Roteiros de 30s prontos</span>
             </div>
@@ -500,7 +500,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 🤖
               </div>
               <h4 className="text-base font-black text-white group-hover:text-[#FE2C55] transition">
-                3. Copiloto IA Gemini 3.8 Flash
+                3. Copiloto TikBlox AI Pro
               </h4>
               <p className="text-xs text-slate-300 leading-relaxed">
                 Inteligência nativa que cria roteiros completos de 30 segundos, ganchos visuais para os primeiros 3s e simulações financeiras em segundos.
@@ -624,7 +624,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   </li>
                   <li className="flex items-center gap-2">
                     <Check className="w-4 h-4 text-[#25F4EE] shrink-0" />
-                    <span><strong>Copiloto IA Gemini 3.8 Flash Ilimitado 24/7</strong></span>
+                    <span><strong>Copiloto TikBlox AI Pro Ilimitado 24/7</strong></span>
                   </li>
                   <li className="flex items-center gap-2">
                     <Check className="w-4 h-4 text-[#25F4EE] shrink-0" />
@@ -694,8 +694,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 a: 'Sim, com 100% de liberdade! Não há nenhuma fidelidade ou multa. Você pode cancelar sua assinatura mensal diretamente no painel da Kiwify a qualquer momento.'
               },
               {
-                q: 'Como funciona o Copiloto IA (Gemini 3.8 Flash)?',
-                a: 'É uma inteligência artificial nativa treinada no algoritmo do TikTok Shop Brasil. Ela analisa cada produto do radar e gera roteiros prontos de 30 segundos, ganchos visuais para os primeiros 3 segundos de vídeo, orientações para lives e cálculos de margem líquida.'
+                q: 'Como funciona o Copiloto TikBlox AI?',
+                a: 'É uma inteligência artificial proprietária nativa treinada no algoritmo do TikTok Shop Brasil. Ela analisa cada produto do radar e gera roteiros prontos de 30 segundos, ganchos visuais para os primeiros 3 segundos de vídeo, orientações para lives e cálculos de margem líquida.'
               }
             ].map((faq, idx) => (
               <div

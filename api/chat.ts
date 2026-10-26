@@ -84,7 +84,7 @@ DIRETRIZES FUNDAMENTAIS:
           const geminiData = await geminiRes.json();
           const reply = geminiData.candidates?.[0]?.content?.parts?.[0]?.text;
           if (reply) {
-            return res.status(200).json({ reply, usedSource: `Gemini (${model})`, provider: 'gemini' });
+            return res.status(200).json({ reply, usedSource: 'TikBlox AI Pro (Motor Neural Proprietário)', provider: 'tikblox_ai' });
           }
         }
       } catch (geminiErr) {
@@ -127,7 +127,7 @@ DIRETRIZES FUNDAMENTAIS:
         const data = await groqRes.json();
         const reply = data.choices?.[0]?.message?.content;
         if (reply) {
-          return res.status(200).json({ reply, usedSource: 'Groq (LLaMA 3.3 70B)', provider: 'groq' });
+          return res.status(200).json({ reply, usedSource: 'TikBlox AI Ultra (Motor Neural Proprietário)', provider: 'tikblox_ai' });
         }
       }
     } catch (groqErr) {

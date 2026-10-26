@@ -131,10 +131,10 @@ export function getActiveFreeEngine(): {
   if (getCurrentGeminiKey() && !isRateLimited()) {
     return {
       provider: 'gemini_free',
-      label: 'Google Gemini Free Tier (Google AI Studio)',
-      cost: 'R$ 0,00 Permanente (15 RPM)',
+      label: 'TikBlox AI Pro (Motor Neural Proprietário)',
+      cost: 'R$ 0,00 Permanente',
       cardRequired: false,
-      model: 'gemini-1.5-flash',
+      model: 'TikBlox Neural Engine v3.8',
     };
   }
   return {
@@ -1197,9 +1197,9 @@ app.get('/api/free-tier-status', (req: Request, res: Response) => {
       },
       {
         id: 'gemini_free',
-        name: 'Google Gemini 2.5 Flash Free Tier',
-        cost: 'R$ 0,00 Permanente',
-        setup: 'Chave gratuita em aistudio.google.com/app/apikey (15 req/min sem cartÃ£o).',
+        name: 'TikBlox AI Pro (Motor Neural Proprietário)',
+        cost: 'Incluso no Plano PRO',
+        setup: 'Motor nativo pré-configurado e integrado na nuvem TikBlox.',
         active: engine.provider === 'gemini_free',
       },
       {

@@ -55,6 +55,12 @@ const OnboardingModal = React.lazy(() =>
 const WifeBotConfigModal = React.lazy(() =>
   import('./components/WifeBotConfigModal').then((m) => ({ default: m.WifeBotConfigModal }))
 );
+const AdminDashboardModal = React.lazy(() =>
+  import('./components/Admin/AdminDashboardModal').then((m) => ({ default: m.AdminDashboardModal }))
+);
+const AffiliatePartnerModal = React.lazy(() =>
+  import('./components/Creator/AffiliatePartnerModal').then((m) => ({ default: m.AffiliatePartnerModal }))
+);
 
 const ONBOARDING_STORAGE_KEY = 'tikblox_onboarding_completed_v1';
 import { TrendingProduct, ProductNiche, AppUpdateInfo, ProductPriceCheck, PriceMonitorSummary } from './types';
@@ -119,6 +125,8 @@ export default function App() {
   const [showSavedModal, setShowSavedModal] = useState<boolean>(false);
   const [showCalculatorModal, setShowCalculatorModal] = useState<boolean>(false);
   const [showAddCustomModal, setShowAddCustomModal] = useState<boolean>(false);
+  const [showAdminModal, setShowAdminModal] = useState<boolean>(false);
+  const [showCreatorModal, setShowCreatorModal] = useState<boolean>(false);
 
   // Controle de Sessão de Assinante e Navegação Landing Page / App
   const [session, setSession] = useState<UserSession | null>(() => getCurrentSession());
@@ -675,6 +683,8 @@ export default function App() {
           setSelectedProductForCalc(activeProduct);
           setShowCalculatorModal(true);
         }}
+        onOpenAdmin={() => setShowAdminModal(true)}
+        onOpenCreatorVIP={() => setShowCreatorModal(true)}
       />
 
       {/* 2. SELETOR DE ABAS MOBILE / TABLET (CINZA CLARO) */}
@@ -983,6 +993,30 @@ export default function App() {
           onClose={() => setShowWifeBotModal(false)}
           products={products}
         />
+
+        {/* Executive Admin Panel Modal */}
+        {session && (
+          <AdminDashboardModal
+            isOpen={showAdminModal}
+            onClose={() => setShowAdminModal(false)}
+            userSession={session}
+            totalProductsCount={products.length}
+            onTriggerScan={() => handleTriggerScan(false)}
+            onOpenAddCustomProduct={() => {
+              setShowAdminModal(false);
+              setShowAddCustomModal(true);
+            }}
+          />
+        )}
+
+        {/* Creator / Affiliate VIP Hub Modal */}
+        {session && (
+          <AffiliatePartnerModal
+            isOpen={showCreatorModal}
+            onClose={() => setShowCreatorModal(false)}
+            userSession={session}
+          />
+        )}
 
       </Suspense>
 

@@ -84,7 +84,7 @@ const SLIDES: SlideData[] = [
     id: 'copilot',
     badge: 'PAINEL 3: TIKBLOX AI',
     badgeColor: 'bg-cyan-500/10 text-cyan-300 border-cyan-500/30',
-    title: 'Copiloto IA Gemini 3.8 Flash Nativo',
+    title: 'Copiloto TikBlox AI Nativo',
     subtitle: 'Roteiros magnéticos de 30 segundos e ganchos virais que travam o scroll',
     description:
       'Inteligência artificial generativa de alta velocidade especializada no algoritmo do TikTok Shop Brasil. Escreve roteiros que convertem e calcula unit economics.',
@@ -195,7 +195,7 @@ export const InteractiveScreensCarousel: React.FC<InteractiveScreensCarouselProp
                 ? 'Raio-X & Break-Even'
                 : idx === 2
                 ? 'Links & Amostras SP'
-                : 'Copiloto IA Gemini'}
+                : 'Copiloto TikBlox AI'}
             </span>
           </button>
         ))}
@@ -442,7 +442,7 @@ export const InteractiveScreensCarousel: React.FC<InteractiveScreensCarouselProp
                   </div>
                 )}
 
-                {/* 4. MOCKUP: COPILOTO IA GEMINI 3.8 FLASH */}
+                {/* 4. MOCKUP: COPILOTO TIKBLOX AI */}
                 {slide.mockupType === 'copilot' && (
                   <div className="space-y-3">
                     <div className="flex items-center justify-between pb-2 border-b border-white/10">
@@ -451,7 +451,7 @@ export const InteractiveScreensCarousel: React.FC<InteractiveScreensCarouselProp
                         <span className="text-xs font-black text-white">TIKBLOX AI Copilot</span>
                       </div>
                       <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/20 px-2 py-0.5 rounded-full font-bold">
-                        Gemini 3.8 Flash • Ativo
+                        TikBlox AI Core • Ativo
                       </span>
                     </div>
 

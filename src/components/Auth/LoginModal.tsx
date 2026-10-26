@@ -1,9 +1,9 @@
 // src/components/Auth/LoginModal.tsx
-// Modal de Login do Assinante integrado ao ecossistema Kiwify
+// Modal de Login do Assinante e Acesso Administrativo / Creator VIP
 
 import React, { useState } from 'react';
-import { Mail, ArrowRight, ShieldCheck, CheckCircle2, Lock, X, ExternalLink } from 'lucide-react';
-import { loginWithEmail, UserSession } from '../../services/authService';
+import { Mail, Lock, Eye, EyeOff, ArrowRight, ShieldCheck, X, ExternalLink } from 'lucide-react';
+import { loginWithEmailAndPassword, UserSession } from '../../services/authService';
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -19,6 +19,8 @@ export const LoginModal: React.FC<LoginModalProps> = ({
   onOpenPricing,
 }) => {
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -30,11 +32,11 @@ export const LoginModal: React.FC<LoginModalProps> = ({
     setLoading(true);
 
     try {
-      const session = await loginWithEmail(email);
+      const session = await loginWithEmailAndPassword(email, password);
       onLoginSuccess(session);
       onClose();
     } catch (err: any) {
-      setError(err?.message || 'Erro ao realizar login. Verifique seu e-mail de compra.');
+      setError(err?.message || 'Erro ao realizar login. Verifique seu e-mail e senha.');
     } finally {
       setLoading(false);
     }
@@ -66,18 +68,20 @@ export const LoginModal: React.FC<LoginModalProps> = ({
             />
           </div>
           <h2 className="text-lg font-black tracking-tight text-white">
-            Acessar Painel de Membro
+            Acessar Terminal TIKBLOX PRO
           </h2>
           <p className="text-xs text-slate-400 max-w-xs mx-auto">
-            Digite o mesmo e-mail que você utilizou ao assinar na <strong>Kiwify</strong> para liberar seu painel.
+            Informe suas credenciais ou o e-mail cadastrado na <strong>Kiwify</strong>.
           </p>
         </div>
 
         {/* Formulário */}
         <form onSubmit={handleSubmit} className="space-y-4">
+          
+          {/* Campo E-mail */}
           <div className="space-y-1.5">
             <label className="text-[11px] font-bold text-slate-300 block">
-              E-mail de Assinante (Kiwify):
+              E-mail de Acesso:
             </label>
             <div className="relative">
               <Mail className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -92,6 +96,33 @@ export const LoginModal: React.FC<LoginModalProps> = ({
             </div>
           </div>
 
+          {/* Campo Senha */}
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between">
+              <label className="text-[11px] font-bold text-slate-300 block">
+                Senha de Acesso:
+              </label>
+            </div>
+            <div className="relative">
+              <Lock className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <input
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Digite sua senha"
+                className="w-full pl-10 pr-10 py-3 bg-white/5 border border-white/10 rounded-xl text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-[#25F4EE] transition font-medium"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition cursor-pointer"
+                title={showPassword ? 'Ocultar senha' : 'Ver senha'}
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
+          </div>
+
           {error && (
             <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs">
               {error}
@@ -103,7 +134,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
             disabled={loading}
             className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-[#25F4EE] via-[#00D2C4] to-[#25F4EE] text-[#0F121C] font-black text-xs uppercase tracking-wider transition cursor-pointer hover:brightness-105 active:scale-95 shadow-[0_4px_20px_rgba(37,244,238,0.3)] flex items-center justify-center gap-2 disabled:opacity-50"
           >
-            <span>{loading ? 'Validando Acesso...' : 'Acessar Terminal Agora'}</span>
+            <span>{loading ? 'Validando Credenciais...' : 'Entrar no Terminal'}</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </form>
