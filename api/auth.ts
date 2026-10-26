@@ -1,11 +1,13 @@
 // api/auth.ts - Servidor de Autenticação Segura, Criptografia SHA-256, Validação OAuth Google e Controle de Assinantes Kiwify
 import crypto from 'crypto';
 import fs from 'fs';
+import os from 'os';
 import path from 'path';
 
 const SALT = 'tikblox_salt_v1:';
 const JWT_SECRET = process.env.TIKBLOX_AUTH_SECRET || 'tikblox_sentinel_enterprise_secret_2026_v1';
-const SUBSCRIBERS_FILE = path.join('/tmp', 'tikblox_kiwify_subscribers.json');
+const SUBSCRIBERS_FILE = path.join(os.tmpdir(), 'tikblox_kiwify_subscribers.json');
+const MEMORY_STORE: Record<string, SubscriberRecord> = {};
 
 // Hashes SHA-256 (senhas NUNCA ficam em texto puro no código)
 const PROTECTED_ACCOUNTS: Record<
@@ -66,15 +68,17 @@ export function loadSubscribersStore(): Record<string, SubscriberRecord> {
   try {
     if (fs.existsSync(SUBSCRIBERS_FILE)) {
       const raw = fs.readFileSync(SUBSCRIBERS_FILE, 'utf-8');
-      return JSON.parse(raw);
+      const parsed = JSON.parse(raw);
+      Object.assign(MEMORY_STORE, parsed);
     }
   } catch {}
-  return {};
+  return MEMORY_STORE;
 }
 
 export function saveSubscribersStore(store: Record<string, SubscriberRecord>): void {
+  Object.assign(MEMORY_STORE, store);
   try {
-    fs.writeFileSync(SUBSCRIBERS_FILE, JSON.stringify(store, null, 2), 'utf-8');
+    fs.writeFileSync(SUBSCRIBERS_FILE, JSON.stringify(MEMORY_STORE, null, 2), 'utf-8');
   } catch (e) {
     console.warn('[AUTH STORE] Aviso ao gravar cache local:', e);
   }

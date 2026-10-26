@@ -53,7 +53,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
   const cleanUtm = encodeURIComponent(utmSource.trim().toLowerCase() || 'duda');
   const baseComboUrl = checkoutUrls.rawCombo || checkoutUrls.combo.split('?')[0];
   const baseRadarUrl = checkoutUrls.rawRadar || checkoutUrls.radar.split('?')[0];
-  const webhookEndpointUrl = 'https://tikbloxpro.vercel.app/api/webhook/kiwify';
+  const webhookEndpointUrl = 'https://tikblox.com.br/api/webhook/kiwify';
   const generatedCheckoutUrl = `${baseComboUrl}?src=${cleanUtm}`;
   const generatedRadarCheckoutUrl = `${baseRadarUrl}?src=${cleanUtm}`;
   const generatedLandingUrl = `https://tikblox.com.br?ref=${cleanUtm}`;
