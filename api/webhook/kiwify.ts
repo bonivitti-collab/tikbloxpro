@@ -1,4 +1,5 @@
-// api/webhook/kiwify.ts - Endpoint de Webhook da Kiwify (Vercel Serverless)
+// api/webhook/kiwify.ts - Endpoint de Webhook da Kiwify com Persistência de Status e Revogação de Reembolso
+import { loadSubscribersStore, saveSubscribersStore } from '../auth';
 
 export default async function handler(req: any, res: any) {
   // CORS
@@ -24,29 +25,36 @@ export default async function handler(req: any, res: any) {
     const customerEmail = (customer.email || '').toLowerCase().trim();
     const customerName = customer.full_name || customer.name || 'Assinante TikBlox';
     const productName = product.product_name || product.name || 'TikBlox Pro';
-    const planName = 
-      payload.plan_name || 
-      subscription.plan_name || 
-      subscription.plan?.name || 
-      payload.Subscription?.plan?.name || 
+    const planName =
+      payload.plan_name ||
+      subscription.plan_name ||
+      subscription.plan?.name ||
+      payload.Subscription?.plan?.name ||
       '';
 
-    console.log(`[KIWIFY WEBHOOK] Recebido evento: ${orderStatus} para ${customerEmail} - Produto: ${productName} - Plano: ${planName}`);
+    console.log(
+      `[KIWIFY WEBHOOK] Recebido evento: ${orderStatus} para ${customerEmail} - Produto: ${productName} - Plano: ${planName}`
+    );
 
-    // Identifica se é o Plano Combo PRO com IA ou o Plano Radar Essential
-    const isComboWithAI = 
-      planName.toLowerCase().includes('pro') ||
-      planName.toLowerCase().includes('ia') ||
-      productName.toLowerCase().includes('ia') || 
-      productName.toLowerCase().includes('combo') || 
-      productName.toLowerCase().includes('copilot');
+    const isEssential = planName.toLowerCase().includes('essential') && !planName.toLowerCase().includes('pro');
+    const assignedPlan: 'pro_ai' | 'essential' = isEssential ? 'essential' : 'pro_ai';
 
-    const assignedPlan = isComboWithAI ? 'pro_ai' : 'essential';
+    const store = loadSubscribersStore();
 
     if (orderStatus === 'paid' || orderStatus === 'approved') {
-      console.log(`[KIWIFY WEBHOOK] Acesso LIBERADO para ${customerEmail} - Plano: ${assignedPlan}`);
-      
-      // Aqui o acesso fica registrado com status ativo
+      if (customerEmail) {
+        store[customerEmail] = {
+          email: customerEmail,
+          name: customerName,
+          plan: assignedPlan,
+          status: 'active',
+          passwordHash: store[customerEmail]?.passwordHash,
+          updatedAt: new Date().toISOString(),
+        };
+        saveSubscribersStore(store);
+      }
+
+      console.log(`[KIWIFY WEBHOOK] Acesso LIBERADO e SALVO para ${customerEmail} - Plano: ${assignedPlan}`);
       return res.status(200).json({
         success: true,
         message: 'Acesso do assinante aprovado e liberado com sucesso.',
@@ -56,15 +64,26 @@ export default async function handler(req: any, res: any) {
     }
 
     if (orderStatus === 'refunded' || orderStatus === 'chargedback' || orderStatus === 'canceled') {
+      if (customerEmail) {
+        store[customerEmail] = {
+          email: customerEmail,
+          name: customerName,
+          plan: assignedPlan,
+          status: 'revoked',
+          passwordHash: store[customerEmail]?.passwordHash,
+          updatedAt: new Date().toISOString(),
+        };
+        saveSubscribersStore(store);
+      }
+
       console.log(`[KIWIFY WEBHOOK] Acesso REVOGADO para ${customerEmail}`);
       return res.status(200).json({
         success: true,
-        message: 'Acesso revogado.',
+        message: 'Acesso revogado por reembolso ou cancelamento.',
         email: customerEmail,
       });
     }
 
-    // Outros eventos
     return res.status(200).json({
       success: true,
       received: true,

@@ -1,5 +1,6 @@
 // src/services/authService.ts
-// Gerenciamento de Autenticação do Assinante e Controle de Acesso: Google, Apple, E-mail/Senha, Kiwify e ADM
+// Gerenciamento de Autenticação Segura (Validação Server-Side via /api/auth, SHA-256, OAuth Google Real e Kiwify)
+// Nenhuma senha em texto puro ou bypass de administrador fica exposto no código do cliente.
 
 import { googleSignIn, googleLogout } from './googleAuth';
 import firebaseConfig from '../../firebase-applet-config.json';
@@ -18,55 +19,14 @@ export interface UserSession {
   source?: 'kiwify' | 'supabase' | 'direct' | 'google' | 'apple' | 'email_registered';
   affiliateCode?: string;
   photoUrl?: string;
-}
-
-export interface RegisteredUser {
-  name: string;
-  email: string;
-  passwordHash: string;
-  createdAt: string;
-  plan: UserPlan;
+  token?: string;
 }
 
 const STORAGE_SESSION_KEY = 'tikblox_auth_session_v1';
-const STORAGE_REGISTERED_USERS_KEY = 'tikblox_registered_users_v1';
-const STORAGE_REMEMBERED_SOCIAL_KEY = 'tikblox_remembered_social_email_v1';
+const STORAGE_VERIFIED_TOKEN_SESSION_KEY = 'tikblox_verified_device_session_v1';
 const STORAGE_AFFILIATE_REF_KEY = 'tikblox_affiliate_ref_v1';
 const KIWIFY_CHECKOUT_RADAR_DEFAULT = 'https://pay.kiwify.com.br/B69SrmS';
 const KIWIFY_CHECKOUT_COMBO_DEFAULT = 'https://pay.kiwify.com.br/ejnXKgn';
-
-// Contas com credenciais oficiais pré-configuradas no sistema
-export const PRECONFIGURED_USERS: Record<
-  string,
-  {
-    password: string;
-    name: string;
-    plan: UserPlan;
-    role: UserRole;
-    affiliateCode?: string;
-  }
-> = {
-  'dbonivitti@gmail.com': {
-    password: 'tikblox!26',
-    name: 'Danillo Bonivitti (Admin)',
-    plan: 'admin',
-    role: 'admin',
-  },
-  'contato.dudavitti@gmail.com': {
-    password: '182726!',
-    name: 'Duda Vitti (Creator VIP)',
-    plan: 'pro_ai',
-    role: 'creator_vip',
-    affiliateCode: 'duda',
-  },
-  'dudavitti@gmail.com': {
-    password: '182726!',
-    name: 'Duda Vitti (Creator VIP)',
-    plan: 'pro_ai',
-    role: 'creator_vip',
-    affiliateCode: 'duda',
-  },
-};
 
 /**
  * Captura e persiste parâmetros de afiliado (?ref=duda ou ?src=duda) na URL
@@ -114,23 +74,6 @@ export function getKiwifyCheckoutUrls() {
 }
 
 /**
- * Obtém o e-mail Google/Apple lembrado neste dispositivo para login com 1 clique
- */
-export function getRememberedSocialEmail(): string | null {
-  try {
-    return localStorage.getItem(STORAGE_REMEMBERED_SOCIAL_KEY);
-  } catch {
-    return null;
-  }
-}
-
-export function saveRememberedSocialEmail(email: string): void {
-  try {
-    localStorage.setItem(STORAGE_REMEMBERED_SOCIAL_KEY, email.trim().toLowerCase());
-  } catch {}
-}
-
-/**
  * Obtém a sessão do usuário atualmente salva no navegador
  */
 export function getCurrentSession(): UserSession | null {
@@ -149,18 +92,38 @@ export function getCurrentSession(): UserSession | null {
 }
 
 /**
- * Salva a sessão ativa do usuário
+ * Salva a sessão ativa do usuário e guarda o token verificado no dispositivo
  */
 export function saveSession(session: UserSession): void {
   try {
     localStorage.setItem(STORAGE_SESSION_KEY, JSON.stringify(session));
+    if (session.token) {
+      localStorage.setItem(STORAGE_VERIFIED_TOKEN_SESSION_KEY, JSON.stringify(session));
+    }
   } catch (e) {
     console.error('Erro ao salvar sessão local:', e);
   }
 }
 
 /**
- * Remove a sessão (Logout)
+ * Obtém a sessão previamente autenticada com token assinado neste dispositivo (para re-login rápido 1-clique)
+ */
+export function getVerifiedDeviceSession(): UserSession | null {
+  try {
+    const raw = localStorage.getItem(STORAGE_VERIFIED_TOKEN_SESSION_KEY);
+    if (!raw) return null;
+    const session: UserSession = JSON.parse(raw);
+    if (session && session.token && session.isAuthenticated) {
+      return session;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Remove a sessão ativa (Logout)
  */
 export function clearSession(): void {
   try {
@@ -170,344 +133,160 @@ export function clearSession(): void {
 }
 
 /**
- * Recupera usuários cadastrados manualmente no navegador
- */
-function getStoredRegisteredUsers(): Record<string, RegisteredUser> {
-  try {
-    const raw = localStorage.getItem(STORAGE_REGISTERED_USERS_KEY);
-    if (!raw) return {};
-    return JSON.parse(raw);
-  } catch {
-    return {};
-  }
-}
-
-/**
- * Salva um novo usuário cadastrado
- */
-function saveRegisteredUser(user: RegisteredUser): void {
-  try {
-    const existing = getStoredRegisteredUsers();
-    existing[user.email.toLowerCase()] = user;
-    localStorage.setItem(STORAGE_REGISTERED_USERS_KEY, JSON.stringify(existing));
-  } catch (e) {
-    console.error('Erro ao registrar usuário localmente:', e);
-  }
-}
-
-/**
- * Cadastro de Novo Usuário com Nome, E-mail e Senha
+ * Cadastro de Novo Usuário via Backend (/api/auth)
  */
 export async function registerWithEmailAndPassword(
   name: string,
   email: string,
   password: string
 ): Promise<UserSession> {
-  const cleanName = name.trim();
-  const cleanEmail = email.trim().toLowerCase();
-  const cleanPassword = password.trim();
+  const res = await fetch('/api/auth', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      action: 'register',
+      name: name.trim(),
+      email: email.trim().toLowerCase(),
+      password: password.trim(),
+    }),
+  });
 
-  if (!cleanName || cleanName.length < 2) {
-    throw new Error('Por favor, informe seu nome completo.');
+  const data = await res.json();
+  if (!res.ok || !data.session) {
+    throw new Error(data.error || 'Não foi possível criar a conta.');
   }
 
-  if (!cleanEmail || !cleanEmail.includes('@') || !cleanEmail.includes('.')) {
-    throw new Error('Por favor, informe um endereço de e-mail válido.');
-  }
-
-  if (!cleanPassword || cleanPassword.length < 6) {
-    throw new Error('A senha deve ter no mínimo 6 caracteres.');
-  }
-
-  // Verifica se já é conta do Danillo ou Duda
-  if (PRECONFIGURED_USERS[cleanEmail]) {
-    throw new Error('Este e-mail já possui cadastro oficial no TikBlox Pro. Faça login.');
-  }
-
-  const registeredUsers = getStoredRegisteredUsers();
-  if (registeredUsers[cleanEmail]) {
-    throw new Error('Este e-mail já está cadastrado. Faça login com sua senha.');
-  }
-
-  // Registra novo usuário
-  const newUser: RegisteredUser = {
-    name: cleanName,
-    email: cleanEmail,
-    passwordHash: cleanPassword, // Armazenamento seguro de sessão local
-    createdAt: new Date().toISOString(),
-    plan: 'pro_ai',
-  };
-
-  saveRegisteredUser(newUser);
-
-  // Cria a sessão com plano Pro liberado
-  const session: UserSession = {
-    email: cleanEmail,
-    name: cleanName,
-    plan: 'pro_ai',
-    role: 'subscriber',
-    isAuthenticated: true,
-    subscriptionStatus: 'active',
-    source: 'email_registered',
-  };
-
-  saveSession(session);
-  return session;
+  saveSession(data.session);
+  return data.session;
 }
 
 /**
- * Autenticação Oficial com Google (OAuth / GIS / Firebase / Seletor Integrado)
- * Reconhece automaticamente dbonivitti@gmail.com como ADMIN e Duda como Creator VIP
- */
-export async function loginWithGoogle(customEmail?: string): Promise<UserSession> {
-  if (customEmail && customEmail.trim().includes('@')) {
-    const clean = customEmail.trim().toLowerCase();
-    saveRememberedSocialEmail(clean);
-    return createSessionFromGoogleUser({
-      email: clean,
-      displayName: clean.split('@')[0],
-    });
-  }
-
-  try {
-    // 1. Tenta autenticação via Firebase se houver apiKey configurada
-    if (firebaseConfig.apiKey && firebaseConfig.apiKey.trim().length > 0) {
-      const result = await googleSignIn();
-      if (result && result.user) {
-        if (result.user.email) saveRememberedSocialEmail(result.user.email);
-        return createSessionFromGoogleUser({
-          email: result.user.email || '',
-          displayName: result.user.displayName || '',
-          photoURL: result.user.photoURL || undefined,
-        });
-      }
-    }
-
-    // 2. Se já houver conta Google lembrada neste dispositivo, autentica com 1 clique
-    const remembered = getRememberedSocialEmail();
-    if (remembered && remembered.includes('@')) {
-      return createSessionFromGoogleUser({
-        email: remembered,
-        displayName: remembered.split('@')[0],
-      });
-    }
-
-    // 3. Dispara abertura do seletor integrado no LoginModal
-    throw new Error('REQUIRE_SOCIAL_EMAIL_INPUT:google');
-  } catch (err: any) {
-    if (err?.message === 'REQUIRE_SOCIAL_EMAIL_INPUT:google') {
-      throw err;
-    }
-    throw new Error('REQUIRE_SOCIAL_EMAIL_INPUT:google');
-  }
-}
-
-/**
- * Helper para criar sessão padronizada a partir de dados da conta Google
- */
-function createSessionFromGoogleUser(googleUser: {
-  email: string;
-  displayName?: string;
-  photoURL?: string;
-}): UserSession {
-  const cleanEmail = (googleUser.email || '').trim().toLowerCase();
-
-  if (!cleanEmail || !cleanEmail.includes('@')) {
-    throw new Error('Por favor, informe um e-mail Google válido.');
-  }
-
-  // Se for a conta do Danillo, assume Administrador Supremo com Painel ADM
-  if (cleanEmail === 'dbonivitti@gmail.com') {
-    const session: UserSession = {
-      email: cleanEmail,
-      name: 'Danillo Bonivitti (Admin)',
-      plan: 'admin',
-      role: 'admin',
-      isAuthenticated: true,
-      subscriptionStatus: 'active',
-      source: 'google',
-      photoUrl: googleUser.photoURL,
-    };
-    saveSession(session);
-    return session;
-  }
-
-  // Se for a conta da Duda, assume Creator VIP Vitalício
-  if (cleanEmail === 'contato.dudavitti@gmail.com' || cleanEmail === 'dudavitti@gmail.com') {
-    const session: UserSession = {
-      email: cleanEmail,
-      name: 'Duda Vitti (Creator VIP)',
-      plan: 'pro_ai',
-      role: 'creator_vip',
-      affiliateCode: 'duda',
-      isAuthenticated: true,
-      subscriptionStatus: 'active',
-      source: 'google',
-      photoUrl: googleUser.photoURL,
-    };
-    saveSession(session);
-    return session;
-  }
-
-  // Para qualquer outro assinante entrando com Google
-  const session: UserSession = {
-    email: cleanEmail,
-    name: googleUser.displayName || cleanEmail.split('@')[0].toUpperCase(),
-    plan: 'pro_ai',
-    role: 'subscriber',
-    isAuthenticated: true,
-    subscriptionStatus: 'active',
-    source: 'google',
-    photoUrl: googleUser.photoURL,
-  };
-
-  saveSession(session);
-  return session;
-}
-
-/**
- * Autenticação Oficial com Apple ID
- */
-export async function loginWithApple(customEmail?: string): Promise<UserSession> {
-  if (!customEmail || !customEmail.trim().includes('@')) {
-    const remembered = getRememberedSocialEmail();
-    if (remembered && remembered.includes('@')) {
-      customEmail = remembered;
-    } else {
-      throw new Error('REQUIRE_SOCIAL_EMAIL_INPUT:apple');
-    }
-  }
-
-  const cleanEmail = customEmail.trim().toLowerCase();
-  saveRememberedSocialEmail(cleanEmail);
-
-  if (cleanEmail === 'dbonivitti@gmail.com') {
-    const session: UserSession = {
-      email: cleanEmail,
-      name: 'Danillo Bonivitti (Admin)',
-      plan: 'admin',
-      role: 'admin',
-      isAuthenticated: true,
-      subscriptionStatus: 'active',
-      source: 'apple',
-    };
-    saveSession(session);
-    return session;
-  }
-
-  if (cleanEmail === 'contato.dudavitti@gmail.com' || cleanEmail === 'dudavitti@gmail.com') {
-    const session: UserSession = {
-      email: cleanEmail,
-      name: 'Duda Vitti (Creator VIP)',
-      plan: 'pro_ai',
-      role: 'creator_vip',
-      affiliateCode: 'duda',
-      isAuthenticated: true,
-      subscriptionStatus: 'active',
-      source: 'apple',
-    };
-    saveSession(session);
-    return session;
-  }
-
-  const session: UserSession = {
-    email: cleanEmail,
-    name: cleanEmail.split('@')[0].toUpperCase(),
-    plan: 'pro_ai',
-    role: 'subscriber',
-    isAuthenticated: true,
-    subscriptionStatus: 'active',
-    source: 'apple',
-  };
-
-  saveSession(session);
-  return session;
-}
-
-/**
- * Realiza autenticação com e-mail e senha (Entrar)
+ * Login com E-mail e Senha validado por Hash SHA-256 no Servidor (/api/auth)
  */
 export async function loginWithEmailAndPassword(
   email: string,
   password?: string
 ): Promise<UserSession> {
-  const cleanEmail = email.trim().toLowerCase();
-  const cleanPass = (password || '').trim();
+  const res = await fetch('/api/auth', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      action: 'login',
+      email: email.trim().toLowerCase(),
+      password: (password || '').trim(),
+    }),
+  });
 
-  if (!cleanEmail || !cleanEmail.includes('@')) {
-    throw new Error('Por favor, informe um e-mail válido.');
+  const data = await res.json();
+  if (!res.ok || !data.session) {
+    throw new Error(data.error || 'E-mail ou senha inválidos.');
   }
 
-  // 1. Checa se é uma conta com credenciais pré-configuradas (Danillo Admin ou Duda)
-  const preconfigured = PRECONFIGURED_USERS[cleanEmail];
-  if (preconfigured) {
-    if (!cleanPass) {
-      throw new Error('Esta conta protegida requer senha de acesso.');
-    }
-    if (cleanPass !== preconfigured.password) {
-      throw new Error('Senha incorreta para esta conta de acesso.');
-    }
-
-    const session: UserSession = {
-      email: cleanEmail,
-      name: preconfigured.name,
-      plan: preconfigured.plan,
-      role: preconfigured.role,
-      isAuthenticated: true,
-      subscriptionStatus: 'active',
-      source: 'direct',
-      affiliateCode: preconfigured.affiliateCode,
-    };
-
-    saveSession(session);
-    return session;
-  }
-
-  // 2. Checa se é um usuário cadastrado manualmente
-  const registeredUsers = getStoredRegisteredUsers();
-  const registered = registeredUsers[cleanEmail];
-  if (registered) {
-    if (cleanPass !== registered.passwordHash) {
-      throw new Error('Senha incorreta para a conta informada.');
-    }
-
-    const session: UserSession = {
-      email: cleanEmail,
-      name: registered.name,
-      plan: registered.plan,
-      role: 'subscriber',
-      isAuthenticated: true,
-      subscriptionStatus: 'active',
-      source: 'email_registered',
-    };
-
-    saveSession(session);
-    return session;
-  }
-
-  // 3. Se for um comprador Kiwify com e-mail válido
-  const isKiwifySubscriber = cleanEmail.length > 5;
-  if (!isKiwifySubscriber) {
-    throw new Error('E-mail não encontrado na base de assinantes Kiwify.');
-  }
-
-  const session: UserSession = {
-    email: cleanEmail,
-    name: cleanEmail.split('@')[0].toUpperCase(),
-    plan: 'pro_ai',
-    role: 'subscriber',
-    isAuthenticated: true,
-    subscriptionStatus: 'active',
-    source: 'kiwify',
-  };
-
-  saveSession(session);
-  return session;
+  saveSession(data.session);
+  return data.session;
 }
 
 /**
- * Mantido para compatibilidade com chamadas existentes
+ * Autenticação Oficial com Google OAuth 2.0 Real
+ * - Se o dispositivo já possui um token criptográfico verificado, restaura em 1 clique.
+ * - Caso contrário, abre o popup oficial do Google Identity Services e valida o access_token no servidor (/api/auth).
  */
+export async function loginWithGoogle(): Promise<UserSession> {
+  // 1. Se este dispositivo já foi autenticado com token assinado pelo servidor, restaura em 1 clique
+  const verifiedDevice = getVerifiedDeviceSession();
+  if (verifiedDevice && verifiedDevice.token) {
+    saveSession(verifiedDevice);
+    return verifiedDevice;
+  }
+
+  // 2. Se Firebase Auth estiver configurado com apiKey, usa popup Firebase + valida token no servidor
+  if (firebaseConfig.apiKey && firebaseConfig.apiKey.trim().length > 0) {
+    const result = await googleSignIn();
+    if (result && result.accessToken) {
+      return await verifyGoogleTokenOnServer(result.accessToken);
+    }
+  }
+
+  // 3. Usa o SDK Oficial Google Identity Services (window.google.accounts.oauth2)
+  const gWindow = typeof window !== 'undefined' ? (window as any) : null;
+  if (gWindow?.google?.accounts?.oauth2) {
+    return new Promise((resolve, reject) => {
+      try {
+        const client = gWindow.google.accounts.oauth2.initTokenClient({
+          client_id:
+            firebaseConfig.oAuthClientId ||
+            '1024308455150-f80msgk4u1aj7sen1n922j9qifa84fk3.apps.googleusercontent.com',
+          scope: 'email profile openid',
+          callback: async (tokenResponse: any) => {
+            if (tokenResponse?.access_token) {
+              try {
+                const session = await verifyGoogleTokenOnServer(tokenResponse.access_token);
+                resolve(session);
+              } catch (err) {
+                reject(err);
+              }
+            } else {
+              reject(new Error('Autenticação com Google não concluída. Use seu e-mail e senha abaixo.'));
+            }
+          },
+          error_callback: () => {
+            reject(
+              new Error(
+                'Para o primeiro acesso neste navegador, entre com seu e-mail e senha abaixo (nos próximos acessos o botão Google entrará em 1 clique).'
+              )
+            );
+          },
+        });
+        client.requestAccessToken();
+      } catch {
+        reject(
+          new Error(
+            'Para o primeiro acesso neste navegador, entre com seu e-mail e senha abaixo (nos próximos acessos o botão Google entrará em 1 clique).'
+          )
+        );
+      }
+    });
+  }
+
+  throw new Error(
+    'No seu primeiro acesso neste aparelho, digite seu e-mail e senha abaixo. Depois disso, o botão Google/Apple ficará salvo para entrar com 1 clique!'
+  );
+}
+
+async function verifyGoogleTokenOnServer(googleAccessToken: string): Promise<UserSession> {
+  const res = await fetch('/api/auth', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      action: 'google_oauth',
+      googleAccessToken,
+    }),
+  });
+
+  const data = await res.json();
+  if (!res.ok || !data.session) {
+    throw new Error(data.error || 'Falha ao validar token Google no servidor.');
+  }
+
+  saveSession(data.session);
+  return data.session;
+}
+
+/**
+ * Autenticação com Apple ID (restaura sessão criptográfica verificada no aparelho ou solicita credencial verificada)
+ */
+export async function loginWithApple(): Promise<UserSession> {
+  const verifiedDevice = getVerifiedDeviceSession();
+  if (verifiedDevice && verifiedDevice.token) {
+    saveSession(verifiedDevice);
+    return verifiedDevice;
+  }
+
+  throw new Error(
+    'No seu primeiro acesso neste aparelho, valide seu e-mail e senha abaixo. Depois disso, o acesso rápido em 1 clique ficará ativo neste dispositivo!'
+  );
+}
+
 export async function loginWithEmail(email: string, passwordOrToken?: string): Promise<UserSession> {
   return loginWithEmailAndPassword(email, passwordOrToken);
 }

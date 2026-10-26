@@ -7,6 +7,8 @@ import { INITIAL_CURATED_TRENDS } from './src/data/curatedTrends.js';
 import { enrichWithTikTokShopData } from './src/data/tiktokShopEnricher.js';
 import { TrendingProduct, ProductNiche, DeepDiveAnalysis } from './src/types.js';
 import { streamProductViabilityPDF } from './src/server/pdfGenerator.js';
+import authHandler from './api/auth.js';
+import kiwifyWebhookHandler from './api/webhook/kiwify.js';
 
 dotenv.config();
 
@@ -14,6 +16,10 @@ const app = express();
 const PORT = Number(process.env.PORT) || 3001;
 
 app.use(express.json());
+
+// Rotas de Segurança de Autenticação e Webhook Oficial Kiwify
+app.all('/api/auth', (req, res) => authHandler(req, res));
+app.all('/api/webhook/kiwify', (req, res) => kiwifyWebhookHandler(req, res));
 
 // Permissive CORS and embedding headers
 app.use((req, res, next) => {

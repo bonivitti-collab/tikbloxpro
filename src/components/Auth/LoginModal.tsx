@@ -1,14 +1,14 @@
 // src/components/Auth/LoginModal.tsx
-// Modal de Autenticação com Google, Apple, E-mail e Cadastro de Nova Conta
+// Modal de Autenticação Segura com Validação Server-Side (/api/auth), OAuth Google, Apple, E-mail e Cadastro
 
 import React, { useState } from 'react';
-import { Mail, Lock, Eye, EyeOff, ArrowRight, ShieldCheck, X, ExternalLink, User, Sparkles } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, ArrowRight, ShieldCheck, X, ExternalLink, User } from 'lucide-react';
 import {
   loginWithEmailAndPassword,
   registerWithEmailAndPassword,
   loginWithGoogle,
   loginWithApple,
-  getRememberedSocialEmail,
+  getVerifiedDeviceSession,
   UserSession,
 } from '../../services/authService';
 import { TikBloxLogo } from '../TikBloxLogo';
@@ -27,23 +27,22 @@ export const LoginModal: React.FC<LoginModalProps> = ({
   onOpenPricing,
 }) => {
   const [mode, setMode] = useState<'login' | 'register'>('login');
-  const [socialProviderPrompt, setSocialProviderPrompt] = useState<'google' | 'apple' | null>(null);
-  const [socialEmail, setSocialEmail] = useState(() => getRememberedSocialEmail() || '');
-  
+  const verifiedDevice = getVerifiedDeviceSession();
+
   // Campos de Formulário
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  
+
   const [loading, setLoading] = useState(false);
   const [socialLoading, setSocialLoading] = useState<'google' | 'apple' | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   if (!isOpen) return null;
 
-  // Login com Google (Danillo entra como Admin com 1 clique se já lembrado no navegador, ou confirma o e-mail Google 1x)
+  // Login com Google (Token OAuth Real verificado no servidor ou sessão criptográfica salva no aparelho)
   const handleGoogleLogin = async () => {
     setError(null);
     setSocialLoading('google');
@@ -52,9 +51,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
       onLoginSuccess(session);
       onClose();
     } catch (err: any) {
-      if (err?.message === 'REQUIRE_SOCIAL_EMAIL_INPUT:google') {
-        setSocialProviderPrompt('google');
-      } else if (err?.message && !err.message.includes('cancelado')) {
+      if (err?.message && !err.message.includes('cancelado')) {
         setError(err.message);
       }
     } finally {
@@ -71,9 +68,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
       onLoginSuccess(session);
       onClose();
     } catch (err: any) {
-      if (err?.message === 'REQUIRE_SOCIAL_EMAIL_INPUT:apple') {
-        setSocialProviderPrompt('apple');
-      } else if (err?.message && !err.message.includes('cancelado')) {
+      if (err?.message && !err.message.includes('cancelado')) {
         setError(err.message);
       }
     } finally {
@@ -81,31 +76,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
     }
   };
 
-  // Confirmação integrada de conta Google / Apple (compatível com navegadores in-app do TikTok e Instagram)
-  const handleConfirmSocialEmail = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    if (!socialEmail || !socialEmail.includes('@')) {
-      setError('Por favor, informe um e-mail válido.');
-      return;
-    }
-    const provider = socialProviderPrompt || 'google';
-    setSocialLoading(provider);
-    try {
-      const session =
-        provider === 'apple'
-          ? await loginWithApple(socialEmail)
-          : await loginWithGoogle(socialEmail);
-      onLoginSuccess(session);
-      onClose();
-    } catch (err: any) {
-      setError(err?.message || 'Erro ao autenticar conta.');
-    } finally {
-      setSocialLoading(null);
-    }
-  };
-
-  // Submissão do Formulário de E-mail
+  // Submissão do Formulário de E-mail e Senha (validado via Hash SHA-256 no servidor /api/auth)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -158,8 +129,8 @@ export const LoginModal: React.FC<LoginModalProps> = ({
           </h2>
           <p className="text-xs text-slate-400 max-w-xs mx-auto leading-relaxed">
             {mode === 'login'
-              ? 'Entre com sua conta Google, Apple ou e-mail de assinante.'
-              : 'Cadastre-se para liberar o radar de produtos virais e pronta entrega.'}
+              ? 'Autenticação criptografada para assinantes e parceiros oficiais.'
+              : 'Cadastre seu e-mail de compra na Kiwify e crie sua senha de acesso.'}
           </p>
         </div>
 
@@ -175,7 +146,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
             {socialLoading === 'google' ? (
               <span className="flex items-center gap-2">
                 <span className="w-4 h-4 border-2 border-slate-900 border-t-transparent rounded-full animate-spin" />
-                <span>Conectando com o Google...</span>
+                <span>Autenticando com Google...</span>
               </span>
             ) : (
               <>
@@ -197,7 +168,13 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                     d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
                   />
                 </svg>
-                <span>{mode === 'login' ? 'Continuar com o Google' : 'Cadastrar com o Google'}</span>
+                <span>
+                  {verifiedDevice
+                    ? `Continuar como ${verifiedDevice.name.split(' ')[0]} (Google)`
+                    : mode === 'login'
+                    ? 'Continuar com o Google'
+                    : 'Cadastrar com o Google'}
+                </span>
               </>
             )}
           </button>
@@ -212,7 +189,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
             {socialLoading === 'apple' ? (
               <span className="flex items-center gap-2">
                 <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                <span>Conectando com a Apple...</span>
+                <span>Autenticando com Apple...</span>
               </span>
             ) : (
               <>
@@ -223,56 +200,13 @@ export const LoginModal: React.FC<LoginModalProps> = ({
               </>
             )}
           </button>
-
-          {/* Seletor Integrado Google / Apple (100% compatível com navegador in-app do TikTok e Instagram) */}
-          {socialProviderPrompt && (
-            <form
-              onSubmit={handleConfirmSocialEmail}
-              className="p-3.5 rounded-2xl bg-white/10 border border-[#25F4EE]/40 space-y-2.5 animate-in fade-in slide-in-from-top-2 duration-200 mt-2"
-            >
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold text-[#25F4EE] flex items-center gap-1.5">
-                  <ShieldCheck className="w-3.5 h-3.5" />
-                  <span>
-                    {socialProviderPrompt === 'apple'
-                      ? 'Informe seu ID Apple para entrar em 1 clique:'
-                      : 'Informe seu e-mail Google para entrar em 1 clique:'}
-                  </span>
-                </span>
-                <button
-                  type="button"
-                  onClick={() => setSocialProviderPrompt(null)}
-                  className="text-slate-400 hover:text-white text-[10px] cursor-pointer"
-                >
-                  Fechar
-                </button>
-              </div>
-              <div className="flex items-center gap-2">
-                <input
-                  type="email"
-                  required
-                  autoFocus
-                  value={socialEmail}
-                  onChange={(e) => setSocialEmail(e.target.value)}
-                  placeholder={socialProviderPrompt === 'apple' ? 'seu.email@icloud.com' : 'seu.email@gmail.com'}
-                  className="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/20 text-xs text-white placeholder:text-slate-400 focus:outline-none focus:border-[#25F4EE]"
-                />
-                <button
-                  type="submit"
-                  className="px-3.5 py-2 rounded-xl bg-[#25F4EE] hover:bg-[#00D2C4] text-[#090D16] font-black text-xs transition cursor-pointer shrink-0"
-                >
-                  Conectar
-                </button>
-              </div>
-            </form>
-          )}
         </div>
 
         {/* Separador Visual */}
         <div className="relative flex items-center justify-center my-1">
           <div className="border-t border-white/10 w-full" />
           <span className="bg-[#0F121C] px-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider shrink-0">
-            ou {mode === 'login' ? 'entre com e-mail' : 'cadastre seu e-mail'}
+            ou {mode === 'login' ? 'entre com e-mail e senha' : 'cadastre seu e-mail'}
           </span>
           <div className="border-t border-white/10 w-full" />
         </div>
@@ -410,7 +344,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
           >
             <span>
               {loading
-                ? 'Processando...'
+                ? 'Verificando Credenciais...'
                 : mode === 'register'
                 ? 'Criar Minha Conta & Acessar'
                 : 'Entrar no Terminal'}
