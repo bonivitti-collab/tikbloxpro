@@ -728,6 +728,25 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <span className="hidden sm:inline text-slate-600">•</span>
           <span>Radar de Tendências e Inteligência TikTok Shop Brasil</span>
         </div>
+
+        {/* Selo de Confiança Sentinel Systems */}
+        <div className="flex justify-center pt-1">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900/90 border border-slate-700/60 text-slate-300 text-[11px] shadow-sm">
+            <ShieldCheck className="w-4 h-4 text-[#25F4EE]" />
+            <span>Desenvolvido e mantido por <strong className="text-white font-bold">Sentinel Systems</strong></span>
+            <span className="text-slate-600">•</span>
+            <a 
+              href="https://sentinelsystems.com.br" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="text-[#25F4EE] hover:underline font-medium inline-flex items-center gap-1"
+            >
+              sentinelsystems.com.br
+              <ExternalLink className="w-3 h-3" />
+            </a>
+          </div>
+        </div>
+
         <p className="max-w-md mx-auto text-[11px] text-slate-500">
           Este site não é afiliado ou endossado pelo TikTok ou ByteDance. Todas as marcas e logotipos são de propriedade de seus respectivos titulares.
         </p>
@@ -741,7 +760,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           </button>
         </div>
         <p className="text-[10px] text-slate-600">
-          © {new Date().getFullYear()} TIKBLOX PRO. Todos os direitos reservados.
+          © {new Date().getFullYear()} TIKBLOX PRO. Uma tecnologia do ecossistema Sentinel Systems. Todos os direitos reservados.
         </p>
       </footer>
 
