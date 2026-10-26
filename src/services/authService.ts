@@ -30,8 +30,8 @@ export interface RegisteredUser {
 
 const STORAGE_SESSION_KEY = 'tikblox_auth_session_v1';
 const STORAGE_REGISTERED_USERS_KEY = 'tikblox_registered_users_v1';
-const KIWIFY_CHECKOUT_RADAR_DEFAULT = 'https://pay.kiwify.com.br/tikblox-radar';
-const KIWIFY_CHECKOUT_COMBO_DEFAULT = 'https://pay.kiwify.com.br/tikblox-pro-ia';
+const KIWIFY_CHECKOUT_RADAR_DEFAULT = 'https://pay.kiwify.com.br/B69SrmS';
+const KIWIFY_CHECKOUT_COMBO_DEFAULT = 'https://pay.kiwify.com.br/ejnXKgn';
 
 // Contas com credenciais oficiais pré-configuradas no sistema
 export const PRECONFIGURED_USERS: Record<

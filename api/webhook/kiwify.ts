@@ -24,11 +24,19 @@ export default async function handler(req: any, res: any) {
     const customerEmail = (customer.email || '').toLowerCase().trim();
     const customerName = customer.full_name || customer.name || 'Assinante TikBlox';
     const productName = product.product_name || product.name || 'TikBlox Pro';
+    const planName = 
+      payload.plan_name || 
+      subscription.plan_name || 
+      subscription.plan?.name || 
+      payload.Subscription?.plan?.name || 
+      '';
 
-    console.log(`[KIWIFY WEBHOOK] Recebido evento: ${orderStatus} para ${customerEmail} - Produto: ${productName}`);
+    console.log(`[KIWIFY WEBHOOK] Recebido evento: ${orderStatus} para ${customerEmail} - Produto: ${productName} - Plano: ${planName}`);
 
-    // Identifica se é o Plano Combo com IA ou o Plano Radar Essential
+    // Identifica se é o Plano Combo PRO com IA ou o Plano Radar Essential
     const isComboWithAI = 
+      planName.toLowerCase().includes('pro') ||
+      planName.toLowerCase().includes('ia') ||
       productName.toLowerCase().includes('ia') || 
       productName.toLowerCase().includes('combo') || 
       productName.toLowerCase().includes('copilot');
