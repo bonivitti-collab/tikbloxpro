@@ -299,19 +299,19 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
           </button>
         </div>
 
-        {/* Linha 4: Grid Simétrico de Ações (Alinhamento Perfeito no Celular e Notebook) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 pt-0.5">
+        {/* Linha 4: Grid Simétrico 2x2 de Ações (Espaço Amplo no Celular e no Notebook com 3 painéis abertos) */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-0.5">
           {/* 1. Ver Produto no TikTok Shop */}
           <a
             href={tiktokShopUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-[#0F121C] hover:bg-black text-white font-black text-xs transition cursor-pointer shadow-sm active:scale-98 whitespace-nowrap border border-slate-800 group"
+            className="w-full min-w-0 inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-[#0F121C] hover:bg-black text-white font-black text-xs transition cursor-pointer shadow-sm active:scale-98 border border-slate-800 group overflow-hidden"
             title="Abrir página oficial do produto ou busca no TikTok Shop Brasil"
           >
             <ShoppingBag className="w-4 h-4 text-[#25F4EE] shrink-0" />
-            <span>Ver no TikTok Shop</span>
-            <ExternalLink className="w-3 h-3 text-slate-400 group-hover:text-white transition-colors shrink-0" />
+            <span className="truncate">Ver no TikTok Shop</span>
+            <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-white transition-colors shrink-0" />
           </a>
 
           {/* 2. Comprar Amostra Pronta Entrega (SP) */}
@@ -319,19 +319,19 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
             href={sampleDeliveryUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:brightness-105 text-white font-black text-xs transition cursor-pointer shadow-sm active:scale-98 whitespace-nowrap group"
+            className="w-full min-w-0 inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:brightness-105 text-white font-black text-xs transition cursor-pointer shadow-sm active:scale-98 group overflow-hidden"
             title="Comprar amostra física com envio imediato de São Paulo (2 a 4 dias úteis)"
           >
             <Package className="w-4 h-4 text-white shrink-0" />
-            <span>Comprar Amostra (SP)</span>
-            <ExternalLink className="w-3 h-3 text-emerald-200 group-hover:text-white transition-colors shrink-0" />
+            <span className="truncate">Comprar Amostra (SP)</span>
+            <ExternalLink className="w-3.5 h-3.5 text-emerald-200 group-hover:text-white transition-colors shrink-0" />
           </a>
 
           {/* 3. Copiar Gancho Viral 3s */}
           <button
             type="button"
             onClick={handleCopyHook}
-            className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-amber-50/80 hover:bg-amber-100/80 border border-amber-300 text-amber-950 font-black text-xs transition cursor-pointer shadow-2xs active:scale-98 whitespace-nowrap"
+            className="w-full min-w-0 inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-amber-50/90 hover:bg-amber-100/90 border border-amber-300 text-amber-950 font-black text-xs transition cursor-pointer shadow-2xs active:scale-98 overflow-hidden"
             title="Copiar o gancho viral de 3 segundos para gravar seu vídeo"
           >
             {copiedHook ? (
@@ -339,17 +339,17 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
             ) : (
               <Zap className="w-4 h-4 text-amber-500 fill-amber-500 shrink-0" />
             )}
-            <span>{copiedHook ? 'Gancho Copiado!' : 'Copiar Gancho 3s'}</span>
+            <span className="truncate">{copiedHook ? 'Gancho Copiado!' : 'Copiar Gancho 3s'}</span>
           </button>
 
           {/* 4. Consultar IA (TikBlox AI Pro) */}
           <button
             type="button"
             onClick={() => onOpenInCopilot(product)}
-            className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-[#25F4EE] to-[#00D2C4] hover:brightness-105 text-[#0F121C] font-black text-xs transition cursor-pointer shadow-sm active:scale-98 whitespace-nowrap"
+            className="w-full min-w-0 inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-[#25F4EE] to-[#00D2C4] hover:brightness-105 text-[#0F121C] font-black text-xs transition cursor-pointer shadow-sm active:scale-98 overflow-hidden"
           >
             <Sparkles className="w-4 h-4 text-[#0F121C] shrink-0" />
-            <span>Gerar Roteiro com IA</span>
+            <span className="truncate">Gerar Roteiro com IA</span>
           </button>
         </div>
 
