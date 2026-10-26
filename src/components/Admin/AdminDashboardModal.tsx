@@ -50,9 +50,13 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
     setTimeout(() => setCopiedLink(null), 2000);
   };
 
+  const cleanUtm = encodeURIComponent(utmSource.trim().toLowerCase() || 'duda');
+  const baseComboUrl = checkoutUrls.rawCombo || checkoutUrls.combo.split('?')[0];
+  const baseRadarUrl = checkoutUrls.rawRadar || checkoutUrls.radar.split('?')[0];
   const webhookEndpointUrl = 'https://tikbloxpro.vercel.app/api/webhook/kiwify';
-  const generatedCheckoutUrl = `${checkoutUrls.combo}?src=${encodeURIComponent(utmSource.trim().toLowerCase())}`;
-  const generatedLandingUrl = `https://tikbloxpro.vercel.app?ref=${encodeURIComponent(utmSource.trim().toLowerCase())}`;
+  const generatedCheckoutUrl = `${baseComboUrl}?src=${cleanUtm}`;
+  const generatedRadarCheckoutUrl = `${baseRadarUrl}?src=${cleanUtm}`;
+  const generatedLandingUrl = `https://tikblox.com.br?ref=${cleanUtm}`;
 
   return (
     <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 select-none animate-in fade-in">
@@ -209,12 +213,12 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-2">
               
               {/* Link do Checkout Combo PRO */}
               <div className="p-3.5 rounded-xl bg-black/30 border border-white/5 space-y-2">
-                <span className="text-[11px] font-bold text-slate-300 block">
-                  Link Direto Checkout Combo PRO (R$ 57):
+                <span className="text-[11px] font-bold text-[#25F4EE] block">
+                  Checkout Combo PRO (R$ 57):
                 </span>
                 <div className="flex items-center gap-2">
                   <input
@@ -226,9 +230,31 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                   <button
                     onClick={() => copyToClipboard(generatedCheckoutUrl, 'checkout')}
                     className="p-2 rounded bg-white/10 hover:bg-white/20 text-white transition cursor-pointer shrink-0"
-                    title="Copiar link de checkout"
+                    title="Copiar link de checkout PRO"
                   >
                     {copiedLink === 'checkout' ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Link do Checkout Essential */}
+              <div className="p-3.5 rounded-xl bg-black/30 border border-white/5 space-y-2">
+                <span className="text-[11px] font-bold text-slate-300 block">
+                  Checkout Essential (R$ 37):
+                </span>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    readOnly
+                    value={generatedRadarCheckoutUrl}
+                    className="w-full px-2 py-1.5 rounded bg-black/50 border border-white/5 font-mono text-[11px] text-slate-300 select-all"
+                  />
+                  <button
+                    onClick={() => copyToClipboard(generatedRadarCheckoutUrl, 'checkout_radar')}
+                    className="p-2 rounded bg-white/10 hover:bg-white/20 text-white transition cursor-pointer shrink-0"
+                    title="Copiar link de checkout Essential"
+                  >
+                    {copiedLink === 'checkout_radar' ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                   </button>
                 </div>
               </div>

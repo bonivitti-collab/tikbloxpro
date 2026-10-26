@@ -41,8 +41,11 @@ export const AffiliatePartnerModal: React.FC<AffiliatePartnerModalProps> = ({
   };
 
   const affiliateTag = userSession.affiliateCode || 'duda';
-  const affiliateCheckoutUrl = `${checkoutUrls.combo}?src=${affiliateTag}`;
-  const affiliateLandingUrl = `https://tikbloxpro.vercel.app?ref=${affiliateTag}`;
+  const baseComboUrl = checkoutUrls.rawCombo || checkoutUrls.combo.split('?')[0];
+  const baseRadarUrl = checkoutUrls.rawRadar || checkoutUrls.radar.split('?')[0];
+  const affiliateCheckoutUrl = `${baseComboUrl}?src=${affiliateTag}`;
+  const affiliateRadarCheckoutUrl = `${baseRadarUrl}?src=${affiliateTag}`;
+  const affiliateLandingUrl = `https://tikblox.com.br?ref=${affiliateTag}`;
 
   return (
     <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 select-none animate-in fade-in">
@@ -102,9 +105,9 @@ export const AffiliatePartnerModal: React.FC<AffiliatePartnerModalProps> = ({
               <div className="p-3.5 rounded-xl bg-black/40 border border-white/5 space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold text-white">
-                    Link Direto do Checkout Kiwify (Combo PRO R$ 57):
+                    Link Direto do Checkout Kiwify (Combo PRO R$ 57/mês):
                   </span>
-                  <span className="text-[10px] text-slate-400">Mais vendido</span>
+                  <span className="text-[10px] text-[#25F4EE] font-bold">⭐ Mais vendido</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <input
@@ -119,6 +122,31 @@ export const AffiliatePartnerModal: React.FC<AffiliatePartnerModalProps> = ({
                   >
                     {copiedLink === 'checkout' ? <Check className="w-3.5 h-3.5 text-emerald-950" /> : <Copy className="w-3.5 h-3.5" />}
                     <span>{copiedLink === 'checkout' ? 'Copiado!' : 'Copiar'}</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Link do Checkout Radar Essential */}
+              <div className="p-3.5 rounded-xl bg-black/40 border border-white/5 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-white">
+                    Link Direto do Checkout Kiwify (Radar Essential R$ 37/mês):
+                  </span>
+                  <span className="text-[10px] text-slate-400">Plano de entrada</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    readOnly
+                    value={affiliateRadarCheckoutUrl}
+                    className="w-full px-3 py-2 rounded-lg bg-black/50 border border-white/10 font-mono text-xs text-slate-200 select-all focus:outline-none"
+                  />
+                  <button
+                    onClick={() => copyToClipboard(affiliateRadarCheckoutUrl, 'checkout_radar')}
+                    className="px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold text-xs transition cursor-pointer flex items-center gap-1 shrink-0"
+                  >
+                    {copiedLink === 'checkout_radar' ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                    <span>{copiedLink === 'checkout_radar' ? 'Copiado!' : 'Copiar'}</span>
                   </button>
                 </div>
               </div>

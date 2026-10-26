@@ -30,6 +30,8 @@ export interface RegisteredUser {
 
 const STORAGE_SESSION_KEY = 'tikblox_auth_session_v1';
 const STORAGE_REGISTERED_USERS_KEY = 'tikblox_registered_users_v1';
+const STORAGE_REMEMBERED_SOCIAL_KEY = 'tikblox_remembered_social_email_v1';
+const STORAGE_AFFILIATE_REF_KEY = 'tikblox_affiliate_ref_v1';
 const KIWIFY_CHECKOUT_RADAR_DEFAULT = 'https://pay.kiwify.com.br/B69SrmS';
 const KIWIFY_CHECKOUT_COMBO_DEFAULT = 'https://pay.kiwify.com.br/ejnXKgn';
 
@@ -57,16 +59,75 @@ export const PRECONFIGURED_USERS: Record<
     role: 'creator_vip',
     affiliateCode: 'duda',
   },
+  'dudavitti@gmail.com': {
+    password: '182726!',
+    name: 'Duda Vitti (Creator VIP)',
+    plan: 'pro_ai',
+    role: 'creator_vip',
+    affiliateCode: 'duda',
+  },
 };
 
 /**
- * Obtém os links de checkout do Kiwify configuráveis
+ * Captura e persiste parâmetros de afiliado (?ref=duda ou ?src=duda) na URL
+ */
+export function getActiveAffiliateRef(): string | null {
+  try {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const refFromUrl = params.get('ref') || params.get('src') || params.get('utm_source');
+      if (refFromUrl && refFromUrl.trim().length > 0) {
+        const cleanRef = refFromUrl.trim().toLowerCase();
+        localStorage.setItem(STORAGE_AFFILIATE_REF_KEY, cleanRef);
+        return cleanRef;
+      }
+      return localStorage.getItem(STORAGE_AFFILIATE_REF_KEY);
+    }
+  } catch {}
+  return null;
+}
+
+/**
+ * Obtém os links de checkout do Kiwify configuráveis (com rastreamento automático de afiliado se houver ?ref=)
  */
 export function getKiwifyCheckoutUrls() {
+  const baseRadar = (import.meta as any).env?.VITE_KIWIFY_CHECKOUT_RADAR || KIWIFY_CHECKOUT_RADAR_DEFAULT;
+  const baseCombo = (import.meta as any).env?.VITE_KIWIFY_CHECKOUT_COMBO || KIWIFY_CHECKOUT_COMBO_DEFAULT;
+  const activeRef = getActiveAffiliateRef();
+
+  if (activeRef && !baseCombo.includes('?src=')) {
+    const encoded = encodeURIComponent(activeRef);
+    return {
+      radar: `${baseRadar}?src=${encoded}`,
+      combo: `${baseCombo}?src=${encoded}`,
+      rawRadar: baseRadar,
+      rawCombo: baseCombo,
+    };
+  }
+
   return {
-    radar: (import.meta as any).env?.VITE_KIWIFY_CHECKOUT_RADAR || KIWIFY_CHECKOUT_RADAR_DEFAULT,
-    combo: (import.meta as any).env?.VITE_KIWIFY_CHECKOUT_COMBO || KIWIFY_CHECKOUT_COMBO_DEFAULT,
+    radar: baseRadar,
+    combo: baseCombo,
+    rawRadar: baseRadar,
+    rawCombo: baseCombo,
   };
+}
+
+/**
+ * Obtém o e-mail Google/Apple lembrado neste dispositivo para login com 1 clique
+ */
+export function getRememberedSocialEmail(): string | null {
+  try {
+    return localStorage.getItem(STORAGE_REMEMBERED_SOCIAL_KEY);
+  } catch {
+    return null;
+  }
+}
+
+export function saveRememberedSocialEmail(email: string): void {
+  try {
+    localStorage.setItem(STORAGE_REMEMBERED_SOCIAL_KEY, email.trim().toLowerCase());
+  } catch {}
 }
 
 /**
@@ -195,15 +256,25 @@ export async function registerWithEmailAndPassword(
 }
 
 /**
- * Autenticação Oficial com Google (OAuth / GIS / Firebase)
- * Reconhece automaticamente dbonivitti@gmail.com como ADMIN
+ * Autenticação Oficial com Google (OAuth / GIS / Firebase / Seletor Integrado)
+ * Reconhece automaticamente dbonivitti@gmail.com como ADMIN e Duda como Creator VIP
  */
-export async function loginWithGoogle(): Promise<UserSession> {
+export async function loginWithGoogle(customEmail?: string): Promise<UserSession> {
+  if (customEmail && customEmail.trim().includes('@')) {
+    const clean = customEmail.trim().toLowerCase();
+    saveRememberedSocialEmail(clean);
+    return createSessionFromGoogleUser({
+      email: clean,
+      displayName: clean.split('@')[0],
+    });
+  }
+
   try {
     // 1. Tenta autenticação via Firebase se houver apiKey configurada
     if (firebaseConfig.apiKey && firebaseConfig.apiKey.trim().length > 0) {
       const result = await googleSignIn();
       if (result && result.user) {
+        if (result.user.email) saveRememberedSocialEmail(result.user.email);
         return createSessionFromGoogleUser({
           email: result.user.email || '',
           displayName: result.user.displayName || '',
@@ -212,11 +283,22 @@ export async function loginWithGoogle(): Promise<UserSession> {
       }
     }
 
-    // 2. Fallback inteligente: Google Identity Services ou prompt OAuth
-    return await promptGoogleIdentitySignIn();
+    // 2. Se já houver conta Google lembrada neste dispositivo, autentica com 1 clique
+    const remembered = getRememberedSocialEmail();
+    if (remembered && remembered.includes('@')) {
+      return createSessionFromGoogleUser({
+        email: remembered,
+        displayName: remembered.split('@')[0],
+      });
+    }
+
+    // 3. Dispara abertura do seletor integrado no LoginModal
+    throw new Error('REQUIRE_SOCIAL_EMAIL_INPUT:google');
   } catch (err: any) {
-    console.warn('Tentativa com Google popup falhou, iniciando fallback direto:', err);
-    return await promptGoogleIdentitySignIn();
+    if (err?.message === 'REQUIRE_SOCIAL_EMAIL_INPUT:google') {
+      throw err;
+    }
+    throw new Error('REQUIRE_SOCIAL_EMAIL_INPUT:google');
   }
 }
 
@@ -231,14 +313,14 @@ function createSessionFromGoogleUser(googleUser: {
   const cleanEmail = (googleUser.email || '').trim().toLowerCase();
 
   if (!cleanEmail || !cleanEmail.includes('@')) {
-    throw new Error('Não foi possível identificar o e-mail da conta Google.');
+    throw new Error('Por favor, informe um e-mail Google válido.');
   }
 
   // Se for a conta do Danillo, assume Administrador Supremo com Painel ADM
   if (cleanEmail === 'dbonivitti@gmail.com') {
     const session: UserSession = {
       email: cleanEmail,
-      name: googleUser.displayName || 'Danillo Bonivitti (Admin)',
+      name: 'Danillo Bonivitti (Admin)',
       plan: 'admin',
       role: 'admin',
       isAuthenticated: true,
@@ -250,11 +332,11 @@ function createSessionFromGoogleUser(googleUser: {
     return session;
   }
 
-  // Se for a conta da Duda, assume Creator VIP
-  if (cleanEmail === 'contato.dudavitti@gmail.com') {
+  // Se for a conta da Duda, assume Creator VIP Vitalício
+  if (cleanEmail === 'contato.dudavitti@gmail.com' || cleanEmail === 'dudavitti@gmail.com') {
     const session: UserSession = {
       email: cleanEmail,
-      name: googleUser.displayName || 'Duda Vitti (Creator VIP)',
+      name: 'Duda Vitti (Creator VIP)',
       plan: 'pro_ai',
       role: 'creator_vip',
       affiliateCode: 'duda',
@@ -284,82 +366,42 @@ function createSessionFromGoogleUser(googleUser: {
 }
 
 /**
- * Popup / Prompt nativo para login Google em navegadores sem backend Firebase
- */
-async function promptGoogleIdentitySignIn(): Promise<UserSession> {
-  return new Promise((resolve, reject) => {
-    // Se o SDK Google Identity já estiver carregado no window
-    const gWindow = window as any;
-    if (gWindow.google?.accounts?.oauth2) {
-      try {
-        const client = gWindow.google.accounts.oauth2.initTokenClient({
-          client_id: firebaseConfig.oAuthClientId || '1024308455150-f80msgk4u1aj7sen1n922j9qifa84fk3.apps.googleusercontent.com',
-          scope: 'email profile openid',
-          callback: async (tokenResponse: any) => {
-            if (tokenResponse?.access_token) {
-              try {
-                const infoRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-                  headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
-                });
-                if (infoRes.ok) {
-                  const info = await infoRes.json();
-                  const session = createSessionFromGoogleUser({
-                    email: info.email,
-                    displayName: info.name,
-                    photoURL: info.picture,
-                  });
-                  return resolve(session);
-                }
-              } catch (e) {
-                console.error('Erro ao buscar userinfo Google:', e);
-              }
-            }
-            // Se falhar a busca da API, autentica Danillo por padrão se solicitado
-            resolve(createSessionFromGoogleUser({ email: 'dbonivitti@gmail.com', displayName: 'Danillo Bonivitti (Admin)' }));
-          },
-        });
-        client.requestAccessToken();
-        return;
-      } catch (e) {
-        console.warn('Erro ao inicializar token client GIS:', e);
-      }
-    }
-
-    // Modal popup direto para seleção de conta Google
-    const userEmail = window.prompt(
-      'Login Oficial Google:\nInforme sua conta Google para prosseguir no TIKBLOX PRO:',
-      'dbonivitti@gmail.com'
-    );
-
-    if (!userEmail) {
-      return reject(new Error('Login com Google cancelado.'));
-    }
-
-    resolve(createSessionFromGoogleUser({ email: userEmail, displayName: userEmail.split('@')[0] }));
-  });
-}
-
-/**
  * Autenticação Oficial com Apple ID
  */
-export async function loginWithApple(): Promise<UserSession> {
-  // Simula ou abre fluxo de Apple ID
-  const appleEmail = window.prompt(
-    'Apple Sign-In:\nInforme o ID Apple cadastrado para acessar o TIKBLOX PRO:',
-    'dbonivitti@gmail.com'
-  );
-
-  if (!appleEmail) {
-    throw new Error('Login com Apple cancelado.');
+export async function loginWithApple(customEmail?: string): Promise<UserSession> {
+  if (!customEmail || !customEmail.trim().includes('@')) {
+    const remembered = getRememberedSocialEmail();
+    if (remembered && remembered.includes('@')) {
+      customEmail = remembered;
+    } else {
+      throw new Error('REQUIRE_SOCIAL_EMAIL_INPUT:apple');
+    }
   }
 
-  const cleanEmail = appleEmail.trim().toLowerCase();
+  const cleanEmail = customEmail.trim().toLowerCase();
+  saveRememberedSocialEmail(cleanEmail);
+
   if (cleanEmail === 'dbonivitti@gmail.com') {
     const session: UserSession = {
       email: cleanEmail,
-      name: 'Danillo Bonivitti (Admin - Apple ID)',
+      name: 'Danillo Bonivitti (Admin)',
       plan: 'admin',
       role: 'admin',
+      isAuthenticated: true,
+      subscriptionStatus: 'active',
+      source: 'apple',
+    };
+    saveSession(session);
+    return session;
+  }
+
+  if (cleanEmail === 'contato.dudavitti@gmail.com' || cleanEmail === 'dudavitti@gmail.com') {
+    const session: UserSession = {
+      email: cleanEmail,
+      name: 'Duda Vitti (Creator VIP)',
+      plan: 'pro_ai',
+      role: 'creator_vip',
+      affiliateCode: 'duda',
       isAuthenticated: true,
       subscriptionStatus: 'active',
       source: 'apple',

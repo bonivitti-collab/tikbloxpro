@@ -133,30 +133,34 @@ export const Header: React.FC<HeaderProps> = ({
               <PanelRight className="w-3.5 h-3.5 text-[#FE2C55]" />
               <span className="text-[10px] hidden xl:inline">TIKBLOX AI</span>
             </button>
+          </div>
 
-            {/* Perfil do Assinante / Alternância para Landing Page */}
-            {userSession && (
-              <div className="flex items-center gap-1.5 pl-1.5 border-l border-slate-200">
-                
-                {/* Botão Painel ADM se for Admin */}
-                {userSession.plan === 'admin' && onOpenAdmin && (
-                  <button
-                    type="button"
-                    onClick={onOpenAdmin}
-                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-amber-300 bg-amber-50 hover:bg-amber-100 text-[11px] font-black text-amber-900 transition shadow-2xs cursor-pointer active:scale-95"
-                    title="Abrir Painel Executivo do Administrador"
-                  >
-                    <span>👑</span>
-                    <span>Painel ADM</span>
-                  </button>
-                )}
+          {/* Perfil do Assinante / Alternância para Landing Page (Visível em Mobile e Desktop) */}
+          {userSession && (
+            <div className="flex items-center gap-1.5 pl-1.5 border-l border-slate-200">
+              
+              {/* Botão Painel ADM se for Admin */}
+              {userSession.plan === 'admin' && onOpenAdmin && (
+                <button
+                  type="button"
+                  onClick={onOpenAdmin}
+                  className="flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-lg border border-amber-300 bg-amber-50 hover:bg-amber-100 text-[10px] sm:text-[11px] font-black text-amber-900 transition shadow-2xs cursor-pointer active:scale-95"
+                  title="Abrir Painel Executivo do Administrador"
+                >
+                  <span>👑</span>
+                  <span className="hidden xs:inline sm:inline">Painel ADM</span>
+                </button>
+              )}
 
-                {/* Botão Central de Divulgação se for Duda */}
-                {(userSession.role === 'creator_vip' || userSession.email === 'contato.dudavitti@gmail.com') && onOpenCreatorVIP && (
+              {/* Botão Central de Divulgação se for Duda */}
+              {(userSession.role === 'creator_vip' ||
+                userSession.email === 'contato.dudavitti@gmail.com' ||
+                userSession.email === 'dudavitti@gmail.com') &&
+                onOpenCreatorVIP && (
                   <button
                     type="button"
                     onClick={onOpenCreatorVIP}
-                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-rose-300 bg-rose-50 hover:bg-rose-100 text-[11px] font-black text-rose-900 transition shadow-2xs cursor-pointer active:scale-95"
+                    className="flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-lg border border-rose-300 bg-rose-50 hover:bg-rose-100 text-[10px] sm:text-[11px] font-black text-rose-900 transition shadow-2xs cursor-pointer active:scale-95"
                     title="Abrir Central de Divulgação da Duda"
                   >
                     <span>📣</span>
@@ -164,33 +168,32 @@ export const Header: React.FC<HeaderProps> = ({
                   </button>
                 )}
 
-                <span className="text-[10px] font-mono font-bold bg-slate-100 text-slate-700 px-2 py-1 rounded-lg border border-slate-200 hidden sm:flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                  <span className="truncate max-w-[120px]">{userSession.name}</span>
-                </span>
+              <span className="text-[10px] font-mono font-bold bg-slate-100 text-slate-700 px-2 py-1 rounded-lg border border-slate-200 hidden md:flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                <span className="truncate max-w-[120px]">{userSession.name}</span>
+              </span>
 
-                {onViewLanding && (
-                  <button
-                    onClick={onViewLanding}
-                    className="p-1 px-2 rounded-lg text-[10px] font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition cursor-pointer border border-slate-200"
-                    title="Ver Landing Page de Apresentação"
-                  >
-                    Landing
-                  </button>
-                )}
+              {onViewLanding && (
+                <button
+                  onClick={onViewLanding}
+                  className="p-1 px-2 rounded-lg text-[10px] font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition cursor-pointer border border-slate-200 hidden sm:inline-block"
+                  title="Ver Landing Page de Apresentação"
+                >
+                  Landing
+                </button>
+              )}
 
-                {onLogout && (
-                  <button
-                    onClick={onLogout}
-                    className="p-1 px-2 rounded-lg text-[10px] font-bold text-rose-600 hover:bg-rose-50 border border-rose-200 transition cursor-pointer"
-                    title="Encerrar sessão"
-                  >
-                    Sair
-                  </button>
-                )}
-              </div>
-            )}
-          </div>
+              {onLogout && (
+                <button
+                  onClick={onLogout}
+                  className="p-1 px-2 rounded-lg text-[10px] font-bold text-rose-600 hover:bg-rose-50 border border-rose-200 transition cursor-pointer"
+                  title="Encerrar sessão"
+                >
+                  Sair
+                </button>
+              )}
+            </div>
+          )}
         </div>
       </header>
 

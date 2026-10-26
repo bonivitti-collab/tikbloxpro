@@ -241,9 +241,9 @@ export const AICopilotPanel: React.FC<AICopilotPanelProps> = ({
       {/* Área de Conversa e Mensagens */}
       <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 min-h-0 bg-[#F8FAFC]">
         {messages.length === 0 ? (
-          <div className="h-full flex flex-col items-center justify-center text-center p-6 select-none opacity-40">
-            <div className="w-12 h-12 rounded-2xl bg-white border border-slate-200 shadow-2xs flex items-center justify-center text-xl mb-2 text-slate-700">
-              ⚡
+          <div className="h-full flex flex-col items-center justify-center text-center p-6 select-none opacity-60">
+            <div className="w-12 h-12 rounded-2xl bg-white border border-slate-200 shadow-2xs flex items-center justify-center text-xl mb-2 text-[#007A87]">
+              <Bot className="w-6 h-6" />
             </div>
             <p className="text-xs font-bold text-slate-700">TIKBLOX Copilot</p>
             <p className="text-[11px] text-slate-500 mt-0.5 max-w-[240px]">

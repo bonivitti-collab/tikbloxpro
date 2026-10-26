@@ -8,6 +8,7 @@ import {
   registerWithEmailAndPassword,
   loginWithGoogle,
   loginWithApple,
+  getRememberedSocialEmail,
   UserSession,
 } from '../../services/authService';
 import { TikBloxLogo } from '../TikBloxLogo';
@@ -26,6 +27,8 @@ export const LoginModal: React.FC<LoginModalProps> = ({
   onOpenPricing,
 }) => {
   const [mode, setMode] = useState<'login' | 'register'>('login');
+  const [socialProviderPrompt, setSocialProviderPrompt] = useState<'google' | 'apple' | null>(null);
+  const [socialEmail, setSocialEmail] = useState(() => getRememberedSocialEmail() || '');
   
   // Campos de Formulário
   const [name, setName] = useState('');
@@ -40,7 +43,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
 
   if (!isOpen) return null;
 
-  // Login com Google (Danillo entra como Admin com 1 clique)
+  // Login com Google (Danillo entra como Admin com 1 clique se já lembrado no navegador, ou confirma o e-mail Google 1x)
   const handleGoogleLogin = async () => {
     setError(null);
     setSocialLoading('google');
@@ -49,7 +52,9 @@ export const LoginModal: React.FC<LoginModalProps> = ({
       onLoginSuccess(session);
       onClose();
     } catch (err: any) {
-      if (err?.message && !err.message.includes('cancelado')) {
+      if (err?.message === 'REQUIRE_SOCIAL_EMAIL_INPUT:google') {
+        setSocialProviderPrompt('google');
+      } else if (err?.message && !err.message.includes('cancelado')) {
         setError(err.message);
       }
     } finally {
@@ -66,9 +71,35 @@ export const LoginModal: React.FC<LoginModalProps> = ({
       onLoginSuccess(session);
       onClose();
     } catch (err: any) {
-      if (err?.message && !err.message.includes('cancelado')) {
+      if (err?.message === 'REQUIRE_SOCIAL_EMAIL_INPUT:apple') {
+        setSocialProviderPrompt('apple');
+      } else if (err?.message && !err.message.includes('cancelado')) {
         setError(err.message);
       }
+    } finally {
+      setSocialLoading(null);
+    }
+  };
+
+  // Confirmação integrada de conta Google / Apple (compatível com navegadores in-app do TikTok e Instagram)
+  const handleConfirmSocialEmail = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    if (!socialEmail || !socialEmail.includes('@')) {
+      setError('Por favor, informe um e-mail válido.');
+      return;
+    }
+    const provider = socialProviderPrompt || 'google';
+    setSocialLoading(provider);
+    try {
+      const session =
+        provider === 'apple'
+          ? await loginWithApple(socialEmail)
+          : await loginWithGoogle(socialEmail);
+      onLoginSuccess(session);
+      onClose();
+    } catch (err: any) {
+      setError(err?.message || 'Erro ao autenticar conta.');
     } finally {
       setSocialLoading(null);
     }
@@ -192,6 +223,49 @@ export const LoginModal: React.FC<LoginModalProps> = ({
               </>
             )}
           </button>
+
+          {/* Seletor Integrado Google / Apple (100% compatível com navegador in-app do TikTok e Instagram) */}
+          {socialProviderPrompt && (
+            <form
+              onSubmit={handleConfirmSocialEmail}
+              className="p-3.5 rounded-2xl bg-white/10 border border-[#25F4EE]/40 space-y-2.5 animate-in fade-in slide-in-from-top-2 duration-200 mt-2"
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold text-[#25F4EE] flex items-center gap-1.5">
+                  <ShieldCheck className="w-3.5 h-3.5" />
+                  <span>
+                    {socialProviderPrompt === 'apple'
+                      ? 'Informe seu ID Apple para entrar em 1 clique:'
+                      : 'Informe seu e-mail Google para entrar em 1 clique:'}
+                  </span>
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setSocialProviderPrompt(null)}
+                  className="text-slate-400 hover:text-white text-[10px] cursor-pointer"
+                >
+                  Fechar
+                </button>
+              </div>
+              <div className="flex items-center gap-2">
+                <input
+                  type="email"
+                  required
+                  autoFocus
+                  value={socialEmail}
+                  onChange={(e) => setSocialEmail(e.target.value)}
+                  placeholder={socialProviderPrompt === 'apple' ? 'seu.email@icloud.com' : 'seu.email@gmail.com'}
+                  className="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/20 text-xs text-white placeholder:text-slate-400 focus:outline-none focus:border-[#25F4EE]"
+                />
+                <button
+                  type="submit"
+                  className="px-3.5 py-2 rounded-xl bg-[#25F4EE] hover:bg-[#00D2C4] text-[#090D16] font-black text-xs transition cursor-pointer shrink-0"
+                >
+                  Conectar
+                </button>
+              </div>
+            </form>
+          )}
         </div>
 
         {/* Separador Visual */}

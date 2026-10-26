@@ -225,24 +225,9 @@ export default function App() {
   const [workspaceInitialTab, setWorkspaceInitialTab] = useState<'drive' | 'gmail' | 'classroom'>('drive');
   const [showOfflineStorageModal, setShowOfflineStorageModal] = useState(false);
 
-  // Onboarding Welcome Tour state
+  // Onboarding Welcome Tour state (manual only, never blocks terminal on login)
   const [showOnboardingModal, setShowOnboardingModal] = useState(false);
   const [showWifeBotModal, setShowWifeBotModal] = useState(false);
-
-  // Auto-launch onboarding tour on first visit
-  useEffect(() => {
-    try {
-      const isCompleted = localStorage.getItem(ONBOARDING_STORAGE_KEY);
-      if (!isCompleted) {
-        const timer = setTimeout(() => {
-          setShowOnboardingModal(true);
-        }, 800);
-        return () => clearTimeout(timer);
-      }
-    } catch {
-      // ignore
-    }
-  }, []);
 
   // IndexedDB offline cache initialization & background hydration (deferred so initial UI paint is instant)
   useEffect(() => {

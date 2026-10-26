@@ -192,7 +192,7 @@ export function resetDefaultMetadata(lang: 'pt' | 'en' = 'pt'): void {
     description: defaultDescription,
     offers: {
       '@type': 'Offer',
-      price: '67.00',
+      price: '37.00',
       priceCurrency: 'BRL',
     },
     aggregateRating: {
