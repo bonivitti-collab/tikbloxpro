@@ -29,6 +29,7 @@ interface ProductDetailTerminalProps {
   onToggleSave: (id: string) => void;
   isSaved: boolean;
   onOpenCalculator: (p: TrendingProduct) => void;
+  isEssentialPlan?: boolean;
 }
 
 export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
@@ -37,6 +38,7 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
   onToggleSave,
   isSaved,
   onOpenCalculator,
+  isEssentialPlan = false,
 }) => {
   const [copiedHook, setCopiedHook] = useState(false);
   const [copiedTerm, setCopiedTerm] = useState(false);
@@ -342,15 +344,27 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
             <span className="truncate">{copiedHook ? 'Gancho Copiado!' : 'Copiar Gancho 3s'}</span>
           </button>
 
-          {/* 4. Consultar IA (TikBlox AI Pro) */}
-          <button
-            type="button"
-            onClick={() => onOpenInCopilot(product)}
-            className="w-full min-w-0 inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-[#25F4EE] to-[#00D2C4] hover:brightness-105 text-[#0F121C] font-black text-xs transition cursor-pointer shadow-sm active:scale-98 overflow-hidden"
-          >
-            <Sparkles className="w-4 h-4 text-[#0F121C] shrink-0" />
-            <span className="truncate">Gerar Roteiro com IA</span>
-          </button>
+          {/* 4. Consultar IA (TikBlox AI Pro) ou Upgrade */}
+          {isEssentialPlan ? (
+            <button
+              type="button"
+              onClick={() => onOpenInCopilot(product)}
+              className="w-full min-w-0 inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-300 text-amber-900 font-black text-xs transition cursor-pointer shadow-xs active:scale-98 overflow-hidden"
+              title="Disponível no Plano PRO (R$ 57/mês)"
+            >
+              <Lock className="w-4 h-4 text-amber-700 shrink-0" />
+              <span className="truncate">Desbloquear IA (Upgrade PRO)</span>
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => onOpenInCopilot(product)}
+              className="w-full min-w-0 inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-[#25F4EE] to-[#00D2C4] hover:brightness-105 text-[#0F121C] font-black text-xs transition cursor-pointer shadow-sm active:scale-98 overflow-hidden"
+            >
+              <Sparkles className="w-4 h-4 text-[#0F121C] shrink-0" />
+              <span className="truncate">Gerar Roteiro com IA</span>
+            </button>
+          )}
         </div>
 
         {/* Linha 5: Guia Rápido de Afiliação Limpo e Bem Formatado */}

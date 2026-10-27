@@ -30,6 +30,7 @@ interface AdminDashboardModalProps {
   onTriggerScan: () => void;
   onOpenAddCustomProduct: () => void;
   onSwitchToSubscriberView?: () => void;
+  onSwitchToEssentialView?: () => void;
   onSwitchToCreatorView?: () => void;
 }
 
@@ -41,6 +42,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
   onTriggerScan,
   onOpenAddCustomProduct,
   onSwitchToSubscriberView,
+  onSwitchToEssentialView,
   onSwitchToCreatorView,
 }) => {
   const [copiedLink, setCopiedLink] = useState<string | null>(null);
@@ -125,7 +127,21 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
                 className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:brightness-110 text-white font-black text-xs transition cursor-pointer flex items-center gap-2 active:scale-95 shadow-md shadow-emerald-950/40"
               >
                 <Eye className="w-4 h-4 text-emerald-100" />
-                <span>👁️ Ver como Assinante Público (Sem ADM)</span>
+                <span>👁️ Ver como Combo PRO (R$ 57 com IA)</span>
+              </button>
+            )}
+
+            {onSwitchToEssentialView && (
+              <button
+                type="button"
+                onClick={() => {
+                  onClose();
+                  onSwitchToEssentialView();
+                }}
+                className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-600 to-yellow-600 hover:brightness-110 text-white font-black text-xs transition cursor-pointer flex items-center gap-2 active:scale-95 shadow-md shadow-amber-950/40"
+              >
+                <Lock className="w-4 h-4 text-amber-100" />
+                <span>🔒 Ver como Radar Essential (R$ 37 sem IA)</span>
               </button>
             )}
 

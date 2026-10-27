@@ -10,7 +10,9 @@ import {
   Sparkles,
   RotateCcw,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Lock,
+  ArrowRight
 } from 'lucide-react';
 import { FormattedMarkdownMessage } from '../FormattedMarkdownMessage';
 import { TrendingProduct } from '../../types';
@@ -28,6 +30,7 @@ interface AICopilotPanelProps {
   activeProduct: TrendingProduct | null;
   isCollapsed: boolean;
   onToggleCollapse: () => void;
+  isEssentialPlan?: boolean;
 }
 
 export const AICopilotPanel: React.FC<AICopilotPanelProps> = ({
@@ -35,6 +38,7 @@ export const AICopilotPanel: React.FC<AICopilotPanelProps> = ({
   activeProduct,
   isCollapsed,
   onToggleCollapse,
+  isEssentialPlan = false,
 }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
@@ -205,10 +209,17 @@ export const AICopilotPanel: React.FC<AICopilotPanelProps> = ({
           <div className="min-w-0">
             <div className="flex items-center gap-1.5 leading-none">
               <span className="font-bold text-xs text-slate-900 truncate">TIKBLOX AI</span>
-              <span className="text-[9px] font-mono px-2 py-0.5 rounded-full font-bold bg-emerald-50 text-emerald-700 border border-emerald-300 flex items-center gap-1 select-none shadow-2xs">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span>PRO ATIVO</span>
-              </span>
+              {isEssentialPlan ? (
+                <span className="text-[9px] font-mono px-2 py-0.5 rounded-full font-bold bg-amber-50 text-amber-800 border border-amber-300 flex items-center gap-1 select-none shadow-2xs">
+                  <Lock className="w-2.5 h-2.5 text-amber-700" />
+                  <span>PLANO ESSENTIAL</span>
+                </span>
+              ) : (
+                <span className="text-[9px] font-mono px-2 py-0.5 rounded-full font-bold bg-emerald-50 text-emerald-700 border border-emerald-300 flex items-center gap-1 select-none shadow-2xs">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <span>PRO ATIVO</span>
+                </span>
+              )}
             </div>
             <span className="text-[10px] text-slate-500 truncate block mt-0.5 font-medium">
               Inteligência de Mercado & Algoritmo TikTok Shop
@@ -217,7 +228,7 @@ export const AICopilotPanel: React.FC<AICopilotPanelProps> = ({
         </div>
 
         <div className="flex items-center gap-1">
-          {messages.length > 0 && (
+          {!isEssentialPlan && messages.length > 0 && (
             <button
               onClick={() => setMessages([])}
               className="p-1 px-1.5 rounded-lg text-[10px] text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition cursor-pointer font-medium flex items-center gap-1"
@@ -238,8 +249,41 @@ export const AICopilotPanel: React.FC<AICopilotPanelProps> = ({
         </div>
       </div>
 
-      {/* Área de Conversa e Mensagens */}
-      <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 min-h-0 bg-[#F8FAFC]">
+      {/* Se o plano for Essential (sem IA), exibe bloqueio visual elegante com convite de Upgrade Kiwify */}
+      {isEssentialPlan ? (
+        <div className="flex-1 flex flex-col items-center justify-center p-6 text-center select-none bg-gradient-to-b from-white to-slate-50 space-y-4">
+          <div className="w-16 h-16 rounded-3xl bg-gradient-to-tr from-[#25F4EE]/20 to-[#FE2C55]/20 border border-slate-300 flex items-center justify-center text-2xl shadow-sm">
+            🔒
+          </div>
+          <div className="space-y-1.5 max-w-xs">
+            <span className="text-[10px] font-mono font-black uppercase tracking-wider text-amber-700 bg-amber-100 border border-amber-300 px-2.5 py-0.5 rounded-full inline-block">
+              Recurso Exclusivo do Plano PRO
+            </span>
+            <h3 className="text-base font-black text-slate-900 leading-snug">
+              Desbloqueie o TikBlox AI Pro
+            </h3>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              Seu plano atual é o <strong>Radar Essential (R$ 37/mês)</strong>. Para gerar roteiros de 30s, ganchos visuais e quebras de objeção com IA, faça o upgrade para o <strong>Combo PRO</strong>.
+            </p>
+          </div>
+
+          <a
+            href="https://pay.kiwify.com.br/ejnXKgn"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full max-w-xs py-3 px-4 rounded-xl bg-gradient-to-r from-[#25F4EE] to-[#00D2C4] hover:brightness-105 text-[#0F121C] font-black text-xs uppercase tracking-wider transition cursor-pointer shadow-md shadow-[#25F4EE]/20 flex items-center justify-center gap-2 active:scale-95"
+          >
+            <span>Fazer Upgrade para o Combo PRO (R$ 57)</span>
+            <ArrowRight className="w-4 h-4" />
+          </a>
+          <span className="text-[10px] text-slate-400 font-medium">
+            Liberação imediata pelo mesmo e-mail de compra
+          </span>
+        </div>
+      ) : (
+        <>
+          {/* Área de Conversa e Mensagens */}
+          <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 min-h-0 bg-[#F8FAFC]">
         {messages.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center text-center p-6 select-none opacity-60">
             <div className="w-12 h-12 rounded-2xl bg-white border border-slate-200 shadow-2xs flex items-center justify-center text-xl mb-2 text-[#007A87]">
@@ -482,6 +526,8 @@ export const AICopilotPanel: React.FC<AICopilotPanelProps> = ({
           <Send className="w-5 h-5 text-[#0F121C]" />
         </button>
       </form>
+        </>
+      )}
 
     </aside>
   );

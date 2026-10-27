@@ -774,6 +774,7 @@ export default function App() {
               setSelectedProductForCalc(p);
               setShowCalculatorModal(true);
             }}
+            isEssentialPlan={session?.plan === 'essential'}
           />
         </div>
 
@@ -803,6 +804,7 @@ export default function App() {
             activeProduct={activeProduct}
             isCollapsed={painelDireitoRecolhido}
             onToggleCollapse={() => setPainelDireitoRecolhido(!painelDireitoRecolhido)}
+            isEssentialPlan={session?.plan === 'essential'}
           />
         </div>
       </div>
@@ -995,8 +997,20 @@ export default function App() {
               // Simula visão exata do assinante público comum (PRO AI)
               setSession({
                 email: 'assinante.teste@gmail.com',
-                name: 'Cliente TikBlox',
+                name: 'Cliente Combo PRO',
                 plan: 'pro_ai',
+                role: 'subscriber',
+                isAuthenticated: true,
+                subscriptionStatus: 'active',
+                source: 'kiwify',
+              });
+            }}
+            onSwitchToEssentialView={() => {
+              // Simula visão exata do assinante Radar Essential (R$ 37 sem IA)
+              setSession({
+                email: 'assinante.essential@gmail.com',
+                name: 'Cliente Essential',
+                plan: 'essential',
                 role: 'subscriber',
                 isAuthenticated: true,
                 subscriptionStatus: 'active',
