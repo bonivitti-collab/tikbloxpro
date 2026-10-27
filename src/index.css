@@ -35,6 +35,17 @@ button, [role="button"], a, input, select, .cursor-pointer {
   -webkit-tap-highlight-color: transparent;
 }
 
+input, textarea, select {
+  -webkit-user-select: text !important;
+  user-select: text !important;
+}
+
+@media (max-width: 640px) {
+  input, textarea, select {
+    font-size: 16px !important;
+  }
+}
+
 /* Barras de rolagem discretas com hover na cor ciano do TikBlox */
 ::-webkit-scrollbar {
   width: 5px;

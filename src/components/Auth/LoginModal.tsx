@@ -125,7 +125,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 select-none overflow-y-auto">
+    <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
       <div className="bg-[#0F121C] border border-white/10 rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl space-y-5 text-white relative overflow-hidden animate-in fade-in zoom-in-95 duration-200 my-auto">
         
         {/* Glows de fundo cromáticos */}
@@ -275,14 +275,14 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                 Nome Completo:
               </label>
               <div className="relative">
-                <User className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <User className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                 <input
                   type="text"
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Seu nome ou da sua loja"
-                  className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-[#25F4EE] transition font-medium"
+                  className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-[16px] sm:text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-[#25F4EE] transition font-medium select-text"
                 />
               </div>
             </div>
@@ -294,7 +294,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
               E-mail:
             </label>
             <div className="relative">
-              <Mail className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <Mail className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
                 ref={emailInputRef}
                 name="email"
@@ -304,7 +304,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="seu.email@exemplo.com"
-                className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-[#25F4EE] transition font-medium"
+                className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-[16px] sm:text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-[#25F4EE] transition font-medium select-text"
               />
             </div>
           </div>
@@ -315,7 +315,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
               {mode === 'register' ? 'Crie uma Senha (mínimo 6 dígitos):' : 'Senha de Acesso:'}
             </label>
             <div className="relative">
-              <Lock className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <Lock className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
                 name="password"
                 autoComplete={mode === 'register' ? 'new-password' : 'current-password'}
@@ -324,7 +324,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder={mode === 'register' ? 'Escolha sua senha secreta' : 'Digite sua senha'}
-                className="w-full pl-10 pr-10 py-2.5 bg-white/5 border border-white/10 rounded-xl text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-[#25F4EE] transition font-medium"
+                className="w-full pl-10 pr-10 py-2.5 bg-white/5 border border-white/10 rounded-xl text-[16px] sm:text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-[#25F4EE] transition font-medium select-text"
               />
               <button
                 type="button"
@@ -344,14 +344,14 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                 Confirmar Senha:
               </label>
               <div className="relative">
-                <Lock className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <Lock className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   required
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Repita sua senha"
-                  className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-[#25F4EE] transition font-medium"
+                  className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-[16px] sm:text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-[#25F4EE] transition font-medium select-text"
                 />
               </div>
             </div>
