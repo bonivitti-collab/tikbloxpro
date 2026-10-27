@@ -41,13 +41,9 @@ button, [role="button"], a, select, .cursor-pointer {
 input, textarea, select {
   -webkit-user-select: text !important;
   user-select: text !important;
-  touch-action: auto !important;
-}
-
-@media (max-width: 640px) {
-  input, textarea, select {
-    font-size: 16px !important;
-  }
+  touch-action: manipulation !important;
+  font-size: 16px !important;
+  -webkit-appearance: none;
 }
 
 /* Barras de rolagem discretas com hover na cor ciano do TikBlox */

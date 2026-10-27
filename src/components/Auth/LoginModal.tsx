@@ -2,6 +2,7 @@
 // Modal de Autenticação Segura com Validação Server-Side (/api/auth), OAuth Google, Apple, E-mail e Cadastro
 
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Mail, Lock, Eye, EyeOff, ArrowRight, ShieldCheck, X, ExternalLink, User } from 'lucide-react';
 import {
   loginWithEmailAndPassword,
@@ -51,6 +52,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
   const passwordInputRef = React.useRef<HTMLInputElement>(null);
 
   if (!isOpen) return null;
+  if (typeof document === 'undefined') return null;
 
   // Login com Google (Restaura sessão criptográfica verificada no aparelho ou foca no campo de e-mail no 1º acesso)
   const handleGoogleLogin = async () => {
@@ -64,7 +66,6 @@ export const LoginModal: React.FC<LoginModalProps> = ({
       if (err?.message && !err.message.includes('cancelado')) {
         const cleanMsg = err.message.replace('INITIAL_DEVICE_SETUP: ', '');
         setError(cleanMsg);
-        setTimeout(() => emailInputRef.current?.focus(), 100);
       }
     } finally {
       setSocialLoading(null);
@@ -82,7 +83,6 @@ export const LoginModal: React.FC<LoginModalProps> = ({
     } catch (err: any) {
       if (err?.message && !err.message.includes('cancelado')) {
         setError(err.message);
-        setTimeout(() => emailInputRef.current?.focus(), 100);
       }
     } finally {
       setSocialLoading(null);
@@ -125,9 +125,17 @@ export const LoginModal: React.FC<LoginModalProps> = ({
     }
   };
 
-  return (
-    <div className="fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
-      <div className="bg-[#0F121C] border border-white/10 rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl space-y-5 text-white relative my-auto">
+  return createPortal(
+    <div
+      className="fixed inset-0 z-[9999] bg-black/85 flex items-center justify-center p-3 sm:p-4 overflow-y-auto"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div
+        className="bg-[#0F121C] border border-white/10 rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl space-y-5 text-white relative my-auto max-h-[92dvh] overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
         
         {/* Glows de fundo cromáticos */}
         <div className="absolute -top-24 -left-24 w-48 h-48 bg-[#25F4EE]/20 rounded-full blur-3xl pointer-events-none" />
@@ -272,20 +280,25 @@ export const LoginModal: React.FC<LoginModalProps> = ({
           {/* Campo Nome (Apenas modo cadastro) */}
           {mode === 'register' && (
             <div className="space-y-1">
-              <label className="text-[11px] font-bold text-slate-300 block">
+              <label htmlFor="auth-name-input" className="text-[11px] font-bold text-slate-300 block">
                 Nome Completo:
               </label>
               <div className="relative">
                 <User className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                 <input
+                  id="auth-name-input"
+                  name="name"
                   type="text"
+                  inputMode="text"
+                  autoComplete="name"
+                  autoCapitalize="words"
+                  autoCorrect="off"
+                  spellCheck={false}
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  onTouchEnd={(e) => e.currentTarget.focus()}
-                  onClick={(e) => e.currentTarget.focus()}
                   placeholder="Seu nome ou da sua loja"
-                  className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-[16px] sm:text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-[#25F4EE] transition font-medium select-text"
+                  className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-[16px] text-white placeholder:text-slate-500 focus:outline-none focus:border-[#25F4EE] transition font-medium select-text cursor-text"
                 />
               </div>
             </div>
@@ -293,46 +306,52 @@ export const LoginModal: React.FC<LoginModalProps> = ({
 
           {/* Campo E-mail */}
           <div className="space-y-1">
-            <label className="text-[11px] font-bold text-slate-300 block">
+            <label htmlFor="auth-email-input" className="text-[11px] font-bold text-slate-300 block">
               E-mail:
             </label>
             <div className="relative">
               <Mail className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
+                id="auth-email-input"
                 ref={emailInputRef}
                 name="email"
-                autoComplete="username email"
+                autoComplete="email"
                 type="email"
+                inputMode="email"
+                autoCapitalize="none"
+                autoCorrect="off"
+                spellCheck={false}
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                onTouchEnd={(e) => e.currentTarget.focus()}
-                onClick={(e) => e.currentTarget.focus()}
                 placeholder="seu.email@exemplo.com"
-                className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-[16px] sm:text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-[#25F4EE] transition font-medium select-text"
+                className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-[16px] text-white placeholder:text-slate-500 focus:outline-none focus:border-[#25F4EE] transition font-medium select-text cursor-text"
               />
             </div>
           </div>
 
           {/* Campo Senha */}
           <div className="space-y-1">
-            <label className="text-[11px] font-bold text-slate-300 block">
+            <label htmlFor="auth-password-input" className="text-[11px] font-bold text-slate-300 block">
               {mode === 'register' ? 'Crie uma Senha (mínimo 6 dígitos):' : 'Senha de Acesso:'}
             </label>
             <div className="relative">
               <Lock className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
+                id="auth-password-input"
                 ref={passwordInputRef}
                 name="password"
                 autoComplete={mode === 'register' ? 'new-password' : 'current-password'}
                 type={showPassword ? 'text' : 'password'}
+                inputMode="text"
+                autoCapitalize="none"
+                autoCorrect="off"
+                spellCheck={false}
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                onTouchEnd={(e) => e.currentTarget.focus()}
-                onClick={(e) => e.currentTarget.focus()}
                 placeholder={mode === 'register' ? 'Escolha sua senha secreta' : 'Digite sua senha'}
-                className="w-full pl-10 pr-10 py-2.5 bg-white/5 border border-white/10 rounded-xl text-[16px] sm:text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-[#25F4EE] transition font-medium select-text"
+                className="w-full pl-10 pr-10 py-2.5 bg-white/5 border border-white/10 rounded-xl text-[16px] text-white placeholder:text-slate-500 focus:outline-none focus:border-[#25F4EE] transition font-medium select-text cursor-text"
               />
               <button
                 type="button"
@@ -348,20 +367,25 @@ export const LoginModal: React.FC<LoginModalProps> = ({
           {/* Confirmar Senha (Apenas modo cadastro) */}
           {mode === 'register' && (
             <div className="space-y-1">
-              <label className="text-[11px] font-bold text-slate-300 block">
+              <label htmlFor="auth-confirm-password-input" className="text-[11px] font-bold text-slate-300 block">
                 Confirmar Senha:
               </label>
               <div className="relative">
                 <Lock className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                 <input
+                  id="auth-confirm-password-input"
+                  name="confirmPassword"
+                  autoComplete="new-password"
                   type={showPassword ? 'text' : 'password'}
+                  inputMode="text"
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  spellCheck={false}
                   required
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  onTouchEnd={(e) => e.currentTarget.focus()}
-                  onClick={(e) => e.currentTarget.focus()}
                   placeholder="Repita sua senha"
-                  className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-[16px] sm:text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-[#25F4EE] transition font-medium select-text"
+                  className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-[16px] text-white placeholder:text-slate-500 focus:outline-none focus:border-[#25F4EE] transition font-medium select-text cursor-text"
                 />
               </div>
             </div>
@@ -423,6 +447,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
         </div>
 
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
