@@ -33,17 +33,22 @@ html, body {
   min-height: 100%;
 }
 
-button, [role="button"], a, select, .cursor-pointer {
+button, [role="button"], a, .cursor-pointer {
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
 
-input, textarea, select {
+input, textarea, select, [contenteditable] {
   -webkit-user-select: text !important;
   user-select: text !important;
-  touch-action: manipulation !important;
-  font-size: 16px !important;
-  -webkit-appearance: none;
+  touch-action: auto !important;
+  -webkit-touch-callout: default !important;
+}
+
+@media screen and (max-width: 768px) {
+  input, textarea, select {
+    font-size: 16px !important;
+  }
 }
 
 /* Barras de rolagem discretas com hover na cor ciano do TikBlox */
