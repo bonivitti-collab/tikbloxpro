@@ -78,7 +78,7 @@ export const Header: React.FC<HeaderProps> = ({
             {/* Badge Institucional do Cronograma Diário (06:00 BRT) */}
             <button
               onClick={() => setShowScheduleModal(true)}
-              className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100/90 text-xs font-bold text-slate-800 transition cursor-pointer shadow-2xs group"
+              className="hidden md:flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100/90 text-xs font-bold text-slate-800 transition cursor-pointer shadow-2xs group shrink-0"
               title="Clique para ver detalhes do cronograma de atualização diária do radar"
             >
               <span className="relative flex h-2 w-2 shrink-0">
@@ -87,13 +87,13 @@ export const Header: React.FC<HeaderProps> = ({
               </span>
 
               <div className="flex items-center gap-1 font-mono text-[10px] sm:text-[11px] whitespace-nowrap">
-                <span className="text-slate-400 hidden md:inline">Varredura Diária:</span>
+                <span className="text-slate-400 hidden xl:inline">Varredura:</span>
                 <span className="font-extrabold text-slate-900">06:00 BRT</span>
               </div>
 
-              <span className="hidden md:inline-flex items-center gap-1 text-[10px] font-extrabold text-emerald-800 bg-emerald-100/80 px-2 py-0.2 rounded-full border border-emerald-200">
+              <span className="hidden 2xl:inline-flex items-center gap-1 text-[10px] font-extrabold text-emerald-800 bg-emerald-100/80 px-2 py-0.2 rounded-full border border-emerald-200">
                 <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                <span>Base Minerada Hoje</span>
+                <span>Hoje</span>
               </span>
             </button>
 
@@ -143,14 +143,14 @@ export const Header: React.FC<HeaderProps> = ({
 
             {/* Perfil do Assinante DESKTOP (lg+) */}
             {userSession && (
-              <div className="hidden lg:flex items-center gap-1.5 pl-2 border-l border-slate-200">
+              <div className="hidden lg:flex items-center gap-1.5 pl-2 border-l border-slate-200 shrink-0">
                 
                 {/* Botão Painel ADM se for Admin */}
                 {userSession.plan === 'admin' && onOpenAdmin && (
                   <button
                     type="button"
                     onClick={onOpenAdmin}
-                    className="flex items-center gap-1 px-2.5 py-1 rounded-lg border border-amber-300 bg-amber-50 hover:bg-amber-100 text-[11px] font-black text-amber-900 transition shadow-2xs cursor-pointer active:scale-95"
+                    className="flex items-center gap-1 px-2.5 py-1 rounded-lg border border-amber-300 bg-amber-50 hover:bg-amber-100 text-[11px] font-black text-amber-900 transition shadow-2xs cursor-pointer active:scale-95 whitespace-nowrap shrink-0"
                     title="Abrir Painel Executivo do Administrador"
                   >
                     <span>👑</span>
@@ -167,7 +167,7 @@ export const Header: React.FC<HeaderProps> = ({
                     <button
                       type="button"
                       onClick={onOpenCreatorVIP}
-                      className="flex items-center gap-1 px-2.5 py-1 rounded-lg border border-rose-300 bg-rose-50 hover:bg-rose-100 text-[11px] font-black text-rose-900 transition shadow-2xs cursor-pointer active:scale-95"
+                      className="flex items-center gap-1 px-2.5 py-1 rounded-lg border border-rose-300 bg-rose-50 hover:bg-rose-100 text-[11px] font-black text-rose-900 transition shadow-2xs cursor-pointer active:scale-95 whitespace-nowrap shrink-0"
                       title="Abrir Central de Divulgação"
                     >
                       <span>📣</span>
@@ -175,37 +175,25 @@ export const Header: React.FC<HeaderProps> = ({
                     </button>
                   )}
 
-                <span className="text-[10px] font-mono font-bold bg-slate-100 text-slate-700 px-2 py-1 rounded-lg border border-slate-200 flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                  <span className="truncate max-w-[120px]">{userSession.name}</span>
+                <span className="text-[10px] font-mono font-bold bg-slate-100 text-slate-700 px-2 py-1 rounded-lg border border-slate-200 hidden xl:flex items-center gap-1 shrink-0">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                  <span className="truncate max-w-[100px]">{userSession.name.split(' ')[0]}</span>
                 </span>
 
                 {onViewLanding && (
                   <button
                     onClick={onViewLanding}
-                    className="p-1 px-2 rounded-lg text-[10px] font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition cursor-pointer border border-slate-200"
+                    className="p-1 px-2 rounded-lg text-[10px] font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition cursor-pointer border border-slate-200 whitespace-nowrap shrink-0"
                     title="Ver Landing Page de Apresentação"
                   >
                     Landing
                   </button>
                 )}
 
-                {/* Alternador Direto de Auditoria no Header Desktop */}
-                {userSession.plan === 'admin' && onOpenAdmin && (
-                  <button
-                    type="button"
-                    onClick={onOpenAdmin}
-                    className="p-1 px-2 rounded-lg text-[10px] font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 transition cursor-pointer"
-                    title="Alternar para visão de assinante comum"
-                  >
-                    👁️ Auditar Visão Cliente
-                  </button>
-                )}
-
                 {onLogout && (
                   <button
                     onClick={onLogout}
-                    className="p-1 px-2 rounded-lg text-[10px] font-bold text-rose-600 hover:bg-rose-50 border border-rose-200 transition cursor-pointer"
+                    className="p-1 px-2 rounded-lg text-[10px] font-bold text-rose-600 hover:bg-rose-50 border border-rose-200 transition cursor-pointer whitespace-nowrap shrink-0"
                     title="Encerrar sessão"
                   >
                     Sair
