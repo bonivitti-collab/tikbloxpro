@@ -310,7 +310,7 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
 
     // Footer & General
     footer_tagline: 'Radar de Tendências Virais e Arbitragem de Produtos Estrangeiros para o Brasil.',
-    footer_pwa: 'PWA Compatível com Android & iOS',
+    footer_pwa: '100% Web Cloud para Celular & Computador',
     footer_ai: 'IA do TikBlox Pro',
     offline_status: 'Você está offline (modo cache IndexedDB)',
     online_status: 'Conexão restabelecida',
@@ -504,7 +504,7 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
 
     // Footer & General
     footer_tagline: 'Viral Trends Radar and Cross-Border Product Arbitrage for Brazil.',
-    footer_pwa: 'PWA Compatible with Android & iOS',
+    footer_pwa: '100% Cloud Web for Mobile & Desktop',
     footer_ai: 'TikBlox Pro AI',
     offline_status: 'You are currently offline (IndexedDB cache mode)',
     online_status: 'Connection restored',

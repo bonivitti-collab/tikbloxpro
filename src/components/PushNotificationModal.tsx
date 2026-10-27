@@ -101,7 +101,7 @@ export const PushNotificationModal: React.FC<PushNotificationModalProps> = ({
           </div>
           <div>
             <h2 className="text-xl sm:text-2xl font-black tracking-tight flex items-center gap-2">
-              <span>Radar Push PWA</span>
+              <span>Radar Push Notificações</span>
               <span className="px-2 py-0.5 rounded-full bg-[#25F4EE]/10 border border-[#25F4EE]/30 text-[#25F4EE] text-[10px] font-extrabold uppercase tracking-wider">
                 Tempo Real
               </span>
@@ -141,7 +141,7 @@ export const PushNotificationModal: React.FC<PushNotificationModalProps> = ({
                 </h4>
                 <p className="text-xs text-white/75 mt-0.5 leading-relaxed">
                   {isGranted
-                    ? 'Seu PWA está pronto para emitir notificações no sistema operacional (mesmo com o app minimizado).'
+                    ? 'Seu navegador está pronto para emitir notificações no sistema operacional.'
                     : isDenied
                     ? 'Você bloqueou as notificações deste site. Clique no cadeado 🔒 na barra de endereço do navegador e mude para "Permitir".'
                     : 'Ative para ser alertado sobre as ondas virais de produtos antes da saturação no Brasil.'}
@@ -257,7 +257,7 @@ export const PushNotificationModal: React.FC<PushNotificationModalProps> = ({
 
         {/* Modal Footer */}
         <div className="mt-6 pt-4 border-t border-white/10 flex items-center justify-between text-xs text-[#707286]">
-          <span>TIKBLOX PWA Web Push • 100% Nativo</span>
+          <span>TIKBLOX Web Push • 100% Nativo</span>
           <button
             onClick={onClose}
             className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white font-bold transition cursor-pointer"

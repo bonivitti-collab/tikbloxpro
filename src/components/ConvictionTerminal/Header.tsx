@@ -12,7 +12,6 @@ import {
   Zap,
 } from 'lucide-react';
 import { TikBloxLogo } from '../TikBloxLogo';
-import { PWAInstallButton } from '../PWAInstallButton';
 import { UserSession } from '../../services/authService';
 
 interface HeaderProps {
@@ -72,9 +71,6 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* 2. Ações Centrais / Direitas: Varredura Diária Fixada às 06:00 BRT */}
           <div className="flex items-center gap-1 sm:gap-2 shrink-0">
-            {/* Botão Oficial Instalar App (PWA) no Terminal */}
-            <PWAInstallButton variant="green" />
-
             {/* Badge Institucional do Cronograma Diário (06:00 BRT) */}
             <button
               onClick={() => setShowScheduleModal(true)}

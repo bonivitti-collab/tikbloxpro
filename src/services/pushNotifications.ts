@@ -370,7 +370,7 @@ export async function checkAndRunAutomatedDailyPush(
  */
 export async function sendTestNotification(): Promise<boolean> {
   const title = '⚡ Radar TIKBLOX: Notificações Push Ativas!';
-  const body = 'Seu PWA está configurado para 3 varreduras automáticas diárias sem repetir produtos!';
+  const body = 'Seu radar está configurado para 3 varreduras automáticas diárias sem repetir produtos!';
 
   return await dispatchPushNotification(title, {
     body,

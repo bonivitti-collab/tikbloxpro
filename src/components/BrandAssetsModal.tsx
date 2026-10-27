@@ -200,7 +200,7 @@ export const BrandAssetsModal: React.FC<BrandAssetsModalProps> = ({ isOpen, onCl
             <div>
               <h4 className="font-bold text-sm sm:text-base text-white">Dossiê Completo de Código Fonte (PDF)</h4>
               <p className="text-xs text-[#8E91A6]">
-                Documento técnico formatado com 96 páginas contendo todo o código TypeScript, React, Express e PWA do TIKBLOX.
+                Documento técnico formatado com 96 páginas contendo todo o código TypeScript, React e Express do TIKBLOX.
               </p>
             </div>
           </div>

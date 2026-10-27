@@ -1,6 +1,5 @@
 import React, { ReactNode, StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { registerSW } from 'virtual:pwa-register';
 import App from './App.tsx';
 import { LanguageProvider } from './i18n/LanguageContext.tsx';
 import './index.css';
@@ -52,16 +51,11 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
   }
 }
 
-// Registra Service Worker PWA para suporte offline e atualização imediata (padrão AntiTrader)
-registerSW({ immediate: true });
-
-// Garante reload imediato quando um novo Service Worker assumir o controle no iOS PWA
+// Desregistra qualquer Service Worker residual para garantir que a aplicação rode 100% como Web App limpa no navegador
 if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
-  let refreshing = false;
-  navigator.serviceWorker.addEventListener('controllerchange', () => {
-    if (!refreshing) {
-      refreshing = true;
-      window.location.reload();
+  navigator.serviceWorker.getRegistrations().then((registrations) => {
+    for (const registration of registrations) {
+      registration.unregister();
     }
   });
 }
