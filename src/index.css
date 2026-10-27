@@ -41,7 +41,7 @@ button, [role="button"], a, select, .cursor-pointer {
 input, textarea, select {
   -webkit-user-select: text !important;
   user-select: text !important;
-  touch-action: manipulation;
+  touch-action: auto !important;
 }
 
 @media (max-width: 640px) {

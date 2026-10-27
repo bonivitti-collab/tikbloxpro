@@ -126,8 +126,8 @@ export const LoginModal: React.FC<LoginModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
-      <div className="bg-[#0F121C] border border-white/10 rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl space-y-5 text-white relative overflow-hidden animate-in fade-in zoom-in-95 duration-200 my-auto">
+    <div className="fixed inset-0 z-50 bg-black/85 flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+      <div className="bg-[#0F121C] border border-white/10 rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl space-y-5 text-white relative my-auto">
         
         {/* Glows de fundo cromáticos */}
         <div className="absolute -top-24 -left-24 w-48 h-48 bg-[#25F4EE]/20 rounded-full blur-3xl pointer-events-none" />
@@ -282,6 +282,8 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
+                  onTouchEnd={(e) => e.currentTarget.focus()}
+                  onClick={(e) => e.currentTarget.focus()}
                   placeholder="Seu nome ou da sua loja"
                   className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-[16px] sm:text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-[#25F4EE] transition font-medium select-text"
                 />
@@ -304,6 +306,8 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                onTouchEnd={(e) => e.currentTarget.focus()}
+                onClick={(e) => e.currentTarget.focus()}
                 placeholder="seu.email@exemplo.com"
                 className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-[16px] sm:text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-[#25F4EE] transition font-medium select-text"
               />
@@ -325,6 +329,8 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                onTouchEnd={(e) => e.currentTarget.focus()}
+                onClick={(e) => e.currentTarget.focus()}
                 placeholder={mode === 'register' ? 'Escolha sua senha secreta' : 'Digite sua senha'}
                 className="w-full pl-10 pr-10 py-2.5 bg-white/5 border border-white/10 rounded-xl text-[16px] sm:text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-[#25F4EE] transition font-medium select-text"
               />
@@ -352,6 +358,8 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                   required
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
+                  onTouchEnd={(e) => e.currentTarget.focus()}
+                  onClick={(e) => e.currentTarget.focus()}
                   placeholder="Repita sua senha"
                   className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-[16px] sm:text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-[#25F4EE] transition font-medium select-text"
                 />

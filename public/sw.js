@@ -3,7 +3,7 @@
  * Integrates offline caching, PWA offline resilience, and push notification events
  */
 
-const CACHE_NAME = 'tikblox-shell-v2';
+const CACHE_NAME = 'tikblox-shell-v3';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
