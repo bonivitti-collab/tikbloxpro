@@ -59,7 +59,9 @@ export const TikBloxLogo: React.FC<TikBloxLogoProps> = ({
   // Símbolo Oficial: Cubos 3D Isométricos com Efeito Glitch Cromático TikTok (Sem raio)
   const Isometric3DBloxSymbol = (
     <div
-      className={`relative flex items-center justify-center shrink-0 ${config.box} bg-gradient-to-br from-[#161824] via-[#0D0F16] to-[#030406] border border-white/15 shadow-[0_4px_24px_rgba(0,0,0,0.85)] ${
+      className={`relative flex items-center justify-center shrink-0 ${config.box} bg-gradient-to-br from-[#161824] via-[#0D0F16] to-[#030406] border border-white/15 ${
+        theme === 'light' ? 'shadow-sm' : 'shadow-[0_4px_24px_rgba(0,0,0,0.85)]'
+      } ${
         animate ? 'hover:border-[#25F4EE]/60 hover:shadow-[0_0_24px_rgba(37,244,238,0.35)] transition-all duration-300' : ''
       } overflow-hidden`}
     >

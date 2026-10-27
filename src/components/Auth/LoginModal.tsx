@@ -2,7 +2,6 @@
 // Modal de Autenticação Segura com Validação Server-Side (/api/auth), OAuth Google, Apple, E-mail e Cadastro
 
 import React, { useState } from 'react';
-import { createPortal } from 'react-dom';
 import { Mail, Lock, Eye, EyeOff, ArrowRight, ShieldCheck, X, ExternalLink, User } from 'lucide-react';
 import {
   loginWithEmailAndPassword,
@@ -130,17 +129,9 @@ export const LoginModal: React.FC<LoginModalProps> = ({
     }
   };
 
-  return createPortal(
-    <div
-      className="fixed inset-0 z-[9999] bg-black/85 flex items-center justify-center p-3 sm:p-4 overflow-y-auto"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
-    >
-      <div
-        className="bg-[#0F121C] border border-white/10 rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl space-y-5 text-white relative my-auto max-h-[92dvh] overflow-y-auto"
-        onClick={(e) => e.stopPropagation()}
-      >
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 overflow-y-auto">
+      <div className="relative w-full max-w-md bg-[#0F121C] border border-white/10 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-5 text-white overflow-hidden my-8">
         
         {/* Glows de fundo cromáticos */}
         <div className="absolute -top-24 -left-24 w-48 h-48 bg-[#25F4EE]/20 rounded-full blur-3xl pointer-events-none" />
@@ -397,7 +388,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
           )}
 
           {/* Opção de Salvar Meu Login neste Aparelho */}
-          <label className="flex items-center justify-between gap-2 pt-0.5 cursor-pointer select-none group">
+          <label className="flex items-center justify-between gap-2 pt-0.5 cursor-pointer group">
             <div className="flex items-center gap-2">
               <input
                 type="checkbox"
@@ -452,7 +443,6 @@ export const LoginModal: React.FC<LoginModalProps> = ({
         </div>
 
       </div>
-    </div>,
-    document.body
+    </div>
   );
 };

@@ -6,13 +6,11 @@ import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig(() => {
   return {
-    base: './',
     plugins: [
       react(),
       tailwindcss(),
       VitePWA({
         registerType: 'autoUpdate',
-        injectRegister: null,
         includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'icon.svg'],
         manifest: {
           id: '/',
@@ -47,6 +45,9 @@ export default defineConfig(() => {
         },
         workbox: {
           importScripts: ['/sw-push-handler.js'],
+          cleanupOutdatedCaches: true,
+          skipWaiting: true,
+          clientsClaim: true,
           globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,woff,woff2,json,webmanifest}'],
           maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
           runtimeCaching: [
@@ -101,7 +102,6 @@ export default defineConfig(() => {
       ],
     },
     server: {
-      // HMR is disabled in AI Studio via DISABLE_HMR env var.
       hmr: process.env.DISABLE_HMR !== 'true',
       watch: process.env.DISABLE_HMR === 'true' ? null : {},
     },

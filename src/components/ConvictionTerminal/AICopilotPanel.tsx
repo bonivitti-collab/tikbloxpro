@@ -197,7 +197,7 @@ export const AICopilotPanel: React.FC<AICopilotPanelProps> = ({
   return (
     <aside
       style={{ width: width ? `${width}px` : undefined }}
-      className="w-full shrink-0 bg-[#F8FAFC] flex flex-col border-t lg:border-t-0 lg:border-l border-slate-200 overflow-hidden h-full select-none text-slate-900"
+      className="w-full shrink-0 bg-[#F8FAFC] flex flex-col border-t lg:border-t-0 lg:border-l border-slate-200 overflow-hidden h-full text-slate-900"
     >
       
       {/* Header Institucional da IA */}
@@ -283,249 +283,319 @@ export const AICopilotPanel: React.FC<AICopilotPanelProps> = ({
       ) : (
         <>
           {/* Área de Conversa e Mensagens */}
-          <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 min-h-0 bg-[#F8FAFC]">
-        {messages.length === 0 ? (
-          <div className="h-full flex flex-col items-center justify-center text-center p-6 select-none opacity-60">
-            <div className="w-12 h-12 rounded-2xl bg-white border border-slate-200 shadow-2xs flex items-center justify-center text-xl mb-2 text-[#007A87]">
-              <Bot className="w-6 h-6" />
-            </div>
-            <p className="text-xs font-bold text-slate-700">TIKBLOX AI</p>
-            <p className="text-[11px] text-slate-500 mt-0.5 max-w-[240px]">
-              Selecione um tópico abaixo ou digite qualquer pergunta sobre o produto.
-            </p>
-          </div>
-        ) : (
-          messages.map((msg, i) => (
-            <div
-              key={i}
-              className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}
-            >
-              <span className="text-[10px] text-slate-400 font-bold mb-0.5 px-1">
-                {msg.role === 'user' ? 'Você' : 'TIKBLOX AI'}
-              </span>
-
-              <div
-                className={`p-3 rounded-2xl max-w-[95%] text-xs leading-relaxed ${
-                  msg.role === 'user'
-                    ? 'bg-gradient-to-r from-[#0F172A] to-[#1E293B] text-white font-medium rounded-br-none shadow-2xs'
-                    : 'bg-white border border-slate-200 text-slate-800 rounded-bl-none shadow-2xs relative group'
-                }`}
-              >
-                {msg.role === 'assistant' ? (
-                  <>
-                    <FormattedMarkdownMessage content={msg.content} variant="light" />
-
-                    {msg.source && (
-                      <div className="mt-2.5 pt-1.5 border-t border-slate-100 text-[9px] font-mono text-slate-400 flex items-center justify-between">
-                        <div className="flex items-center gap-1">
-                          <span>Origem:</span>
-                          <strong className="text-slate-600">{msg.source}</strong>
-                        </div>
-                        <span className="text-slate-400">TikTok Shop Brasil</span>
-                      </div>
-                    )}
-
-                    <button
-                      onClick={() => handleCopy(msg.content, i)}
-                      className="absolute top-2 right-2 p-1 rounded-md bg-slate-50 hover:bg-slate-100 text-slate-500 hover:text-slate-800 transition cursor-pointer opacity-0 group-hover:opacity-100 border border-slate-200"
-                      title="Copiar resposta"
-                    >
-                      {copiedIndex === i ? (
-                        <Check className="w-3.5 h-3.5 text-emerald-600" />
-                      ) : (
-                        <Copy className="w-3.5 h-3.5" />
-                      )}
-                    </button>
-                  </>
-                ) : (
-                  <span>{msg.content}</span>
+          <div className="flex-1 overflow-y-auto p-3.5 sm:p-4 space-y-3 min-h-0 bg-[#F8FAFC]">
+            {messages.length === 0 ? (
+              <div className="space-y-3.5 py-1">
+                {/* Card de Contexto do Produto Ativo */}
+                {tk && (
+                  <div className="p-3 rounded-2xl bg-white border border-slate-200/90 shadow-2xs flex items-center justify-between gap-2.5">
+                    <div className="min-w-0 flex-1">
+                      <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#007A87] block">
+                        Produto em Foco na IA
+                      </span>
+                      <p className="text-xs font-extrabold text-slate-900 truncate mt-0.5">
+                        {tk.name}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200">
+                        {tk.tiktokShop?.commissionRatePercent || 20}% Comiss.
+                      </span>
+                    </div>
+                  </div>
                 )}
+
+                {/* Cabeçalho de Boas-Vindas */}
+                <div className="flex items-center gap-2.5 px-1">
+                  <div className="w-9 h-9 rounded-xl bg-white border border-slate-200 shadow-2xs flex items-center justify-center text-[#007A87] shrink-0">
+                    <Sparkles className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-black text-slate-900 leading-tight">
+                      Análises Rápidas com 1 Toque
+                    </p>
+                    <p className="text-[11px] text-slate-500 leading-snug">
+                      Toque em uma estratégia abaixo ou digite sua pergunta:
+                    </p>
+                  </div>
+                </div>
+
+                {/* Lista de Tópicos Rápidos Sem Cortes */}
+                <div className="grid grid-cols-1 gap-2">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      handleSendMessage(
+                        `Vale a pena comprar a amostra de ${tk?.name || 'este produto'} com meu próprio dinheiro hoje? Analise o risco, concorrência no TikTok BR e break-even.`
+                      )
+                    }
+                    disabled={isLoading}
+                    className="w-full text-left bg-white hover:bg-emerald-50/40 text-slate-800 border border-slate-200 hover:border-emerald-400 rounded-xl p-3 cursor-pointer transition-all shadow-2xs flex items-center justify-between gap-2 disabled:opacity-50 active:scale-[0.99] group"
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0" />
+                      <div className="min-w-0">
+                        <span className="text-xs font-bold text-slate-900 group-hover:text-emerald-800 block">
+                          Diagnóstico & Risco de Amostra
+                        </span>
+                        <span className="text-[11px] text-slate-500 block truncate">
+                          Análise de viabilidade, saturação BR e ponto de equilíbrio
+                        </span>
+                      </div>
+                    </div>
+                    <ArrowUpRight className="w-4 h-4 text-slate-400 group-hover:text-emerald-600 shrink-0 transition-colors" />
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      handleSendMessage(
+                        `Gere 3 roteiros técnicos de 30 segundos no TikTok para ${tk?.name || 'este produto'}, detalhando o gancho exato de 3s para prender o scroll no Brasil.`
+                      )
+                    }
+                    disabled={isLoading}
+                    className="w-full text-left bg-white hover:bg-sky-50/40 text-slate-800 border border-slate-200 hover:border-sky-400 rounded-xl p-3 cursor-pointer transition-all shadow-2xs flex items-center justify-between gap-2 disabled:opacity-50 active:scale-[0.99] group"
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <span className="w-2.5 h-2.5 rounded-full bg-sky-500 shrink-0" />
+                      <div className="min-w-0">
+                        <span className="text-xs font-bold text-slate-900 group-hover:text-sky-800 block">
+                          3 Roteiros Virais (30 Segundos)
+                        </span>
+                        <span className="text-[11px] text-slate-500 block truncate">
+                          Estrutura completa com gancho visual, dor, prova e CTA
+                        </span>
+                      </div>
+                    </div>
+                    <ArrowUpRight className="w-4 h-4 text-slate-400 group-hover:text-sky-600 shrink-0 transition-colors" />
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      handleSendMessage(
+                        `Simular a estrutura completa de unit economics e projeção de lucro líquido com 50 vendas para ${tk?.name || 'este produto'} no TikTok Shop.`
+                      )
+                    }
+                    disabled={isLoading}
+                    className="w-full text-left bg-white hover:bg-amber-50/40 text-slate-800 border border-slate-200 hover:border-amber-400 rounded-xl p-3 cursor-pointer transition-all shadow-2xs flex items-center justify-between gap-2 disabled:opacity-50 active:scale-[0.99] group"
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <span className="w-2.5 h-2.5 rounded-full bg-amber-500 shrink-0" />
+                      <div className="min-w-0">
+                        <span className="text-xs font-bold text-slate-900 group-hover:text-amber-800 block">
+                          Simular Lucro & Break-Even (50 Vendas)
+                        </span>
+                        <span className="text-[11px] text-slate-500 block truncate">
+                          Projeção financeira líquida para afiliado e operação própria
+                        </span>
+                      </div>
+                    </div>
+                    <ArrowUpRight className="w-4 h-4 text-slate-400 group-hover:text-amber-600 shrink-0 transition-colors" />
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      handleSendMessage(
+                        `Quais as 3 maiores objeções de compradores no TikTok para ${tk?.name || 'produtos desta categoria'} e como quebrar nos comentários?`
+                      )
+                    }
+                    disabled={isLoading}
+                    className="w-full text-left bg-white hover:bg-rose-50/40 text-slate-800 border border-slate-200 hover:border-rose-400 rounded-xl p-3 cursor-pointer transition-all shadow-2xs flex items-center justify-between gap-2 disabled:opacity-50 active:scale-[0.99] group"
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <span className="w-2.5 h-2.5 rounded-full bg-rose-500 shrink-0" />
+                      <div className="min-w-0">
+                        <span className="text-xs font-bold text-slate-900 group-hover:text-rose-800 block">
+                          Quebrar Objeções nos Comentários
+                        </span>
+                        <span className="text-[11px] text-slate-500 block truncate">
+                          Respostas prontas para converter dúvidas em vendas no vídeo
+                        </span>
+                      </div>
+                    </div>
+                    <ArrowUpRight className="w-4 h-4 text-slate-400 group-hover:text-rose-600 shrink-0 transition-colors" />
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      handleSendMessage(
+                        `Quais os melhores ganchos virais de 3 segundos para reter atenção no feed para ${tk?.name || 'este produto'}?`
+                      )
+                    }
+                    disabled={isLoading}
+                    className="w-full text-left bg-white hover:bg-purple-50/40 text-slate-800 border border-slate-200 hover:border-purple-400 rounded-xl p-3 cursor-pointer transition-all shadow-2xs flex items-center justify-between gap-2 disabled:opacity-50 active:scale-[0.99] group"
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <span className="w-2.5 h-2.5 rounded-full bg-purple-500 shrink-0" />
+                      <div className="min-w-0">
+                        <span className="text-xs font-bold text-slate-900 group-hover:text-purple-800 block">
+                          Ganchos Virais de 3 Segundos
+                        </span>
+                        <span className="text-[11px] text-slate-500 block truncate">
+                          Aberturas magnéticas para travar o scroll na For You
+                        </span>
+                      </div>
+                    </div>
+                    <ArrowUpRight className="w-4 h-4 text-slate-400 group-hover:text-purple-600 shrink-0 transition-colors" />
+                  </button>
+                </div>
+              </div>
+            ) : (
+              messages.map((msg, i) => (
+                <div
+                  key={i}
+                  className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}
+                >
+                  <span className="text-[10px] text-slate-400 font-bold mb-0.5 px-1">
+                    {msg.role === 'user' ? 'Você' : 'TIKBLOX AI'}
+                  </span>
+
+                  <div
+                    className={`p-3 rounded-2xl max-w-[95%] text-xs leading-relaxed ${
+                      msg.role === 'user'
+                        ? 'bg-gradient-to-r from-[#0F172A] to-[#1E293B] text-white font-medium rounded-br-none shadow-2xs'
+                        : 'bg-white border border-slate-200 text-slate-800 rounded-bl-none shadow-2xs relative group'
+                    }`}
+                  >
+                    {msg.role === 'assistant' ? (
+                      <>
+                        <FormattedMarkdownMessage content={msg.content} variant="light" />
+
+                        {msg.source && (
+                          <div className="mt-2.5 pt-1.5 border-t border-slate-100 text-[9px] font-mono text-slate-400 flex items-center justify-between">
+                            <div className="flex items-center gap-1">
+                              <span>Origem:</span>
+                              <strong className="text-slate-600">{msg.source}</strong>
+                            </div>
+                            <span className="text-slate-400">TikTok Shop Brasil</span>
+                          </div>
+                        )}
+
+                        <button
+                          onClick={() => handleCopy(msg.content, i)}
+                          className="absolute top-2 right-2 p-1 rounded-md bg-slate-50 hover:bg-slate-100 text-slate-500 hover:text-slate-800 transition cursor-pointer opacity-0 group-hover:opacity-100 border border-slate-200"
+                          title="Copiar resposta"
+                        >
+                          {copiedIndex === i ? (
+                            <Check className="w-3.5 h-3.5 text-emerald-600" />
+                          ) : (
+                            <Copy className="w-3.5 h-3.5" />
+                          )}
+                        </button>
+                      </>
+                    ) : (
+                      <span>{msg.content}</span>
+                    )}
+                  </div>
+                </div>
+              ))
+            )}
+
+            {isLoading && (
+              <div className="flex items-center gap-2 p-3 bg-white border border-slate-200 rounded-2xl text-slate-700 text-xs shadow-2xs font-medium">
+                <Loader2 className="w-4 h-4 text-[#007A87] animate-spin" />
+                <span>Consultando inteligência analítica e algoritmo TikTok Shop...</span>
+              </div>
+            )}
+
+            <div ref={chatScrollRef} />
+          </div>
+
+          {/* Barra de Sugestões de Continuidade (exibida quando já há mensagens na conversa) */}
+          {messages.length > 0 && (
+            <div className="relative border-t border-slate-200 bg-slate-50/90 shrink-0">
+              <div className="flex items-center px-2.5 py-2 gap-1.5">
+                <div className="flex items-center gap-1 text-[10px] font-black text-slate-500 uppercase tracking-wider shrink-0">
+                  <Sparkles className="w-3.5 h-3.5 text-[#007A87]" />
+                  <span className="hidden sm:inline">Prosseguir:</span>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => scrollTopics('left')}
+                  className="hidden sm:inline-flex p-1 rounded-md text-slate-400 hover:text-slate-800 hover:bg-slate-200 transition cursor-pointer shrink-0"
+                  title="Rolar para a esquerda"
+                >
+                  <ChevronLeft className="w-3.5 h-3.5" />
+                </button>
+
+                <div
+                  ref={topicsScrollRef}
+                  onWheel={handleTopicsWheel}
+                  className="flex-1 flex items-center gap-2 overflow-x-auto scroll-smooth py-0.5 no-scrollbar"
+                  style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                >
+                  {followUpSuggestions.map((sugestao, idx) => {
+                    const dotColors = ['bg-emerald-500', 'bg-sky-500', 'bg-amber-500', 'bg-purple-500', 'bg-rose-500'];
+                    const hoverBorders = [
+                      'hover:border-emerald-400 hover:text-emerald-700',
+                      'hover:border-sky-400 hover:text-sky-700',
+                      'hover:border-amber-400 hover:text-amber-700',
+                      'hover:border-purple-400 hover:text-purple-700',
+                      'hover:border-rose-400 hover:text-rose-700',
+                    ];
+                    const dot = dotColors[idx % dotColors.length];
+                    const hov = hoverBorders[idx % hoverBorders.length];
+
+                    return (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => handleSendMessage(sugestao)}
+                        disabled={isLoading}
+                        className={`text-xs font-semibold bg-white text-slate-800 border border-slate-200 ${hov} rounded-full px-3 py-1.5 whitespace-nowrap cursor-pointer transition-all shadow-2xs shrink-0 flex items-center gap-1.5 disabled:opacity-50 active:scale-95 group`}
+                      >
+                        <span className={`w-2 h-2 rounded-full ${dot} shrink-0`} />
+                        <span>{sugestao}</span>
+                        <ArrowUpRight className="w-3 h-3 text-slate-400 group-hover:text-slate-700 transition-colors" />
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => scrollTopics('right')}
+                  className="hidden sm:inline-flex p-1 rounded-md text-slate-400 hover:text-slate-800 hover:bg-slate-200 transition cursor-pointer shrink-0"
+                  title="Rolar para a direita"
+                >
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </button>
               </div>
             </div>
-          ))
-        )}
+          )}
 
-        {isLoading && (
-          <div className="flex items-center gap-2 p-3 bg-white border border-slate-200 rounded-2xl text-slate-700 text-xs shadow-2xs font-medium">
-            <Loader2 className="w-4 h-4 text-[#007A87] animate-spin" />
-            <span>Consultando inteligência analítica e algoritmo TikTok Shop...</span>
-          </div>
-        )}
-
-        <div ref={chatScrollRef} />
-      </div>
-
-      {/* Barra de Tópicos com Scroll Horizontal Fluído e Detalhes de Cor Elegantes */}
-      <div className="relative border-t border-slate-200 bg-slate-50/90 shrink-0 select-none">
-        <div className="flex items-center px-2 py-2 gap-1.5">
-          {/* Label de Tópicos */}
-          <div className="flex items-center gap-1 text-[10px] font-black text-slate-500 uppercase tracking-wider shrink-0 pl-1">
-            <Sparkles className="w-3.5 h-3.5 text-[#007A87]" />
-            <span className="hidden sm:inline">{messages.length > 0 ? 'Prosseguir:' : 'Tópicos:'}</span>
-          </div>
-
-          {/* Seta Scroll Esquerda */}
-          <button
-            type="button"
-            onClick={() => scrollTopics('left')}
-            className="p-1 rounded-md text-slate-400 hover:text-slate-800 hover:bg-slate-200 transition cursor-pointer shrink-0"
-            title="Rolar tópicos para a esquerda"
+          {/* Caixa de Digitação do Chat Ampliada e Robusta */}
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSendMessage();
+            }}
+            className="p-3 sm:p-3.5 pb-safe border-t border-slate-200 bg-white flex items-center gap-2.5 shrink-0"
           >
-            <ChevronLeft className="w-3.5 h-3.5" />
-          </button>
+            <input
+              type="text"
+              inputMode="text"
+              autoComplete="off"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="Pergunte ao TikBlox AI..."
+              disabled={isLoading}
+              className="flex-1 py-3 px-4 text-sm font-medium bg-slate-50 border border-slate-300 rounded-2xl focus:outline-none focus:border-[#25F4EE] focus:ring-2 focus:ring-[#25F4EE]/30 focus:bg-white transition-all text-slate-900 placeholder:text-slate-400 disabled:opacity-50 shadow-2xs"
+            />
 
-          {/* Container Scrollável de Tópicos (Com Mousewheel e Touch) */}
-          <div
-            ref={topicsScrollRef}
-            onWheel={handleTopicsWheel}
-            className="flex-1 flex items-center gap-2 overflow-x-auto scroll-smooth py-0.5 no-scrollbar"
-            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-          >
-            {messages.length === 0 ? (
-              <>
-                <button
-                  type="button"
-                  onClick={() =>
-                    handleSendMessage(
-                      `Vale a pena comprar a amostra de ${tk?.name || 'este produto'} com meu próprio dinheiro hoje? Analise o risco, concorrência no TikTok BR e break-even.`
-                    )
-                  }
-                  disabled={isLoading}
-                  className="text-xs font-semibold bg-white text-slate-800 border border-slate-200 hover:border-emerald-400 hover:text-emerald-700 rounded-full px-3 py-1 whitespace-nowrap cursor-pointer transition-all shadow-2xs shrink-0 flex items-center gap-1.5 disabled:opacity-50 active:scale-95 group"
-                >
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
-                  <span>Diagnóstico & Risco</span>
-                  <ArrowUpRight className="w-3 h-3 text-slate-400 group-hover:text-emerald-600 transition-colors" />
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() =>
-                    handleSendMessage(
-                      `Gere 3 roteiros técnicos de 30 segundos no TikTok para ${tk?.name || 'este produto'}, detalhando o gancho exato de 3s para prender o scroll no Brasil.`
-                    )
-                  }
-                  disabled={isLoading}
-                  className="text-xs font-semibold bg-white text-slate-800 border border-slate-200 hover:border-sky-400 hover:text-sky-700 rounded-full px-3 py-1 whitespace-nowrap cursor-pointer transition-all shadow-2xs shrink-0 flex items-center gap-1.5 disabled:opacity-50 active:scale-95 group"
-                >
-                  <span className="w-2 h-2 rounded-full bg-sky-500 shrink-0" />
-                  <span>3 Roteiros (30s)</span>
-                  <ArrowUpRight className="w-3 h-3 text-slate-400 group-hover:text-sky-600 transition-colors" />
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() =>
-                    handleSendMessage(
-                      `Simular a estrutura completa de unit economics e projeção de lucro líquido com 50 vendas para ${tk?.name || 'este produto'} no TikTok Shop.`
-                    )
-                  }
-                  disabled={isLoading}
-                  className="text-xs font-semibold bg-white text-slate-800 border border-slate-200 hover:border-amber-400 hover:text-amber-700 rounded-full px-3 py-1 whitespace-nowrap cursor-pointer transition-all shadow-2xs shrink-0 flex items-center gap-1.5 disabled:opacity-50 active:scale-95 group"
-                >
-                  <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0" />
-                  <span>Simular Lucro & Break-Even</span>
-                  <ArrowUpRight className="w-3 h-3 text-slate-400 group-hover:text-amber-600 transition-colors" />
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() =>
-                    handleSendMessage(
-                      `Quais as 3 maiores objeções de compradores no TikTok para ${tk?.name || 'produtos desta categoria'} e como quebrar nos comentários?`
-                    )
-                  }
-                  disabled={isLoading}
-                  className="text-xs font-semibold bg-white text-slate-800 border border-slate-200 hover:border-rose-400 hover:text-rose-700 rounded-full px-3 py-1 whitespace-nowrap cursor-pointer transition-all shadow-2xs shrink-0 flex items-center gap-1.5 disabled:opacity-50 active:scale-95 group"
-                >
-                  <span className="w-2 h-2 rounded-full bg-rose-500 shrink-0" />
-                  <span>Quebrar Objeções</span>
-                  <ArrowUpRight className="w-3 h-3 text-slate-400 group-hover:text-rose-600 transition-colors" />
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() =>
-                    handleSendMessage(
-                      `Quais os melhores ganchos virais de 3 segundos para reter atenção no feed para ${tk?.name || 'este produto'}?`
-                    )
-                  }
-                  disabled={isLoading}
-                  className="text-xs font-semibold bg-white text-slate-800 border border-slate-200 hover:border-purple-400 hover:text-purple-700 rounded-full px-3 py-1 whitespace-nowrap cursor-pointer transition-all shadow-2xs shrink-0 flex items-center gap-1.5 disabled:opacity-50 active:scale-95 group"
-                >
-                  <span className="w-2 h-2 rounded-full bg-purple-500 shrink-0" />
-                  <span>Ganchos de 3s</span>
-                  <ArrowUpRight className="w-3 h-3 text-slate-400 group-hover:text-purple-600 transition-colors" />
-                </button>
-              </>
-            ) : (
-              followUpSuggestions.map((sugestao, idx) => {
-                const dotColors = ['bg-emerald-500', 'bg-sky-500', 'bg-amber-500', 'bg-purple-500', 'bg-rose-500'];
-                const hoverBorders = [
-                  'hover:border-emerald-400 hover:text-emerald-700',
-                  'hover:border-sky-400 hover:text-sky-700',
-                  'hover:border-amber-400 hover:text-amber-700',
-                  'hover:border-purple-400 hover:text-purple-700',
-                  'hover:border-rose-400 hover:text-rose-700',
-                ];
-                const dot = dotColors[idx % dotColors.length];
-                const hov = hoverBorders[idx % hoverBorders.length];
-
-                return (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() => handleSendMessage(sugestao)}
-                    disabled={isLoading}
-                    className={`text-xs font-semibold bg-white text-slate-800 border border-slate-200 ${hov} rounded-full px-3 py-1 whitespace-nowrap cursor-pointer transition-all shadow-2xs shrink-0 flex items-center gap-1.5 disabled:opacity-50 active:scale-95 group`}
-                  >
-                    <span className={`w-2 h-2 rounded-full ${dot} shrink-0`} />
-                    <span>{sugestao}</span>
-                    <ArrowUpRight className="w-3 h-3 text-slate-400 group-hover:text-slate-700 transition-colors" />
-                  </button>
-                );
-              })
-            )}
-          </div>
-
-          {/* Seta Scroll Direita */}
-          <button
-            type="button"
-            onClick={() => scrollTopics('right')}
-            className="p-1 rounded-md text-slate-400 hover:text-slate-800 hover:bg-slate-200 transition cursor-pointer shrink-0"
-            title="Rolar tópicos para a direita"
-          >
-            <ChevronRight className="w-3.5 h-3.5" />
-          </button>
-        </div>
-      </div>
-
-      {/* Caixa de Digitação do Chat Ampliada e Robusta (Foto 1) */}
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          handleSendMessage();
-        }}
-        className="p-3 sm:p-3.5 border-t border-slate-200 bg-white flex items-center gap-2.5 shrink-0"
-      >
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Pergunte sobre nichos, métricas ou simule lucros..."
-          disabled={isLoading}
-          className="flex-1 py-3 px-4 text-sm font-medium bg-slate-50 border border-slate-300 rounded-2xl focus:outline-none focus:border-[#25F4EE] focus:ring-2 focus:ring-[#25F4EE]/30 focus:bg-white transition-all text-slate-900 placeholder:text-slate-400 disabled:opacity-50 shadow-2xs"
-        />
-
-        <button
-          type="submit"
-          disabled={!input.trim() || isLoading}
-          className="w-12 h-12 rounded-2xl bg-gradient-to-r from-[#25F4EE] to-[#00D2C4] hover:brightness-105 disabled:bg-slate-200 text-[#0F121C] disabled:text-slate-400 font-bold transition cursor-pointer active:scale-95 shadow-[0_0_16px_rgba(37,244,238,0.3)] shrink-0 flex items-center justify-center"
-          title="Enviar pergunta para o TikBlox AI"
-        >
-          <Send className="w-5 h-5 text-[#0F121C]" />
-        </button>
-      </form>
+            <button
+              type="submit"
+              disabled={!input.trim() || isLoading}
+              className="w-12 h-12 rounded-2xl bg-gradient-to-r from-[#25F4EE] to-[#00D2C4] hover:brightness-105 disabled:bg-slate-200 text-[#0F121C] disabled:text-slate-400 font-bold transition cursor-pointer active:scale-95 shadow-[0_0_16px_rgba(37,244,238,0.3)] shrink-0 flex items-center justify-center"
+              title="Enviar pergunta para o TikBlox AI"
+            >
+              <Send className="w-5 h-5 text-[#0F121C]" />
+            </button>
+          </form>
         </>
       )}
 

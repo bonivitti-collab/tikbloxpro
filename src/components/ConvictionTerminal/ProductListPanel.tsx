@@ -147,7 +147,7 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
   return (
     <section
       style={{ width: width ? `${width}px` : undefined }}
-      className="w-full shrink-0 bg-[#F8FAFC] flex flex-col border-r border-slate-200 h-full overflow-hidden select-none text-slate-900"
+      className="w-full shrink-0 bg-[#F8FAFC] flex flex-col border-r border-slate-200 h-full overflow-hidden text-slate-900"
     >
       
       {/* Topo: Cabeçalho com Seletor de Categoria e Acentos TikBlox */}

@@ -206,22 +206,22 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* BARRA DE CONTA MOBILE (< lg): Sempre 100% visível no celular para você, para a Duda e para qualquer cliente público */}
         {userSession && (
-          <div className="flex lg:hidden items-center justify-between gap-1.5 pt-1.5 mt-1.5 border-t border-slate-100 overflow-x-auto no-scrollbar">
+          <div className="flex lg:hidden items-center justify-between gap-2 pt-1.5 mt-1.5 border-t border-slate-100 overflow-x-auto no-scrollbar">
             {/* Identificação do Usuário Logado no Celular */}
-            <div className="flex items-center gap-1.5 min-w-0 shrink">
+            <div className="flex items-center gap-1.5 shrink-0">
               <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
-              <span className="text-[11px] font-bold text-slate-700 truncate max-w-[115px]">
-                {userSession.name}
+              <span className="text-[11px] font-bold text-slate-800 whitespace-nowrap">
+                {userSession.name.split(' ')[0]}
               </span>
-              <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200 shrink-0">
-                {userSession.plan === 'admin'
-                  ? 'ADM'
-                  : userSession.role === 'creator_vip'
-                  ? 'VIP'
-                  : userSession.plan === 'pro_ai'
-                  ? 'PRO AI'
-                  : 'RADAR'}
-              </span>
+              {userSession.plan !== 'admin' && (
+                <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200 shrink-0">
+                  {userSession.role === 'creator_vip'
+                    ? 'VIP'
+                    : userSession.plan === 'pro_ai'
+                    ? 'PRO AI'
+                    : 'RADAR'}
+                </span>
+              )}
             </div>
 
             {/* Botões de Ação Mobile: Painel ADM, Divulgação, Início e Sair */}

@@ -1,5 +1,6 @@
 import React, { ReactNode, StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import { registerSW } from 'virtual:pwa-register';
 import App from './App.tsx';
 import { LanguageProvider } from './i18n/LanguageContext.tsx';
 import './index.css';
@@ -51,27 +52,18 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
   }
 }
 
-// Safe ServiceWorker registration for PWA installability (production only)
+// Registra Service Worker PWA para suporte offline e atualização imediata (padrão AntiTrader)
+registerSW({ immediate: true });
+
+// Garante reload imediato quando um novo Service Worker assumir o controle no iOS PWA
 if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
-  try {
-    if (import.meta.env.PROD) {
-      const isTopLevel = window.self === window.top;
-      if (isTopLevel) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js').then((reg) => { reg.update(); }).catch((err) => { console.warn('PWA service worker registration notice:', err); });
-        });
-      }
-    } else {
-      // In development mode, unregister any active service worker to prevent intercepting Vite dev server modules
-      navigator.serviceWorker.getRegistrations().then((registrations) => {
-        for (const registration of registrations) {
-          registration.unregister();
-        }
-      });
+  let refreshing = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!refreshing) {
+      refreshing = true;
+      window.location.reload();
     }
-  } catch (swErr) {
-    console.warn('PWA service worker check ignored:', swErr);
-  }
+  });
 }
 
 createRoot(document.getElementById('root')!).render(

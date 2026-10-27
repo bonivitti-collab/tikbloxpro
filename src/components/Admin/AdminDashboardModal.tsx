@@ -66,7 +66,7 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
   const generatedLandingUrl = `https://tikblox.com.br?ref=${cleanUtm}`;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 select-none animate-in fade-in">
+    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 animate-in fade-in">
       <div className="bg-[#0D111E] border border-[#25F4EE]/30 rounded-3xl max-w-4xl w-full p-6 sm:p-8 shadow-2xl space-y-6 text-white relative overflow-hidden flex flex-col max-h-[92vh]">
         
         {/* Glow Superior */}

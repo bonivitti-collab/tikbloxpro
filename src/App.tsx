@@ -625,7 +625,7 @@ export default function App() {
   // =========================================================================
   if (currentView === 'landing' || !session || !session.isAuthenticated || session.plan === 'guest') {
     return (
-      <div className="min-h-screen w-full overflow-y-auto bg-[#090D16]">
+      <>
         <LandingPage
           isLoggedIn={Boolean(session && session.isAuthenticated && session.plan !== 'guest')}
           onOpenLogin={() => {
@@ -644,12 +644,18 @@ export default function App() {
             document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' });
           }}
         />
-      </div>
+      </>
     );
   }
 
   return (
-    <div className="h-full h-dvh w-full max-w-full bg-[#F8FAFC] text-[#0F172A] font-sans flex flex-col overflow-hidden select-none">
+    <div
+      className="w-full max-w-full bg-[#F8FAFC] text-[#0F172A] font-sans flex flex-col overflow-hidden"
+      style={{
+        height: '100dvh',
+        maxHeight: '100dvh',
+      }}
+    >
       
       {/* 1. HEADER PRINCIPAL RESPONSIVO */}
       <Header
@@ -753,7 +759,7 @@ export default function App() {
         {/* PAINEL 1: Lista de Produtos */}
         <div
           style={{ width: isDesktop && !painelEsquerdoRecolhido ? `${leftWidth}px` : undefined }}
-          className={`h-full shrink-0 ${mobileTab !== 'produtos' ? 'hidden lg:flex' : 'flex'}`}
+          className={`w-full lg:w-auto flex-1 lg:flex-none h-full min-h-0 lg:shrink-0 ${mobileTab !== 'produtos' ? 'hidden lg:flex' : 'flex'}`}
         >
           <ProductListPanel
             width={isDesktop && !painelEsquerdoRecolhido ? leftWidth : undefined}
@@ -796,7 +802,7 @@ export default function App() {
         )}
 
         {/* PAINEL 2: Terminal de Raio-X & Destrinchamento do Produto em Foco */}
-        <div className={`h-full flex-1 overflow-hidden min-w-0 ${mobileTab !== 'terminal' ? 'hidden lg:flex' : 'flex'}`}>
+        <div className={`w-full h-full flex-1 overflow-hidden min-w-0 min-h-0 ${mobileTab !== 'terminal' ? 'hidden lg:flex' : 'flex'}`}>
           <ProductDetailTerminal
             product={activeProduct}
             onOpenInCopilot={(p) => {
@@ -833,7 +839,7 @@ export default function App() {
         {/* PAINEL 3: TIKBLOX AI Especialista em TikTok Shop */}
         <div
           style={{ width: isDesktop && !painelDireitoRecolhido ? `${rightWidth}px` : undefined }}
-          className={`h-full shrink-0 ${mobileTab !== 'copilot' ? 'hidden lg:flex' : 'flex'}`}
+          className={`w-full lg:w-auto flex-1 lg:flex-none h-full min-h-0 lg:shrink-0 ${mobileTab !== 'copilot' ? 'hidden lg:flex' : 'flex'}`}
         >
           <AICopilotPanel
             width={isDesktop && !painelDireitoRecolhido ? rightWidth : undefined}
@@ -1131,8 +1137,8 @@ export default function App() {
         </div>
       )}
 
-      {/* Footer */}
-      <footer className="border-t border-slate-200 bg-white py-3.5 px-4 sm:px-6 text-xs text-slate-500 shadow-2xs pb-safe">
+      {/* Footer (exibido no desktop para não comprimir o terminal/chat no mobile) */}
+      <footer className="hidden lg:block border-t border-slate-200 bg-white py-3.5 px-4 sm:px-6 text-xs text-slate-500 shadow-2xs pb-safe shrink-0">
         <div className="mx-auto max-w-7xl flex flex-col sm:flex-row items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <span className="font-black text-slate-900 flex items-center gap-1.5">

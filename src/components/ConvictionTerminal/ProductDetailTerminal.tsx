@@ -216,7 +216,7 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
   };
 
   return (
-    <main className="flex-1 min-w-0 bg-[#F8FAFC] overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-5 text-slate-900 select-none">
+    <main className="flex-1 min-w-0 bg-[#F8FAFC] overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-5 text-slate-900">
       
       {/* ========================================================= */}
       {/* 1. CABEÇALHO EXECUTIVO INSTITUCIONAL (GRID SIMÉTRICO PRO) */}
