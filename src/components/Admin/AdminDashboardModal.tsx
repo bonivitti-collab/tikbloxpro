@@ -100,6 +100,51 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
           </button>
         </div>
 
+        {/* BANNER DE AUDITORIA VISUAL NO TOPO DO PAINEL */}
+        <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-950/60 via-[#14192B] to-rose-950/60 border border-emerald-500/40 shrink-0 space-y-2.5">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Eye className="w-4 h-4 text-emerald-400 animate-pulse" />
+              <span className="text-xs font-black uppercase tracking-wider text-emerald-300">
+                Auditoria de Experiência do Usuário (1-Clique)
+              </span>
+            </div>
+            <span className="text-[10px] font-mono text-slate-400">Sem precisar deslogar</span>
+          </div>
+          <p className="text-xs text-slate-300">
+            Alterne sua visão instantaneamente para navegar exatamente como um cliente ou parceiro vê a plataforma:
+          </p>
+          <div className="flex flex-wrap items-center gap-2.5 pt-1">
+            {onSwitchToSubscriberView && (
+              <button
+                type="button"
+                onClick={() => {
+                  onClose();
+                  onSwitchToSubscriberView();
+                }}
+                className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:brightness-110 text-white font-black text-xs transition cursor-pointer flex items-center gap-2 active:scale-95 shadow-md shadow-emerald-950/40"
+              >
+                <Eye className="w-4 h-4 text-emerald-100" />
+                <span>👁️ Ver como Assinante Público (Sem ADM)</span>
+              </button>
+            )}
+
+            {onSwitchToCreatorView && (
+              <button
+                type="button"
+                onClick={() => {
+                  onClose();
+                  onSwitchToCreatorView();
+                }}
+                className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-pink-600 hover:brightness-110 text-white font-black text-xs transition cursor-pointer flex items-center gap-2 active:scale-95 shadow-md shadow-rose-950/40"
+              >
+                <span>📣</span>
+                <span>Ver como Creator VIP (Duda Vitti)</span>
+              </button>
+            )}
+          </div>
+        </div>
+
         {/* Corpo com Scroll */}
         <div className="overflow-y-auto pr-1 space-y-6">
           
