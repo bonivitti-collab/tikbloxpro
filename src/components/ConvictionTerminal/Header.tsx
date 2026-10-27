@@ -190,6 +190,18 @@ export const Header: React.FC<HeaderProps> = ({
                   </button>
                 )}
 
+                {/* Alternador Direto de Auditoria no Header Desktop */}
+                {userSession.plan === 'admin' && onOpenAdmin && (
+                  <button
+                    type="button"
+                    onClick={onOpenAdmin}
+                    className="p-1 px-2 rounded-lg text-[10px] font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 transition cursor-pointer"
+                    title="Alternar para visão de assinante comum"
+                  >
+                    👁️ Auditar Visão Cliente
+                  </button>
+                )}
+
                 {onLogout && (
                   <button
                     onClick={onLogout}

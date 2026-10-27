@@ -32,7 +32,6 @@ import { InteractiveScreensCarousel } from './InteractiveScreensCarousel';
 import { ProfitSimulator } from './ProfitSimulator';
 import { SocialProofSection } from './SocialProofSection';
 import { TikBloxLogo } from '../TikBloxLogo';
-import { PWAInstallButton } from '../PWAInstallButton';
 
 interface LandingPageProps {
   onOpenLogin: () => void;
@@ -159,9 +158,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
           {/* Ações / Login */}
           <div className="flex items-center gap-2 sm:gap-3">
-            {/* Botão Oficial Instalar App (PWA) */}
-            <PWAInstallButton variant="green" />
-
             <button
               onClick={onOpenLogin}
               className="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-200 hover:text-white hover:bg-white/5 transition cursor-pointer border border-transparent hover:border-white/10 flex items-center gap-1.5"
