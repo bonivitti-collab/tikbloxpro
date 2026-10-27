@@ -991,6 +991,30 @@ export default function App() {
               setShowAdminModal(false);
               setShowAddCustomModal(true);
             }}
+            onSwitchToSubscriberView={() => {
+              // Simula visão exata do assinante público comum (PRO AI)
+              setSession({
+                email: 'assinante.teste@gmail.com',
+                name: 'Cliente TikBlox',
+                plan: 'pro_ai',
+                role: 'subscriber',
+                isAuthenticated: true,
+                subscriptionStatus: 'active',
+                source: 'kiwify',
+              });
+            }}
+            onSwitchToCreatorView={() => {
+              // Simula visão da Duda Vitti
+              setSession({
+                email: 'contato.dudavitti@gmail.com',
+                name: 'Duda Vitti (VIP)',
+                plan: 'pro_ai',
+                role: 'creator_vip',
+                isAuthenticated: true,
+                subscriptionStatus: 'active',
+                source: 'kiwify',
+              });
+            }}
           />
         )}
 

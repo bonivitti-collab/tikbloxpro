@@ -18,6 +18,7 @@ import {
   Radio,
   CheckCircle2,
   Lock,
+  Eye,
 } from 'lucide-react';
 import { UserSession, getKiwifyCheckoutUrls } from '../../services/authService';
 
@@ -28,6 +29,8 @@ interface AdminDashboardModalProps {
   totalProductsCount: number;
   onTriggerScan: () => void;
   onOpenAddCustomProduct: () => void;
+  onSwitchToSubscriberView?: () => void;
+  onSwitchToCreatorView?: () => void;
 }
 
 export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
@@ -37,6 +40,8 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
   totalProductsCount,
   onTriggerScan,
   onOpenAddCustomProduct,
+  onSwitchToSubscriberView,
+  onSwitchToCreatorView,
 }) => {
   const [copiedLink, setCopiedLink] = useState<string | null>(null);
   const [utmSource, setUtmSource] = useState('duda');
@@ -311,6 +316,36 @@ export const AdminDashboardModal: React.FC<AdminDashboardModalProps> = ({
 
             {/* Ações Administrativas */}
             <div className="pt-2 flex flex-wrap items-center gap-3">
+              {onSwitchToSubscriberView && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    onClose();
+                    onSwitchToSubscriberView();
+                  }}
+                  className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:brightness-105 text-white font-black text-xs transition cursor-pointer flex items-center gap-2 active:scale-95 shadow-md"
+                  title="Simular e auditar exatamente a visão do cliente pagante comum"
+                >
+                  <Eye className="w-4 h-4 text-emerald-200" />
+                  <span>👁️ Ver como Assinante Público (Auditoria)</span>
+                </button>
+              )}
+
+              {onSwitchToCreatorView && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    onClose();
+                    onSwitchToCreatorView();
+                  }}
+                  className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-pink-600 hover:brightness-105 text-white font-black text-xs transition cursor-pointer flex items-center gap-2 active:scale-95 shadow-md"
+                  title="Simular e auditar a visão da Duda Vitti"
+                >
+                  <span>📣</span>
+                  <span>Ver como Creator VIP (Duda)</span>
+                </button>
+              )}
+
               <button
                 onClick={() => {
                   onClose();
