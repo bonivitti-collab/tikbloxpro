@@ -192,19 +192,7 @@ export const Header: React.FC<HeaderProps> = ({
                   <span className="truncate max-w-[100px]">{userSession.name.split(' ')[0]}</span>
                 </span>
 
-                {onOpenTutorial && (
-                <button
-                  type="button"
-                  onClick={onOpenTutorial}
-                  className="flex items-center gap-1 px-2 py-1 rounded-lg border border-sky-200 bg-sky-50 active:bg-sky-100 text-[10px] font-bold text-sky-900 transition shadow-2xs cursor-pointer"
-                  title="Como Usar o Sistema"
-                >
-                  <HelpCircle className="w-3 h-3 text-[#007A87]" />
-                  <span>Tutorial</span>
-                </button>
-              )}
-
-              {onViewLanding && (
+                {onViewLanding && (
                   <button
                     onClick={onViewLanding}
                     className="p-1 px-2 rounded-lg text-[10px] font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition cursor-pointer border border-slate-200 whitespace-nowrap shrink-0"
@@ -284,7 +272,7 @@ export const Header: React.FC<HeaderProps> = ({
                   title="Como Usar o Sistema"
                 >
                   <HelpCircle className="w-3 h-3 text-[#007A87]" />
-                  <span>Tutorial</span>
+                  <span>Como Usar</span>
                 </button>
               )}
 
