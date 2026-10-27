@@ -117,7 +117,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* ========================================================= */}
       {/* 1. NAVBAR INSTITUCIONAL RESPONSIVA                         */}
       {/* ========================================================= */}
-      <header className="fixed top-0 left-0 right-0 z-40 bg-[#090D16] border-b border-white/10 transition-all pt-safe">
+      <header className="fixed top-0 left-0 right-0 z-40 bg-[#090D16] border-b border-white/10 transition-all">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between">
           
           {/* Logo TikBlox Oficial */}
@@ -247,7 +247,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* ========================================================= */}
       {/* 2. HERO SECTION COM PROPOSTA DE VALOR MATADORA            */}
       {/* ========================================================= */}
-      <section className="relative pt-36 sm:pt-44 pb-16 sm:pb-24 px-4 sm:px-6 overflow-hidden">
+      <section className="relative pt-32 sm:pt-40 pb-16 sm:pb-24 px-4 sm:px-6 overflow-hidden">
         
         {/* Efeitos de Luz de Fundo */}
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-gradient-to-tr from-[#25F4EE]/15 to-[#FE2C55]/15 rounded-full blur-[120px] pointer-events-none" />

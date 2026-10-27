@@ -168,29 +168,6 @@ export default function App() {
     } catch {}
   }, [leftWidth, rightWidth]);
 
-  // Ajuste dinâmico de barra de status no iOS / Android entre Landing Page (Dark) e Terminal (Light)
-  useEffect(() => {
-    const isTerminal = currentView === 'app' && Boolean(session && session.isAuthenticated && session.plan !== 'guest');
-    const targetTheme = isTerminal ? '#ffffff' : '#090D16';
-    const targetStatus = isTerminal ? 'default' : 'black-translucent';
-
-    let metaTheme = document.querySelector('meta[name="theme-color"]');
-    if (!metaTheme) {
-      metaTheme = document.createElement('meta');
-      metaTheme.setAttribute('name', 'theme-color');
-      document.head.appendChild(metaTheme);
-    }
-    metaTheme.setAttribute('content', targetTheme);
-
-    let metaStatus = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
-    if (!metaStatus) {
-      metaStatus = document.createElement('meta');
-      metaStatus.setAttribute('name', 'apple-mobile-web-app-status-bar-style');
-      document.head.appendChild(metaStatus);
-    }
-    metaStatus.setAttribute('content', targetStatus);
-  }, [currentView, session]);
-
   useEffect(() => {
     if (!redimensionando) return;
 
@@ -648,7 +625,7 @@ export default function App() {
   // =========================================================================
   if (currentView === 'landing' || !session || !session.isAuthenticated || session.plan === 'guest') {
     return (
-      <div className="h-dvh w-full overflow-y-auto">
+      <div className="min-h-screen w-full overflow-y-auto bg-[#090D16]">
         <LandingPage
           isLoggedIn={Boolean(session && session.isAuthenticated && session.plan !== 'guest')}
           onOpenLogin={() => {

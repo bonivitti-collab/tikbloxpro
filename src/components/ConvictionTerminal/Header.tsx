@@ -52,7 +52,7 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <>
-      <header className="relative bg-white border-b border-slate-200/90 px-2.5 sm:px-4 py-1.5 sm:py-2 flex flex-col z-20 select-none text-slate-900 shadow-2xs pt-safe">
+      <header className="relative bg-white border-b border-slate-200/90 px-2.5 sm:px-4 py-1.5 sm:py-2 flex flex-col z-20 select-none text-slate-900 shadow-2xs">
         
         {/* Faixa de Identidade Visual TikBlox: Friso Cromático Ciano e Rosa do Logo */}
         <div className="absolute bottom-0 left-0 right-0 h-[2.5px] bg-gradient-to-r from-[#25F4EE] via-[#FE2C55] to-[#25F4EE] opacity-90" />
