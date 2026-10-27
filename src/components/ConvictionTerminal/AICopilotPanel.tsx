@@ -245,7 +245,7 @@ export const AICopilotPanel: React.FC<AICopilotPanelProps> = ({
             <div className="w-12 h-12 rounded-2xl bg-white border border-slate-200 shadow-2xs flex items-center justify-center text-xl mb-2 text-[#007A87]">
               <Bot className="w-6 h-6" />
             </div>
-            <p className="text-xs font-bold text-slate-700">TIKBLOX Copilot</p>
+            <p className="text-xs font-bold text-slate-700">TIKBLOX AI</p>
             <p className="text-[11px] text-slate-500 mt-0.5 max-w-[240px]">
               Selecione um tópico abaixo ou digite qualquer pergunta sobre o produto.
             </p>
@@ -477,7 +477,7 @@ export const AICopilotPanel: React.FC<AICopilotPanelProps> = ({
           type="submit"
           disabled={!input.trim() || isLoading}
           className="w-12 h-12 rounded-2xl bg-gradient-to-r from-[#25F4EE] to-[#00D2C4] hover:brightness-105 disabled:bg-slate-200 text-[#0F121C] disabled:text-slate-400 font-bold transition cursor-pointer active:scale-95 shadow-[0_0_16px_rgba(37,244,238,0.3)] shrink-0 flex items-center justify-center"
-          title="Enviar pergunta para o Copilot"
+          title="Enviar pergunta para o TikBlox AI"
         >
           <Send className="w-5 h-5 text-[#0F121C]" />
         </button>

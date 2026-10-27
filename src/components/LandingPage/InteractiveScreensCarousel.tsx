@@ -84,7 +84,7 @@ const SLIDES: SlideData[] = [
     id: 'copilot',
     badge: 'PAINEL 3: TIKBLOX AI',
     badgeColor: 'bg-cyan-500/10 text-cyan-300 border-cyan-500/30',
-    title: 'Copiloto TikBlox AI Nativo',
+    title: 'TikBlox AI Pro Nativo',
     subtitle: 'Roteiros magnéticos de 30 segundos e ganchos virais que travam o scroll',
     description:
       'Inteligência artificial generativa de alta velocidade especializada no algoritmo do TikTok Shop Brasil. Escreve roteiros que convertem e calcula unit economics.',
@@ -195,7 +195,7 @@ export const InteractiveScreensCarousel: React.FC<InteractiveScreensCarouselProp
                 ? 'Raio-X & Break-Even'
                 : idx === 2
                 ? 'Links & Amostras SP'
-                : 'Copiloto TikBlox AI'}
+                : 'TikBlox AI Pro'}
             </span>
           </button>
         ))}
@@ -442,13 +442,13 @@ export const InteractiveScreensCarousel: React.FC<InteractiveScreensCarouselProp
                   </div>
                 )}
 
-                {/* 4. MOCKUP: COPILOTO TIKBLOX AI */}
+                {/* 4. MOCKUP: TIKBLOX AI */}
                 {slide.mockupType === 'copilot' && (
                   <div className="space-y-3">
                     <div className="flex items-center justify-between pb-2 border-b border-white/10">
                       <div className="flex items-center gap-1.5">
                         <Bot className="w-4 h-4 text-[#25F4EE]" />
-                        <span className="text-xs font-black text-white">TIKBLOX AI Copilot</span>
+                        <span className="text-xs font-black text-white">TikBlox AI Pro</span>
                       </div>
                       <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/20 px-2 py-0.5 rounded-full font-bold">
                         TikBlox AI Core • Ativo

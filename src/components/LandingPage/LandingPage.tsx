@@ -280,7 +280,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
           {/* Subtítulo persuasivo */}
           <p className="text-sm sm:text-lg text-slate-300 max-w-3xl mx-auto leading-relaxed">
-            Identifique produtos validados com estoque nacional em São Paulo (chega em 2 a 4 dias), concorrência zerada (&lt; 10 vídeos no feed BR), ponto de equilíbrio em 3 vendas e <strong>Copiloto IA para gerar ganchos virais de 3 segundos</strong>.
+            Identifique produtos validados com estoque nacional em São Paulo (chega em 2 a 4 dias), concorrência zerada (&lt; 10 vídeos no feed BR), ponto de equilíbrio em 3 vendas e <strong>TikBlox AI para gerar ganchos virais de 3 segundos</strong>.
           </p>
 
           {/* Botão de Ação Hero Principal */}
@@ -369,7 +369,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               Conheça as Telas do TikBlox Pro por Dentro
             </h2>
             <p className="text-xs sm:text-sm text-slate-300">
-              Passe o carrossel abaixo e veja exatamente como o radar, o raio-x financeiro e o copiloto funcionam antes de assinar:
+              Passe o carrossel abaixo e veja exatamente como o radar, o raio-x financeiro e o TikBlox AI funcionam antes de assinar:
             </p>
           </div>
 
@@ -497,7 +497,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 🤖
               </div>
               <h4 className="text-base font-black text-white group-hover:text-[#FE2C55] transition">
-                3. Copiloto TikBlox AI Pro
+                3. Motor TikBlox AI Pro
               </h4>
               <p className="text-xs text-slate-300 leading-relaxed">
                 Inteligência nativa que cria roteiros completos de 30 segundos, ganchos visuais para os primeiros 3s e simulações financeiras em segundos.
@@ -587,7 +587,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </a>
             </div>
 
-            {/* PLANO 2: COMBO RADAR PRO + IA COPILOT (DESTAQUE) */}
+            {/* PLANO 2: COMBO RADAR PRO + TIKBLOX AI (DESTAQUE) */}
             <div className="p-7 sm:p-8 rounded-3xl bg-gradient-to-b from-[#141A29] to-[#0F121C] border-2 border-[#25F4EE] flex flex-col justify-between space-y-6 relative shadow-[0_0_40px_rgba(37,244,238,0.15)]">
               
               {/* Badge Mais Vendido */}
@@ -601,7 +601,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   <span>Combo Completo com IA</span>
                 </div>
                 <div>
-                  <h4 className="text-xl font-black text-white">Radar PRO + IA Copilot</h4>
+                  <h4 className="text-xl font-black text-white">Radar PRO + TikBlox AI</h4>
                   <p className="text-xs text-slate-300 mt-1">
                     A ferramenta completa com a Inteligência Artificial escrevendo seus roteiros e estratégias.
                   </p>
@@ -621,7 +621,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   </li>
                   <li className="flex items-center gap-2">
                     <Check className="w-4 h-4 text-[#25F4EE] shrink-0" />
-                    <span><strong>Copiloto TikBlox AI Pro Ilimitado 24/7</strong></span>
+                    <span><strong>TikBlox AI Pro Ilimitado 24/7</strong></span>
                   </li>
                   <li className="flex items-center gap-2">
                     <Check className="w-4 h-4 text-[#25F4EE] shrink-0" />
@@ -691,7 +691,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 a: 'Sim, com 100% de liberdade! Não há nenhuma fidelidade ou multa. Você pode cancelar sua assinatura mensal diretamente no painel da Kiwify a qualquer momento.'
               },
               {
-                q: 'Como funciona o Copiloto TikBlox AI?',
+                q: 'Como funciona o TikBlox AI?',
                 a: 'É uma inteligência artificial proprietária nativa treinada no algoritmo do TikTok Shop Brasil. Ela analisa cada produto do radar e gera roteiros prontos de 30 segundos, ganchos visuais para os primeiros 3 segundos de vídeo, orientações para lives e cálculos de margem líquida.'
               }
             ].map((faq, idx) => (

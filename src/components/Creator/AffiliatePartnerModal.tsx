@@ -217,7 +217,7 @@ export const AffiliatePartnerModal: React.FC<AffiliatePartnerModalProps> = ({
                   <strong>Gancho (0 a 3s):</strong> "Eu achei um produto com estoque em São Paulo e pedi pra IA do TikBlox escrever o roteiro de vendas..."
                 </li>
                 <li>
-                  <strong>Demonstração (3 a 20s):</strong> Grave você clicando no Copiloto TikBlox AI gerando o gancho de 3 segundos que trava o feed e a simulação de lucro no Pix D+7.
+                  <strong>Demonstração (3 a 20s):</strong> Grave você clicando no TikBlox AI gerando o gancho de 3 segundos que trava o feed e a simulação de lucro no Pix D+7.
                 </li>
                 <li>
                   <strong>Chamada (20 a 30s):</strong> "É a ferramenta mais completa que vi até agora pro TikTok Shop Brasil. O link com desconto tá no meu perfil."
