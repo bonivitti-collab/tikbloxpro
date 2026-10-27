@@ -10,6 +10,7 @@ import {
   X,
   ShieldCheck,
   Zap,
+  HelpCircle,
 } from 'lucide-react';
 import { TikBloxLogo } from '../TikBloxLogo';
 import { UserSession } from '../../services/authService';
@@ -29,6 +30,7 @@ interface HeaderProps {
   onViewLanding?: () => void;
   onOpenAdmin?: () => void;
   onOpenCreatorVIP?: () => void;
+  onOpenTutorial?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -46,6 +48,7 @@ export const Header: React.FC<HeaderProps> = ({
   onViewLanding,
   onOpenAdmin,
   onOpenCreatorVIP,
+  onOpenTutorial,
 }) => {
   const [showScheduleModal, setShowScheduleModal] = useState(false);
 
@@ -105,6 +108,19 @@ export const Header: React.FC<HeaderProps> = ({
                 {savedCount}
               </span>
             </button>
+
+            {/* Botão Como Usar o Sistema */}
+            {onOpenTutorial && (
+              <button
+                type="button"
+                onClick={onOpenTutorial}
+                className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg border border-sky-200 bg-sky-50/80 hover:bg-sky-100 text-xs font-bold text-sky-900 transition-all cursor-pointer shadow-2xs active:scale-95 shrink-0"
+                title="Aprenda a minerar produtos e usar o TikBlox Pro"
+              >
+                <HelpCircle className="w-3.5 h-3.5 text-[#007A87]" />
+                <span className="hidden sm:inline">Como Usar</span>
+              </button>
+            )}
 
             {/* Toggles de Painéis no Desktop */}
             <div className="hidden lg:flex items-center gap-1.5 border-l border-slate-200 pl-2.5 ml-1">
@@ -176,7 +192,19 @@ export const Header: React.FC<HeaderProps> = ({
                   <span className="truncate max-w-[100px]">{userSession.name.split(' ')[0]}</span>
                 </span>
 
-                {onViewLanding && (
+                {onOpenTutorial && (
+                <button
+                  type="button"
+                  onClick={onOpenTutorial}
+                  className="flex items-center gap-1 px-2 py-1 rounded-lg border border-sky-200 bg-sky-50 active:bg-sky-100 text-[10px] font-bold text-sky-900 transition shadow-2xs cursor-pointer"
+                  title="Como Usar o Sistema"
+                >
+                  <HelpCircle className="w-3 h-3 text-[#007A87]" />
+                  <span>Tutorial</span>
+                </button>
+              )}
+
+              {onViewLanding && (
                   <button
                     onClick={onViewLanding}
                     className="p-1 px-2 rounded-lg text-[10px] font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition cursor-pointer border border-slate-200 whitespace-nowrap shrink-0"
@@ -247,6 +275,18 @@ export const Header: React.FC<HeaderProps> = ({
                     <span>Divulgação</span>
                   </button>
                 )}
+
+              {onOpenTutorial && (
+                <button
+                  type="button"
+                  onClick={onOpenTutorial}
+                  className="flex items-center gap-1 px-2 py-1 rounded-lg border border-sky-200 bg-sky-50 active:bg-sky-100 text-[10px] font-bold text-sky-900 transition shadow-2xs cursor-pointer"
+                  title="Como Usar o Sistema"
+                >
+                  <HelpCircle className="w-3 h-3 text-[#007A87]" />
+                  <span>Tutorial</span>
+                </button>
+              )}
 
               {onViewLanding && (
                 <button

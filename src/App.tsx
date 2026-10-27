@@ -676,6 +676,7 @@ export default function App() {
         }}
         onOpenAdmin={() => setShowAdminModal(true)}
         onOpenCreatorVIP={() => setShowCreatorModal(true)}
+        onOpenTutorial={() => setShowOnboardingModal(true)}
       />
 
       {/* 1.1 BARRA FLUTUANTE DE AUDITORIA (QUANDO ESTIVER TESTANDO VISÃO DE CLIENTE) */}
