@@ -672,6 +672,42 @@ export default function App() {
         onOpenCreatorVIP={() => setShowCreatorModal(true)}
       />
 
+      {/* 1.1 BARRA FLUTUANTE DE AUDITORIA (QUANDO ESTIVER TESTANDO VISÃO DE CLIENTE) */}
+      {session && (session.email.startsWith('assinante.') || session.email === 'contato.dudavitti@gmail.com') && (
+        <div className="bg-gradient-to-r from-amber-600 via-indigo-600 to-purple-600 text-white px-3 py-1.5 flex items-center justify-between text-xs font-semibold shadow-md shrink-0 border-b border-white/10">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping shrink-0" />
+            <span>
+              <strong>Modo Auditoria:</strong> Visualizando exatamente como{' '}
+              <span className="underline decoration-white/60">{session.name}</span>{' '}
+              ({session.plan === 'essential' ? 'Radar Essential • Sem IA' : session.role === 'creator_vip' ? 'Creator VIP' : 'Combo PRO • Com IA'})
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              const realSession = getCurrentSession();
+              if (realSession && realSession.plan === 'admin') {
+                setSession(realSession);
+              } else {
+                setSession({
+                  email: 'dbonivitti@gmail.com',
+                  name: 'Danillo Bonivitti (Admin)',
+                  plan: 'admin',
+                  role: 'admin',
+                  isAuthenticated: true,
+                  subscriptionStatus: 'active',
+                });
+              }
+            }}
+            className="px-2.5 py-0.5 rounded-md bg-white text-slate-900 font-bold hover:bg-slate-100 transition cursor-pointer text-[11px] shadow-xs shrink-0 flex items-center gap-1 active:scale-95"
+          >
+            <span>👑</span>
+            <span>Voltar ao Painel ADM</span>
+          </button>
+        </div>
+      )}
+
       {/* 2. SELETOR DE ABAS MOBILE / TABLET (CINZA CLARO) */}
       <nav className="grid grid-cols-3 lg:hidden w-full bg-white border-b border-slate-200 p-1.5 gap-1.5 shrink-0 text-xs font-bold select-none">
         <button

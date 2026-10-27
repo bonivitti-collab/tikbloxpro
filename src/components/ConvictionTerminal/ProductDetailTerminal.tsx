@@ -18,7 +18,8 @@ import {
   DollarSign,
   HelpCircle,
   ChevronRight,
-  ExternalLink
+  ExternalLink,
+  Lock
 } from 'lucide-react';
 import { TrendingProduct } from '../../types';
 import { enrichWithTikTokShopData } from '../../data/tiktokShopEnricher';
