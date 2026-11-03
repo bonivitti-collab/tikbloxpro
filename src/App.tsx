@@ -119,7 +119,7 @@ export default function App() {
   const [filterBlueOceanOnly, setFilterBlueOceanOnly] = useState<boolean>(false);
   const [activeProduct, setActiveProduct] = useState<TrendingProduct | null>(() => INITIAL_CURATED_TRENDS[0] || null);
   const [painelEsquerdoRecolhido, setPainelEsquerdoRecolhido] = useState(false);
-  const [painelDireitoRecolhido, setPainelDireitoRecolhido] = useState(false);
+  const [painelDireitoRecolhido, setPainelDireitoRecolhido] = useState(true); // AI panel disabled
   const [mobileTab, setMobileTab] = useState<'produtos' | 'terminal' | 'copilot'>('produtos');
   const [filterHighCommissionOnly, setFilterHighCommissionOnly] = useState<boolean>(false);
   const [showSavedModal, setShowSavedModal] = useState<boolean>(false);
@@ -692,9 +692,9 @@ export default function App() {
           setSelectedProductForCalc(activeProduct);
           setShowCalculatorModal(true);
         }}
-        onOpenAdmin={() => setShowAdminModal(true)}
-        onOpenCreatorVIP={() => setShowCreatorModal(true)}
-        onOpenTutorial={() => setShowOnboardingModal(true)}
+        onOpenAdmin={() => {}} // Admin locked
+        onOpenCreatorVIP={() => {}} // Creator locked
+        onOpenTutorial={() => {}} // Tutorial locked
       />
 
       {/* 1.1 BARRA FLUTUANTE DE AUDITORIA (QUANDO ESTIVER TESTANDO VISÃO DE CLIENTE) */}

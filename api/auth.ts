@@ -22,9 +22,9 @@ const PROTECTED_ACCOUNTS: Record<
 > = {
   'dbonivitti@gmail.com': {
     passwordHash: 'cfa225309d259dab977bbc8938a72ed136be53d053e970df527843c10dcccb53',
-    name: 'Danillo Bonivitti (Admin)',
-    plan: 'admin',
-    role: 'admin',
+    name: 'Danillo Bonivitti',
+    plan: 'pro_ai',
+    role: 'subscriber',
   },
   'contato.dudavitti@gmail.com': {
     passwordHash: 'af999e05f41cd9e701bb4016a6fc87fe451ec15ba2d771db88bba55ab1053487',
