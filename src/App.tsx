@@ -94,7 +94,7 @@ import { Radio, Sparkles, Filter, AlertCircle, BellRing, FolderUp, Download, Che
 export default function App() {
   const { t, language } = useTranslation();
   const [activeTab, setActiveTab] = useState<
-    'all' | 'early_wave' | 'high_margin' | 'saved' | 'calculator'
+    'all' | 'early_wave' | 'high_margin' | 'novidades' | 'saved' | 'calculator'
   >('all');
   const [products, setProducts] = useState<TrendingProduct[]>(() => {
     try {
@@ -535,18 +535,36 @@ export default function App() {
   };
 
   // High-performance filter products based on activeTab, niche, origin, search, and TikTok Shop metrics
+  // Novos parâmetros: >500 vendas, <50 vídeos BR, comissão >= R$ 10
   const filteredProducts = useMemo(() => {
     const isEarlyWave = activeTab === 'early_wave';
     const isHighMargin = activeTab === 'high_margin';
+    const isNovidades = activeTab === 'novidades';
     const filterNiche = selectedNiche !== 'all' ? selectedNiche : null;
     const filterOrigin = selectedOrigin !== 'all' ? selectedOrigin : null;
     const queryTrim = searchQuery.toLowerCase().trim();
     const queryTokens = queryTrim ? queryTrim.split(' ').filter(Boolean) : [];
 
+    const today = new Date().toISOString().slice(0, 10);
+
     return products.filter((p) => {
+      // Parâmetros rígidos de pesquisa
+      const sales = p.tiktokShop?.recentSalesCount || p.tradeConviction?.netProfitAt50Sales || 0;
+      const videos = p.tradeConviction?.creatorVideoCountBR || (p.creatorSaturationBR === 'Baixa' ? 8 : 25);
+      const commission = p.tiktokShop?.commissionValueBRL || p.tradeConviction?.commissionBRL || (Number(p.estimatedPriceBRL || 0) * 0.2);
+
+      if (sales < 500) return false;
+      if (videos >= 50) return false;
+      if (commission < 10) return false;
+
       // 1. Fast tab filter
       if (isEarlyWave && p.waveStage !== 'early_wave' && p.tiktokShop?.saturationLevel !== 'Oceano Azul') return false;
       if (isHighMargin && (p.tiktokShop?.commissionRatePercent || 0) < 20 && p.estimatedProfitMarginPercent < 280) return false;
+      if (isNovidades) {
+        const discovered = (p.discoveredAt || '').toLowerCase();
+        const isToday = discovered.includes(today) || discovered.includes('hoje') || discovered.includes('escaneado') || discovered.includes('tempo real') || !discovered;
+        if (!isToday) return false;
+      }
 
       // 2. Fast niche filter
       if (filterNiche && p.niche !== filterNiche) return false;

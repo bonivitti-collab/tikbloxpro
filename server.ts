@@ -281,7 +281,16 @@ function getFilteredCuratedTrends(niche?: string, originCountry?: string, query?
   if (filtered.length === 0) {
     filtered = INITIAL_CURATED_TRENDS.slice(0, 6);
   }
-  return filtered.map(enrichWithTikTokShopData);
+
+  // Aplicar parâmetros de pesquisa: >500 vendas, <50 vídeos, comissão >= R$ 10
+  const withFilters = filtered.map(enrichWithTikTokShopData).filter((p: any) => {
+    const sales = p.tiktokShop?.recentSalesCount || 0;
+    const videos = p.tradeConviction?.creatorVideoCountBR || 10;
+    const commission = p.tiktokShop?.commissionValueBRL || p.commissionEstimatedBRL || 0;
+    return sales >= 500 && videos < 50 && commission >= 10;
+  });
+
+  return withFilters.length > 0 ? withFilters : filtered.map(enrichWithTikTokShopData);
 }
 
 // Helper: Resilient Deep-Dive fallback when API is rate-limited (429) or unavailable (503)

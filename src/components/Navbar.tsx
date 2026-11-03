@@ -25,8 +25,8 @@ import { GlobalScanCountdown } from './GlobalScanCountdown';
 import { useTranslation } from '../i18n/LanguageContext';
 
 interface NavbarProps {
-  activeTab: 'all' | 'early_wave' | 'high_margin' | 'saved' | 'calculator';
-  setActiveTab: (tab: 'all' | 'early_wave' | 'high_margin' | 'saved' | 'calculator') => void;
+  activeTab: 'all' | 'early_wave' | 'high_margin' | 'novidades' | 'saved' | 'calculator';
+  setActiveTab: (tab: 'all' | 'early_wave' | 'high_margin' | 'novidades' | 'saved' | 'calculator') => void;
   savedCount: number;
   onOpenPushModal?: () => void;
   isPushActive?: boolean;
@@ -144,6 +144,28 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
 
             <button
+              id="nav-tab-novidades"
+              onClick={() => setActiveTab('novidades')}
+              className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-bold transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
+                activeTab === 'novidades'
+                  ? 'text-sky-300'
+                  : 'text-[#A6A7B2] hover:text-white hover:bg-white/5'
+              }`}
+            >
+              {activeTab === 'novidades' && (
+                <motion.div
+                  layoutId="desktop-navbar-active-pill"
+                  className="absolute inset-0 rounded-lg bg-sky-500/20 border border-sky-500/40 shadow-sm"
+                  transition={{ type: 'spring', stiffness: 450, damping: 35 }}
+                />
+              )}
+              <span className="relative z-10 flex items-center gap-1.5">
+                <span className="text-xs">🆕</span>
+                <span>Novidades</span>
+              </span>
+            </button>
+
+            <button
               id="nav-tab-saved"
               onClick={() => setActiveTab('saved')}
               className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-bold transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
@@ -209,6 +231,16 @@ export const Navbar: React.FC<NavbarProps> = ({
             }`}
           >
             💰 +20% Comissão
+          </button>
+          <button
+            onClick={() => setActiveTab('novidades')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap cursor-pointer transition ${
+              activeTab === 'novidades'
+                ? 'bg-sky-400 text-slate-950 font-black'
+                : 'text-[#A6A7B2] bg-[#2A3042] border border-white/10'
+            }`}
+          >
+            🆕 Novidades
           </button>
           <button
             onClick={() => setActiveTab('saved')}
