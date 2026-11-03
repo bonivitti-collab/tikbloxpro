@@ -716,7 +716,7 @@ export default function App() {
       )}
 
       {/* 2. SELETOR DE ABAS MOBILE / TABLET (CINZA CLARO) */}
-      <nav className="grid grid-cols-3 lg:hidden w-full bg-white border-b border-slate-200 p-1.5 gap-1.5 shrink-0 text-xs font-bold select-none">
+      <nav className="grid grid-cols-2 lg:hidden w-full bg-white border-b border-slate-200 p-1.5 gap-1.5 shrink-0 text-xs font-bold select-none">
         <button
           onClick={() => setMobileTab('produtos')}
           className={`py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1 cursor-pointer transition-all border ${
@@ -739,16 +739,7 @@ export default function App() {
           <span>🔬 Raio-X Produto</span>
         </button>
 
-        <button
-          onClick={() => setMobileTab('copilot')}
-          className={`py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1 cursor-pointer transition-all border ${
-            mobileTab === 'copilot'
-              ? 'bg-slate-900 text-white border-slate-900 shadow-2xs font-black'
-              : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100'
-          }`}
-        >
-          <span>🤖 TIKBLOX AI</span>
-        </button>
+        
       </nav>
 
       {/* 3. ÁREA PRINCIPAL: THREE-PANEL TERMINAL (REDIMENSIONÁVEL NO NOTEBOOK/DESKTOP) */}
@@ -837,19 +828,7 @@ export default function App() {
           </div>
         )}
 
-        {/* PAINEL 3: TIKBLOX AI Especialista em TikTok Shop */}
-        <div
-          style={{ width: isDesktop && !painelDireitoRecolhido ? `${rightWidth}px` : undefined }}
-          className={`w-full lg:w-auto flex-1 lg:flex-none h-full min-h-0 lg:shrink-0 ${mobileTab !== 'copilot' ? 'hidden lg:flex' : 'flex'}`}
-        >
-          <AICopilotPanel
-            width={isDesktop && !painelDireitoRecolhido ? rightWidth : undefined}
-            activeProduct={activeProduct}
-            isCollapsed={painelDireitoRecolhido}
-            onToggleCollapse={() => setPainelDireitoRecolhido(!painelDireitoRecolhido)}
-            isEssentialPlan={session?.plan === 'essential'}
-          />
-        </div>
+        
       </div>
 
       {/* Modal de Análise de Produto Próprio (Oceano Azul) */}
@@ -1163,3 +1142,4 @@ export default function App() {
     </div>
   );
 }
+
