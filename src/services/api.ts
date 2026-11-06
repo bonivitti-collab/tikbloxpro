@@ -5,7 +5,7 @@ import {
   ProductPriceCheck,
   PriceMonitorSummary,
 } from '../types';
-import { INITIAL_CURATED_TRENDS, isBlueOceanOpportunity } from '../data/curatedTrends';
+import { isBlueOceanOpportunity } from '../lib/blueOcean';
 import {
   saveProductToIndexedDB,
   removeProductFromIndexedDB,
@@ -18,6 +18,15 @@ import {
 const LOCAL_STORAGE_KEY_SAVED = 'tikblox_saved_products_v1';
 const LOCAL_STORAGE_KEY_SCAN_CACHE = 'tikblox_scan_cache_v3_blueocean';
 
+export async function fetchCatalog(): Promise<TrendingProduct[]> {
+  const res = await fetch('/api/catalog', { method: 'GET', credentials: 'include' });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error(data.error || 'Não foi possível carregar o radar.');
+  }
+  return Array.isArray(data.products) ? data.products.filter(isBlueOceanOpportunity) : [];
+}
+
 export async function scanTrends(params: {
   niche?: string;
   originCountry?: string;
@@ -26,6 +35,7 @@ export async function scanTrends(params: {
   try {
     const res = await fetch('/api/scan', {
       method: 'POST',
+      credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(params),
     });
@@ -60,17 +70,12 @@ export async function scanTrends(params: {
     // Graceful offline fallback: try retrieving from IndexedDB trend history
   }
 
-  // Fallback to rich curated trends + cached trend history from IndexedDB
-  let sourceProducts = [...INITIAL_CURATED_TRENDS];
+  let sourceProducts: TrendingProduct[] = [];
   try {
     const dbCached = await getAllCachedTrendsFromIndexedDB();
-    if (dbCached && dbCached.length > 0) {
-      const existingIds = new Set(dbCached.map((p) => p.id));
-      const complement = INITIAL_CURATED_TRENDS.filter((p) => !existingIds.has(p.id));
-      sourceProducts = [...dbCached, ...complement];
-    }
+    if (dbCached && dbCached.length > 0) sourceProducts = dbCached;
   } catch {
-    // Continue with curated trends
+    sourceProducts = [];
   }
 
   let filtered = sourceProducts.filter(isBlueOceanOpportunity);

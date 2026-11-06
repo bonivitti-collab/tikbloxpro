@@ -1,95 +1,75 @@
-// api/webhook/kiwify.ts - Endpoint de Webhook da Kiwify com Persistência de Status e Revogação de Reembolso
-import { loadSubscribersStore, saveSubscribersStore } from '../auth';
+import { applyKiwifyPayload } from '../../lib/access';
+import { clientIp, maskEmail, readRawBody, sendJson } from '../../lib/http';
+import { signatureFromRequest, signatureIsValid, webhookToken } from '../../lib/kiwify';
+import { isRateLimited } from '../../lib/rateLimit';
+
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
 
 export default async function handler(req: any, res: any) {
-  // CORS
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type,x-kiwify-signature');
-
   if (req.method === 'OPTIONS') {
-    return res.status(200).end();
+    return res.status(204).end();
   }
-
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    return sendJson(res, 405, { error: 'Method not allowed' });
   }
 
   try {
-    const payload = req.body || {};
-    const orderStatus = payload.order_status || payload.status;
-    const customer = payload.Customer || payload.customer || {};
-    const product = payload.Product || payload.product || {};
-    const subscription = payload.Subscription || payload.subscription || {};
-
-    const customerEmail = (customer.email || '').toLowerCase().trim();
-    const customerName = customer.full_name || customer.name || 'Assinante TikBlox';
-    const productName = product.product_name || product.name || 'TikBlox Pro';
-    const planName =
-      payload.plan_name ||
-      subscription.plan_name ||
-      subscription.plan?.name ||
-      payload.Subscription?.plan?.name ||
-      '';
-
-    console.log(
-      `[KIWIFY WEBHOOK] Recebido evento: ${orderStatus} para ${customerEmail} - Produto: ${productName} - Plano: ${planName}`
-    );
-
-    const isEssential = planName.toLowerCase().includes('essential') && !planName.toLowerCase().includes('pro');
-    const assignedPlan: 'pro_ai' | 'essential' = isEssential ? 'essential' : 'pro_ai';
-
-    const store = loadSubscribersStore();
-
-    if (orderStatus === 'paid' || orderStatus === 'approved') {
-      if (customerEmail) {
-        store[customerEmail] = {
-          email: customerEmail,
-          name: customerName,
-          plan: assignedPlan,
-          status: 'active',
-          passwordHash: store[customerEmail]?.passwordHash,
-          updatedAt: new Date().toISOString(),
-        };
-        saveSubscribersStore(store);
-      }
-
-      console.log(`[KIWIFY WEBHOOK] Acesso LIBERADO e SALVO para ${customerEmail} - Plano: ${assignedPlan}`);
-      return res.status(200).json({
-        success: true,
-        message: 'Acesso do assinante aprovado e liberado com sucesso.',
-        email: customerEmail,
-        plan: assignedPlan,
-      });
+    if (await isRateLimited(`kiwify:${clientIp(req)}`, 120, 15 * 60 * 1000)) {
+      return sendJson(res, 429, { error: 'Too many requests' });
     }
 
-    if (orderStatus === 'refunded' || orderStatus === 'chargedback' || orderStatus === 'canceled') {
-      if (customerEmail) {
-        store[customerEmail] = {
-          email: customerEmail,
-          name: customerName,
-          plan: assignedPlan,
-          status: 'revoked',
-          passwordHash: store[customerEmail]?.passwordHash,
-          updatedAt: new Date().toISOString(),
-        };
-        saveSubscribersStore(store);
-      }
-
-      console.log(`[KIWIFY WEBHOOK] Acesso REVOGADO para ${customerEmail}`);
-      return res.status(200).json({
-        success: true,
-        message: 'Acesso revogado por reembolso ou cancelamento.',
-        email: customerEmail,
-      });
+    const token = webhookToken();
+    if (token.length < 16) {
+      console.error('[KIWIFY] KIWIFY_WEBHOOK_TOKEN ausente');
+      return sendJson(res, 503, { error: 'Webhook não configurado' });
     }
 
-    return res.status(200).json({
-      success: true,
-      received: true,
-    });
+    const rawBody = await readRawBody(req);
+    const signature = signatureFromRequest(req);
+    if (!signatureIsValid(rawBody, signature)) {
+      return sendJson(res, 401, { error: 'Assinatura inválida' });
+    }
+
+    let payload: any;
+    try {
+      payload = rawBody ? JSON.parse(rawBody) : {};
+    } catch {
+      return sendJson(res, 400, { error: 'JSON inválido' });
+    }
+    if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
+      return sendJson(res, 400, { error: 'JSON inválido' });
+    }
+
+    const result = await applyKiwifyPayload(payload);
+    if (result.outcome === 'granted') {
+      console.log(`[KIWIFY] acesso liberado ${maskEmail(result.email)}`);
+    } else if (result.outcome === 'revoked') {
+      console.log(`[KIWIFY] acesso revogado ${maskEmail(result.email)}`);
+    } else if (result.outcome === 'late') {
+      console.log(`[KIWIFY] assinatura em atraso ${maskEmail(result.email)}`);
+    } else {
+      console.log(`[KIWIFY] evento ignorado (${result.reason})`);
+    }
+    return sendJson(res, 200, { ok: true, outcome: result.outcome });
   } catch (error: any) {
-    console.error('[KIWIFY WEBHOOK ERROR]:', error);
-    return res.status(500).json({ error: 'Erro interno ao processar webhook da Kiwify' });
+    const code = error?.message || '';
+    if (code === 'PAYLOAD_TOO_LARGE') {
+      return sendJson(res, 413, { error: 'Payload grande demais' });
+    }
+    if (
+      code === 'RAW_BODY_REQUIRED' ||
+      code === 'SUBSCRIBER_STORE_UNCONFIGURED' ||
+      code === 'AUTH_SECRET_MISSING' ||
+      code === 'AUTH_SECRET_LEAKED'
+    ) {
+      console.error('[KIWIFY]', code);
+      return sendJson(res, 503, { error: 'Webhook sem persistência configurada' });
+    }
+    console.error('[KIWIFY]', error);
+    return sendJson(res, 500, { error: 'Erro ao processar webhook' });
   }
 }

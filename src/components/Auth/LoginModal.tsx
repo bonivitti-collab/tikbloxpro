@@ -8,7 +8,6 @@ import {
   registerWithEmailAndPassword,
   loginWithGoogle,
   loginWithApple,
-  getVerifiedDeviceSession,
   UserSession,
 } from '../../services/authService';
 import { TikBloxLogo } from '../TikBloxLogo';
@@ -27,17 +26,16 @@ export const LoginModal: React.FC<LoginModalProps> = ({
   onOpenPricing,
 }) => {
   const [mode, setMode] = useState<'login' | 'register'>('login');
-  const verifiedDevice = getVerifiedDeviceSession();
 
-  // Campos de Formulário (Pré-carrega e-mail salvo se o usuário marcou "Salvar meu login")
   const [name, setName] = useState('');
   const [email, setEmail] = useState(() => {
     try {
-      return localStorage.getItem('tikblox_remembered_email_v1') || verifiedDevice?.email || '';
+      return localStorage.getItem('tikblox_remembered_email_v1') || '';
     } catch {
       return '';
     }
   });
+  const [orderCode, setOrderCode] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -114,7 +112,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
         if (password !== confirmPassword) {
           throw new Error('As senhas digitadas não coincidem.');
         }
-        const session = await registerWithEmailAndPassword(name, email, password, rememberMe);
+        const session = await registerWithEmailAndPassword(name, email, password, orderCode);
         onLoginSuccess(session);
         onClose();
       } else {
@@ -196,11 +194,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                   />
                 </svg>
                 <span>
-                  {verifiedDevice
-                    ? `Continuar como ${verifiedDevice.name.split(' ')[0]} (Google)`
-                    : mode === 'login'
-                    ? 'Continuar com o Google'
-                    : 'Cadastrar com o Google'}
+                  {mode === 'login' ? 'Continuar com o Google' : 'Entrar com o Google'}
                 </span>
               </>
             )}
@@ -266,13 +260,18 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                 : 'text-slate-400 hover:text-white'
             }`}
           >
-            Criar conta nova
+            Primeiro acesso
           </button>
         </div>
 
         {/* Formulário de E-mail e Senha */}
         <form onSubmit={handleSubmit} className="space-y-3.5">
-          
+          {mode === 'register' && (
+            <p className="text-[11px] text-slate-400 leading-relaxed">
+              Use o mesmo e-mail da compra e o código do pedido que a Kiwify enviou no e-mail de confirmação. Sem esse código, a senha não é criada.
+            </p>
+          )}
+
           {/* Campo Nome (Apenas modo cadastro) */}
           {mode === 'register' && (
             <div className="space-y-1">
@@ -297,6 +296,27 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                   className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-[16px] text-white placeholder:text-slate-500 focus:outline-none focus:border-[#25F4EE] transition font-medium select-text cursor-text"
                 />
               </div>
+            </div>
+          )}
+
+          {mode === 'register' && (
+            <div className="space-y-1">
+              <label htmlFor="auth-order-code" className="text-[11px] font-bold text-slate-300 block">
+                Código do pedido na Kiwify:
+              </label>
+              <input
+                id="auth-order-code"
+                name="orderCode"
+                type="text"
+                autoCapitalize="characters"
+                autoCorrect="off"
+                spellCheck={false}
+                required
+                value={orderCode}
+                onChange={(e) => setOrderCode(e.target.value)}
+                placeholder="Código que chegou no e-mail da compra"
+                className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-[16px] text-white placeholder:text-slate-500 focus:outline-none focus:border-[#25F4EE] transition font-medium select-text cursor-text"
+              />
             </div>
           )}
 
@@ -329,7 +349,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
           {/* Campo Senha */}
           <div className="space-y-1">
             <label htmlFor="auth-password-input" className="text-[11px] font-bold text-slate-300 block">
-              {mode === 'register' ? 'Crie uma Senha (mínimo 6 dígitos):' : 'Senha de Acesso:'}
+              {mode === 'register' ? 'Crie uma senha (mínimo 8 caracteres):' : 'Senha de acesso:'}
             </label>
             <div className="relative">
               <Lock className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />

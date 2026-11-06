@@ -9,14 +9,14 @@ import { TrendPulseSection } from './components/TrendPulseSection';
 import { Header } from './components/ConvictionTerminal/Header';
 import { ProductListPanel } from './components/ConvictionTerminal/ProductListPanel';
 import { ProductDetailTerminal } from './components/ConvictionTerminal/ProductDetailTerminal';
-import { AICopilotPanel } from './components/ConvictionTerminal/AICopilotPanel';
 import { SavedRadarView } from './components/SavedRadarView';
 import { AddCustomProductModal } from './components/ConvictionTerminal/AddCustomProductModal';
 import { LandingPage } from './components/LandingPage/LandingPage';
 import { LoginModal } from './components/Auth/LoginModal';
 import {
   getCurrentSession,
-  clearSession,
+  logout,
+  refreshSession,
   UserSession,
 } from './services/authService';
 
@@ -52,33 +52,22 @@ const WorkspaceHubModal = React.lazy(() =>
 const OnboardingModal = React.lazy(() =>
   import('./components/OnboardingModal').then((m) => ({ default: m.OnboardingModal }))
 );
-const WifeBotConfigModal = React.lazy(() =>
-  import('./components/WifeBotConfigModal').then((m) => ({ default: m.WifeBotConfigModal }))
-);
-const AdminDashboardModal = React.lazy(() =>
-  import('./components/Admin/AdminDashboardModal').then((m) => ({ default: m.AdminDashboardModal }))
-);
-const AffiliatePartnerModal = React.lazy(() =>
-  import('./components/Creator/AffiliatePartnerModal').then((m) => ({ default: m.AffiliatePartnerModal }))
-);
-
 const ONBOARDING_STORAGE_KEY = 'tikblox_onboarding_completed_v1';
 import { TrendingProduct, ProductNiche, AppUpdateInfo, ProductPriceCheck, PriceMonitorSummary } from './types';
-import { INITIAL_CURATED_TRENDS, isBlueOceanOpportunity } from './data/curatedTrends';
+import { isBlueOceanOpportunity } from './lib/blueOcean';
 import {
   scanTrends,
+  fetchCatalog,
   getSavedProductIds,
   toggleSaveProduct,
-  getCachedScannedProducts,
-  syncSavedProductsToIndexedDB,
   checkSavedProductsPrices,
   getStoredPriceChecks,
 } from './services/api';
 import {
-  seedInitialIndexedDB,
   getAllSavedProductsFromIndexedDB,
   getAllCachedTrendsFromIndexedDB,
   saveProductToIndexedDB,
+  cacheTrendProductsToIndexedDB,
   autoCleanupTrendCacheIfDue,
 } from './services/indexedDbService';
 import {
@@ -96,20 +85,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<
     'all' | 'early_wave' | 'high_margin' | 'novidades' | 'saved' | 'calculator'
   >('all');
-  const [products, setProducts] = useState<TrendingProduct[]>(() => {
-    try {
-      localStorage.removeItem('tikblox_scan_cache_v1');
-      localStorage.removeItem('tikblox_scan_cache_v2');
-    } catch {}
-    const cached = getCachedScannedProducts().filter(isBlueOceanOpportunity);
-    if (cached.length > 0) {
-      // Merge unique
-      const ids = new Set(cached.map((p) => p.id));
-      const rest = INITIAL_CURATED_TRENDS.filter((p) => !ids.has(p.id) && isBlueOceanOpportunity(p));
-      return [...cached, ...rest];
-    }
-    return INITIAL_CURATED_TRENDS.filter(isBlueOceanOpportunity);
-  });
+  const [products, setProducts] = useState<TrendingProduct[]>([]);
 
   const [savedIds, setSavedIds] = useState<string[]>(() => getSavedProductIds());
   const [selectedNiche, setSelectedNiche] = useState<ProductNiche>('all');
@@ -117,7 +93,7 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [filterFreeSampleOnly, setFilterFreeSampleOnly] = useState<boolean>(false);
   const [filterBlueOceanOnly, setFilterBlueOceanOnly] = useState<boolean>(false);
-  const [activeProduct, setActiveProduct] = useState<TrendingProduct | null>(() => INITIAL_CURATED_TRENDS[0] || null);
+  const [activeProduct, setActiveProduct] = useState<TrendingProduct | null>(null);
   const [painelEsquerdoRecolhido, setPainelEsquerdoRecolhido] = useState(false);
   const [painelDireitoRecolhido, setPainelDireitoRecolhido] = useState(true); // AI panel disabled
   const [mobileTab, setMobileTab] = useState<'produtos' | 'terminal' | 'copilot'>('produtos');
@@ -125,14 +101,67 @@ export default function App() {
   const [showSavedModal, setShowSavedModal] = useState<boolean>(false);
   const [showCalculatorModal, setShowCalculatorModal] = useState<boolean>(false);
   const [showAddCustomModal, setShowAddCustomModal] = useState<boolean>(false);
-  const [showAdminModal, setShowAdminModal] = useState<boolean>(false);
-  const [showCreatorModal, setShowCreatorModal] = useState<boolean>(false);
 
   // Controle de Sessão de Assinante e Navegação Landing Page / App
   const [session, setSession] = useState<UserSession | null>(() => getCurrentSession());
   const [showLoginModal, setShowLoginModal] = useState<boolean>(false);
-  // Abre OBRIGATORIAMENTE na Landing Page por padrão conforme solicitado
   const [currentView, setCurrentView] = useState<'app' | 'landing'>('landing');
+
+  useEffect(() => {
+    let cancelled = false;
+    if (!getCurrentSession()) return;
+    refreshSession()
+      .then((fresh) => {
+        if (!cancelled) setSession(fresh);
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setSession(null);
+          setCurrentView('landing');
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!session?.isAuthenticated) {
+      setProducts([]);
+      setActiveProduct(null);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      try {
+        if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+          const cached = await getAllCachedTrendsFromIndexedDB();
+          if (cancelled) return;
+          const visible = (cached || []).filter(isBlueOceanOpportunity);
+          setProducts(visible);
+          setActiveProduct((current) => current || visible[0] || null);
+          return;
+        }
+        const fresh = await fetchCatalog();
+        if (cancelled) return;
+        setProducts(fresh);
+        setActiveProduct((current) => {
+          if (current && fresh.some((product) => product.id === current.id)) return current;
+          return fresh[0] || null;
+        });
+        cacheTrendProductsToIndexedDB(fresh, 'curated').catch(() => {});
+      } catch (error) {
+        console.warn('Falha ao carregar o radar autenticado:', error);
+        if (!cancelled) {
+          setProducts([]);
+          setActiveProduct(null);
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [session?.email, session?.isAuthenticated]);
 
   // Redimensionamento dos painéis estilo TikBlox (com persistência no localStorage)
   const [redimensionando, setRedimensionando] = useState<'left' | 'right' | null>(null);
@@ -227,7 +256,6 @@ export default function App() {
 
   // Onboarding Welcome Tour state (manual only, never blocks terminal on login)
   const [showOnboardingModal, setShowOnboardingModal] = useState(false);
-  const [showWifeBotModal, setShowWifeBotModal] = useState(false);
 
   // IndexedDB offline cache initialization & background hydration (deferred so initial UI paint is instant)
   useEffect(() => {
@@ -243,27 +271,7 @@ export default function App() {
           setSavedIds(merged);
         }
 
-        // 2. Hydrate trend history from IndexedDB if available (Strict Blue Ocean Only)
-        const offlineTrends = await getAllCachedTrendsFromIndexedDB();
-        if (isMounted && offlineTrends && offlineTrends.length > 0) {
-          const validTrends = offlineTrends.filter(isBlueOceanOpportunity);
-          setProducts((prev) => {
-            const map = new Map<string, TrendingProduct>();
-            validTrends.forEach((p) => map.set(p.id, p));
-            prev.filter(isBlueOceanOpportunity).forEach((p) => {
-              if (!map.has(p.id)) map.set(p.id, p);
-            });
-            return Array.from(map.values()).filter(isBlueOceanOpportunity);
-          });
-        }
-
-        // 3. Seed initial curated trends into IndexedDB in the background if database is empty
-        await seedInitialIndexedDB(INITIAL_CURATED_TRENDS);
-
-        // 4. Sync existing saved products into IndexedDB
-        await syncSavedProductsToIndexedDB(INITIAL_CURATED_TRENDS);
-
-        // 5. Automatic maintenance: purge products from trend cache older than 30 days
+        // 2. Automatic maintenance: purge products from trend cache older than 30 days
         await autoCleanupTrendCacheIfDue(30);
       } catch (e) {
         console.warn('IndexedDB initial sync error:', e);
@@ -633,9 +641,10 @@ export default function App() {
   };
 
   const handleLogout = () => {
-    clearSession();
-    setSession(null);
-    setCurrentView('landing');
+    logout().finally(() => {
+      setSession(null);
+      setCurrentView('landing');
+    });
   };
 
   // =========================================================================
@@ -692,46 +701,7 @@ export default function App() {
           setSelectedProductForCalc(activeProduct);
           setShowCalculatorModal(true);
         }}
-        onOpenAdmin={() => {}} // Admin locked
-        onOpenCreatorVIP={() => {}} // Creator locked
-        onOpenTutorial={() => {}} // Tutorial locked
       />
-
-      {/* 1.1 BARRA FLUTUANTE DE AUDITORIA (QUANDO ESTIVER TESTANDO VISÃO DE CLIENTE) */}
-      {session && (session.email.startsWith('assinante.') || session.email === 'contato.dudavitti@gmail.com') && (
-        <div className="bg-gradient-to-r from-amber-600 via-indigo-600 to-purple-600 text-white px-3 py-1.5 flex items-center justify-between text-xs font-semibold shadow-md shrink-0 border-b border-white/10">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping shrink-0" />
-            <span>
-              <strong>Modo Auditoria:</strong> Visualizando exatamente como{' '}
-              <span className="underline decoration-white/60">{session.name}</span>{' '}
-              ({session.plan === 'essential' ? 'Radar Essential • Sem IA' : session.role === 'creator_vip' ? 'Creator VIP' : 'Combo PRO • Com IA'})
-            </span>
-          </div>
-          <button
-            type="button"
-            onClick={() => {
-              const realSession = getCurrentSession();
-              if (realSession && realSession.plan === 'admin') {
-                setSession(realSession);
-              } else {
-                setSession({
-                  email: 'dbonivitti@gmail.com',
-                  name: 'Danillo Bonivitti (Admin)',
-                  plan: 'admin',
-                  role: 'admin',
-                  isAuthenticated: true,
-                  subscriptionStatus: 'active',
-                });
-              }
-            }}
-            className="px-2.5 py-0.5 rounded-md bg-white text-slate-900 font-bold hover:bg-slate-100 transition cursor-pointer text-[11px] shadow-xs shrink-0 flex items-center gap-1 active:scale-95"
-          >
-            <span>👑</span>
-            <span>Voltar ao Painel ADM</span>
-          </button>
-        </div>
-      )}
 
       {/* 2. SELETOR DE ABAS MOBILE / TABLET (CINZA CLARO) */}
       <nav className="grid grid-cols-2 lg:hidden w-full bg-white border-b border-slate-200 p-1.5 gap-1.5 shrink-0 text-xs font-bold select-none">
@@ -815,38 +785,15 @@ export default function App() {
         <div className={`w-full h-full flex-1 overflow-hidden min-w-0 min-h-0 ${mobileTab !== 'terminal' ? 'hidden lg:flex' : 'flex'}`}>
           <ProductDetailTerminal
             product={activeProduct}
-            onOpenInCopilot={(p) => {
-              setActiveProduct(p);
-              setPainelDireitoRecolhido(false);
-              setMobileTab('copilot');
-            }}
             onToggleSave={handleToggleSave}
             isSaved={activeProduct ? savedIdsSet.has(activeProduct.id) : false}
             onOpenCalculator={(p) => {
               setSelectedProductForCalc(p);
               setShowCalculatorModal(true);
             }}
-            isEssentialPlan={session?.plan === 'essential'}
           />
         </div>
 
-        {/* Divisor / Splitter Direito Redimensionável */}
-        {!painelDireitoRecolhido && (
-          <div
-            onMouseDown={(e) => {
-              e.preventDefault();
-              setRedimensionando('right');
-            }}
-            onTouchStart={() => setRedimensionando('right')}
-            onDoubleClick={() => setRightWidth(380)}
-            className="hidden lg:flex w-[5px] hover:w-[7px] bg-slate-200 hover:bg-[#007A87] cursor-col-resize shrink-0 transition-all z-10 items-center justify-center group relative select-none"
-            title="Arraste para redimensionar a TIKBLOX AI. Clique duplo para redefinir para 380px."
-          >
-            <div className="w-1 h-8 rounded-full bg-slate-400 group-hover:bg-white transition-colors" />
-          </div>
-        )}
-
-        
       </div>
 
       {/* Modal de Análise de Produto Próprio (Oceano Azul) */}
@@ -1013,73 +960,6 @@ export default function App() {
           }}
           sampleProduct={products[0] || null}
         />
-
-        {/* Wife Bot Telegram & TikTok Personal Radar Modal */}
-        <WifeBotConfigModal
-          isOpen={showWifeBotModal}
-          onClose={() => setShowWifeBotModal(false)}
-          products={products}
-        />
-
-        {/* Executive Admin Panel Modal */}
-        {session && (
-          <AdminDashboardModal
-            isOpen={showAdminModal}
-            onClose={() => setShowAdminModal(false)}
-            userSession={session}
-            totalProductsCount={products.length}
-            onTriggerScan={() => handleTriggerScan(false)}
-            onOpenAddCustomProduct={() => {
-              setShowAdminModal(false);
-              setShowAddCustomModal(true);
-            }}
-            onSwitchToSubscriberView={() => {
-              // Simula visão exata do assinante público comum (PRO AI)
-              setSession({
-                email: 'assinante.teste@gmail.com',
-                name: 'Cliente Combo PRO',
-                plan: 'pro_ai',
-                role: 'subscriber',
-                isAuthenticated: true,
-                subscriptionStatus: 'active',
-                source: 'kiwify',
-              });
-            }}
-            onSwitchToEssentialView={() => {
-              // Simula visão exata do assinante Radar Essential (R$ 37 sem IA)
-              setSession({
-                email: 'assinante.essential@gmail.com',
-                name: 'Cliente Essential',
-                plan: 'essential',
-                role: 'subscriber',
-                isAuthenticated: true,
-                subscriptionStatus: 'active',
-                source: 'kiwify',
-              });
-            }}
-            onSwitchToCreatorView={() => {
-              // Simula visão da Duda Vitti
-              setSession({
-                email: 'contato.dudavitti@gmail.com',
-                name: 'Duda Vitti (VIP)',
-                plan: 'pro_ai',
-                role: 'creator_vip',
-                isAuthenticated: true,
-                subscriptionStatus: 'active',
-                source: 'kiwify',
-              });
-            }}
-          />
-        )}
-
-        {/* Creator / Affiliate VIP Hub Modal */}
-        {session && (
-          <AffiliatePartnerModal
-            isOpen={showCreatorModal}
-            onClose={() => setShowCreatorModal(false)}
-            userSession={session}
-          />
-        )}
 
       </Suspense>
 

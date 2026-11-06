@@ -1,13 +1,13 @@
 import express, { Request, Response } from 'express';
 import path from 'path';
 import dotenv from 'dotenv';
-import { GoogleGenAI } from '@google/genai';
 // Vite import is dynamic to avoid crashing Vercel (devDependency)
 import { INITIAL_CURATED_TRENDS } from './src/data/curatedTrends.js';
 import { enrichWithTikTokShopData } from './src/data/tiktokShopEnricher.js';
 import { TrendingProduct, ProductNiche, DeepDiveAnalysis } from './src/types.js';
 import { streamProductViabilityPDF } from './src/server/pdfGenerator.js';
 import authHandler from './api/auth.js';
+import catalogHandler from './api/catalog.js';
 import kiwifyWebhookHandler from './api/webhook/kiwify.js';
 
 dotenv.config();
@@ -15,22 +15,19 @@ dotenv.config();
 const app = express();
 const PORT = Number(process.env.PORT) || 3001;
 
-app.use(express.json());
+app.use(
+  express.json({
+    limit: '200kb',
+    verify: (req, _res, buf) => {
+      (req as any).rawBody = buf.toString('utf8');
+    },
+  })
+);
 
-// Rotas de Segurança de Autenticação e Webhook Oficial Kiwify
 app.all('/api/auth', (req, res) => authHandler(req, res));
 app.all('/api/webhook/kiwify', (req, res) => kiwifyWebhookHandler(req, res));
-
-// Permissive CORS and embedding headers
-app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  if (req.method === 'OPTIONS') {
-    return res.sendStatus(204);
-  }
-  next();
-});
+app.all('/api/catalog', (req, res) => catalogHandler(req, res));
+app.all('/api/scan', (req, res) => catalogHandler(req, res));
 
 // Circuit breaker and API Key Rotation
 const getAvailableKeys = (prefix: string) => [
@@ -61,24 +58,8 @@ export function getCurrentGroqKey(): string | null {
   return groqKeys[currentGroqKeyIndex];
 }
 
-// Lazy-safe Google GenAI initialization
-let genAIClient: GoogleGenAI | null = null;
-function getGenAI(): GoogleGenAI {
-  if (!genAIClient) {
-    const apiKey = getCurrentGeminiKey();
-    if (!apiKey) {
-      console.warn('No GEMINI_API_KEY found. Operating with fallback intelligence mode.');
-    }
-    genAIClient = new GoogleGenAI({
-      apiKey: apiKey || '',
-      httpOptions: {
-        headers: {
-          'User-Agent': 'aistudio-build',
-        },
-      },
-    });
-  }
-  return genAIClient;
+function getGenAI(): any {
+  return null;
 }
 
 // In-memory radar caches to avoid redundant API calls and prevent 429 rate-limit exhaustion
@@ -103,8 +84,6 @@ function triggerRateLimitCooldown(durationMs = 60000) {
   // If we have fallback keys, rotate them instead of locking out completely
   if (geminiKeys.length > 1) {
     currentGeminiKeyIndex = (currentGeminiKeyIndex + 1) % geminiKeys.length;
-    genAIClient = null; // force re-init with new key
-    console.log(`Rotated to Gemini Key #${currentGeminiKeyIndex + 1}`);
   }
   if (groqKeys.length > 1) {
     currentGroqKeyIndex = (currentGroqKeyIndex + 1) % groqKeys.length;
@@ -137,7 +116,7 @@ export function getActiveFreeEngine(): {
   if (getCurrentGeminiKey() && !isRateLimited()) {
     return {
       provider: 'gemini_free',
-      label: 'TikBlox AI Pro (Motor Neural Proprietário)',
+      label: 'Radar local TIKBLOX',
       cost: 'R$ 0,00 Permanente',
       cardRequired: false,
       model: 'TikBlox Neural Engine v3.8',
@@ -396,7 +375,7 @@ app.get('/api/health', (req: Request, res: Response) => {
     status: 'ok',
     appName: 'TIKBLOX',
     isFrozen: IS_FROZEN,
-    hasApiKey: IS_FROZEN ? false : !!process.env.GEMINI_API_KEY,
+    hasApiKey: false,
     timestamp: new Date().toISOString(),
   });
 });
@@ -424,8 +403,8 @@ app.post('/api/scan', async (req: Request, res: Response) => {
     }
 
     // Check circuit breaker and API keys
-    const hasGroq = !!process.env.GROQ_API_KEY && !isRateLimited();
-    const hasGemini = !!process.env.GEMINI_API_KEY && !isRateLimited();
+    const hasGroq = false;
+    const hasGemini = false;
 
     if (!hasGroq && !hasGemini) {
       const filtered = getFilteredCuratedTrends(niche, originCountry, query);
@@ -608,8 +587,8 @@ app.post('/api/deep-dive', async (req: Request, res: Response) => {
     }
 
     const ai = getGenAI();
-    const hasGroq = !!process.env.GROQ_API_KEY && !isRateLimited();
-    const hasGemini = !!process.env.GEMINI_API_KEY && !isRateLimited();
+    const hasGroq = false;
+    const hasGemini = false;
 
     if (!hasGroq && !hasGemini) {
       const fallback = getFallbackDeepDive(product);
@@ -730,8 +709,8 @@ app.post('/api/creative-generator', async (req: Request, res: Response) => {
     }
 
     const ai = getGenAI();
-    const hasGroq = !!process.env.GROQ_API_KEY && !isRateLimited();
-    const hasGemini = !!process.env.GEMINI_API_KEY && !isRateLimited();
+    const hasGroq = false;
+    const hasGemini = false;
 
     if (!hasGroq && !hasGemini) {
       const fallback = getFallbackCreativeScripts(productName, originalName, niche, targetAudience);
@@ -890,125 +869,8 @@ Copie e envie esta mensagem no chat do vendedor dentro do Centro de Criadores do
 💬 *Quer que eu crie um roteiro completo ou ganchos para outro nicho? É só me pedir!*`;
 }
 
-// Endpoint: AI Chat Copilot (TikTok Shop Brasil Strategist)
-app.post('/api/chat', async (req: Request, res: Response) => {
-  try {
-    const { messages, productContext } = req.body;
-    if (!messages || !Array.isArray(messages)) {
-      return res.status(400).json({ error: 'Formato de mensagens inválido.' });
-    }
-
-    const ai = getGenAI();
-    const groqKey = getCurrentGroqKey();
-    const geminiKey = getCurrentGeminiKey();
-    const hasGroq = !!groqKey && !isRateLimited();
-    const hasGemini = !!geminiKey && !isRateLimited();
-
-    const lastUserMessage = messages[messages.length - 1]?.content || '';
-    
-    // Fallback directly to rich autonomous intelligence if no external API keys
-    if (!hasGroq && !hasGemini) {
-      const autonomousReply = generateAutonomousTikTokShopReply(lastUserMessage, productContext);
-      return res.json({ reply: autonomousReply });
-    }
-
-    let replyText = '';
-
-    const systemPrompt = `Você é o Copiloto Estratégico Especialista em TikTok Shop Brasil do TikBlox Pro.
-Sua missão é ajudar criadores e afiliados a ganharem muito dinheiro no TikTok Shop Brasil com produtos de alta demanda e baixa saturação.
-${productContext ? `PRODUTO ATUALMENTE SELECIONADO PELO USUÁRIO:\nNome: ${productContext.name}\nPreço: R$ ${productContext.estimatedPriceBRL}\nComissão: ${productContext.tiktokShop?.commissionRatePercent}% (R$ ${productContext.tiktokShop?.commissionValueBRL})\nEstoque: ${productContext.tiktokShop?.stockLocation}\nAmostra Grátis: ${productContext.tiktokShop?.freeSampleAvailable ? 'Disponível' : 'Sob Consulta'}\nCriadores Ativos: ${productContext.tiktokShop?.activeCreatorsCount}` : ''}
-Instruções:
-- Responda sempre em português do Brasil, com tom analítico, direto, focado em vendas rápidas, ganchos magnéticos de 3s e unit economics.
-- Nunca utilize emojis.
-- Formatação e Design Visual: Nunca escreva blocos maciços de texto. Use parágrafos curtos (máximo 2 a 3 frases), títulos claros, bullet points destacados para métricas em negrito e tabelas Markdown estruturadas para números e simulações. Nunca mencione que você é um modelo de linguagem genérico.`;
-
-    if (hasGroq) {
-      try {
-        const groqMessages = [
-          { role: 'system', content: systemPrompt },
-          ...messages.map((m: any) => ({
-            role: m.role === 'assistant' ? 'assistant' : 'user',
-            content: m.content
-          }))
-        ];
-        
-        const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${groqKey}`,
-          },
-          body: JSON.stringify({
-            model: 'llama-3.3-70b-versatile',
-            messages: groqMessages,
-            temperature: 0.7,
-          }),
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          replyText = data.choices?.[0]?.message?.content || '';
-        }
-      } catch (groqErr) {
-        console.warn('Groq chat error, trying fallback:', groqErr);
-      }
-    }
-
-    if (!replyText && hasGemini) {
-      try {
-        const response = await ai.models.generateContent({
-          model: 'gemini-3.8-flash',
-          contents: lastUserMessage,
-          config: {
-            systemInstruction: systemPrompt,
-          }
-        });
-        replyText = response.text || '';
-      } catch (geminiErr) {
-        console.warn('Gemini chat error, trying fallback:', geminiErr);
-      }
-    }
-
-    if (!replyText) {
-      replyText = generateAutonomousTikTokShopReply(lastUserMessage, productContext);
-    }
-
-    return res.json({ reply: replyText });
-  } catch (error: any) {
-    console.error('Chat error:', error);
-    const fallback = generateAutonomousTikTokShopReply(req.body?.messages?.slice(-1)[0]?.content || '', req.body?.productContext);
-    return res.json({ reply: fallback });
-  }
-});
-
-// Endpoint: Kiwify Webhook (Ativação Automática de Assinantes)
-app.post('/api/webhook/kiwify', (req: Request, res: Response) => {
-  try {
-    const payload = req.body || {};
-    const orderStatus = payload.order_status || payload.status;
-    const customer = payload.Customer || payload.customer || {};
-    const product = payload.Product || payload.product || {};
-    const email = (customer.email || '').toLowerCase().trim();
-    const productName = product.product_name || product.name || 'TikBlox Pro';
-
-    console.log(`[KIWIFY SERVER WEBHOOK] Status: ${orderStatus} | Email: ${email} | Produto: ${productName}`);
-
-    const isCombo = 
-      productName.toLowerCase().includes('ia') || 
-      productName.toLowerCase().includes('combo') || 
-      productName.toLowerCase().includes('copilot');
-
-    const plan = isCombo ? 'pro_ai' : 'essential';
-
-    if (orderStatus === 'paid' || orderStatus === 'approved') {
-      return res.status(200).json({ success: true, message: 'Aprovado', email, plan });
-    }
-
-    return res.status(200).json({ success: true, received: true });
-  } catch (err: any) {
-    console.error('Kiwify webhook server error:', err);
-    return res.status(500).json({ error: 'Webhook processing error' });
-  }
+app.post('/api/chat', (_req: Request, res: Response) => {
+  res.status(410).json({ error: 'O copiloto de IA foi removido do TikBlox.' });
 });
 
 // Cache for live price monitoring checks
@@ -1212,7 +1074,7 @@ app.get('/api/free-tier-status', (req: Request, res: Response) => {
       },
       {
         id: 'gemini_free',
-        name: 'TikBlox AI Pro (Motor Neural Proprietário)',
+        name: 'Radar local TIKBLOX',
         cost: 'Incluso no Plano PRO',
         setup: 'Motor nativo pré-configurado e integrado na nuvem TikBlox.',
         active: engine.provider === 'gemini_free',
@@ -1257,93 +1119,6 @@ app.post('/api/export-product-pdf', async (req: Request, res: Response) => {
     if (!res.headersSent) {
       return res.status(500).json({ error: 'Failed to generate PDF summary sheet' });
     }
-  }
-});
-
-// Endpoint: Send message to Telegram Bot
-app.post('/api/telegram/send', async (req: Request, res: Response) => {
-  try {
-    const { token, chatId, text } = req.body;
-    if (!token || !chatId || !text) {
-      return res.status(400).json({ error: 'Missing token, chatId or text' });
-    }
-    const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chat_id: chatId,
-        text: text,
-        parse_mode: 'Markdown'
-      })
-    });
-    const data = await response.json();
-    if (!data.ok) {
-      return res.status(400).json({ success: false, error: data.description || 'Telegram API error' });
-    }
-    return res.json({ success: true, data });
-  } catch (error: any) {
-    console.error('Error sending Telegram message:', error);
-    return res.status(500).json({ success: false, error: error.message });
-  }
-});
-
-// Endpoint: Personal Assistant Chat with Product Context
-app.post('/api/assistant-chat', async (req: Request, res: Response) => {
-  try {
-    const { message, products } = req.body;
-    if (!message) {
-      return res.status(400).json({ error: 'Missing message' });
-    }
-
-    const contextSummary = Array.isArray(products) 
-      ? products.slice(0, 15).map((p: any) => `- ${p.name} (Nicho: ${p.niche}, Custo: $${p.costUSD} USD, Venda Sugerida: R$ ${p.suggestedPriceBRL}, Margem: ${p.grossMargin}, Score Viral: ${p.trendVelocity?.score || 90}/100, Janela Brasil: ${p.arbitrageWindowDays || 21} dias)`).join('\n')
-      : 'Nenhum produto no momento.';
-
-    const systemPrompt = `VocÃª Ã© o Assistente Pessoal de InteligÃªncia de E-commerce da Duda no TIKBLOX. 
-VocÃª tem acesso em tempo real ao radar de produtos virais importados (EUA/China para o Brasil).
-Produtos atualmente no radar da Duda:
-${contextSummary}
-
-Responda Ã  pergunta da Duda de forma objetiva, acolhedora, especialista em arbitragem e focada em conversÃ£o e lucro no Brasil. Se ela perguntar sobre margens, fornecedores ou estratÃ©gias, use os dados acima. Se faltar algum dado, faÃ§a uma estimativa realista baseada no mercado de dropshipping e TikTok Shop.`;
-
-    const apiKey = IS_FROZEN ? '' : process.env.GEMINI_API_KEY;
-    if (apiKey) {
-      try {
-        const ai = getGenAI();
-        const response = await ai.models.generateContent({
-          model: 'gemini-2.5-flash',
-          contents: [
-            { role: 'user', parts: [{ text: `${systemPrompt}\n\nPergunta da Duda: ${message}` }] }
-          ]
-        });
-        const reply = response.text;
-        if (reply) {
-          return res.json({ success: true, reply });
-        }
-      } catch (err) {
-        console.warn('Gemini chat error, falling back:', err);
-      }
-    }
-
-    let reply = `OlÃ¡ Duda! Analisei o radar atual e sua pergunta ("${message}"). `;
-    const lower = message.toLowerCase();
-    if (lower.includes('lucro') || lower.includes('margem') || lower.includes('melhor')) {
-      const best = products?.[0];
-      if (best) {
-        reply += `O destaque com maior margem no momento Ã© o **${best.name}**, com custo estimado de $${best.costUSD} USD, preÃ§o de venda sugerido de R$ ${best.suggestedPriceBRL} e margem bruta de ${best.grossMargin}! Vale a pena priorizar esse no TikTok Ads.`;
-      } else {
-        reply += `Os produtos do radar estÃ£o com margens mÃ©dias superiores a 250%. Recomendo focar em itens com alta velocidade no TikTok US.`;
-      }
-    } else if (lower.includes('mochila') || lower.includes('antifurto')) {
-      reply += `A Mochila Antifurto ImpermeÃ¡vel estÃ¡ com Score de 98/100, custo de $14.50 USD e venda sugerida de R$ 269,90 (+280% de margem). O gancho matador para o TikTok Ã©: "Nunca mais ande com medo de abrirem o zÃ­per da sua mochila no metrÃ´ lotado!".`;
-    } else {
-      reply += `Para essa dÃºvida, o ideal Ã© minerar os produtos listados no topo do app e testar criativos UGC nos primeiros 3 segundos. Quer que eu detalhe o plano de aÃ§Ã£o de algum produto especÃ­fico?`;
-    }
-
-    return res.json({ success: true, reply });
-  } catch (error: any) {
-    console.error('Error in /api/assistant-chat:', error);
-    return res.status(500).json({ success: false, error: 'Failed to process assistant chat' });
   }
 });
 

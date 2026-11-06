@@ -9,7 +9,6 @@ import {
   ShoppingBag,
   Package,
   ShieldCheck,
-  Bot,
   Target,
   Zap,
   CheckCircle2,
@@ -28,7 +27,7 @@ interface SlideData {
   subtitle: string;
   description: string;
   highlights: string[];
-  mockupType: 'radar' | 'terminal' | 'links' | 'copilot';
+  mockupType: 'radar' | 'terminal' | 'links';
 }
 
 const SLIDES: SlideData[] = [
@@ -79,22 +78,6 @@ const SLIDES: SlideData[] = [
       'Copiar Gancho Magnético dos primeiros 3 segundos para o roteiro',
     ],
     mockupType: 'links',
-  },
-  {
-    id: 'copilot',
-    badge: 'PAINEL 3: TIKBLOX AI',
-    badgeColor: 'bg-cyan-500/10 text-cyan-300 border-cyan-500/30',
-    title: 'TikBlox AI Pro Nativo',
-    subtitle: 'Roteiros magnéticos de 30 segundos e ganchos virais que travam o scroll',
-    description:
-      'Inteligência artificial generativa de alta velocidade especializada no algoritmo do TikTok Shop Brasil. Escreve roteiros que convertem e calcula unit economics.',
-    highlights: [
-      'Roteiros estruturados: Gancho (3s), Demonstração (15s) e Chamada p/ Carrinho (12s)',
-      'Tabelas comparativas e simulações de lucro líquido instantâneas',
-      'Orientações táticas para transmissões de Live Commerce',
-      'Tira-dúvidas sobre regras de saque Pix (D+7) e afiliação no app',
-    ],
-    mockupType: 'copilot',
   },
 ];
 
@@ -162,7 +145,7 @@ export const InteractiveScreensCarousel: React.FC<InteractiveScreensCarouselProp
     >
       
       {/* Abas Superiores de Navegação das Telas */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
         {SLIDES.map((s, idx) => (
           <button
             key={s.id}
@@ -193,9 +176,7 @@ export const InteractiveScreensCarousel: React.FC<InteractiveScreensCarouselProp
                 ? 'Radar de Produtos'
                 : idx === 1
                 ? 'Raio-X & Break-Even'
-                : idx === 2
-                ? 'Links & Amostras SP'
-                : 'TikBlox AI Pro'}
+                : 'Links & Amostras SP'}
             </span>
           </button>
         ))}
@@ -438,44 +419,6 @@ export const InteractiveScreensCarousel: React.FC<InteractiveScreensCarouselProp
                       <span className="text-[10px] font-mono text-[#25F4EE] bg-[#25F4EE]/10 px-2 py-0.5 rounded font-bold">
                         Copiar 1-Clique
                       </span>
-                    </div>
-                  </div>
-                )}
-
-                {/* 4. MOCKUP: TIKBLOX AI */}
-                {slide.mockupType === 'copilot' && (
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between pb-2 border-b border-white/10">
-                      <div className="flex items-center gap-1.5">
-                        <Bot className="w-4 h-4 text-[#25F4EE]" />
-                        <span className="text-xs font-black text-white">TikBlox AI Pro</span>
-                      </div>
-                      <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/20 px-2 py-0.5 rounded-full font-bold">
-                        TikBlox AI Core • Ativo
-                      </span>
-                    </div>
-
-                    {/* Mensagem da IA formatada */}
-                    <div className="p-3 rounded-2xl bg-white/5 border border-white/10 space-y-2 text-[11px] leading-relaxed">
-                      <p className="font-bold text-[#25F4EE]">
-                        Roteiro Técnico Viral (30 Segundos para Fechar no Carrinho):
-                      </p>
-                      <ul className="space-y-1 text-slate-300 pl-2">
-                        <li>
-                          <strong>0s - 3s (Gancho Visual):</strong> Mostre um pacote de biscoito caindo e esparramando, e no mesmo segundo corte selando a embalagem hermeticamente.
-                        </li>
-                        <li>
-                          <strong>3s - 18s (Dor & Demonstração):</strong> "Toda vez que você abre salgadinho ele murcha no dia seguinte? Essa mini seladora térmica de bolso fecha qualquer plástico em 2 segundos."
-                        </li>
-                        <li>
-                          <strong>18s - 30s (CTA Carrinho Amarelo):</strong> "O lojista nacional colocou estoque com frete grátis aqui no carrinho amarelo do vídeo. Garanta a sua antes de acabar."
-                        </li>
-                      </ul>
-
-                      <div className="pt-2 border-t border-white/10 flex items-center justify-between text-[10px] font-mono text-slate-400">
-                        <span>Simulação: 50 vendas = <strong>R$ 448,50 de lucro líquido</strong></span>
-                        <span className="text-[#25F4EE]">D+7 Saque Pix</span>
-                      </div>
                     </div>
                   </div>
                 )}

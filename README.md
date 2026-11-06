@@ -9,7 +9,7 @@ TIKBLOX é uma plataforma de inteligência de mercado e mineração de tendênci
 - **Frontend:** React 19, TypeScript, Tailwind CSS v4, Motion (Framer Motion), Lucide React
 - **Visualização & Mapas:** D3.js, TopoJSON (World Atlas)
 - **Backend / API:** Node.js, Express, tsx
-- **Inteligência Artificial:** Google Gemini 2.5 Flash / Gemini 3.8 via `@google/genai` (com fallback autônomo offline)
+- **Acesso pago:** Webhook Kiwify com assinatura HMAC-SHA1 e assinantes no Supabase
 - **PWA & Offline:** Vite Plugin PWA, Service Workers (Push Notifications, Background Sync, IndexedDB)
 - **Desktop:** Electron & Electron Builder (geração de instalador `.exe` para Windows)
 - **Bundler:** Vite 6
@@ -36,16 +36,23 @@ npm run dev
 O app estará acessível em `http://localhost:3000`.
 
 ### Variáveis de Ambiente (.env)
-Copie `.env.example` para `.env`:
+Copie `.env.example` para `.env`. O significado de cada variável, o SQL do Supabase e os passos da Kiwify estão em `docs/RELATORIO.md`.
+
 ```env
-# Opcional (Gratuito): chave do Google AI Studio (https://aistudio.google.com)
-GEMINI_API_KEY=
-
-# Opcional (Gratuito): chave Groq Cloud
-GROQ_API_KEY=
-
-# Porta do servidor (padrão: 3000)
+TIKBLOX_AUTH_SECRET=
+TIKBLOX_ADMIN_EMAIL=
+TIKBLOX_ADMIN_PASSWORD=
+TIKBLOX_ADMIN_NAME=
+KIWIFY_WEBHOOK_TOKEN=
+SUPABASE_URL=
+SUPABASE_SERVICE_ROLE_KEY=
 PORT=3000
+```
+
+Para simular compra aprovada e reembolso:
+
+```bash
+npm run test:webhook
 ```
 
 ---

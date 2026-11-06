@@ -35,7 +35,6 @@ interface NavbarProps {
   onOpenWorkspaceHub?: (tab?: 'drive' | 'gmail' | 'classroom') => void;
   onOpenOfflineStorage?: () => void;
   onOpenOnboardingTour?: () => void;
-  onOpenWifeBot?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -49,7 +48,6 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenWorkspaceHub,
   onOpenOfflineStorage,
   onOpenOnboardingTour,
-  onOpenWifeBot,
 }) => {
   const { t } = useTranslation();
 
