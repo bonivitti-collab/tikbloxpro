@@ -169,15 +169,9 @@ export const Header: React.FC<HeaderProps> = ({
               <span className="text-[11px] font-bold text-slate-800 whitespace-nowrap">
                 {userSession.name.split(' ')[0]}
               </span>
-              {userSession.plan !== 'admin' && (
-                <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200 shrink-0">
-                  {userSession.role === 'creator_vip'
-                    ? 'VIP'
-                    : userSession.plan === 'pro_ai'
-                    ? 'PRO AI'
-                    : 'RADAR'}
-                </span>
-              )}
+              <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200 shrink-0">
+                RADAR
+              </span>
             </div>
 
             {/* Botões de Ação Mobile: Painel ADM, Divulgação, Início e Sair */}

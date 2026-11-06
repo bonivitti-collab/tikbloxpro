@@ -15,7 +15,7 @@ export const SocialProofSection: React.FC = () => {
       commission: 'R$ 3.840,00',
       badge: 'Oceano Azul Validado',
       badgeColor: 'bg-[#25F4EE]/10 text-[#25F4EE] border-[#25F4EE]/30',
-      story: 'A amostra custou R$ 38 no fornecedor de SP. Com o gancho de 3 segundos gerado pelo TikBlox AI, o primeiro vídeo orgânico ultrapassou 100k views em 48h, batendo o ponto de equilíbrio na primeira hora.',
+      story: 'A amostra custou R$ 38 no fornecedor de SP. Com o gancho de 3 segundos do raio-x do radar, o primeiro vídeo orgânico ultrapassou 100k views em 48h, batendo o ponto de equilíbrio na primeira hora.',
       hookUsed: '"O motivo pelo qual todo mundo na academia trocou a garrafa comum por este copo..."',
     },
     {

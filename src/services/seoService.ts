@@ -6,9 +6,9 @@ const DEFAULT_TITLE_PT = 'TIKBLOX PRO | Radar TikTok Shop Brasil - Produtos Vira
 const DEFAULT_TITLE_EN = 'TIKBLOX PRO | TikTok Shop Brazil Radar - Viral Products & Fast Suppliers';
 
 const DEFAULT_DESCRIPTION_PT =
-  'Minere produtos virais no TikTok Shop Brasil antes da saturação. Radar com catálogo nacional em SP/PR, envio em 24h, comissões de 15% a 30%, amostras grátis e inteligência TikBlox AI.';
+  'Minere produtos virais no TikTok Shop Brasil antes da saturação. Radar com catálogo nacional em SP/PR, envio em 24h, comissões de 15% a 30% e amostras grátis.';
 const DEFAULT_DESCRIPTION_EN =
-  'Discover viral products on TikTok Shop Brazil before market saturation. National catalog with SP/PR warehouses, 24h dispatch, 15%-30% commissions and TikBlox AI.';
+  'Discover viral products on TikTok Shop Brazil before market saturation. National catalog with SP/PR warehouses, 24h dispatch and 15%-30% commissions.';
 
 const DEFAULT_IMAGE = `${BASE_APP_URL}/pwa-512x512.png`;
 
@@ -162,8 +162,8 @@ export function resetDefaultMetadata(lang: 'pt' | 'en' = 'pt'): void {
     'name',
     'keywords',
     lang === 'en'
-      ? 'tiktok shop brazil radar, viral products tiktok, suppliers sao paulo, affiliate tiktok shop, winners products 2026, tikblox pro, tikblox ai'
-      : 'tiktok shop brasil, radar tiktok shop, produtos virais tiktok, minerador tiktok shop, afiliados tiktok shop brasil, fornecedores pronta entrega sao paulo, tikblox pro, tikblox ai'
+      ? 'tiktok shop brazil radar, viral products tiktok, suppliers sao paulo, affiliate tiktok shop, winners products 2026, tikblox pro'
+      : 'tiktok shop brasil, radar tiktok shop, produtos virais tiktok, minerador tiktok shop, afiliados tiktok shop brasil, fornecedores pronta entrega sao paulo, tikblox pro'
   );
   setLinkTag('canonical', `${BASE_APP_URL}/`);
 

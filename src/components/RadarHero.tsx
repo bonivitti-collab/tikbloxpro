@@ -10,7 +10,6 @@ interface RadarHeroProps {
   setSelectedOrigin: (origin: string) => void;
   totalProductsCount: number;
   onOpenTour?: () => void;
-  onOpenCopilot?: () => void;
   searchQuery?: string;
   setSearchQuery?: (q: string) => void;
   onTriggerScan?: () => void;
@@ -42,7 +41,6 @@ export const RadarHero: React.FC<RadarHeroProps> = React.memo(({
   setSelectedOrigin,
   totalProductsCount,
   onOpenTour,
-  onOpenCopilot,
   searchQuery,
   setSearchQuery,
   onTriggerScan,

@@ -1,296 +1,194 @@
-// api/auth.ts - Servidor de Autenticação Segura, Criptografia SHA-256, Validação OAuth Google e Controle de Assinantes Kiwify
-import crypto from 'crypto';
-import fs from 'fs';
-import os from 'os';
-import path from 'path';
+import {
+  cleanName,
+  cleanPassword,
+  clientIp,
+  normalizeEmail,
+  readCookie,
+  sendJson,
+} from '../lib/http';
+import { isOwnerEmail, ownerName, ownerPasswordMatches } from '../lib/owner';
+import { hashPassword, verifyPassword } from '../lib/passwords';
+import { isRateLimited } from '../lib/rateLimit';
+import {
+  SESSION_COOKIE_NAME,
+  clearSessionCookie,
+  sessionCookie,
+  signSession,
+  verifySession,
+} from '../lib/session';
+import { getSubscriber, saveSubscriber, subscriberBackend } from '../lib/subscribers';
 
-const SALT = 'tikblox_salt_v1:';
-const JWT_SECRET = process.env.TIKBLOX_AUTH_SECRET || 'tikblox_sentinel_enterprise_secret_2026_v1';
-const SUBSCRIBERS_FILE = path.join(os.tmpdir(), 'tikblox_kiwify_subscribers.json');
-const MEMORY_STORE: Record<string, SubscriberRecord> = {};
+const LOGIN_WINDOW_MS = 15 * 60 * 1000;
 
-// Hashes SHA-256 (senhas NUNCA ficam em texto puro no código)
-const PROTECTED_ACCOUNTS: Record<
-  string,
-  {
-    passwordHash: string;
-    name: string;
-    plan: 'admin' | 'pro_ai' | 'essential';
-    role: 'admin' | 'creator_vip' | 'subscriber';
-    affiliateCode?: string;
-  }
-> = {
-  'dbonivitti@gmail.com': {
-    passwordHash: 'cfa225309d259dab977bbc8938a72ed136be53d053e970df527843c10dcccb53',
-    name: 'Danillo Bonivitti',
-    plan: 'pro_ai',
-    role: 'subscriber',
-  },
-  'contato.dudavitti@gmail.com': {
-    passwordHash: 'af999e05f41cd9e701bb4016a6fc87fe451ec15ba2d771db88bba55ab1053487',
-    name: 'Duda Vitti (Creator VIP)',
-    plan: 'pro_ai',
-    role: 'creator_vip',
-    affiliateCode: 'duda',
-  },
-  'dudavitti@gmail.com': {
-    passwordHash: 'af999e05f41cd9e701bb4016a6fc87fe451ec15ba2d771db88bba55ab1053487',
-    name: 'Duda Vitti (Creator VIP)',
-    plan: 'pro_ai',
-    role: 'creator_vip',
-    affiliateCode: 'duda',
-  },
-};
-
-export interface SubscriberRecord {
-  email: string;
-  name: string;
-  plan: 'pro_ai' | 'essential';
-  status: 'active' | 'revoked';
-  passwordHash?: string;
-  updatedAt: string;
+function publicSession(email: string, name: string, role: 'owner' | 'subscriber') {
+  return {
+    email,
+    name,
+    plan: 'essential' as const,
+    role,
+    isAuthenticated: true,
+    subscriptionStatus: 'active' as const,
+    source: role === 'owner' ? 'direct' : 'kiwify',
+  };
 }
 
-export function hashPassword(password: string): string {
-  return crypto
-    .createHash('sha256')
-    .update(SALT + password.trim())
-    .digest('hex');
-}
-
-export function signSessionToken(payload: object): string {
-  const data = Buffer.from(JSON.stringify(payload)).toString('base64url');
-  const sig = crypto.createHmac('sha256', JWT_SECRET).update(data).digest('base64url');
-  return `${data}.${sig}`;
-}
-
-export function loadSubscribersStore(): Record<string, SubscriberRecord> {
-  try {
-    if (fs.existsSync(SUBSCRIBERS_FILE)) {
-      const raw = fs.readFileSync(SUBSCRIBERS_FILE, 'utf-8');
-      const parsed = JSON.parse(raw);
-      Object.assign(MEMORY_STORE, parsed);
-    }
-  } catch {}
-  return MEMORY_STORE;
-}
-
-export function saveSubscribersStore(store: Record<string, SubscriberRecord>): void {
-  Object.assign(MEMORY_STORE, store);
-  try {
-    fs.writeFileSync(SUBSCRIBERS_FILE, JSON.stringify(MEMORY_STORE, null, 2), 'utf-8');
-  } catch (e) {
-    console.warn('[AUTH STORE] Aviso ao gravar cache local:', e);
-  }
+async function issueSession(req: any, res: any, email: string, name: string, role: 'owner' | 'subscriber') {
+  const token = signSession({ email, role });
+  sendJson(res, 200, { session: publicSession(email, name, role) }, {
+    'Set-Cookie': sessionCookie(token, req),
+  });
 }
 
 export default async function handler(req: any, res: any) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization');
-
   if (req.method === 'OPTIONS') {
-    return res.status(200).end();
+    return res.status(204).end();
   }
-
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    return sendJson(res, 405, { error: 'Method not allowed' });
   }
 
   try {
-    const { action, email, password, name, googleAccessToken } = req.body || {};
-    const cleanEmail = (email || '').trim().toLowerCase();
-    const store = loadSubscribersStore();
+    const body = req.body && typeof req.body === 'object' ? req.body : {};
+    const action = typeof body.action === 'string' ? body.action : '';
+    const ip = clientIp(req);
 
-    // =========================================================================
-    // 1. AUTENTICAÇÃO OFICIAL VIA TOKEN OAUTH DO GOOGLE (VERIFICADO NO GOOGLE)
-    // =========================================================================
-    if (action === 'google_oauth') {
-      if (!googleAccessToken) {
-        return res.status(400).json({ error: 'Token OAuth do Google ausente.' });
+    if (action === 'logout') {
+      return sendJson(res, 200, { ok: true }, { 'Set-Cookie': clearSessionCookie(req) });
+    }
+
+    if (action === 'me') {
+      const claims = verifySession(readCookie(req, SESSION_COOKIE_NAME));
+      if (!claims) {
+        return sendJson(res, 401, { error: 'Sessão expirada. Entre novamente.' }, {
+          'Set-Cookie': clearSessionCookie(req),
+        });
       }
+      if (claims.role === 'owner' && isOwnerEmail(claims.email)) {
+        return sendJson(res, 200, {
+          session: publicSession(claims.email, ownerName(), 'owner'),
+        });
+      }
+      if (subscriberBackend() === 'unconfigured') {
+        return sendJson(res, 503, { error: 'Base de assinantes ainda não configurada.' });
+      }
+      const subscriber = await getSubscriber(claims.email);
+      if (!subscriber || subscriber.status !== 'active') {
+        return sendJson(res, 403, { error: 'Assinatura inativa.' }, {
+          'Set-Cookie': clearSessionCookie(req),
+        });
+      }
+      return sendJson(res, 200, {
+        session: publicSession(subscriber.email, subscriber.name, 'subscriber'),
+      });
+    }
 
+    if (await isRateLimited(`auth:${ip}`, 30, LOGIN_WINDOW_MS)) {
+      return sendJson(res, 429, { error: 'Muitas tentativas. Aguarde alguns minutos e tente de novo.' });
+    }
+
+    if (action === 'google_oauth') {
+      const googleAccessToken = typeof body.googleAccessToken === 'string' ? body.googleAccessToken.trim() : '';
+      if (!googleAccessToken || googleAccessToken.length > 4096) {
+        return sendJson(res, 400, { error: 'Token do Google ausente.' });
+      }
       const googleRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
         headers: { Authorization: `Bearer ${googleAccessToken}` },
       });
-
       if (!googleRes.ok) {
-        return res.status(401).json({ error: 'Token do Google inválido ou expirado. Tente novamente.' });
+        return sendJson(res, 401, { error: 'Token do Google inválido ou expirado.' });
       }
-
       const googleUser = await googleRes.json();
-      const verifiedEmail = (googleUser.email || '').trim().toLowerCase();
-
-      if (!verifiedEmail) {
-        return res.status(400).json({ error: 'A conta Google não retornou um e-mail válido.' });
+      const email = normalizeEmail(googleUser.email);
+      if (!email || googleUser.email_verified === false) {
+        return sendJson(res, 401, { error: 'A conta Google não confirmou um e-mail válido.' });
       }
-
-      // Verifica se é conta protegida (Danillo Admin ou Duda VIP)
-      const protectedAcc = PROTECTED_ACCOUNTS[verifiedEmail];
-      if (protectedAcc) {
-        const session = {
-          email: verifiedEmail,
-          name: googleUser.name || protectedAcc.name,
-          plan: protectedAcc.plan,
-          role: protectedAcc.role,
-          affiliateCode: protectedAcc.affiliateCode,
-          isAuthenticated: true,
-          subscriptionStatus: 'active',
-          source: 'google',
-          photoUrl: googleUser.picture,
-          token: signSessionToken({ email: verifiedEmail, role: protectedAcc.role, iat: Date.now() }),
-        };
-        return res.status(200).json({ session });
+      const name = cleanName(googleUser.name) || email.split('@')[0];
+      if (isOwnerEmail(email)) {
+        return issueSession(req, res, email, name, 'owner');
       }
-
-      // Verifica se o assinante teve reembolso/cancelamento na Kiwify
-      const subRecord = store[verifiedEmail];
-      if (subRecord && subRecord.status === 'revoked') {
-        return res.status(403).json({
-          error: 'Sua assinatura consta como cancelada ou reembolsada na Kiwify.',
+      if (subscriberBackend() === 'unconfigured') {
+        return sendJson(res, 503, { error: 'Base de assinantes ainda não configurada.' });
+      }
+      const subscriber = await getSubscriber(email);
+      if (!subscriber || subscriber.status !== 'active') {
+        return sendJson(res, 403, {
+          error: 'Não há assinatura ativa para este e-mail. O acesso libera depois do pagamento aprovado na Kiwify.',
         });
       }
-
-      const assignedPlan = subRecord?.plan || 'pro_ai';
-      const session = {
-        email: verifiedEmail,
-        name: googleUser.name || subRecord?.name || verifiedEmail.split('@')[0].toUpperCase(),
-        plan: assignedPlan,
-        role: 'subscriber',
-        isAuthenticated: true,
-        subscriptionStatus: 'active',
-        source: 'google',
-        photoUrl: googleUser.picture,
-        token: signSessionToken({ email: verifiedEmail, role: 'subscriber', iat: Date.now() }),
-      };
-      return res.status(200).json({ session });
+      return issueSession(req, res, email, subscriber.name || name, 'subscriber');
     }
 
-    // =========================================================================
-    // 2. LOGIN COM E-MAIL E SENHA (VALIDADO POR HASH SHA-256 NO SERVIDOR)
-    // =========================================================================
+    const email = normalizeEmail(body.email);
+    const password = cleanPassword(body.password, action === 'register' ? 8 : 4);
+
     if (action === 'login') {
-      if (!cleanEmail || !cleanEmail.includes('@')) {
-        return res.status(400).json({ error: 'Informe um e-mail válido.' });
+      if (!email || !password) {
+        return sendJson(res, 400, { error: 'Informe e-mail e senha válidos.' });
       }
-      if (!password || password.trim().length < 4) {
-        return res.status(400).json({ error: 'Por favor, digite sua senha de acesso.' });
+      if (await isRateLimited(`login:${ip}:${email}`, 8, LOGIN_WINDOW_MS)) {
+        return sendJson(res, 429, { error: 'Muitas tentativas para este e-mail. Aguarde alguns minutos.' });
       }
-
-      const inputHash = hashPassword(password);
-
-      // 2.1 Conta Protegida (Danillo Admin ou Duda VIP) -> NUNCA entra sem a senha exata!
-      const protectedAcc = PROTECTED_ACCOUNTS[cleanEmail];
-      if (protectedAcc) {
-        if (inputHash !== protectedAcc.passwordHash) {
-          return res.status(401).json({
-            error: 'Senha incorreta para esta conta protegida.',
-          });
+      if (isOwnerEmail(email)) {
+        if (!ownerPasswordMatches(password)) {
+          return sendJson(res, 401, { error: 'E-mail ou senha inválidos.' });
         }
-
-        const session = {
-          email: cleanEmail,
-          name: protectedAcc.name,
-          plan: protectedAcc.plan,
-          role: protectedAcc.role,
-          affiliateCode: protectedAcc.affiliateCode,
-          isAuthenticated: true,
-          subscriptionStatus: 'active',
-          source: 'direct',
-          token: signSessionToken({ email: cleanEmail, role: protectedAcc.role, iat: Date.now() }),
-        };
-        return res.status(200).json({ session });
+        return issueSession(req, res, email, ownerName(), 'owner');
       }
-
-      // 2.2 Verifica se foi cancelado/reembolsado na Kiwify
-      const subRecord = store[cleanEmail];
-      if (subRecord && subRecord.status === 'revoked') {
-        return res.status(403).json({
-          error: 'Acesso bloqueado: assinatura reembolsada ou cancelada na Kiwify.',
+      if (subscriberBackend() === 'unconfigured') {
+        return sendJson(res, 503, { error: 'Base de assinantes ainda não configurada.' });
+      }
+      const subscriber = await getSubscriber(email);
+      if (!subscriber || subscriber.status !== 'active') {
+        return sendJson(res, 403, {
+          error: 'Não há assinatura ativa para este e-mail. O acesso libera depois do pagamento aprovado na Kiwify.',
         });
       }
-
-      // 2.3 Se o assinante já tem senha cadastrada no servidor, valida o hash
-      if (subRecord && subRecord.passwordHash && subRecord.passwordHash !== inputHash) {
-        return res.status(401).json({ error: 'Senha incorreta para o e-mail informado.' });
+      if (!subscriber.password_hash) {
+        return sendJson(res, 403, {
+          error: 'Primeiro acesso: abra a aba Primeiro acesso e defina uma senha com o mesmo e-mail da compra.',
+        });
       }
-
-      // Salva o hash da senha no primeiro acesso do assinante Kiwify
-      if (subRecord && !subRecord.passwordHash) {
-        subRecord.passwordHash = inputHash;
-        saveSubscribersStore(store);
+      if (!verifyPassword(password, subscriber.password_hash)) {
+        return sendJson(res, 401, { error: 'E-mail ou senha inválidos.' });
       }
-
-      const session = {
-        email: cleanEmail,
-        name: subRecord?.name || cleanEmail.split('@')[0].toUpperCase(),
-        plan: subRecord?.plan || 'pro_ai',
-        role: 'subscriber',
-        isAuthenticated: true,
-        subscriptionStatus: 'active',
-        source: 'kiwify',
-        token: signSessionToken({ email: cleanEmail, role: 'subscriber', iat: Date.now() }),
-      };
-
-      return res.status(200).json({ session });
+      return issueSession(req, res, email, subscriber.name, 'subscriber');
     }
 
-    // =========================================================================
-    // 3. CADASTRO DE CONTA DO ASSINANTE ("CRIAR CONTA NOVA")
-    // =========================================================================
     if (action === 'register') {
-      if (!name || name.trim().length < 2) {
-        return res.status(400).json({ error: 'Informe seu nome completo.' });
+      const name = cleanName(body.name);
+      if (!name || !email || !password) {
+        return sendJson(res, 400, { error: 'Informe nome, e-mail da compra e uma senha de pelo menos 8 caracteres.' });
       }
-      if (!cleanEmail || !cleanEmail.includes('@')) {
-        return res.status(400).json({ error: 'Informe um e-mail válido.' });
+      if (isOwnerEmail(email)) {
+        return sendJson(res, 403, { error: 'Este e-mail entra pela aba Já tenho conta.' });
       }
-      if (!password || password.trim().length < 6) {
-        return res.status(400).json({ error: 'A senha deve ter pelo menos 6 caracteres.' });
+      if (subscriberBackend() === 'unconfigured') {
+        return sendJson(res, 503, { error: 'Base de assinantes ainda não configurada.' });
       }
-
-      // Impede que qualquer pessoa tente registrar o e-mail do Admin ou da Duda
-      if (PROTECTED_ACCOUNTS[cleanEmail]) {
-        return res.status(403).json({
-          error: 'Este e-mail pertence à administração oficial. Use a aba "Já tenho conta" com sua senha.',
+      const subscriber = await getSubscriber(email);
+      if (!subscriber || subscriber.status !== 'active') {
+        return sendJson(res, 403, {
+          error: 'Este e-mail não tem uma compra aprovada. Pague o Radar Essential e use o mesmo e-mail da Kiwify.',
         });
       }
-
-      const existing = store[cleanEmail];
-      if (existing && existing.status === 'revoked') {
-        return res.status(403).json({
-          error: 'Esta assinatura consta como cancelada ou reembolsada na Kiwify.',
-        });
+      if (subscriber.password_hash) {
+        return sendJson(res, 409, { error: 'Esta conta já tem senha. Entre em Já tenho conta.' });
       }
-
-      const inputHash = hashPassword(password);
-      store[cleanEmail] = {
-        email: cleanEmail,
-        name: name.trim(),
-        plan: existing?.plan || 'pro_ai',
-        status: 'active',
-        passwordHash: inputHash,
-        updatedAt: new Date().toISOString(),
-      };
-      saveSubscribersStore(store);
-
-      const session = {
-        email: cleanEmail,
-        name: name.trim(),
-        plan: store[cleanEmail].plan,
-        role: 'subscriber',
-        isAuthenticated: true,
-        subscriptionStatus: 'active',
-        source: 'email_registered',
-        token: signSessionToken({ email: cleanEmail, role: 'subscriber', iat: Date.now() }),
-      };
-
-      return res.status(200).json({ session });
+      subscriber.name = name;
+      subscriber.password_hash = hashPassword(password);
+      subscriber.updated_at = new Date().toISOString();
+      await saveSubscriber(subscriber);
+      return issueSession(req, res, email, name, 'subscriber');
     }
 
-    return res.status(400).json({ error: 'Ação de autenticação inválida.' });
-  } catch (err: any) {
-    console.error('[AUTH API ERROR]:', err);
-    return res.status(500).json({ error: 'Erro interno no servidor de autenticação.' });
+    return sendJson(res, 400, { error: 'Ação de autenticação inválida.' });
+  } catch (error: any) {
+    const code = error?.message || '';
+    if (code === 'AUTH_SECRET_MISSING' || code === 'AUTH_SECRET_LEAKED' || code === 'SUBSCRIBER_STORE_UNCONFIGURED') {
+      console.error('[AUTH]', code);
+      return sendJson(res, 503, { error: 'Autenticação ainda não configurada no servidor.' });
+    }
+    console.error('[AUTH]', error);
+    return sendJson(res, 500, { error: 'Erro interno no servidor de autenticação.' });
   }
 }

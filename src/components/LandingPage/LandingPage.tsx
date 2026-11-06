@@ -5,7 +5,6 @@
 import React, { useState, useEffect } from 'react';
 import {
   Sparkles,
-  Bot,
   ShieldCheck,
   Package,
   TrendingUp,
@@ -27,7 +26,7 @@ import {
   X,
   ChevronUp,
 } from 'lucide-react';
-import { getKiwifyCheckoutUrls } from '../../services/authService';
+import { getKiwifyCheckoutUrl } from '../../services/authService';
 import { InteractiveScreensCarousel } from './InteractiveScreensCarousel';
 import { ProfitSimulator } from './ProfitSimulator';
 import { SocialProofSection } from './SocialProofSection';
@@ -48,7 +47,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   const [floatingCtaDismissed, setFloatingCtaDismissed] = useState(false);
   const [countdown, setCountdown] = useState<string>('00h 00m 00s');
 
-  const checkoutUrls = getKiwifyCheckoutUrls();
+  const checkoutUrl = getKiwifyCheckoutUrl();
 
   // Contador regressivo em tempo real até a próxima varredura das 06:00 BRT (09:00 UTC)
   useEffect(() => {
@@ -280,7 +279,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
           {/* Subtítulo persuasivo */}
           <p className="text-sm sm:text-lg text-slate-300 max-w-3xl mx-auto leading-relaxed">
-            Identifique produtos validados com estoque nacional em São Paulo (chega em 2 a 4 dias), concorrência zerada (&lt; 10 vídeos no feed BR), ponto de equilíbrio em 3 vendas e <strong>TikBlox AI para gerar ganchos virais de 3 segundos</strong>.
+            Identifique produtos validados com estoque nacional em São Paulo (chega em 2 a 4 dias), concorrência zerada (&lt; 10 vídeos no feed BR) e ponto de equilíbrio em 3 vendas.
           </p>
 
           {/* Botão de Ação Hero Principal */}
@@ -342,12 +341,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </div>
 
             <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 space-y-1 hover:border-[#FE2C55]/40 transition">
-              <span className="text-[10px] uppercase font-bold text-slate-400 block">Inteligência</span>
+              <span className="text-[10px] uppercase font-bold text-slate-400 block">Raio-X</span>
               <span className="text-xs font-black text-white flex items-center gap-1.5">
-                <Bot className="w-3.5 h-3.5 text-[#FE2C55]" />
-                <span>TikBlox AI Pro</span>
+                <Target className="w-3.5 h-3.5 text-[#FE2C55]" />
+                <span>Gancho e margem</span>
               </span>
-              <span className="text-[10px] text-slate-400 block font-mono">Roteiros de 30s prontos</span>
+              <span className="text-[10px] text-slate-400 block font-mono">Números do produto</span>
             </div>
           </div>
 
@@ -369,7 +368,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               Conheça as Telas do TikBlox Pro por Dentro
             </h2>
             <p className="text-xs sm:text-sm text-slate-300">
-              Passe o carrossel abaixo e veja exatamente como o radar, o raio-x financeiro e o TikBlox AI funcionam antes de assinar:
+              Passe o carrossel abaixo e veja exatamente como o radar, o raio-x financeiro e os links de amostra funcionam antes de assinar:
             </p>
           </div>
 
@@ -497,10 +496,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 🤖
               </div>
               <h4 className="text-base font-black text-white group-hover:text-[#FE2C55] transition">
-                3. Motor TikBlox AI Pro
+                3. Raio-X e ponto de equilíbrio
               </h4>
               <p className="text-xs text-slate-300 leading-relaxed">
-                Inteligência nativa que cria roteiros completos de 30 segundos, ganchos visuais para os primeiros 3s e simulações financeiras em segundos.
+                Cada produto mostra comissão, margem, gancho de 3 segundos e em quantas vendas o custo da amostra se paga.
               </p>
             </div>
 
@@ -525,14 +524,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               Planos Transparentes & Sem Fidelidade
             </h2>
             <h3 className="text-2xl sm:text-4xl font-black text-white">
-              Escolha o seu plano e comece a minerar hoje
+              Radar Essential por R$ 37/mês
             </h3>
             <p className="text-xs text-slate-400">
               Cancele quando quiser com apenas 1 clique. Acesso imediato pelo e-mail da compra.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto items-stretch">
+          <div className="grid grid-cols-1 gap-8 max-w-md mx-auto items-stretch">
             
             {/* PLANO 1: RADAR ESSENTIAL */}
             <div className="p-7 sm:p-8 rounded-3xl bg-[#0F121C] border border-white/10 flex flex-col justify-between space-y-6 hover:border-white/20 transition">
@@ -578,77 +577,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </div>
 
               <a
-                href={checkoutUrls.radar}
+                href={checkoutUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full py-4 px-4 rounded-xl bg-white/10 hover:bg-white/15 text-white font-black text-xs uppercase tracking-wider text-center transition cursor-pointer active:scale-95 border border-white/10 block"
               >
                 Assinar Radar Essential por R$ 37/mês
-              </a>
-            </div>
-
-            {/* PLANO 2: COMBO RADAR PRO + TIKBLOX AI (DESTAQUE) */}
-            <div className="p-7 sm:p-8 rounded-3xl bg-gradient-to-b from-[#141A29] to-[#0F121C] border-2 border-[#25F4EE] flex flex-col justify-between space-y-6 relative shadow-[0_0_40px_rgba(37,244,238,0.15)]">
-              
-              {/* Badge Mais Vendido */}
-              <div className="absolute -top-3.5 right-6 px-3.5 py-1 rounded-full bg-gradient-to-r from-[#25F4EE] to-[#00D2C4] text-[#0F121C] text-[10px] font-black uppercase tracking-wider shadow-sm">
-                ⭐ Mais Escolhido (Desconto Ativo)
-              </div>
-
-              <div className="space-y-4">
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#25F4EE]/10 text-[#25F4EE] text-xs font-bold border border-[#25F4EE]/30">
-                  <Sparkles className="w-3.5 h-3.5" />
-                  <span>Combo Completo com IA</span>
-                </div>
-                <div>
-                  <h4 className="text-xl font-black text-white">Radar PRO + TikBlox AI</h4>
-                  <p className="text-xs text-slate-300 mt-1">
-                    A ferramenta completa com a Inteligência Artificial escrevendo seus roteiros e estratégias.
-                  </p>
-                </div>
-
-                <div className="pt-2 flex items-baseline gap-1">
-                  <span className="text-xs font-bold text-slate-400 line-through mr-1">R$ 87</span>
-                  <span className="text-xs font-bold text-[#25F4EE]">R$</span>
-                  <span className="text-4xl font-black text-[#25F4EE]">57</span>
-                  <span className="text-xs text-slate-400 font-medium">/mês</span>
-                </div>
-
-                <ul className="space-y-2.5 text-xs text-slate-200 pt-4 border-t border-white/10">
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-[#25F4EE] shrink-0" />
-                    <span><strong>Tudo incluso no Plano Essential</strong></span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-[#25F4EE] shrink-0" />
-                    <span><strong>TikBlox AI Pro Ilimitado 24/7</strong></span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-[#25F4EE] shrink-0" />
-                    <span>Gerador de Roteiros de 30s prontos com ganchos virais</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-[#25F4EE] shrink-0" />
-                    <span>Estratégias de Live Commerce e saques Pix (D+7)</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-[#25F4EE] shrink-0" />
-                    <span>Simulador de Lucro Líquido por Volume</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-[#25F4EE] shrink-0" />
-                    <span>Suporte prioritário exclusivo para assinantes PRO</span>
-                  </li>
-                </ul>
-              </div>
-
-              <a
-                href={checkoutUrls.combo}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full py-4 px-4 rounded-xl bg-gradient-to-r from-[#25F4EE] via-[#00D2C4] to-[#25F4EE] hover:brightness-105 text-[#0F121C] font-black text-xs uppercase tracking-wider text-center transition cursor-pointer active:scale-95 shadow-[0_4px_25px_rgba(37,244,238,0.4)] block"
-              >
-                Garantir Combo PRO com Desconto por R$ 57/mês
               </a>
             </div>
 
@@ -688,11 +622,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               },
               {
                 q: 'Posso cancelar a assinatura quando eu quiser?',
-                a: 'Sim, com 100% de liberdade! Não há nenhuma fidelidade ou multa. Você pode cancelar sua assinatura mensal diretamente no painel da Kiwify a qualquer momento.'
-              },
-              {
-                q: 'Como funciona o TikBlox AI?',
-                a: 'É uma inteligência artificial proprietária nativa treinada no algoritmo do TikTok Shop Brasil. Ela analisa cada produto do radar e gera roteiros prontos de 30 segundos, ganchos visuais para os primeiros 3 segundos de vídeo, orientações para lives e cálculos de margem líquida.'
+                a: 'Sim, com 100% de liberdade! Não há nenhuma fidelidade ou multa. Você pode cancelar sua assinatura mensal diretamente no painel da Kiwify a qualquer momento. O cancelamento ou o reembolso encerra o acesso ao radar.'
               }
             ].map((faq, idx) => (
               <div
@@ -726,7 +656,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
           <TikBloxLogo size="sm" theme="dark" animate={false} />
           <span className="hidden sm:inline text-slate-600">•</span>
-          <span>Radar de Tendências e Inteligência TikTok Shop Brasil</span>
+          <span>Radar de tendências do TikTok Shop Brasil</span>
         </div>
 
         {/* Selo de Confiança Sentinel Systems */}

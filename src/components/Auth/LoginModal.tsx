@@ -8,7 +8,6 @@ import {
   registerWithEmailAndPassword,
   loginWithGoogle,
   loginWithApple,
-  getVerifiedDeviceSession,
   UserSession,
 } from '../../services/authService';
 import { TikBloxLogo } from '../TikBloxLogo';
@@ -27,13 +26,11 @@ export const LoginModal: React.FC<LoginModalProps> = ({
   onOpenPricing,
 }) => {
   const [mode, setMode] = useState<'login' | 'register'>('login');
-  const verifiedDevice = getVerifiedDeviceSession();
 
-  // Campos de Formulário (Pré-carrega e-mail salvo se o usuário marcou "Salvar meu login")
   const [name, setName] = useState('');
   const [email, setEmail] = useState(() => {
     try {
-      return localStorage.getItem('tikblox_remembered_email_v1') || verifiedDevice?.email || '';
+      return localStorage.getItem('tikblox_remembered_email_v1') || '';
     } catch {
       return '';
     }
@@ -196,11 +193,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                   />
                 </svg>
                 <span>
-                  {verifiedDevice
-                    ? `Continuar como ${verifiedDevice.name.split(' ')[0]} (Google)`
-                    : mode === 'login'
-                    ? 'Continuar com o Google'
-                    : 'Cadastrar com o Google'}
+                  {mode === 'login' ? 'Continuar com o Google' : 'Entrar com o Google'}
                 </span>
               </>
             )}
@@ -266,13 +259,18 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                 : 'text-slate-400 hover:text-white'
             }`}
           >
-            Criar conta nova
+            Primeiro acesso
           </button>
         </div>
 
         {/* Formulário de E-mail e Senha */}
         <form onSubmit={handleSubmit} className="space-y-3.5">
-          
+          {mode === 'register' && (
+            <p className="text-[11px] text-slate-400 leading-relaxed">
+              Use o mesmo e-mail da compra aprovada na Kiwify. Sem pagamento, a conta não é criada.
+            </p>
+          )}
+
           {/* Campo Nome (Apenas modo cadastro) */}
           {mode === 'register' && (
             <div className="space-y-1">
@@ -329,7 +327,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
           {/* Campo Senha */}
           <div className="space-y-1">
             <label htmlFor="auth-password-input" className="text-[11px] font-bold text-slate-300 block">
-              {mode === 'register' ? 'Crie uma Senha (mínimo 6 dígitos):' : 'Senha de Acesso:'}
+              {mode === 'register' ? 'Crie uma senha (mínimo 8 caracteres):' : 'Senha de acesso:'}
             </label>
             <div className="relative">
               <Lock className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />

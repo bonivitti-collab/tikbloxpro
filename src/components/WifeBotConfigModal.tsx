@@ -25,7 +25,7 @@ interface BotConfig {
 const DEFAULT_CONFIG: BotConfig = {
   assistantName: 'Radar Pessoal da Duda',
   tiktokProfile: '@duda.trends.compras',
-  telegramToken: '789123456:AAH_mock_token_tikblox_wife',
+  telegramToken: '',
   telegramChatId: '@radar_viral_duda',
   selectedNiches: ['beauty', 'home', 'accessories', 'fitness'],
   alertFrequency: 'realtime',
@@ -137,13 +137,12 @@ export const WifeBotConfigModal: React.FC<WifeBotConfigModalProps> = ({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          token: config.telegramToken,
           chatId: config.telegramChatId,
           text: messageText,
         }),
       });
       const data = await res.json();
-      if (data.success || config.telegramToken.includes('mock')) {
+      if (data.success) {
         setTestSent(true);
         setTimeout(() => setTestSent(false), 4000);
       } else {
@@ -151,8 +150,7 @@ export const WifeBotConfigModal: React.FC<WifeBotConfigModalProps> = ({
       }
     } catch (err) {
       console.error(err);
-      setTestSent(true);
-      setTimeout(() => setTestSent(false), 4000);
+      alert('Não foi possível contactar o servidor.');
     }
   };
 
@@ -361,20 +359,9 @@ export const WifeBotConfigModal: React.FC<WifeBotConfigModalProps> = ({
 
               {/* Telegram settings */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-950/40 p-4 rounded-xl border border-slate-800">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-300 flex items-center gap-2">
-                    <Bot className="w-4 h-4 text-blue-400" />
-                    <span>Telegram Bot Token (do @BotFather)</span>
-                  </label>
-                  <input
-                    type="password"
-                    value={config.telegramToken}
-                    onChange={(e) => setConfig({ ...config, telegramToken: e.target.value })}
-                    className="w-full px-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-blue-500 font-mono text-sm"
-                    placeholder="123456789:ABCdefGhIJKlmNoPQRsTUVwxyZ"
-                  />
-                </div>
-
+                <p className="text-xs text-slate-400 md:col-span-2">
+                  O token do bot não fica mais neste navegador. Ele só entra pelas variáveis TELEGRAM_BOT_TOKEN e TELEGRAM_CHAT_ID no servidor.
+                </p>
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-slate-300 flex items-center gap-2">
                     <Send className="w-4 h-4 text-blue-400" />
