@@ -37,7 +37,6 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
   onOpenCalculator,
 }) => {
   const [copiedHook, setCopiedHook] = useState(false);
-  const [copiedName, setCopiedName] = useState(false);
   const [simulationSales, setSimulationSales] = useState<number>(25);
 
   // O terminal monta com produto nulo (catálogo ainda não chegou) e só
@@ -59,7 +58,7 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
     let saturationPercent = 22;
     let remainingDays = 35;
     let stageName = 'Fase 1: Entrada no Radar & Descoberta';
-    let recommendation = 'Oceano Azul! Poucos criadores postando no Brasil. Momento ideal para comprar a amostra e garantir os primeiros rankings no feed.';
+    let recommendation = 'Oceano Azul. Poucos criadores postando no Brasil. Bom momento para entrar antes do feed encher.';
 
     if (sat === 'Baixa' || videoCount < 12) {
       daysActive = 3 + (hash % 5);
@@ -67,7 +66,7 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
       saturationPercent = 18 + (hash % 14);
       remainingDays = 30 + (hash % 10);
       stageName = 'Fase 1: Entrada & Descoberta';
-      recommendation = `Oceano Azul! Apenas ~${videoCount} criadores ativos no Brasil. Compre sua amostra agora e poste os primeiros vídeos para fixar seu carrinho amarelo.`;
+      recommendation = `Oceano Azul. Cerca de ${videoCount} criadores ativos no Brasil. Ainda dá para publicar antes da concorrência.`;
     } else if (sat === 'Média' || videoCount <= 25) {
       daysActive = 12 + (hash % 9);
       stageIndex = 1;
@@ -82,7 +81,7 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
         saturationPercent = 82 + (hash % 12);
         remainingDays = 5 + (hash % 5);
         stageName = 'Fase 4: Alerta de Saturação & Fadiga';
-        recommendation = 'Alerta de Saturação! Muitos vídeos semelhantes no feed. Evite comprar amostra agora; priorize produtos em Fase 1.';
+        recommendation = 'Alerta de saturação. Muitos vídeos semelhantes no feed. Priorize produtos ainda na fase 1.';
       } else {
         stageIndex = 2;
         saturationPercent = 68 + (hash % 12);
@@ -124,7 +123,7 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
   const tk = enrichWithTikTokShopData(product);
   const tc = tk.tradeConviction || {
     verdict: 'COMPRA_RECOMENDADA',
-    verdictLabel: '🟢 ENTRADA FORTE (COMPRA DE AMOSTRA VALIDADA)',
+    verdictLabel: '🟢 ENTRADA FORTE',
     convictionScore: 94,
     sampleCostBRL: Number(tk.estimatedPriceBRL || 69.90),
     commissionBRL: Number(tk.commissionEstimatedBRL || 15.50),
@@ -139,7 +138,7 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
     riskLevel: 'MUITO_BAIXO',
     riskLabel: 'Risco Mínimo (Assimetria Altamente Positiva)',
     reasons: [
-      'O comprador escolhe o vendedor dentro do TikTok Shop. O radar não indica cidade de estoque nem prazo de entrega.',
+      'O comprador escolhe o vendedor dentro do TikTok Shop.',
       'Apenas 6 vídeos de criadores no TikTok Brasil. Vácuo de conteúdo no algoritmo com carrinho amarelo ativo.',
       'Amortização Imediata: Com apenas 5 vendas no feed você recupera 100% do que pagou na compra.'
     ]
@@ -268,20 +267,8 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
               <img src={tk.imageUrl} alt="" className="w-16 h-16 rounded-lg object-cover border border-slate-200 shrink-0" />
             )}
             <div className="min-w-0 flex-1">
-              <p className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">Como achar este produto</p>
               <p className="text-sm font-black text-slate-900 leading-snug">{tk.name}</p>
               <p className="text-xs font-mono text-slate-600">R$ {priceBRL.toFixed(2)}{tk.metricsEstimated !== false && tk.dataSource !== 'live' ? ' · Estimativa' : ''}</p>
-              <button
-                type="button"
-                onClick={() => {
-                  navigator.clipboard.writeText(tk.name);
-                  setCopiedName(true);
-                  setTimeout(() => setCopiedName(false), 1500);
-                }}
-                className="mt-1 text-[11px] font-bold text-[#007A87]"
-              >
-                {copiedName ? 'Nome copiado' : 'Copiar nome exato'}
-              </button>
             </div>
           </div>
           <a
@@ -338,7 +325,7 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
               </span>
             </div>
             <p className="text-xs text-slate-600 pt-0.5">
-              Diagnóstico de assimetria de risco para criadores de TikTok Shop que compram a amostra com recursos próprios.
+              Diagnóstico de assimetria de risco para quem vende este produto no TikTok Shop.
             </p>
           </div>
 
@@ -355,19 +342,19 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
           </div>
         </div>
 
-        {/* Os 4 Pilares Financeiros do Trade de Amostra (SEM QUEBRA DE LINHA DE NÚMEROS) */}
+        {/* Os 4 pilares financeiros */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           
           {/* Pilar 1: Custo de Compra (Seu Bolso) */}
           <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 min-w-0">
             <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block truncate">
-              Custo Amostra (Seu Bolso)
+              Preço de referência
             </span>
             <div className="text-lg sm:text-xl font-black text-slate-900 font-mono mt-1 whitespace-nowrap overflow-hidden">
               R$ {priceBRL.toFixed(2)}
             </div>
             <span className="text-[10px] text-slate-500 mt-0.5 block truncate">
-              Preço pago na loja BR
+              Valor mostrado no anúncio
             </span>
           </div>
 
@@ -457,7 +444,7 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
                 <span>Simulador de Retorno do Investimento Próprio</span>
               </h4>
               <p className="text-[11px] text-slate-500">
-                Arraste ou selecione para simular o retorno líquido após pagar a amostra:
+                Arraste ou selecione para simular o retorno líquido sobre o preço de referência:
               </p>
             </div>
 
@@ -507,7 +494,7 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
             </div>
 
             <div className="p-2 rounded-lg bg-white border border-slate-200 min-w-0">
-              <span className="text-[10px] text-slate-400 uppercase font-bold block truncate">Custo Amostra</span>
+              <span className="text-[10px] text-slate-400 uppercase font-bold block truncate">Preço de referência</span>
               <span className="font-mono font-bold text-rose-600 text-sm block whitespace-nowrap">
                 -R$ {priceBRL.toFixed(2)}
               </span>
@@ -691,7 +678,7 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
             <span>Onde comprar</span>
           </h3>
           <p className="text-xs text-slate-700 leading-relaxed">
-            O comprador escolhe o vendedor dentro do TikTok Shop. O link abaixo abre este produto; prazo e estoque são os da loja que ele selecionar.
+            O comprador escolhe o vendedor dentro do TikTok Shop. O link abre este produto.
           </p>
           <a
             href={shopLink.href}
