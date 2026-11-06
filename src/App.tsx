@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef, Suspense } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Navbar } from './components/Navbar';
-import { RadarHero } from './components/RadarHero';
 import { ProductCard } from './components/ProductCard';
 import { OfflineIndicator } from './components/OfflineIndicator';
 import { EarlyWaveDashboard } from './components/EarlyWaveDashboard';

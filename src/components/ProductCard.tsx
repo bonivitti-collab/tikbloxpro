@@ -20,7 +20,6 @@ import {
   CheckCircle2,
   AlertTriangle,
   ExternalLink,
-  Gift,
   ShoppingBag,
   Users,
 } from 'lucide-react';
@@ -214,7 +213,7 @@ export const ProductCard: React.FC<ProductCardProps> = React.memo(({
         {/* TikTok Shop Brasil Affiliate Box */}
         <div className="rounded-xl border border-white/10 bg-[#212636] p-3 mb-3.5">
           {/* Main 3 Financial Metrics */}
-          <div className="grid grid-cols-3 gap-2 text-center pb-2.5 border-b border-white/5">
+          <div className="grid grid-cols-2 gap-2 text-center pb-2.5 border-b border-white/5">
             <div>
               <span className="block text-[10px] text-[#A6A7B2] uppercase font-semibold">
                 Faixa de preço
@@ -231,22 +230,6 @@ export const ProductCard: React.FC<ProductCardProps> = React.memo(({
               </span>
               <span className="text-[11px] sm:text-xs font-black text-emerald-400">
                 {commissionBandOf(priced) ? formatCommissionBand(commissionBandOf(priced)!) : 'não informada'}
-              </span>
-            </div>
-            <div>
-              <span className="block text-[10px] text-[#25F4EE] uppercase font-bold">
-                Amostra Grátis
-              </span>
-              <span className="text-[11px] sm:text-xs font-black text-white flex items-center justify-center gap-1 mt-0.5">
-                {tk.freeSampleAvailable ? (
-                  <span className="text-emerald-300 bg-emerald-500/20 px-1.5 py-0.5 rounded border border-emerald-500/30">
-                    Liberada (+1k)
-                  </span>
-                ) : (
-                  <span className="text-[#A6A7B2] bg-white/5 px-1.5 py-0.5 rounded">
-                    Sob Consulta
-                  </span>
-                )}
               </span>
             </div>
           </div>

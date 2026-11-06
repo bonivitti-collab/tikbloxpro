@@ -735,22 +735,10 @@ function generateAutonomousTikTokShopReply(
   * *"Clica na sacola amarela aqui embaixo no canto esquerdo e garante o seu antes do término da live!"*`;
   }
 
-  if (q.includes('amostra') || q.includes('loja') || q.includes('vendedor') || q.includes('pedir')) {
-    return `### 📩 Mensagem de Alta Conversão para Solicitar Amostra Grátis
+  if (q.includes('loja') || q.includes('vendedor')) {
+    return `### Onde achar o produto
 
-Copie e envie esta mensagem no chat do vendedor dentro do Centro de Criadores do TikTok Shop:
-
----
-*"Olá, equipe! Tudo bem?*
-
-*Acompanho a loja de vocês e vi que o produto **${prodName}** tem altíssimo potencial de vendas com o meu público.*
-
-*Tenho perfil ativo focado em vídeos curtos e Lives no TikTok com público comprador qualificado. Gostaria de solicitar **1 amostra grátis** para gravar 3 vídeos verticais com gancho de alta conversão e incluir o produto com destaque na minha próxima Live Shop assim que chegar.*
-
-*Fico no aguardo para aprovação e envio para começarmos a rodar as vendas juntos! Muito obrigado!"*
----
-
-💡 **Dica:** Combine um número específico de vídeos (por exemplo 3 vídeos + 1 live) com a loja que você escolher no TikTok Shop.`;
+O link do **${prodName}** abre o anúncio no TikTok Shop. O afiliado gera o link de promoção no próprio app, no perfil de criador. O TikBlox não envia amostra.`;
   }
 
   if (q.includes('objeç') || q.includes('publico') || q.includes('público') || q.includes('vender') || q.includes('estratégia')) {
