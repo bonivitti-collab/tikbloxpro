@@ -39,6 +39,8 @@
     "lint": "tsc --noEmit",
     "test:webhook": "tsx scripts/test-kiwify-access.ts",
     "test:white-screen": "tsx scripts/test-white-screen.ts",
+    "test:catalog": "tsx scripts/test-catalog-rules.ts",
+    "test:ingest": "tsx scripts/test-ingest.ts",
     "electron:dev": "cross-env NODE_ENV=development electron electron-main.cjs",
     "electron:build": "vite build && electron-builder --win"
   },

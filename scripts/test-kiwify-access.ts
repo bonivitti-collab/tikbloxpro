@@ -227,8 +227,10 @@ await catalog(
 assert(
   catalogOk.statusCode === 200 &&
     Array.isArray(catalogOk.body?.products) &&
+    catalogOk.body.products.length > 0 &&
+    catalogOk.body.products.every((product: { dataSource?: string }) => product.dataSource !== 'live') &&
     catalogOk.body.products.some((product: { id?: string }) => product.id === 'tb-home-001'),
-  'sessão paga recebe o catálogo, inclusive tb-home-001'
+  'sem produtos ao vivo o catálogo completa com a base curada'
 );
 
 const waitingBody = JSON.stringify({

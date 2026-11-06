@@ -43,42 +43,38 @@ export function extractSharpProductIdentifiers(product: any): {
 export function enrichWithTikTokShopData(product: any): any {
   if (!product) return product;
 
-  // Realistic commission rate based on niche and margin
-  let commissionRatePercent = product.tiktokShop?.commissionRatePercent || product.commissionPercent || 20;
-  if (!product.tiktokShop && !product.commissionPercent) {
-    if (product.niche === 'beauty' || product.niche === 'health') commissionRatePercent = 25;
-    else if (product.niche === 'accessories' || product.niche === 'home') commissionRatePercent = 22;
-    else if (product.niche === 'tech' || product.niche === 'gaming') commissionRatePercent = 18;
-    else if (product.niche === 'fitness') commissionRatePercent = 20;
-    else commissionRatePercent = 20;
+  // Comissão ausente no dado ao vivo fica ausente. Não inventar 20% em cima do preço.
+  const commissionUnknown = product.commissionUnknown === true;
+  let commissionRatePercent: number | null = null;
+  let commissionValueBRL: number | null = null;
+  if (!commissionUnknown) {
+    commissionRatePercent = product.tiktokShop?.commissionRatePercent || product.commissionPercent || 20;
+    if (!product.tiktokShop && !product.commissionPercent) {
+      if (product.niche === 'beauty' || product.niche === 'health') commissionRatePercent = 25;
+      else if (product.niche === 'accessories' || product.niche === 'home') commissionRatePercent = 22;
+      else if (product.niche === 'tech' || product.niche === 'gaming') commissionRatePercent = 18;
+      else if (product.niche === 'fitness') commissionRatePercent = 20;
+      else commissionRatePercent = 20;
+    }
   }
 
-  const priceBRL = Number(product.estimatedPriceBRL) || 89.90;
-  const commissionValueBRL = product.tiktokShop?.commissionValueBRL || 
-    product.commissionEstimatedBRL || 
-    Number(((priceBRL * commissionRatePercent) / 100).toFixed(2));
+  const priceBRL = Number(product.estimatedPriceBRL) || (product.dataSource === 'live' ? 0 : 89.90);
+  if (!commissionUnknown) {
+    const explicitCommission = product.tiktokShop?.commissionValueBRL ?? product.commissionEstimatedBRL;
+    commissionValueBRL = explicitCommission != null && explicitCommission !== ''
+      ? Number(explicitCommission)
+      : Number((((priceBRL * (commissionRatePercent || 0)) / 100)).toFixed(2));
+  }
 
   const charCodeSum = (product.id || '').split('').reduce((acc: number, char: string) => acc + char.charCodeAt(0), 0);
 
-  let activeCreatorsCount = product.tiktokShop?.activeCreatorsCount || 8;
-  let recentSalesCount = product.tiktokShop?.recentSalesCount || 2840;
-  let saturationLevel = product.tiktokShop?.saturationLevel || product.creatorSaturationBR || 'Oceano Azul';
-
-  if (!product.tiktokShop && !product.creatorSaturationBR) {
-    if (product.waveStage === 'early_wave') {
-      activeCreatorsCount = (charCodeSum % 7) + 3;
-      recentSalesCount = ((charCodeSum * 37) % 2500) + 1200;
-      saturationLevel = 'Oceano Azul';
-    } else if (product.waveStage === 'rising_wave') {
-      activeCreatorsCount = (charCodeSum % 8) + 8;
-      recentSalesCount = ((charCodeSum * 43) % 3500) + 3200;
-      saturationLevel = 'Baixa';
-    } else {
-      activeCreatorsCount = (charCodeSum % 8) + 6;
-      recentSalesCount = ((charCodeSum * 51) % 6000) + 6500;
-      saturationLevel = 'Baixa';
-    }
-  }
+  const explicitVideos = Number(product.videoCountBR ?? product.tiktokShop?.videoCountBR);
+  const activeCreatorsCount = Number.isFinite(explicitVideos) ? explicitVideos : undefined;
+  const explicitSales = Number(product.tiktokShop?.recentSalesCount);
+  const recentSalesCount = Number.isFinite(explicitSales) ? explicitSales : undefined;
+  const explicitStock = Number(product.stockUnits ?? product.tiktokShop?.stockUnits);
+  const stockUnits = Number.isFinite(explicitStock) ? explicitStock : undefined;
+  const saturationLevel = product.tiktokShop?.saturationLevel || product.creatorSaturationBR || 'Oceano Azul';
 
   const stockLocations = [
     'São Paulo - SP (Envio Full 24h)',
@@ -110,9 +106,10 @@ export function enrichWithTikTokShopData(product: any): any {
   // MOTOR DE CONVICÇÃO TIKBLOX: UNIT ECONOMICS & SINAL DE ENTRADA DO AFILIADO
   // =========================================================================
   const sampleCostBRL = priceBRL;
-  const breakEvenSales = Math.max(1, Math.ceil(sampleCostBRL / Math.max(1, commissionValueBRL)));
-  const netProfitAt20Sales = Math.max(0, Number(((20 * commissionValueBRL) - sampleCostBRL).toFixed(2)));
-  const netProfitAt50Sales = Math.max(0, Number(((50 * commissionValueBRL) - sampleCostBRL).toFixed(2)));
+  const commissionForMath = commissionValueBRL ?? 0;
+  const breakEvenSales = commissionForMath > 0 ? Math.max(1, Math.ceil(sampleCostBRL / commissionForMath)) : 0;
+  const netProfitAt20Sales = Math.max(0, Number(((20 * commissionForMath) - sampleCostBRL).toFixed(2)));
+  const netProfitAt50Sales = Math.max(0, Number(((50 * commissionForMath) - sampleCostBRL).toFixed(2)));
 
   // Concorrência de vídeos no feed do TikTok Brasil
   const creatorVideoCountBR = activeCreatorsCount;
@@ -122,7 +119,8 @@ export function enrichWithTikTokShopData(product: any): any {
   else if (creatorVideoCountBR >= 10) creatorCompetitionLevel = 'Baixa Concorrência (10-25 vídeos)';
 
   // Score de Convicção e Veredito TikBlox
-  let convictionScore = Math.min(99, Math.max(65, Math.round((product.viralityScore || 85) - (creatorVideoCountBR * 0.35))));
+  const videoPenalty = typeof creatorVideoCountBR === 'number' ? creatorVideoCountBR * 0.35 : 0;
+  let convictionScore = Math.min(99, Math.max(65, Math.round((product.viralityScore || 85) - videoPenalty)));
   if (product.waveStage === 'early_wave') convictionScore = Math.min(99, Math.max(91, convictionScore + 6));
 
   let verdict: 'COMPRA_RECOMENDADA' | 'ENTRADA_MODERADA' | 'ALERTA_SATURACAO' = 'COMPRA_RECOMENDADA';
@@ -130,12 +128,12 @@ export function enrichWithTikTokShopData(product: any): any {
   let riskLevel: 'MUITO_BAIXO' | 'BAIXO' | 'MODERADO' = 'MUITO_BAIXO';
   let riskLabel = 'Risco Mínimo (Assimetria Altamente Positiva)';
 
-  if (convictionScore < 75 || creatorVideoCountBR > 45) {
+  if (creatorVideoCountBR != null && (convictionScore < 75 || creatorVideoCountBR > 45)) {
     verdict = 'ALERTA_SATURACAO';
     verdictLabel = '🔴 ALERTA DE SATURAÇÃO (ALTA CONCORRÊNCIA)';
     riskLevel = 'MODERADO';
     riskLabel = 'Risco Moderado (Muitos criadores competindo no feed)';
-  } else if (convictionScore < 88 || creatorVideoCountBR > 20) {
+  } else if (creatorVideoCountBR != null && (convictionScore < 88 || creatorVideoCountBR > 20)) {
     verdict = 'ENTRADA_MODERADA';
     verdictLabel = '🟡 ENTRADA MODERADA (ACOMPANHAR FEED)';
     riskLevel = 'BAIXO';
@@ -144,7 +142,9 @@ export function enrichWithTikTokShopData(product: any): any {
 
   const reasons = [
     `Estoque Pronta Entrega Brasil: Vendedor nacional despacha de ${stockLocation.split('(')[0].trim()}. Chega em 3 a 5 dias para você gravar antes do produto espalhar.`,
-    `Apenas ${creatorVideoCountBR} vídeos de criadores no TikTok Brasil (${creatorCompetitionLevel}). Vácuo de conteúdo no algoritmo com carrinho amarelo ativo.`,
+    creatorVideoCountBR == null
+      ? 'Contagem de vídeos no feed BR ainda não verificada. Métrica sem número inventado.'
+      : `Apenas ${creatorVideoCountBR} vídeos de criadores no TikTok Brasil (${creatorCompetitionLevel}). Vácuo de conteúdo no algoritmo com carrinho amarelo ativo.`,
     `Amortização Imediata: Com apenas ${breakEvenSales} vendas no feed você recupera 100% dos R$ ${sampleCostBRL.toFixed(2)} pagos na compra. A partir da ${breakEvenSales + 1}ª venda, o retorno é lucro puro.`
   ];
 
@@ -153,8 +153,8 @@ export function enrichWithTikTokShopData(product: any): any {
     verdictLabel,
     convictionScore,
     sampleCostBRL,
-    commissionBRL: commissionValueBRL,
-    commissionPercent: commissionRatePercent,
+    commissionBRL: commissionUnknown ? null : commissionValueBRL,
+    commissionPercent: commissionUnknown ? null : commissionRatePercent,
     breakEvenSales,
     netProfitAt20Sales,
     netProfitAt50Sales,
@@ -167,12 +167,18 @@ export function enrichWithTikTokShopData(product: any): any {
     reasons
   };
 
+  const dataSource = product.dataSource === 'live' ? 'live' : 'curated';
+
   return {
     ...product,
+    dataSource,
+    metricsEstimated: dataSource !== 'live',
+    commissionUnknown,
+    stockUnits,
+    videoCountBR: activeCreatorsCount,
     tradeConviction,
-    // Root level compatibility properties with safe fallbacks
-    commissionPercent: commissionRatePercent,
-    commissionEstimatedBRL: commissionValueBRL,
+    commissionPercent: commissionUnknown ? undefined : commissionRatePercent,
+    commissionEstimatedBRL: commissionUnknown ? undefined : commissionValueBRL,
     stockLocationBrazil: stockLocation,
     freeSampleAvailable: isFreeSample,
     creatorSaturationBR: saturationLevel,
@@ -187,11 +193,14 @@ export function enrichWithTikTokShopData(product: any): any {
     tiktokShop: {
       hasBrazilStock: true,
       stockLocation,
-      commissionRatePercent,
-      commissionValueBRL,
+      commissionRatePercent: commissionUnknown ? undefined : commissionRatePercent,
+      commissionValueBRL: commissionUnknown ? undefined : commissionValueBRL,
+      productUrl: product.productUrl || product.tiktokShop?.productUrl,
       freeSampleAvailable: isFreeSample,
       minFollowersForSample: 1000,
       activeCreatorsCount,
+      videoCountBR: activeCreatorsCount,
+      stockUnits,
       recentSalesCount,
       saturationLevel,
       tiktokShopAffiliateLink,

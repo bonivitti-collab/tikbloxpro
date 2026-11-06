@@ -21,6 +21,8 @@ import {
 } from 'lucide-react';
 import { TrendingProduct } from '../../types';
 import { enrichWithTikTokShopData } from '../../data/tiktokShopEnricher';
+import { commissionBrlOf, formatCollectedAt } from '../../lib/productRules';
+import { tiktokShopHref, tiktokVideoSearchHref } from '../../lib/productRules';
 
 interface ProductDetailTerminalProps {
   product: TrendingProduct | null;
@@ -37,6 +39,7 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
 }) => {
   const [copiedHook, setCopiedHook] = useState(false);
   const [copiedTerm, setCopiedTerm] = useState(false);
+  const [copiedName, setCopiedName] = useState(false);
   const [simulationSales, setSimulationSales] = useState<number>(25);
 
   // O terminal monta com produto nulo (catálogo ainda não chegou) e só
@@ -145,16 +148,15 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
   };
 
   const priceBRL = Number(tk.estimatedPriceBRL || tc.sampleCostBRL || 0);
-  const commissionVal = Number(tk.commissionEstimatedBRL || tc.commissionBRL || 0);
-  const commissionPct = Number(tk.commissionPercent || tc.commissionPercent || 20);
+  const knownCommission = commissionBrlOf(tk);
+  const commissionVal = knownCommission ?? 0;
+  const collectedLabel = formatCollectedAt(tk.collectedAt);
+  const commissionPct = Number(tk.commissionPercent || tc.commissionPercent || 0);
   const stockLoc = String(tk.stockLocationBrazil || tc.stockLocation || 'São Paulo - SP (Pronta Entrega)');
   const hookText = String(tk.hookViral3s || tk.tiktokShop?.topViralHook || tk.adHooks?.[0] || 'Oportunidade em alta no TikTok Shop!');
-  const affiliateTerm = String(tk.exactAffiliateSearchTerm || tk.originalName || tk.name);
-
-  const tiktokShopUrl =
-    tk.customProductUrl ||
-    tk.tiktokShop?.productUrl ||
-    `https://www.tiktok.com/search?q=${encodeURIComponent(affiliateTerm)}`;
+  const affiliateTerm = String(tk.name || tk.originalName || '');
+  const shopLink = tiktokShopHref(tk);
+  const videoSearchUrl = tiktokVideoSearchHref(tk);
 
   const sampleDeliveryUrl =
     tk.supplierUrl ||
@@ -234,7 +236,7 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
             </span>
             <span className="inline-flex items-center gap-1 font-semibold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-full border border-slate-200/80 text-[10.5px]">
               <Clock className="w-3 h-3 text-[#007A87] shrink-0" />
-              <span>Há {lifecycle.daysActive} dias no radar</span>
+              <span>{collectedLabel ? `Coletado em ${collectedLabel}` : `Há ${lifecycle.daysActive} dias no radar`}</span>
             </span>
             <span className="inline-flex items-center gap-1 text-[10.5px] font-extrabold text-rose-600 bg-rose-50 px-2.5 py-1 rounded-full border border-rose-200">
               <Flame className="w-3 h-3 fill-current text-[#FE2C55] shrink-0" />
@@ -300,17 +302,44 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
 
         {/* Linha 4: Grid Simétrico 2x2 de Ações (Espaço Amplo no Celular e no Notebook com 3 painéis abertos) */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-0.5">
-          {/* 1. Ver Produto no TikTok Shop */}
+          <div className="sm:col-span-2 rounded-xl border border-slate-200 bg-slate-50 p-3 flex gap-3 items-center">
+            {tk.imageUrl && (
+              <img src={tk.imageUrl} alt="" className="w-16 h-16 rounded-lg object-cover border border-slate-200 shrink-0" />
+            )}
+            <div className="min-w-0 flex-1">
+              <p className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">Como achar este produto</p>
+              <p className="text-sm font-black text-slate-900 leading-snug">{tk.name}</p>
+              <p className="text-xs font-mono text-slate-600">R$ {priceBRL.toFixed(2)}{tk.metricsEstimated !== false && tk.dataSource !== 'live' ? ' · Estimativa' : ''}</p>
+              <button
+                type="button"
+                onClick={() => {
+                  navigator.clipboard.writeText(tk.name);
+                  setCopiedName(true);
+                  setTimeout(() => setCopiedName(false), 1500);
+                }}
+                className="mt-1 text-[11px] font-bold text-[#007A87]"
+              >
+                {copiedName ? 'Nome copiado' : 'Copiar nome exato'}
+              </button>
+            </div>
+          </div>
           <a
-            href={tiktokShopUrl}
+            href={shopLink.href}
             target="_blank"
             rel="noopener noreferrer"
             className="w-full min-w-0 inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-[#0F121C] hover:bg-black text-white font-black text-xs transition cursor-pointer shadow-sm active:scale-98 border border-slate-800 group overflow-hidden"
             title="Abrir página oficial do produto ou busca no TikTok Shop Brasil"
           >
             <ShoppingBag className="w-4 h-4 text-[#25F4EE] shrink-0" />
-            <span className="truncate">Ver no TikTok Shop</span>
-            <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-white transition-colors shrink-0" />
+            <span className="truncate">{shopLink.exact ? 'Abrir produto exato' : 'Busca precisa no TikTok Shop'}</span>
+          </a>
+          <a
+            href={videoSearchUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full min-w-0 inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white border border-slate-300 text-slate-900 font-black text-xs"
+          >
+            <span className="truncate">Vídeos com o nome exato</span>
           </a>
 
           {/* 2. Comprar Amostra Pronta Entrega (SP) */}
@@ -422,15 +451,23 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
               Comissão por Venda
             </span>
             <div className="flex items-baseline gap-1 mt-1 whitespace-nowrap overflow-hidden">
-              <span className="text-lg sm:text-xl font-black text-emerald-700 font-mono">
-                R$ {commissionVal.toFixed(2)}
-              </span>
-              <span className="text-xs font-bold text-emerald-600 font-mono">
-                ({commissionPct}%)
-              </span>
+              {knownCommission == null ? (
+                <span className="text-sm font-black text-amber-700">comissão não informada</span>
+              ) : (
+                <>
+                  <span className="text-lg sm:text-xl font-black text-emerald-700 font-mono">
+                    R$ {commissionVal.toFixed(2)}
+                  </span>
+                  {commissionPct > 0 ? (
+                    <span className="text-xs font-bold text-emerald-600 font-mono">
+                      ({commissionPct}%)
+                    </span>
+                  ) : null}
+                </>
+              )}
             </div>
             <span className="text-[10px] text-emerald-700 mt-0.5 block truncate">
-              Líquido no carrinho
+              {knownCommission == null ? 'A loja não publicou a comissão' : 'Líquido no carrinho'}
             </span>
           </div>
 

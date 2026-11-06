@@ -27,6 +27,7 @@ import { useTranslation } from '../i18n/LanguageContext';
 interface NavbarProps {
   activeTab: 'all' | 'early_wave' | 'high_margin' | 'novidades' | 'saved' | 'calculator';
   setActiveTab: (tab: 'all' | 'early_wave' | 'high_margin' | 'novidades' | 'saved' | 'calculator') => void;
+  showNovidades?: boolean;
   savedCount: number;
   onOpenPushModal?: () => void;
   isPushActive?: boolean;
@@ -40,6 +41,7 @@ interface NavbarProps {
 export const Navbar: React.FC<NavbarProps> = ({
   activeTab,
   setActiveTab,
+  showNovidades = false,
   savedCount,
   onOpenPushModal,
   isPushActive = false,
@@ -141,7 +143,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               </span>
             </button>
 
-            <button
+            {showNovidades && <button
               id="nav-tab-novidades"
               onClick={() => setActiveTab('novidades')}
               className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-bold transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
@@ -161,7 +163,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <span className="text-xs">🆕</span>
                 <span>Novidades</span>
               </span>
-            </button>
+            </button>}
 
             <button
               id="nav-tab-saved"
@@ -230,7 +232,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           >
             💰 +20% Comissão
           </button>
-          <button
+          {showNovidades && <button
             onClick={() => setActiveTab('novidades')}
             className={`px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap cursor-pointer transition ${
               activeTab === 'novidades'
@@ -239,7 +241,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             }`}
           >
             🆕 Novidades
-          </button>
+          </button>}
           <button
             onClick={() => setActiveTab('saved')}
             className={`px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap cursor-pointer transition flex items-center gap-1 ${

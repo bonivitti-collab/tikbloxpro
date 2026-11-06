@@ -15,10 +15,16 @@ export default async function handler(req: any, res: any) {
     if (auth.ok === false) return sendJson(res, auth.status, { error: auth.error });
 
     const body = req.method === 'POST' && req.body && typeof req.body === 'object' ? req.body : {};
-    const products = listCatalog({
-      niche: body.niche,
-      originCountry: body.originCountry || body.origin,
-      query: body.query,
+    let queryFromUrl = '';
+    try {
+      queryFromUrl = new URL(req.url || '/', 'https://tikblox.local').searchParams.get('query') || '';
+    } catch {
+      queryFromUrl = '';
+    }
+    const products = await listCatalog({
+      niche: body.niche || req.query?.niche,
+      originCountry: body.originCountry || body.origin || req.query?.originCountry,
+      query: body.query || req.query?.query || queryFromUrl,
     });
     return sendJson(res, 200, { success: true, products });
   } catch (error) {

@@ -2,7 +2,7 @@ import express, { Request, Response } from 'express';
 import path from 'path';
 import dotenv from 'dotenv';
 // Vite import is dynamic to avoid crashing Vercel (devDependency)
-import { INITIAL_CURATED_TRENDS } from './src/data/curatedTrends.js';
+import { listCatalog } from './lib/catalog.js';
 import { enrichWithTikTokShopData } from './src/data/tiktokShopEnricher.js';
 import { TrendingProduct, ProductNiche, DeepDiveAnalysis } from './src/types.js';
 import { streamProductViabilityPDF } from './src/server/pdfGenerator.js';
@@ -175,101 +175,8 @@ const DEFAULT_SOURCES = [
   { title: 'Tendências Virais #TikTokShopBrasil', uri: 'https://www.tiktok.com/tag/tiktokshopbrasil' },
 ];
 
-function generateDynamicQueriedTrend(query: string, niche = 'all', originCountry = 'CN'): TrendingProduct {
-  const cleanQuery = query.trim();
-  const capitalized = cleanQuery.charAt(0).toUpperCase() + cleanQuery.slice(1);
-  const costUSD = 6.50;
-  const priceBRL = 79.90;
-  const profitMargin = 280;
-
-  const safeNiche: ProductNiche = (niche && niche !== 'all' ? niche : 'home') as ProductNiche;
-  const safeOrigin: 'US' | 'CN' | 'KR' | 'JP' | 'EU' = (originCountry && originCountry !== 'all' ? originCountry : 'CN') as any;
-
-  const baseProduct: TrendingProduct = {
-    id: `tb-live-dyn-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-    name: `${capitalized} Inteligente Portátil`,
-    originalName: `Smart Viral ${capitalized} Pro`,
-    niche: safeNiche,
-    nicheLabel: safeNiche === 'tech' ? 'Gadgets & Inovação' : safeNiche === 'beauty' ? 'Beleza & Estética' : 'Casa & Praticidade',
-    originCountry: safeOrigin,
-    originPlatform: 'TikTok Shop Brasil & Trending Showcase',
-    waveStage: 'early_wave' as const,
-    waveStageLabel: 'Onda Inicial (Oceano Azul)',
-    viralityScore: 97,
-    saturationInBrazil: 'Muito Baixa' as const,
-    estimatedCostUSD: costUSD,
-    estimatedPriceBRL: priceBRL,
-    estimatedProfitMarginPercent: profitMargin,
-    culturalFitReason: `Solução visual perfeita para vídeos curtos de demonstração no TikTok Shop. Gera desejo imediato e quebra objeções em menos de 5 segundos.`,
-    brazilEntryStatus: 'Estoque disponível em São Paulo para pronta entrega. Pouquíssimos criadores ativos promovendo no TikTok.',
-    targetAudience: 'Criadores e compradores por impulso no TikTok e Instagram (18 a 45 anos).',
-    iconType: 'Zap',
-    highlights: [
-      `Estoque nacional em São Paulo com envio rápido em 24h`,
-      `Alta comissão para afiliados (até 25% por venda)`,
-      `Amostra grátis disponível para criadores parceiros`,
-    ],
-    adHooks: [
-      `"Se você ainda faz isso do jeito antigo, olha essa novidade do TikTok Shop..."`,
-      `"Eu duvido você assistir esse vídeo até o final e não querer esse ${capitalized}!"`,
-      `"Chegou com estoque no Brasil o que os gringos estavam escondendo..."`,
-    ],
-    supplierKeywords: [`${cleanQuery} atacado sp`, `${cleanQuery} tiktok shop pronta entrega`],
-    logisticsComplexity: 'Fácil (Leve / Sem Bateria)' as const,
-    trendingMetrics: {
-      viewsLast30Days: '38.4M visualizações',
-      growthRatePercent: 520,
-      searchVolumeBR: 'Disparada +620%' as const,
-    },
-    discoveredAt: 'Escaneado em tempo real pelo Motor TIKBLOX',
-    groundingSources: DEFAULT_SOURCES,
-  };
-
-  return enrichWithTikTokShopData(baseProduct);
-}
-
-function getFilteredCuratedTrends(niche?: string, originCountry?: string, query?: string) {
-  let filtered = [...INITIAL_CURATED_TRENDS];
-
-  if (niche && niche !== 'all') {
-    filtered = filtered.filter((p) => p.niche === niche);
-  }
-  if (originCountry && originCountry !== 'all') {
-    filtered = filtered.filter((p) => p.originCountry === originCountry);
-  }
-  if (query && query.trim()) {
-    const q = query.toLowerCase().trim();
-    const queryTokens = q.split(' ').filter(Boolean);
-    
-    // Fuzzy matching against name, originalName, niche, highlights, culturalFit
-    filtered = filtered.filter((p) => {
-      const fullText = `${p.name} ${p.originalName} ${p.niche} ${p.nicheLabel} ${p.culturalFitReason} ${(p.supplierKeywords || []).join(' ')}`.toLowerCase();
-      return queryTokens.some(token => fullText.includes(token));
-    });
-
-    // If query has no direct matches, synthesize fresh relevant products!
-    if (filtered.length === 0) {
-      filtered = [
-        generateDynamicQueriedTrend(query, niche, originCountry),
-        generateDynamicQueriedTrend(`Mini ${query}`, niche, originCountry),
-        ...INITIAL_CURATED_TRENDS.slice(0, 4),
-      ];
-    }
-  }
-
-  if (filtered.length === 0) {
-    filtered = INITIAL_CURATED_TRENDS.slice(0, 6);
-  }
-
-  // Aplicar parâmetros de pesquisa: >500 vendas, <50 vídeos, comissão >= R$ 10
-  const withFilters = filtered.map(enrichWithTikTokShopData).filter((p: any) => {
-    const sales = p.tiktokShop?.recentSalesCount || 0;
-    const videos = p.tradeConviction?.creatorVideoCountBR || 10;
-    const commission = p.tiktokShop?.commissionValueBRL || p.commissionEstimatedBRL || 0;
-    return sales >= 500 && videos < 50 && commission >= 10;
-  });
-
-  return withFilters.length > 0 ? withFilters : filtered.map(enrichWithTikTokShopData);
+async function getFilteredCuratedTrends(niche?: string, originCountry?: string, query?: string) {
+  return listCatalog({ niche, originCountry, query });
 }
 
 // Helper: Resilient Deep-Dive fallback when API is rate-limited (429) or unavailable (503)
@@ -407,7 +314,7 @@ app.post('/api/scan', async (req: Request, res: Response) => {
     const hasGemini = false;
 
     if (!hasGroq && !hasGemini) {
-      const filtered = getFilteredCuratedTrends(niche, originCountry, query);
+      const filtered = await getFilteredCuratedTrends(niche, originCountry, query);
       return res.status(200).json({
         success: true,
         source: 'radar_curated_dataset',
@@ -547,7 +454,7 @@ Retorne EXCLUSIVAMENTE o array JSON sem delimitadores markdown adicionais.`;
     
     // Resilient fallback to high-quality curated trends matching filters
     const { niche = 'all', originCountry = 'all', query = '' } = req.body;
-    const filtered = getFilteredCuratedTrends(niche, originCountry, query);
+    const filtered = await getFilteredCuratedTrends(niche, originCountry, query);
 
     // Save in cache to prevent repeated errors
     const cacheKey = `${niche}_${originCountry}_${(query || '').toLowerCase().trim()}`;
