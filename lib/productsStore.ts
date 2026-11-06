@@ -1,4 +1,4 @@
-import type { ScrapedProduct } from './apifyShop.js';
+import { parseIntegerCount, type ScrapedProduct } from './apifyShop.js';
 
 export interface StoredProductRow extends ScrapedProduct {
   scraped_at: string;
@@ -62,11 +62,11 @@ export async function upsertScrapedProducts(rows: ScrapedProduct[]): Promise<{ i
     id: row.id,
     title: row.title,
     price_brl: row.price_brl,
-    sold_7d: row.sold_7d,
-    sold_30d: row.sold_30d,
-    video_count: row.video_count,
-    influencer_count: row.influencer_count,
-    stock_units: row.stock_units,
+    sold_7d: parseIntegerCount(row.sold_7d),
+    sold_30d: parseIntegerCount(row.sold_30d),
+    video_count: parseIntegerCount(row.video_count),
+    influencer_count: parseIntegerCount(row.influencer_count),
+    stock_units: parseIntegerCount(row.stock_units),
     commission_brl: row.commission_brl,
     cover_url: row.cover_url,
     product_url: row.product_url,
@@ -87,4 +87,32 @@ export async function upsertScrapedProducts(rows: ScrapedProduct[]): Promise<{ i
     else inserted += 1;
   }
   return { inserted, updated };
+}
+
+export function ingestRunKey(now: Date): string {
+  return now.toISOString().slice(0, 10);
+}
+
+/** Reserva o dia antes da Apify. 'already' significa que esta data já chamou o ator. */
+export async function claimDailyRun(runKey: string): Promise<'claimed' | 'already'> {
+  const { data, response } = await sb('ingest_runs?on_conflict=run_key', {
+    method: 'POST',
+    headers: { Prefer: 'resolution=ignore-duplicates,return=representation' },
+    body: JSON.stringify({ run_key: runKey, status: 'started', apify_started: true }),
+  });
+  if (response.status === 409) return 'already';
+  if (Array.isArray(data) && data.length > 0) return 'claimed';
+  return 'already';
+}
+
+export async function finishDailyRun(runKey: string, status: 'ok' | 'failed', detail?: string): Promise<void> {
+  await sb(`ingest_runs?run_key=eq.${encodeURIComponent(runKey)}`, {
+    method: 'PATCH',
+    headers: { Prefer: 'return=minimal' },
+    body: JSON.stringify({
+      status,
+      finished_at: new Date().toISOString(),
+      detail: detail ? detail.slice(0, 300) : null,
+    }),
+  });
 }

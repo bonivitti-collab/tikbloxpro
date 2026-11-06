@@ -1,5 +1,5 @@
 import { timingSafeEqual } from 'node:crypto';
-import { runDailyIngest } from '../../lib/ingestRun.js';
+import { runDailyIngest, statusForIngestError } from '../../lib/ingestRun.js';
 import { sendJson } from '../../lib/http.js';
 
 export const config = {
@@ -40,11 +40,11 @@ export default async function handler(req: any, res: any) {
     return sendJson(res, 200, { success: true, ...summary });
   } catch (error: any) {
     const message = String(error?.message || error);
-    if (message === 'SUPABASE_NOT_CONFIGURED' || message === 'APIFY_TOKEN_MISSING') {
-      console.error('[INGEST]', message);
-      return sendJson(res, 503, { error: 'Coleta não configurada' });
-    }
+    const status = statusForIngestError(error);
     console.error('[INGEST]', message.slice(0, 300));
-    return sendJson(res, 502, { error: 'A coleta não concluiu' });
+    if (status === 503) return sendJson(res, 503, { error: 'Coleta não configurada' });
+    if (status === 502) return sendJson(res, 502, { error: 'A coleta não começou' });
+    // 200 de propósito: um 5xx faz a Vercel repetir o cron e chamar a Apify de novo.
+    return sendJson(res, 200, { success: false, retry: false, error: 'A coleta não concluiu' });
   }
 }

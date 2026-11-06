@@ -41,6 +41,31 @@ export function parseLooseNumber(value: unknown): number | null {
   return Number.isFinite(parsed) ? parsed : null;
 }
 
+/** Inteiro para colunas integer. 1.73 vira 2. "1.7K" e "1,7 mil" viram 1700. */
+export function parseIntegerCount(value: unknown): number | null {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    const rounded = Math.round(value);
+    return rounded >= 0 ? rounded : null;
+  }
+  if (typeof value !== 'string') return null;
+  const trimmed = value.trim().replace(/\s+/g, ' ');
+  if (!trimmed) return null;
+  const suffix = trimmed.match(/^(.*?)\s*(k|m|b|mil|mi)$/i);
+  let body = trimmed;
+  let multiplier = 1;
+  if (suffix) {
+    body = suffix[1];
+    const mark = suffix[2].toLowerCase();
+    if (mark === 'k' || mark === 'mil') multiplier = 1_000;
+    else if (mark === 'm' || mark === 'mi') multiplier = 1_000_000;
+    else multiplier = 1_000_000_000;
+  }
+  const parsed = parseLooseNumber(body);
+  if (parsed == null) return null;
+  const rounded = Math.round(parsed * multiplier);
+  return rounded >= 0 ? rounded : null;
+}
+
 function skuList(skus: unknown): any[] {
   if (Array.isArray(skus)) return skus;
   if (skus && typeof skus === 'object') return Object.values(skus as Record<string, unknown>);
@@ -50,9 +75,9 @@ function skuList(skus: unknown): any[] {
 export function stockFromItem(item: any): number | null {
   const stocks = skuList(item?.skus)
     .map((sku) => parseLooseNumber(sku?.stock))
-    .filter((value): value is number => value != null);
-  if (stocks.length > 0) return stocks.reduce((sum, value) => sum + value, 0);
-  return parseLooseNumber(item?.stock);
+    .filter((value): value is number => value != null && value >= 0);
+  if (stocks.length > 0) return Math.round(stocks.reduce((sum, value) => sum + value, 0));
+  return parseIntegerCount(item?.stock);
 }
 
 export function priceFromItem(item: any): number | null {
@@ -84,10 +109,10 @@ export function parseApifyProduct(item: any, keyword: string, refreshedAt: strin
     id,
     title,
     price_brl: priceFromItem(item),
-    sold_7d: parseLooseNumber(item?.total_sale_7d_cnt ?? item?.week_sold_count),
-    sold_30d: parseLooseNumber(item?.total_sale_30d_cnt),
-    video_count: parseLooseNumber(item?.videos_count ?? item?.total_video_count ?? relatedVideos),
-    influencer_count: parseLooseNumber(item?.influencers_count ?? item?.total_ifl_cnt),
+    sold_7d: parseIntegerCount(item?.total_sale_7d_cnt ?? item?.week_sold_count),
+    sold_30d: parseIntegerCount(item?.total_sale_30d_cnt),
+    video_count: parseIntegerCount(item?.videos_count ?? item?.total_video_count ?? relatedVideos),
+    influencer_count: parseIntegerCount(item?.influencers_count ?? item?.total_ifl_cnt),
     stock_units: stockFromItem(item),
     commission_brl: parseLooseNumber(item?.commission_brl ?? item?.commission),
     cover_url: typeof item?.cover_url === 'string' ? item.cover_url : null,
