@@ -27,7 +27,6 @@ import {
   ChevronUp,
 } from 'lucide-react';
 import { getKiwifyCheckoutUrl } from '../../services/authService';
-import { InteractiveScreensCarousel } from './InteractiveScreensCarousel';
 import { ProfitSimulator } from './ProfitSimulator';
 import { SocialProofSection } from './SocialProofSection';
 import { TikBloxLogo } from '../TikBloxLogo';
@@ -135,9 +134,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
           {/* Navegação Desktop */}
           <nav className="hidden lg:flex items-center gap-6 text-xs font-bold text-slate-300">
-            <button onClick={() => scrollToSection('demonstracao')} className="hover:text-[#25F4EE] transition cursor-pointer">
-              Como Funciona
-            </button>
             <button onClick={() => scrollToSection('diferencial')} className="hover:text-white transition cursor-pointer">
               Oceano Azul
             </button>
@@ -168,12 +164,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               )}
             </button>
 
-            <button
-              onClick={scrollToPricing}
+            <a
+              href={checkoutUrl}
               className="hidden sm:inline-flex px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl bg-gradient-to-r from-[#25F4EE] to-[#00D2C4] hover:brightness-105 text-[#0F121C] font-black text-xs transition cursor-pointer shadow-[0_0_20px_rgba(37,244,238,0.3)] active:scale-95 whitespace-nowrap"
             >
               Começar Agora
-            </button>
+            </a>
 
             {/* Botão Hambúrguer Mobile */}
             <button
@@ -191,12 +187,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         {mobileMenuOpen && (
           <div className="lg:hidden bg-[#0C101C] border-b border-white/10 px-4 py-5 space-y-4 animate-in slide-in-from-top-2 duration-200">
             <nav className="flex flex-col space-y-3 text-sm font-bold text-slate-200">
-              <button
-                onClick={() => scrollToSection('demonstracao')}
-                className="text-left py-2 px-3 rounded-lg hover:bg-white/5 hover:text-[#25F4EE] transition"
-              >
-                📱 Como Funciona (Telas do Sistema)
-              </button>
               <button
                 onClick={() => scrollToSection('diferencial')}
                 className="text-left py-2 px-3 rounded-lg hover:bg-white/5 hover:text-white transition"
@@ -223,12 +213,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </button>
             </nav>
 
-            <button
-              onClick={scrollToPricing}
+            <a
+              href={checkoutUrl}
               className="w-full py-3.5 rounded-xl bg-gradient-to-r from-[#25F4EE] to-[#00D2C4] text-[#0F121C] font-black text-xs uppercase tracking-wider text-center shadow-lg shadow-[#25F4EE]/20 block"
             >
               Quero Acessar o Radar por R$ 37/mês
-            </button>
+            </a>
           </div>
         )}
       </header>
@@ -270,13 +260,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
           {/* Botão de Ação Hero Principal */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-            <button
-              onClick={scrollToPricing}
+            <a
+              href={checkoutUrl}
               className="w-full sm:w-auto px-10 py-5 rounded-2xl bg-gradient-to-r from-[#25F4EE] via-[#00D2C4] to-[#25F4EE] hover:brightness-110 text-[#090D16] font-black text-base sm:text-lg uppercase tracking-wider transition cursor-pointer shadow-[0_12px_40px_rgba(37,244,238,0.45)] active:scale-95 flex items-center justify-center gap-3 group"
             >
               <span>Quero Minerar Produtos Vencedores Agora</span>
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1.5 transition-transform" />
-            </button>
+            </a>
           </div>
 
           {/* Selos de Garantia e Confiança */}
@@ -338,28 +328,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
         </div>
 
-      </section>
-
-      {/* ========================================================= */}
-      {/* 2.5 CARROSSEL EXPLICATIVO DE TELAS DO TIKBLOX PRO         */}
-      {/* ========================================================= */}
-      <section id="demonstracao" className="py-12 sm:py-20 px-4 sm:px-6 relative border-t border-white/5 bg-[#090D16] scroll-mt-24">
-        <div className="max-w-6xl mx-auto space-y-8 text-center">
-          <div className="space-y-3 max-w-2xl mx-auto">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#25F4EE]/10 border border-[#25F4EE]/30 text-xs font-bold text-[#25F4EE]">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Tour Visual Interativo</span>
-            </div>
-            <h2 className="text-2xl sm:text-4xl font-black text-white">
-              Conheça as Telas do TikBlox Pro por Dentro
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-300">
-              Passe o carrossel e veja o que cada tela do radar mostra, sem números de exemplo:
-            </p>
-          </div>
-
-          <InteractiveScreensCarousel onSelectPlan={scrollToPricing} />
-        </div>
       </section>
 
       {/* ========================================================= */}
@@ -431,7 +399,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* ========================================================= */}
       {/* 3.5 SIMULADOR INTERATIVO DE LUCRO LÍQUIDO                  */}
       {/* ========================================================= */}
-      <ProfitSimulator onSelectPlan={scrollToPricing} />
+      <ProfitSimulator checkoutUrl={checkoutUrl} />
 
       {/* ========================================================= */}
       {/* 4. OS 4 PILARES DA PLATAFORMA                            */}
@@ -604,7 +572,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               },
               {
                 q: 'Preciso ter mais de 1.000 seguidores no TikTok para usar?',
-                a: 'Não para usar a ferramenta. O TikBlox é o radar de oportunidades. Amostra grátis, quando existir, é uma regra do TikTok Shop, não uma entrega nossa. O link do produto abre o anúncio e você escolhe o vendedor ali.'
+                a: 'Não para usar a ferramenta. O TikBlox é o radar. O link do produto abre o anúncio no TikTok Shop e você escolhe o vendedor ali.'
               },
               {
                 q: 'O TikBlox envia o produto para a minha casa?',
@@ -714,12 +682,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </div>
 
             <div className="flex items-center gap-2 shrink-0">
-              <button
-                onClick={scrollToPricing}
+              <a
+                href={checkoutUrl}
                 className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-[#25F4EE] to-[#00D2C4] text-[#0F121C] font-black text-xs uppercase tracking-wider hover:brightness-110 active:scale-95 transition shadow-sm cursor-pointer whitespace-nowrap"
               >
                 Assinar R$ 37
-              </button>
+              </a>
               <button
                 onClick={() => setFloatingCtaDismissed(true)}
                 className="p-1 rounded-lg text-slate-400 hover:text-white transition cursor-pointer"

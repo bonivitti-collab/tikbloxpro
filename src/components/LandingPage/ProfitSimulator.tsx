@@ -3,10 +3,10 @@ import { Calculator } from 'lucide-react';
 import { REFUND_7_DAYS } from '../../copy/guarantee';
 
 interface ProfitSimulatorProps {
-  onSelectPlan: () => void;
+  checkoutUrl: string;
 }
 
-export const ProfitSimulator: React.FC<ProfitSimulatorProps> = ({ onSelectPlan }) => {
+export const ProfitSimulator: React.FC<ProfitSimulatorProps> = ({ checkoutUrl }) => {
   return (
     <section id="simulador" className="py-16 sm:py-24 px-4 sm:px-6 relative bg-gradient-to-b from-[#090D16] via-[#0D1220] to-[#090D16] border-t border-white/5">
       <div className="max-w-3xl mx-auto space-y-6 text-center">
@@ -20,13 +20,12 @@ export const ProfitSimulator: React.FC<ProfitSimulatorProps> = ({ onSelectPlan }
         <p className="text-sm text-slate-300 leading-relaxed">
           No Raio-X, a calculadora começa no menor preço da faixa coletada. Você pode trocar pelo valor que está na tela do TikTok naquele momento. Comissão e vendas para cobrir o preço acompanham esse valor. O TikBlox não estima quantas views um vídeo vai ter.
         </p>
-        <button
-          type="button"
-          onClick={onSelectPlan}
-          className="px-6 py-3 rounded-xl bg-[#25F4EE] text-[#090D16] font-black text-xs uppercase tracking-wider cursor-pointer"
+        <a
+          href={checkoutUrl}
+          className="inline-flex px-6 py-3 rounded-xl bg-[#25F4EE] text-[#090D16] font-black text-xs uppercase tracking-wider"
         >
-          Ver o plano
-        </button>
+          Assinar por R$ 37/mês
+        </a>
         <p className="text-[11px] text-slate-400">{REFUND_7_DAYS}</p>
       </div>
     </section>

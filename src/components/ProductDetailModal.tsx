@@ -20,7 +20,6 @@ import {
   Activity,
   Flame,
   Radio,
-  Gift,
   Users,
 } from 'lucide-react';
 import { TrendingProduct, DeepDiveAnalysis } from '../types';
@@ -607,16 +606,6 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                   </span>
                 </div>
                 <div className="rounded-lg bg-[#161823] p-2.5 border border-white/5">
-                  <span className="block text-[10px] text-[#A6A7B2] font-semibold uppercase">Amostra Grátis</span>
-                  <span className="text-xs font-black text-white flex items-center gap-1 mt-0.5">
-                    {tk.freeSampleAvailable ? (
-                      <span className="text-emerald-300">✅ Liberada (+1k seguidores)</span>
-                    ) : (
-                      <span className="text-[#A6A7B2]">⚠️ Sob solicitação ao seller</span>
-                    )}
-                  </span>
-                </div>
-                <div className="rounded-lg bg-[#161823] p-2.5 border border-white/5">
                   <span className="block text-[10px] text-[#A6A7B2] font-semibold uppercase">Saturação de Criadores</span>
                   <span className="text-xs font-black text-[#25F4EE]">
                     {tk.saturationLevel} ({tk.activeCreatorsCount} criadores ativos)
@@ -625,14 +614,6 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
               </div>
 
               {/* Sample Request Tip */}
-              {tk.sampleRequestTip && (
-                <div className="rounded-lg bg-emerald-500/10 border border-emerald-500/20 p-2.5 text-[11px] text-emerald-200 flex items-start gap-2">
-                  <Gift className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
-                  <span>
-                    <strong>Dica de Ouro para Aprovação de Amostra:</strong> {tk.sampleRequestTip}
-                  </span>
-                </div>
-              )}
             </div>
           )}
 

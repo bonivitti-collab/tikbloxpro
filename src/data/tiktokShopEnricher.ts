@@ -100,10 +100,6 @@ export function enrichWithTikTokShopData(product: any): any {
     (product.adHooks && product.adHooks[0]) || 
     `Se você mora no Brasil e ainda não viu esse ${(product.name || 'produto').split(' ')[0]}, você tá vivendo errado!`;
 
-  const isFreeSample = product.tiktokShop?.freeSampleAvailable ?? 
-    product.freeSampleAvailable ??
-    (product.waveStage === 'early_wave' || (product.viralityScore || 0) >= 92);
-
   // =========================================================================
   // MOTOR DE CONVICÇÃO TIKBLOX: UNIT ECONOMICS & SINAL DE ENTRADA DO AFILIADO
   // =========================================================================
@@ -201,7 +197,7 @@ export function enrichWithTikTokShopData(product: any): any {
     commissionPercent: commissionUnknown ? undefined : commissionRatePercent,
     commissionEstimatedBRL: commissionUnknown ? undefined : commissionValueBRL,
     stockLocationBrazil: stockLocation,
-    freeSampleAvailable: isFreeSample,
+    freeSampleAvailable: false,
     creatorSaturationBR: saturationLevel,
     tiktokShopAffiliateLink,
     exactViralSearchQuery: sharp.exactViralSearchQuery,
@@ -217,7 +213,7 @@ export function enrichWithTikTokShopData(product: any): any {
       commissionRatePercent: commissionUnknown ? undefined : commissionRatePercent,
       commissionValueBRL: commissionUnknown ? undefined : commissionValueBRL,
       productUrl: product.productUrl || product.tiktokShop?.productUrl,
-      freeSampleAvailable: isFreeSample,
+      freeSampleAvailable: false,
       minFollowersForSample: 1000,
       activeCreatorsCount,
       videoCountBR: activeCreatorsCount,
@@ -232,7 +228,7 @@ export function enrichWithTikTokShopData(product: any): any {
       mercadoLivreSearchUrl: sharp.mercadoLivreSearchUrl,
       topViralHook,
       tradeConviction,
-      sampleRequestTip: 'Solicite amostra grátis no Centro de Criadores do TikTok Shop mencionando que você vai gravar 3 vídeos verticais e fazer 1 live na semana da entrega.',
+      sampleRequestTip: '',
     },
   };
 }

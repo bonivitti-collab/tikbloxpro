@@ -3,7 +3,6 @@ import {
   Search,
   X,
   RefreshCw,
-  Gift,
   Sparkles,
   Globe,
   Filter,
@@ -108,23 +107,6 @@ export const LeftSidebar: React.FC<LeftSidebarProps> = ({
         <span className="text-[10px] uppercase font-bold text-[#A6A7B2] tracking-wider block mb-1">
           Filtros de Afiliado
         </span>
-
-        <button
-          onClick={() => setFilterFreeSampleOnly(!filterFreeSampleOnly)}
-          className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition cursor-pointer border ${
-            filterFreeSampleOnly
-              ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/50 shadow-sm'
-              : 'bg-[#141722] text-[#A6A7B2] border-white/5 hover:text-white hover:bg-[#1A1E2B]'
-          }`}
-        >
-          <div className="flex items-center gap-2">
-            <Gift className={`w-4 h-4 ${filterFreeSampleOnly ? 'text-emerald-400' : 'text-[#757788]'}`} />
-            <span>Amostra Grátis</span>
-          </div>
-          <span className="text-[10px] font-black px-1.5 py-0.5 rounded bg-black/30">
-            {filterFreeSampleOnly ? 'ATIVO' : 'TODOS'}
-          </span>
-        </button>
 
         <button
           onClick={() => setFilterBlueOceanOnly(!filterBlueOceanOnly)}
