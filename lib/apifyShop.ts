@@ -1,5 +1,6 @@
 import { assignNiche } from './ingestPlan.js';
 import type { ProductNiche } from '../src/types.js';
+import { snapshotFromObserved, type PriceFields } from '../src/lib/priceRange.js';
 
 export const APIFY_ACTOR = 'pratikdani~tiktok-shop-search-scraper';
 
@@ -19,6 +20,11 @@ export interface ScrapedProduct {
   keyword: string;
   source: 'apify' | 'kalodata';
   last_refreshed_at: string;
+  price_min?: number | null;
+  price_max?: number | null;
+  price_avg?: number | null;
+  price_estimated?: boolean;
+  commission_rate?: number | null;
 }
 
 export function parseLooseNumber(value: unknown): number | null {
@@ -80,14 +86,31 @@ export function stockFromItem(item: any): number | null {
   return parseIntegerCount(item?.stock);
 }
 
-export function priceFromItem(item: any): number | null {
+export function pricesFromItem(item: any): number[] {
+  const points: number[] = [];
+  const push = (value: unknown) => {
+    const priced = parseLooseNumber(value);
+    if (priced != null && priced > 0) points.push(priced);
+  };
   for (const sku of skuList(item?.skus)) {
     const currency = String(sku?.real_price?.currency || sku?.currency || '').toUpperCase();
     if (currency && currency !== 'BRL') continue;
-    const priced = parseLooseNumber(sku?.real_price?.price_val ?? sku?.real_price?.price_str ?? sku?.price);
-    if (priced != null) return priced;
+    push(sku?.real_price?.price_val ?? sku?.real_price?.price_str ?? sku?.price);
   }
-  return parseLooseNumber(item?.real_price ?? item?.price ?? item?.min_price);
+  push(item?.real_price?.price_val ?? item?.real_price);
+  push(item?.price);
+  push(item?.min_price);
+  push(item?.max_price);
+  return points;
+}
+
+export function priceFromItem(item: any): number | null {
+  return pricesFromItem(item)[0] ?? null;
+}
+
+export function priceFieldsFromItem(item: any, rate: number | null = null): PriceFields {
+  const points = pricesFromItem(item);
+  return snapshotFromObserved({ points, representative: points[0] ?? null, rate });
 }
 
 export function productUrlFromItem(item: any, id: string): string {
@@ -105,10 +128,15 @@ export function parseApifyProduct(item: any, keyword: string, refreshedAt: strin
   const title = String(item?.product_title || item?.title || item?.product_name || '').trim();
   if (!id || !title) return null;
   const relatedVideos = Array.isArray(item?.related_videos) ? item.related_videos.length : null;
+  const prices = priceFieldsFromItem(item);
   return {
     id,
     title,
-    price_brl: priceFromItem(item),
+    price_brl: prices.price_brl,
+    price_min: prices.price_min,
+    price_max: prices.price_max,
+    price_avg: prices.price_avg,
+    price_estimated: prices.price_estimated,
     sold_7d: parseIntegerCount(item?.total_sale_7d_cnt ?? item?.week_sold_count),
     sold_30d: parseIntegerCount(item?.total_sale_30d_cnt),
     video_count: parseIntegerCount(item?.videos_count ?? item?.total_video_count ?? relatedVideos),

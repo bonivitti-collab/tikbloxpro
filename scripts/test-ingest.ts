@@ -116,6 +116,16 @@ const fractional = parseApifyProduct({
 assert(fractional?.sold_7d === 2 && fractional?.sold_30d === 4, 'vendas quebradas viram inteiro');
 assert(fractional?.video_count === 1700 && fractional?.influencer_count === 1 && fractional?.stock_units === 4, 'vídeo, influenciador e estoque inteiros');
 assert(fractional?.price_brl === 10.5 && fractional?.commission_brl === 1.73, 'preço e comissão continuam decimais');
+assert(fractional?.price_estimated === true && fractional?.price_min === 8.92 && fractional?.price_max === 12.08, 'preço único da Apify vira faixa estimada');
+const skuRange = parseApifyProduct({
+  product_id: 'sku',
+  product_title: 'Kit',
+  skus: [
+    { real_price: { price_val: 10, currency: 'BRL' } },
+    { real_price: { price_val: 14, currency: 'BRL' } },
+  ],
+}, 'kit', '2026-11-06T15:00:00.000Z');
+assert(skuRange?.price_estimated === false && skuRange?.price_min === 10 && skuRange?.price_max === 14, 'SKUs com preços diferentes formam a faixa real');
 for (const key of ['sold_7d', 'sold_30d', 'video_count', 'influencer_count', 'stock_units'] as const) {
   assert(Number.isInteger(fractional?.[key]), `${key} é inteiro`);
 }

@@ -1,4 +1,5 @@
 import { parseIntegerCount, type ScrapedProduct } from './apifyShop.js';
+import { mergePriceHistory, type PriceFields } from '../src/lib/priceRange.js';
 
 export interface StoredProductRow extends ScrapedProduct {
   scraped_at: string;
@@ -28,6 +29,11 @@ const PRODUCT_COLUMNS = [
   'id',
   'title',
   'price_brl',
+  'price_min',
+  'price_max',
+  'price_avg',
+  'price_estimated',
+  'commission_rate',
   'sold_7d',
   'sold_30d',
   'video_count',
@@ -55,11 +61,35 @@ export async function listStoredProducts(): Promise<StoredProductRow[]> {
   return Array.isArray(data) ? (data as StoredProductRow[]) : [];
 }
 
+function priceFieldsOf(row: Partial<ScrapedProduct> | StoredProductRow): PriceFields {
+  return {
+    price_brl: row.price_brl ?? null,
+    price_min: row.price_min ?? null,
+    price_max: row.price_max ?? null,
+    price_avg: row.price_avg ?? null,
+    price_estimated: row.price_estimated === true,
+    commission_rate: row.commission_rate ?? null,
+  };
+}
+
+export function productUpsertPayload(rows: ScrapedProduct[], existing: Array<Partial<StoredProductRow>> = []): ReturnType<typeof scrapedProductRecord>[] {
+  const previous = new Map(existing.map((row) => [String(row.id), row]));
+  return rows.map((row) => {
+    const merged = mergePriceHistory(priceFieldsOf(previous.get(row.id) || {}), priceFieldsOf(row));
+    return scrapedProductRecord({ ...row, ...merged });
+  });
+}
+
 export function scrapedProductRecord(row: ScrapedProduct) {
   return {
     id: row.id,
     title: row.title,
     price_brl: row.price_brl,
+    price_min: row.price_min ?? null,
+    price_max: row.price_max ?? null,
+    price_avg: row.price_avg ?? null,
+    price_estimated: row.price_estimated === true,
+    commission_rate: row.commission_rate ?? null,
     sold_7d: parseIntegerCount(row.sold_7d),
     sold_30d: parseIntegerCount(row.sold_30d),
     video_count: parseIntegerCount(row.video_count),
@@ -77,8 +107,9 @@ export function scrapedProductRecord(row: ScrapedProduct) {
 
 export async function upsertScrapedProducts(rows: ScrapedProduct[]): Promise<{ inserted: number; updated: number }> {
   if (rows.length === 0) return { inserted: 0, updated: 0 };
-  const existing = new Set((await listStoredProducts()).map((row) => row.id));
-  const payload = rows.map((row) => scrapedProductRecord(row));
+  const stored = await listStoredProducts();
+  const existing = new Set(stored.map((row) => row.id));
+  const payload = productUpsertPayload(rows, stored);
   await sb('products?on_conflict=id', {
     method: 'POST',
     headers: { Prefer: 'resolution=merge-duplicates,return=minimal' },

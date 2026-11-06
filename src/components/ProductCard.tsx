@@ -28,6 +28,7 @@ import { TrendingProduct, ProductPriceCheck } from '../types';
 import { useTranslation } from '../i18n/LanguageContext';
 import { SocialProofBadge } from './SocialProofBadge';
 import { enrichWithTikTokShopData } from '../data/tiktokShopEnricher';
+import { commissionBandOf, formatBrl, formatCommissionBand, formatPriceNote, priceBandOf } from '../lib/priceRange';
 
 interface ProductCardProps {
   product: TrendingProduct;
@@ -53,7 +54,8 @@ export const ProductCard: React.FC<ProductCardProps> = React.memo(({
   isSelectedForAI = false,
 }) => {
   const { t, language } = useTranslation();
-  const tk = product.tiktokShop || enrichWithTikTokShopData(product).tiktokShop!;
+  const priced = enrichWithTikTokShopData(product);
+  const tk = product.tiktokShop || priced.tiktokShop!;
 
   const getNicheEmoji = (niche?: string) => {
     if (!niche) return '🛍️';
@@ -215,19 +217,20 @@ export const ProductCard: React.FC<ProductCardProps> = React.memo(({
           <div className="grid grid-cols-3 gap-2 text-center pb-2.5 border-b border-white/5">
             <div>
               <span className="block text-[10px] text-[#A6A7B2] uppercase font-semibold">
-                Preço no Shop
+                Faixa de preço
               </span>
-              <span className="text-xs sm:text-sm font-extrabold text-white">
-                R$ {product.estimatedPriceBRL.toFixed(2)}
+              <span className="text-[11px] sm:text-xs font-extrabold text-white">
+                {formatBrl(priceBandOf(priced).min)} – {formatBrl(priceBandOf(priced).max)}
               </span>
+              <span className="block text-[9px] text-[#A6A7B2] leading-tight mt-0.5">{formatPriceNote(priced.collectedAt || product.collectedAt)}</span>
             </div>
             <div>
               <span className="block text-[10px] text-emerald-400 uppercase font-black flex items-center justify-center gap-0.5">
                 <Sparkles className="w-2.5 h-2.5 text-emerald-400" />
                 Sua Comissão
               </span>
-              <span className="text-xs sm:text-sm font-black text-emerald-400">
-                +{tk.commissionRatePercent}% <span className="text-[10px] font-bold text-emerald-300 block">R$ {tk.commissionValueBRL.toFixed(2)}</span>
+              <span className="text-[11px] sm:text-xs font-black text-emerald-400">
+                {commissionBandOf(priced) ? formatCommissionBand(commissionBandOf(priced)!) : 'não informada'}
               </span>
             </div>
             <div>

@@ -4,7 +4,13 @@ export interface CreatorProductCard {
   id: string;
   title: string;
   price_brl: number | null;
+  price_min: number | null;
+  price_max: number | null;
+  price_avg: number | null;
+  price_estimated: boolean;
   commission_brl: number | null;
+  commission_rate: number | null;
+  last_refreshed_at: string | null;
   product_url: string;
   cover_url: string | null;
 }
@@ -82,7 +88,7 @@ export async function listCreatorBoard(): Promise<CreatorCard[]> {
   let products: any[] = [];
   if (productIds.length > 0) {
     const quoted = productIds.map((id) => encodeURIComponent(id)).join(',');
-    const loaded = await sb(`products?select=id,title,price_brl,commission_brl,product_url,cover_url&id=in.(${quoted})&limit=1000`);
+    const loaded = await sb(`products?select=id,title,price_brl,price_min,price_max,price_avg,price_estimated,commission_brl,commission_rate,product_url,cover_url,last_refreshed_at&id=in.(${quoted})&limit=1000`);
     products = Array.isArray(loaded) ? loaded : [];
   }
   const byId = new Map(products.map((product) => [product.id, product]));
@@ -102,7 +108,13 @@ export async function listCreatorBoard(): Promise<CreatorCard[]> {
           id: link.product_id,
           title: product?.title || 'Produto no TikTok Shop',
           price_brl: product?.price_brl ?? null,
+          price_min: product?.price_min ?? null,
+          price_max: product?.price_max ?? null,
+          price_avg: product?.price_avg ?? null,
+          price_estimated: product?.price_estimated === true,
           commission_brl: product?.commission_brl ?? null,
+          commission_rate: product?.commission_rate ?? null,
+          last_refreshed_at: product?.last_refreshed_at ?? null,
           product_url: product?.product_url || tiktokProductUrl(link.product_id),
           cover_url: product?.cover_url ?? null,
         };

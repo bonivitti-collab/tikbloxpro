@@ -2,6 +2,7 @@ import { assignNiche } from './ingestPlan.js';
 import type { ScrapedProduct } from './apifyShop.js';
 import { parseIntegerCount, parseLooseNumber } from './apifyShop.js';
 import { canSpend, planKalodataSpend, rankCreditCost, resolveKalodataMaxCredits, KALODATA_PAGE_SIZE } from './kalodataPlan.js';
+import { mergePriceHistory, snapshotFromObserved, type PriceFields } from '../src/lib/priceRange.js';
 
 /** api.kalodata.com não completa o TLS. O host que responde é www. */
 export const KALODATA_BASE = 'https://www.kalodata.com/openapi/v1';
@@ -23,17 +24,86 @@ export function commissionBrlFromRate(price: number | null, rate: number | null)
   return Number(((price * rate) / 100).toFixed(2));
 }
 
+const PRICE_POINT_KEYS = [
+  'unit_price',
+  'min_price',
+  'max_price',
+  'avg_price',
+  'average_price',
+  'price_avg',
+  'price_min',
+  'price_max',
+  'minimum_price',
+  'maximum_price',
+  'min_unit_price',
+  'max_unit_price',
+  'unit_price_min',
+  'unit_price_max',
+];
+const PRICE_AVG_KEYS = ['avg_price', 'average_price', 'price_avg', 'avg_unit_price'];
+const PRICE_HISTORY_KEYS = ['price_history', 'unit_price_history', 'unit_price_trend', 'price_trend'];
+
+function pushPrice(points: number[], value: unknown): void {
+  const priced = parseLooseNumber(value);
+  if (priced != null && priced > 0) points.push(priced);
+}
+
+/**
+ * Campos de preço que o ranking e a ficha já devolvem. Sem chamada extra.
+ * Ficha: minimum/maximum/average price e commission_rate.
+ * Ranking (need_extra): unit_price e, quando vem, min_price/max_price.
+ */
+export function kalodataPriceFields(item: any): PriceFields | null {
+  if (!item || typeof item !== 'object') return null;
+  const points: number[] = [];
+  for (const key of PRICE_POINT_KEYS) pushPrice(points, item[key]);
+  if (item.price && typeof item.price === 'object') {
+    for (const key of PRICE_POINT_KEYS) pushPrice(points, item.price[key]);
+    pushPrice(points, item.price.price ?? item.price.value);
+  } else {
+    pushPrice(points, item.price);
+  }
+  for (const key of PRICE_HISTORY_KEYS) {
+    const history = item[key];
+    if (!Array.isArray(history)) continue;
+    for (const entry of history) {
+      if (entry && typeof entry === 'object') {
+        for (const pointKey of PRICE_POINT_KEYS) pushPrice(points, entry[pointKey]);
+        pushPrice(points, entry.price ?? entry.value);
+      } else {
+        pushPrice(points, entry);
+      }
+    }
+  }
+  const average = PRICE_AVG_KEYS.map((key) => parseLooseNumber(item[key])).find((value) => value != null && value > 0) ?? null;
+  const representative = parseLooseNumber(item.unit_price) ?? average ?? points[0] ?? null;
+  const rate = parseLooseNumber(item.commission_rate);
+  if (representative == null && points.length === 0) return null;
+  return snapshotFromObserved({
+    points: points.length > 0 ? points : representative != null ? [representative] : [],
+    average,
+    representative,
+    rate,
+  });
+}
+
 export function mapKalodataProduct(item: any, keyword: string, refreshedAt: string): ScrapedProduct | null {
   const id = String(item?.product_id || item?.id || '').trim();
   const title = String(item?.product_name || item?.product_title || item?.title || '').trim();
   if (!id || !title) return null;
-  const price = parseLooseNumber(item?.unit_price ?? item?.min_price ?? item?.max_price);
-  const rate = parseLooseNumber(item?.commission_rate);
+  const prices = kalodataPriceFields(item);
+  const price = prices?.price_brl ?? null;
+  const rate = prices?.commission_rate ?? parseLooseNumber(item?.commission_rate);
   const category = String(item?.ter_category?.category_name || item?.pri_category?.category_name || item?.category_name || '');
   return {
     id,
     title,
     price_brl: price,
+    price_min: prices?.price_min ?? null,
+    price_max: prices?.price_max ?? null,
+    price_avg: prices?.price_avg ?? null,
+    price_estimated: prices?.price_estimated ?? false,
+    commission_rate: rate,
     sold_7d: parseIntegerCount(item?.sales_volumn),
     sold_30d: null,
     video_count: parseIntegerCount(item?.video_number ?? item?.videos_count),
@@ -218,10 +288,18 @@ export async function collectKalodata(input: {
       const stock = parseIntegerCount(data.stock ?? data.stock_count ?? data.inventory ?? data.sku_stock);
       if (videos != null) product.video_count = videos;
       if (stock != null) product.stock_units = stock;
-      const price = parseLooseNumber(data.unit_price ?? data.min_price) ?? product.price_brl;
-      const rate = parseLooseNumber(data.commission_rate);
-      const commission = commissionBrlFromRate(price, rate);
-      if (commission != null) product.commission_brl = commission;
+      const detailPrices = kalodataPriceFields(data);
+      if (detailPrices) {
+        const merged = mergePriceHistory(product, detailPrices);
+        product.price_brl = merged.price_brl;
+        product.price_min = merged.price_min;
+        product.price_max = merged.price_max;
+        product.price_avg = merged.price_avg;
+        product.price_estimated = merged.price_estimated;
+        product.commission_rate = merged.commission_rate;
+        const commission = commissionBrlFromRate(merged.price_brl, merged.commission_rate);
+        if (commission != null) product.commission_brl = commission;
+      }
       if (typeof data.master_image_url === 'string' && data.master_image_url) product.cover_url = data.master_image_url;
     } catch (error) {
       console.error('[KALODATA]', String((error as { message?: string })?.message || error).slice(0, 180));
