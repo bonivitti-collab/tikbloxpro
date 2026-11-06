@@ -1,5 +1,6 @@
 import { resolveRealProductImage } from './productImageResolver.js';
 import { TrendingProduct } from '../types.js';
+import { commissionRateOf, priceBandOf, roundMoney } from '../lib/priceRange.js';
 
 export function extractSharpProductIdentifiers(product: any): {
   exactViralSearchQuery: string;
@@ -58,8 +59,19 @@ export function enrichWithTikTokShopData(product: any): any {
     }
   }
 
-  const priceBRL = Number(product.estimatedPriceBRL) || (product.dataSource === 'live' ? 0 : 89.90);
+  const band = priceBandOf(product);
+  const priceBRL = band.avg || Number(product.estimatedPriceBRL) || (product.dataSource === 'live' ? 0 : 89.90);
   if (!commissionUnknown) {
+    const explicitRate = commissionRateOf({
+      commissionRate: product.commissionRate,
+      commission_rate: product.commission_rate,
+      commissionPercent: product.commissionPercent,
+      tiktokShop: product.tiktokShop,
+      commissionEstimatedBRL: product.commissionEstimatedBRL ?? product.tiktokShop?.commissionValueBRL,
+      priceAvg: product.priceAvg ?? product.estimatedPriceBRL,
+      estimatedPriceBRL: product.estimatedPriceBRL,
+    });
+    if (explicitRate != null) commissionRatePercent = explicitRate;
     const explicitCommission = product.tiktokShop?.commissionValueBRL ?? product.commissionEstimatedBRL;
     commissionValueBRL = explicitCommission != null && explicitCommission !== ''
       ? Number(explicitCommission)
@@ -95,8 +107,10 @@ export function enrichWithTikTokShopData(product: any): any {
   // =========================================================================
   // MOTOR DE CONVICÇÃO TIKBLOX: UNIT ECONOMICS & SINAL DE ENTRADA DO AFILIADO
   // =========================================================================
-  const sampleCostBRL = priceBRL;
-  const commissionForMath = commissionValueBRL ?? 0;
+  const sampleCostBRL = band.min || priceBRL;
+  const commissionForMath = !commissionUnknown && commissionRatePercent != null
+    ? roundMoney((sampleCostBRL * commissionRatePercent) / 100)
+    : (commissionValueBRL ?? 0);
   const breakEvenSales = commissionForMath > 0 ? Math.max(1, Math.ceil(sampleCostBRL / commissionForMath)) : 0;
   const netProfitAt20Sales = Math.max(0, Number(((20 * commissionForMath) - sampleCostBRL).toFixed(2)));
   const netProfitAt50Sales = Math.max(0, Number(((50 * commissionForMath) - sampleCostBRL).toFixed(2)));
@@ -135,7 +149,7 @@ export function enrichWithTikTokShopData(product: any): any {
     creatorVideoCountBR == null
       ? 'Contagem de vídeos no feed BR ainda não verificada. Métrica sem número inventado.'
       : `Apenas ${creatorVideoCountBR} vídeos de criadores no TikTok Brasil (${creatorCompetitionLevel}). Vácuo de conteúdo no algoritmo com carrinho amarelo ativo.`,
-    `Amortização Imediata: Com apenas ${breakEvenSales} vendas no feed você recupera 100% dos R$ ${sampleCostBRL.toFixed(2)} pagos na compra. A partir da ${breakEvenSales + 1}ª venda, o retorno é lucro puro.`
+    `No menor preço da faixa, cerca de ${breakEvenSales} vendas cobrem esse valor. O preço no TikTok muda com cupom, promoção e vendedor.`
   ];
 
   const tradeConviction = {
@@ -162,6 +176,11 @@ export function enrichWithTikTokShopData(product: any): any {
   return {
     ...product,
     dataSource,
+    priceMin: band.min || undefined,
+    priceMax: band.max || undefined,
+    priceAvg: band.avg || undefined,
+    priceEstimated: band.estimated,
+    commissionRate: commissionUnknown ? undefined : commissionRatePercent ?? undefined,
     metricsEstimated: dataSource !== 'live',
     commissionUnknown,
     stockUnits,

@@ -1,10 +1,17 @@
 import React, { useEffect, useState } from 'react';
+import { commissionBandOf, formatCommissionBand, formatPriceBand, formatPriceNote, priceBandOf } from '../lib/priceRange';
 
 interface CreatorProduct {
   id: string;
   title: string;
   price_brl: number | null;
+  price_min: number | null;
+  price_max: number | null;
+  price_avg: number | null;
+  price_estimated: boolean;
   commission_brl: number | null;
+  commission_rate: number | null;
+  last_refreshed_at: string | null;
   product_url: string;
   cover_url: string | null;
 }
@@ -96,9 +103,14 @@ export const CreatorsPanel: React.FC = () => {
                   )}
                   <span className="min-w-0 flex-1">
                     <span className="block text-sm font-bold text-slate-900 truncate">{product.title}</span>
-                    <span className="block text-[11px] text-slate-500">
-                      {money(product.price_brl)}
-                      {product.commission_brl == null ? ' · comissão não informada' : ` · comissão ${money(product.commission_brl)}`}
+                    <span className="block text-[11px] text-slate-700">
+                      {formatPriceBand(priceBandOf(product))}
+                    </span>
+                    <span className="block text-[10px] text-slate-500">
+                      {formatPriceNote(product.last_refreshed_at)}
+                      {commissionBandOf(product)
+                        ? ` · comissão ${formatCommissionBand(commissionBandOf(product)!)}`
+                        : ' · comissão não informada'}
                     </span>
                   </span>
                   <span className="text-[11px] font-bold text-[#FE2C55] shrink-0">Abrir no TikTok Shop</span>

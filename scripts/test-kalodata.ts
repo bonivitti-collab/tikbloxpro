@@ -6,10 +6,13 @@ import { canSeeKalodata } from '../lib/kalodataAccess.ts';
 import {
   collectKalodata,
   commissionBrlFromRate,
+  kalodataPriceFields,
   mapKalodataProduct,
   readKalodataBalance,
   tiktokProductUrl,
 } from '../lib/kalodata.ts';
+import { productUpsertPayload } from '../lib/productsStore.ts';
+import { formatCommissionBand, formatPriceBand, mergePriceHistory, roundMoney } from '../src/lib/priceRange.ts';
 import { canSpend, planKalodataSpend, rankCreditCost } from '../lib/kalodataPlan.ts';
 
 let failed = 0;
@@ -44,6 +47,37 @@ const mapped = mapKalodataProduct({
 assert(mapped?.source === 'kalodata', 'origem kalodata');
 assert(mapped?.product_url === tiktokProductUrl('1729508370969629931'), 'o clique abre o produto exato no TikTok Shop');
 assert(mapped?.sold_7d === 2 && mapped?.commission_brl === 12 && mapped?.price_brl === 80, 'venda inteira e comissão em reais');
+assert(mapped?.price_estimated === true && mapped?.price_min === 68 && mapped?.price_max === 92, 'um preço só vira faixa de ±15%');
+const ranged = mapKalodataProduct({
+  product_id: 'lark',
+  product_name: 'Hollyland Lark A1',
+  unit_price: 304.49,
+  min_price: 299.13,
+  max_price: 349.9,
+  avg_price: 310,
+  commission_rate: 15,
+}, 'ranking BR', '2026-11-06T12:00:00.000Z');
+assert(ranged?.price_estimated === false && ranged?.price_min === 299.13 && ranged?.price_max === 349.9 && ranged?.price_avg === 310, 'mínimo, máximo e média da Kalodata');
+assert(ranged?.price_brl === 304.49 && ranged?.commission_brl === roundMoney(304.49 * 0.15), 'a comissão de referência continua no preço unitário');
+const aliased = kalodataPriceFields({
+  minimum_price: 20,
+  maximum_price: 28,
+  average_price: 24,
+  commission_rate: 10,
+});
+assert(aliased?.price_estimated === false && aliased?.price_min === 20 && aliased?.price_max === 28 && aliased?.price_avg === 24, 'ficha também aceita minimum, maximum e average price');
+const history = kalodataPriceFields({ unit_price: 100, price_history: [90, 110] });
+assert(history?.price_estimated === false && history?.price_min === 90 && history?.price_max === 110, 'histórico de preço entra na faixa');
+const dayOne = mapKalodataProduct({ product_id: 'lark', product_name: 'Hollyland Lark A1', unit_price: 100, commission_rate: 15 }, 'ranking BR', '2026-11-06T12:00:00.000Z')!;
+const dayTwo = mapKalodataProduct({ product_id: 'lark', product_name: 'Hollyland Lark A1', unit_price: 90, commission_rate: 15 }, 'ranking BR', '2026-11-07T12:00:00.000Z')!;
+const widened = productUpsertPayload([dayTwo], [{ ...dayOne, scraped_at: dayOne.last_refreshed_at }])[0];
+assert(widened.price_estimated === true && widened.price_min === 76.5 && widened.price_max === 115, 'o mínimo e o máximo históricos não encolhem');
+const realLater = mergePriceHistory(dayOne, kalodataPriceFields({ min_price: 70, max_price: 90, avg_price: 80, commission_rate: 15 })!);
+assert(realLater.price_estimated === false && realLater.price_min === 70 && realLater.price_max === 100, 'faixa real substitui o ±15% e guarda o preço já visto');
+const shown = { priceMin: ranged?.price_min, priceMax: ranged?.price_max, priceAvg: ranged?.price_avg, priceEstimated: false, commissionRate: 15, estimatedPriceBRL: 304.49 };
+assert(formatPriceBand({ min: 299.13, max: 349.9, avg: 310, estimated: false }).startsWith('Faixa de preço:'), 'a faixa não é um preço único');
+assert(formatCommissionBand({ min: roundMoney(299.13 * 0.15), max: roundMoney(349.9 * 0.15), rate: 15 }).includes('(15%)'), 'comissão em faixa com a taxa');
+assert(shown.priceMin === 299.13, 'o card usa o mínimo observado');
 assert(!passesBusinessRules(mapped), 'regra estrita da Apify continua exigindo estoque e vídeos');
 const visible = liveRowToProduct({ ...mapped!, scraped_at: mapped!.last_refreshed_at });
 assert(visible?.countsUnknown === true && keepLiveProduct(visible), 'Kalodata sem estoque/vídeos entra no radar se a comissão passa de R$ 10');
@@ -93,7 +127,7 @@ const fetchImpl: typeof fetch = async (input, init) => {
   if (url.endsWith('/tiktok/product/detail')) {
     return json({
       success: true,
-      data: { product_id: body.product_id, video_number: 8, unit_price: 80, commission_rate: 15 },
+      data: { product_id: body.product_id, video_number: 8, unit_price: 80, min_price: 70, max_price: 90, avg_price: 82, commission_rate: 15 },
     });
   }
   assert(body.region === 'BR' && body.currency === 'BRL' && body.language === 'pt-BR', 'região BR e moeda BRL');
@@ -145,6 +179,7 @@ assert(collected.spent === 1 && collected.products.length === 500, '500 produtos
 assert(collected.creators[0]?.followers === 1700, 'criador com seguidores inteiros');
 const enriched = ['1000', '1001', '1002', '1003'].map((id) => collected.products.find((product) => product.id === id));
 assert(enriched.every((product) => product?.video_count === 8 && product?.stock_units == null), 'as 4 fichas preenchem vídeos e deixam estoque ausente');
+assert(enriched.every((product) => product?.price_estimated === false && product?.price_min === 70 && product?.price_max === 90), 'a ficha troca o ±15% pela faixa real');
 assert(collected.products.find((product) => product.id === '1004')?.video_count == null, 'o quinto produto não gasta ficha');
 
 let blocked = 0;

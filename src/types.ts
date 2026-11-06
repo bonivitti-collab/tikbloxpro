@@ -50,6 +50,11 @@ export interface TrendingProduct {
   saturationInBrazil: 'Muito Baixa' | 'Baixa' | 'Média' | 'Incipiente';
   estimatedCostUSD: number;
   estimatedPriceBRL: number;
+  priceMin?: number;
+  priceMax?: number;
+  priceAvg?: number;
+  priceEstimated?: boolean;
+  commissionRate?: number;
   estimatedProfitMarginPercent: number; // e.g. 320
   culturalFitReason: string;
   brazilEntryStatus: string;

@@ -20,8 +20,18 @@ import {
 } from 'lucide-react';
 import { TrendingProduct } from '../../types';
 import { enrichWithTikTokShopData } from '../../data/tiktokShopEnricher';
-import { commissionBrlOf, formatCollectedAt } from '../../lib/productRules';
+import { formatCollectedAt } from '../../lib/productRules';
 import { tiktokShopHref } from '../../lib/productRules';
+import {
+  commissionBandOf,
+  formatBrl,
+  formatCommissionBand,
+  formatPriceBand,
+  formatPriceNote,
+  parseTypedPrice,
+  priceBandOf,
+  roundMoney,
+} from '../../lib/priceRange';
 
 interface ProductDetailTerminalProps {
   product: TrendingProduct | null;
@@ -38,6 +48,8 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
 }) => {
   const [copiedHook, setCopiedHook] = useState(false);
   const [simulationSales, setSimulationSales] = useState<number>(25);
+  const [priceDraft, setPriceDraft] = useState('');
+  const [priceDraftFor, setPriceDraftFor] = useState('');
 
   // O terminal monta com produto nulo (catálogo ainda não chegou) e só
   // depois recebe o item ativo. Este hook precisa existir nos dois renders.
@@ -144,20 +156,23 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
     ]
   };
 
-  const priceBRL = Number(tk.estimatedPriceBRL || tc.sampleCostBRL || 0);
-  const knownCommission = commissionBrlOf(tk);
-  const commissionVal = knownCommission ?? 0;
+  const band = priceBandOf(tk);
+  const commissionBand = commissionBandOf(tk);
+  const draftValue = priceDraftFor === tk.id ? priceDraft : (band.min > 0 ? band.min.toFixed(2) : '');
+  const typedPrice = parseTypedPrice(draftValue);
+  const workingPrice = typedPrice ?? (band.min > 0 ? band.min : 0);
+  const commissionEach = commissionBand ? roundMoney((workingPrice * commissionBand.rate) / 100) : 0;
+  const breakEvenSales = commissionEach > 0 ? Math.max(1, Math.ceil(workingPrice / commissionEach)) : 0;
   const collectedLabel = formatCollectedAt(tk.collectedAt);
-  const commissionPct = Number(tk.commissionPercent || tc.commissionPercent || 0);
   const hookText = String(tk.hookViral3s || tk.tiktokShop?.topViralHook || tk.adHooks?.[0] || 'Oportunidade em alta no TikTok Shop!');
   const shopLink = tiktokShopHref(tk);
 
   // =========================================================================
   // SIMULAÇÃO DINÂMICA DE RETORNO DO CRIADOR
   // =========================================================================
-  const simGrossCommission = simulationSales * commissionVal;
-  const simNetProfit = Math.max(0, simGrossCommission - priceBRL);
-  const simRoi = priceBRL > 0 ? Math.round((simNetProfit / priceBRL) * 100) : 0;
+  const simGrossCommission = simulationSales * commissionEach;
+  const simNetProfit = Math.max(0, simGrossCommission - workingPrice);
+  const simRoi = workingPrice > 0 ? Math.round((simNetProfit / workingPrice) * 100) : 0;
 
   const STAGES = [
     {
@@ -268,7 +283,8 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
             )}
             <div className="min-w-0 flex-1">
               <p className="text-sm font-black text-slate-900 leading-snug">{tk.name}</p>
-              <p className="text-xs font-mono text-slate-600">R$ {priceBRL.toFixed(2)}{tk.metricsEstimated !== false && tk.dataSource !== 'live' ? ' · Estimativa' : ''}</p>
+              <p className="text-xs font-bold text-slate-800">{formatPriceBand(band)}</p>
+              <p className="text-[11px] leading-snug text-slate-500">{formatPriceNote(tk.collectedAt)}</p>
             </div>
           </div>
           <a
@@ -348,13 +364,13 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
           {/* Pilar 1: Custo de Compra (Seu Bolso) */}
           <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 min-w-0">
             <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block truncate">
-              Preço de referência
+              Faixa de preço
             </span>
-            <div className="text-lg sm:text-xl font-black text-slate-900 font-mono mt-1 whitespace-nowrap overflow-hidden">
-              R$ {priceBRL.toFixed(2)}
+            <div className="text-sm sm:text-base font-black text-slate-900 font-mono mt-1 leading-tight">
+              {formatBrl(band.min)} – {formatBrl(band.max)}
             </div>
-            <span className="text-[10px] text-slate-500 mt-0.5 block truncate">
-              Valor mostrado no anúncio
+            <span className="text-[10px] text-slate-500 mt-0.5 block">
+              {formatPriceNote(tk.collectedAt)}
             </span>
           </div>
 
@@ -363,24 +379,17 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
             <span className="text-[10px] font-bold text-emerald-800 uppercase tracking-wider block truncate">
               Comissão por Venda
             </span>
-            <div className="flex items-baseline gap-1 mt-1 whitespace-nowrap overflow-hidden">
-              {knownCommission == null ? (
+            <div className="mt-1 min-w-0">
+              {commissionBand == null ? (
                 <span className="text-sm font-black text-amber-700">comissão não informada</span>
               ) : (
-                <>
-                  <span className="text-lg sm:text-xl font-black text-emerald-700 font-mono">
-                    R$ {commissionVal.toFixed(2)}
-                  </span>
-                  {commissionPct > 0 ? (
-                    <span className="text-xs font-bold text-emerald-600 font-mono">
-                      ({commissionPct}%)
-                    </span>
-                  ) : null}
-                </>
+                <span className="text-sm sm:text-base font-black text-emerald-700 font-mono leading-tight">
+                  {formatCommissionBand(commissionBand)}
+                </span>
               )}
             </div>
             <span className="text-[10px] text-emerald-700 mt-0.5 block truncate">
-              {knownCommission == null ? 'A loja não publicou a comissão' : 'Líquido no carrinho'}
+              {commissionBand == null ? 'A loja não publicou a comissão' : 'Varia com o preço do anúncio'}
             </span>
           </div>
 
@@ -390,7 +399,7 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
               Break-Even (Ponto Zero)
             </span>
             <div className="text-lg sm:text-xl font-black text-[#0F172A] font-mono mt-1 flex items-baseline gap-1 whitespace-nowrap overflow-hidden">
-              <span>{tc.breakEvenSales}</span>
+              <span>{breakEvenSales}</span>
               <span className="text-xs font-extrabold text-slate-600 font-sans">vendas</span>
             </div>
             <span className="text-[10px] text-[#007A87] font-semibold mt-0.5 block truncate">
@@ -444,8 +453,21 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
                 <span>Simulador de Retorno do Investimento Próprio</span>
               </h4>
               <p className="text-[11px] text-slate-500">
-                Arraste ou selecione para simular o retorno líquido sobre o preço de referência:
+                O cálculo começa no menor preço. Digite o valor que aparece agora no TikTok.
               </p>
+              <label className="mt-2 flex items-center gap-2">
+                <span className="text-[10px] font-bold uppercase text-slate-500 shrink-0">Preço visto</span>
+                <input
+                  inputMode="decimal"
+                  value={draftValue}
+                  onChange={(event) => {
+                    setPriceDraftFor(tk.id);
+                    setPriceDraft(event.target.value);
+                  }}
+                  aria-label="Preço que você vê no TikTok agora"
+                  className="h-9 w-full min-w-0 rounded-lg border border-slate-300 bg-white px-2 font-mono text-sm text-slate-900"
+                />
+              </label>
             </div>
 
             {/* Botoes rápidos de metas */}
@@ -489,21 +511,21 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
             <div className="p-2 rounded-lg bg-white border border-slate-200 min-w-0">
               <span className="text-[10px] text-slate-400 uppercase font-bold block truncate">Comissão Bruta</span>
               <span className="font-mono font-extrabold text-slate-900 text-sm block whitespace-nowrap">
-                R$ {simGrossCommission.toFixed(2)}
+                {formatBrl(simGrossCommission)}
               </span>
             </div>
 
             <div className="p-2 rounded-lg bg-white border border-slate-200 min-w-0">
-              <span className="text-[10px] text-slate-400 uppercase font-bold block truncate">Preço de referência</span>
+              <span className="text-[10px] text-slate-400 uppercase font-bold block truncate">Preço usado</span>
               <span className="font-mono font-bold text-rose-600 text-sm block whitespace-nowrap">
-                -R$ {priceBRL.toFixed(2)}
+                -{formatBrl(workingPrice)}
               </span>
             </div>
 
             <div className="p-2 rounded-lg bg-emerald-50 border border-emerald-300 min-w-0">
               <span className="text-[10px] text-emerald-800 uppercase font-black block truncate">Lucro no Bolso</span>
               <span className="font-mono font-black text-emerald-700 text-sm block whitespace-nowrap">
-                R$ {simNetProfit.toFixed(2)}
+                {formatBrl(simNetProfit)}
               </span>
             </div>
 

@@ -9,7 +9,8 @@ import {
 } from 'lucide-react';
 import { TrendingProduct, ProductNiche } from '../../types';
 import { ALL_CATEGORY, categoriesForCounts } from '../../data/taxonomy';
-import { commissionBrlOf, formatCollectedAt, stockUnitsOf, videoCountOf } from '../../lib/productRules';
+import { formatCollectedAt, stockUnitsOf, videoCountOf } from '../../lib/productRules';
+import { commissionBandOf, formatCommissionBand, formatPriceBand, formatPriceNote, priceBandOf } from '../../lib/priceRange';
 
 interface ProductListPanelProps {
   width?: number;
@@ -272,12 +273,11 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
         ) : (
           filtered.map((prod) => {
             const isSelected = activeProduct?.id === prod.id;
-            const priceBRL = Number(prod.estimatedPriceBRL || 0);
-            const commission = commissionBrlOf(prod);
-            const commPct = Number(prod.commissionPercent || prod.tiktokShop?.commissionRatePercent || 0);
+            const band = priceBandOf(prod);
+            const commissionBand = commissionBandOf(prod);
             const collectedLabel = formatCollectedAt(prod.collectedAt);
             const tc = prod.tradeConviction;
-            const breakEvenSales = tc?.breakEvenSales || (commission != null && commission > 0 ? Math.max(1, Math.ceil(priceBRL / commission)) : 0);
+            const breakEvenSales = tc?.breakEvenSales || (commissionBand && commissionBand.min > 0 ? Math.max(1, Math.ceil(band.min / commissionBand.min)) : 0);
             const convictionScore = tc?.convictionScore || Math.min(99, Math.round(prod.viralityScore || 92));
             const videoCount = videoCountOf(prod);
             const stock = stockUnitsOf(prod);
@@ -316,24 +316,15 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
                 <h3 className="text-[13px] font-bold text-slate-950 leading-tight line-clamp-1" title={prod.name}>
                   {prod.name}
                 </h3>
-                <div className="mt-1 grid grid-cols-2 gap-1 font-mono text-[12px]">
-                  <div className="min-w-0">
-                    <span className="block text-[8px] font-sans font-bold text-slate-500 uppercase">Amostra</span>
-                    <span className="font-extrabold text-slate-950">R$ {priceBRL.toFixed(2)}</span>
-                  </div>
-                  <div className="text-right min-w-0">
-                    <span className="block text-[8px] font-sans font-bold text-slate-500 uppercase">Comissão</span>
-                    <span className="font-extrabold text-emerald-800">
-                      {commission == null ? (
-                        <span className="font-sans text-[10px] font-bold text-amber-800">comissão não informada</span>
-                      ) : (
-                        <>
-                          R$ {commission.toFixed(2)}{commPct > 0 ? ` (${commPct}%)` : ''}
-                        </>
-                      )}
-                    </span>
-                  </div>
-                </div>
+                <p className="mt-1 text-[11px] font-bold leading-tight text-slate-950">{formatPriceBand(band)}</p>
+                <p className="text-[10px] leading-tight text-slate-500">{formatPriceNote(prod.collectedAt)}</p>
+                <p className="text-[11px] font-bold leading-tight text-emerald-800">
+                  {commissionBand == null ? (
+                    <span className="text-amber-800">comissão não informada</span>
+                  ) : (
+                    <>Comissão {formatCommissionBand(commissionBand)}</>
+                  )}
+                </p>
                 <div className="mt-0.5 flex items-center justify-between gap-2 text-[10px]">
                   <span className={`font-bold truncate ${prod.countsUnknown ? 'text-amber-800' : 'text-slate-800'}`}>
                     {prod.countsUnknown
