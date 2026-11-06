@@ -1,5 +1,5 @@
-import { NICHE_TAXONOMY, nicheById } from '../src/data/taxonomy.js';
 import { signalsForProducts, type ProductSignal, type PromotionSighting } from './creatorSignal.js';
+import { SHOP_NICHES, shopNicheFromText } from './shopNiches.js';
 
 export interface RadarCreator {
   id: string;
@@ -40,6 +40,7 @@ export function buildRadarSnapshot(input: {
     id: string;
     title: string;
     niche: string | null;
+    keyword?: string | null;
     product_url: string | null;
     cover_url: string | null;
     commission_brl: number | null;
@@ -56,10 +57,15 @@ export function buildRadarSnapshot(input: {
     if (sighting.videoUrl) videoByPair.set(`${sighting.creatorId}:${sighting.productId}`, sighting.videoUrl);
   }
 
+  const nicheOf = (product: { title: string; keyword?: string | null }) =>
+    shopNicheFromText(product.keyword || '', product.title);
+
   const nicheByCreator = new Map<string, Set<string>>();
   for (const sighting of input.sightings) {
-    const niche = productById.get(sighting.productId)?.niche;
-    if (!niche || !nicheById(niche)) continue;
+    const product = productById.get(sighting.productId);
+    if (!product) continue;
+    const niche = nicheOf(product);
+    if (!niche) continue;
     const set = nicheByCreator.get(sighting.creatorId) || new Set<string>();
     set.add(niche);
     nicheByCreator.set(sighting.creatorId, set);
@@ -69,7 +75,8 @@ export function buildRadarSnapshot(input: {
   for (const signal of signals) {
     const product = productById.get(signal.productId);
     if (!product?.title || !product.product_url) continue;
-    if (!product.niche || !nicheById(product.niche)) continue;
+    const niche = nicheOf(product);
+    if (!niche) continue;
     const creators = signal.creatorIds.map((id) => {
       const creator = creatorById.get(id);
       return {
@@ -83,7 +90,7 @@ export function buildRadarSnapshot(input: {
     products.push({
       id: product.id,
       title: product.title,
-      niche: product.niche,
+      niche,
       productUrl: product.product_url,
       coverUrl: product.cover_url,
       commissionBrl: product.commission_brl,
@@ -108,7 +115,7 @@ export function buildRadarSnapshot(input: {
     }))
     .filter((creator) => creator.niches.length > 0);
 
-  const niches = NICHE_TAXONOMY.map((niche) => ({
+  const niches = SHOP_NICHES.map((niche) => ({
     id: niche.id,
     label: niche.label,
     icon: niche.icon,

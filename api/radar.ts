@@ -32,7 +32,7 @@ export default async function handler(req: any, res: any) {
     const [links, creators, products] = await Promise.all([
       sb('creator_products?select=creator_id,product_id,first_seen_at,video_url&limit=5000'),
       sb('creators?select=id,handle,nickname,avatar_url,followers&source=eq.kalodata&limit=200'),
-      sb('products?select=id,title,niche,product_url,cover_url,commission_brl,commission_rate,price_min,price_max&source=eq.kalodata&limit=1000'),
+      sb('products?select=id,title,niche,keyword,product_url,cover_url,commission_brl,commission_rate,price_min,price_max&source=eq.kalodata&limit=1000'),
     ]);
     const snapshot = buildRadarSnapshot({
       now: new Date(),

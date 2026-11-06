@@ -5,7 +5,7 @@ const webpush = createRequire(import.meta.url)('web-push') as {
   sendNotification: (subscription: { endpoint: string; keys: { p256dh: string; auth: string } }, payload: string) => Promise<unknown>;
 };
 import { buildRadarSnapshot } from './radarBoard.js';
-import { nicheById } from '../src/data/taxonomy.js';
+import { shopNicheById } from './shopNiches.js';
 
 function supabaseConfig(): { base: string; key: string } | null {
   const base = (process.env.SUPABASE_URL || '').replace(/\/$/, '');
@@ -65,7 +65,7 @@ export async function sendDailyAlerts(now: Date = new Date()): Promise<number> {
   const [links, creators, products, subscriptions] = await Promise.all([
     sb('creator_products?select=creator_id,product_id,first_seen_at,video_url&limit=5000'),
     sb('creators?select=id,handle,nickname,avatar_url,followers&source=eq.kalodata&limit=200'),
-    sb('products?select=id,title,niche,product_url,cover_url,commission_brl,commission_rate,price_min,price_max&source=eq.kalodata&limit=1000'),
+    sb('products?select=id,title,niche,keyword,product_url,cover_url,commission_brl,commission_rate,price_min,price_max&source=eq.kalodata&limit=1000'),
     sb('push_subscriptions?select=id,endpoint,p256dh,auth,niche,last_body&limit=1000'),
   ]);
   const snapshot = buildRadarSnapshot({
@@ -81,7 +81,7 @@ export async function sendDailyAlerts(now: Date = new Date()): Promise<number> {
   });
   let sent = 0;
   for (const subscription of Array.isArray(subscriptions) ? subscriptions : []) {
-    const niche = nicheById(String(subscription.niche || ''));
+    const niche = shopNicheById(String(subscription.niche || ''));
     const fresh = niche
       ? snapshot.products.filter((product) => product.niche === niche.id && (product.tag === 'Novo' || product.tag === 'Subindo'))
       : [];

@@ -1,4 +1,5 @@
 import { assignNiche } from './ingestPlan.js';
+import { kalodataCategoryName } from './shopNiches.js';
 import type { ScrapedProduct } from './apifyShop.js';
 import { parseIntegerCount, parseLooseNumber } from './apifyShop.js';
 import { canSpend, planKalodataSpend, rankCreditCost, resolveKalodataMaxCredits, KALODATA_PAGE_SIZE } from './kalodataPlan.js';
@@ -95,7 +96,7 @@ export function mapKalodataProduct(item: any, keyword: string, refreshedAt: stri
   const prices = kalodataPriceFields(item);
   const price = prices?.price_brl ?? null;
   const rate = prices?.commission_rate ?? parseLooseNumber(item?.commission_rate);
-  const category = String(item?.ter_category?.category_name || item?.pri_category?.category_name || item?.category_name || '');
+  const category = kalodataCategoryName(item);
   return {
     id,
     title,
@@ -113,8 +114,8 @@ export function mapKalodataProduct(item: any, keyword: string, refreshedAt: stri
     commission_brl: commissionBrlFromRate(price, rate),
     cover_url: typeof item?.master_image_url === 'string' && item.master_image_url ? item.master_image_url : null,
     product_url: tiktokProductUrl(id),
-    niche: assignNiche(keyword || category, `${title} ${category}`),
-    keyword: keyword || category || 'ranking BR',
+    niche: assignNiche(category || keyword, `${title} ${category}`),
+    keyword: category || keyword || 'ranking BR',
     source: 'kalodata',
     last_refreshed_at: refreshedAt,
   };
