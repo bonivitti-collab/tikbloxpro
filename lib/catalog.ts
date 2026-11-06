@@ -4,7 +4,13 @@ import { matchScore, passesBusinessRules } from '../src/lib/productRules.js';
 import type { TrendingProduct } from '../src/types.js';
 import { mergeLiveAndCurated } from './ingestPlan.js';
 import { liveRowToProduct } from './liveCatalog.js';
-import { listStoredProducts } from './productsStore.js';
+import { canSeeKalodata } from './kalodataAccess.js';
+import { listStoredProducts, type StoredProductRow } from './productsStore.js';
+
+export function rowsVisibleTo(rows: StoredProductRow[], viewer?: { email?: string | null; role?: string | null } | null): StoredProductRow[] {
+  if (viewer && canSeeKalodata(viewer)) return rows;
+  return rows.filter((row) => row.source !== 'kalodata');
+}
 
 function applyFilters(products: TrendingProduct[], filters: {
   niche?: unknown;
@@ -31,10 +37,10 @@ export async function listCatalog(filters: {
   niche?: unknown;
   originCountry?: unknown;
   query?: unknown;
-} = {}): Promise<TrendingProduct[]> {
+} = {}, viewer?: { email?: string | null; role?: string | null } | null): Promise<TrendingProduct[]> {
   let live: TrendingProduct[] = [];
   try {
-    const rows = await listStoredProducts();
+    const rows = rowsVisibleTo(await listStoredProducts(), viewer);
     live = rows
       .map((row) => liveRowToProduct(row))
       .filter((product): product is TrendingProduct => product != null)

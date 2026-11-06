@@ -1,5 +1,7 @@
 import { fetchApifySearch, parseApifyProduct, type ScrapedProduct } from './apifyShop.js';
+import { upsertCreators } from './creatorsStore.js';
 import { planIngestCalls, resolveChargeUsd, resolveResultBudget, type StoredProductRef } from './ingestPlan.js';
+import { collectKalodata } from './kalodata.js';
 import {
   claimDailyRun,
   finishDailyRun,
@@ -22,6 +24,8 @@ export interface IngestSummary {
 
 export interface IngestDeps {
   token?: string;
+  /** String vazia desliga a Kalodata mesmo se a variável de ambiente existir. */
+  kalodataKey?: string;
   now?: Date;
   fetchImpl?: typeof fetch;
   claimRun?: (runKey: string) => Promise<'claimed' | 'already'>;
@@ -32,7 +36,7 @@ export interface IngestDeps {
 
 export function statusForIngestError(error: unknown): number {
   const message = String((error as { message?: string })?.message || error);
-  if (message === 'SUPABASE_NOT_CONFIGURED' || message === 'APIFY_TOKEN_MISSING') return 503;
+  if (message === 'SUPABASE_NOT_CONFIGURED' || message === 'APIFY_TOKEN_MISSING' || message === 'INGEST_UNCONFIGURED') return 503;
   if (message.startsWith('BEFORE_APIFY:')) return 502;
   return 200;
 }
@@ -40,8 +44,9 @@ export function statusForIngestError(error: unknown): number {
 export async function runDailyIngest(options: IngestDeps = {}): Promise<IngestSummary> {
   const usingMemory = Boolean(options.listProducts && options.claimRun && options.saveProducts);
   if (!usingMemory && productsBackend() !== 'supabase') throw new Error('SUPABASE_NOT_CONFIGURED');
-  const token = options.token || process.env.APIFY_TOKEN || '';
-  if (!token) throw new Error('APIFY_TOKEN_MISSING');
+  const token = options.token ?? process.env.APIFY_TOKEN ?? '';
+  const kalodataKey = options.kalodataKey !== undefined ? options.kalodataKey : (process.env.KALODATA_API_KEY || '');
+  if (!token && !kalodataKey) throw new Error('INGEST_UNCONFIGURED');
 
   const listProducts = options.listProducts || listStoredProducts;
   const saveProducts = options.saveProducts || upsertScrapedProducts;
@@ -71,6 +76,36 @@ export async function runDailyIngest(options: IngestDeps = {}): Promise<IngestSu
 
   const budget = resolveResultBudget();
   const charge = resolveChargeUsd();
+  let kalodataCalls = 0;
+  if (kalodataKey) {
+    try {
+      const collected = await collectKalodata({
+        apiKey: kalodataKey,
+        fetchImpl: options.fetchImpl,
+        now,
+      });
+      kalodataCalls = collected.calls;
+      if (collected.calls > 0) {
+        await saveProducts(collected.products);
+        await upsertCreators(collected.creators, now.toISOString());
+        await finishRun(runKey, 'ok').catch(() => {});
+        return {
+          budget,
+          calls: collected.calls,
+          fetched: collected.products.length,
+          inserted: collected.products.length,
+          updated: 0,
+          skipped: 0,
+          alreadyRan: false,
+        };
+      }
+    } catch (error) {
+      if (kalodataCalls > 0) throw error;
+      console.error('[INGEST] Kalodata indisponível, tentando Apify', String((error as { message?: string })?.message || error).slice(0, 180));
+    }
+  }
+
+  if (!token) throw new Error('APIFY_TOKEN_MISSING');
   const refs: StoredProductRef[] = stored.map((row) => ({
     id: row.id,
     keyword: row.keyword || '',

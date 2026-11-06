@@ -18,13 +18,16 @@ import {
 const LOCAL_STORAGE_KEY_SAVED = 'tikblox_saved_products_v1';
 const LOCAL_STORAGE_KEY_SCAN_CACHE = 'tikblox_scan_cache_v3_blueocean';
 
-export async function fetchCatalog(): Promise<TrendingProduct[]> {
+export async function fetchCatalog(): Promise<{ products: TrendingProduct[]; showCreators: boolean }> {
   const res = await fetch('/api/catalog', { method: 'GET', credentials: 'include' });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
     throw new Error(data.error || 'Não foi possível carregar o radar.');
   }
-  return Array.isArray(data.products) ? data.products.filter(isBlueOceanOpportunity) : [];
+  return {
+    products: Array.isArray(data.products) ? data.products.filter(isBlueOceanOpportunity) : [],
+    showCreators: data.showCreators === true,
+  };
 }
 
 export async function scanTrends(params: {

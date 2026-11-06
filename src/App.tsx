@@ -8,6 +8,7 @@ import { EarlyWaveDashboard } from './components/EarlyWaveDashboard';
 import { TrendPulseSection } from './components/TrendPulseSection';
 import { Header } from './components/ConvictionTerminal/Header';
 import { ProductListPanel } from './components/ConvictionTerminal/ProductListPanel';
+import { CreatorsPanel } from './components/CreatorsPanel';
 import { ProductDetailTerminal } from './components/ConvictionTerminal/ProductDetailTerminal';
 import { SavedRadarView } from './components/SavedRadarView';
 import { AddCustomProductModal } from './components/ConvictionTerminal/AddCustomProductModal';
@@ -98,7 +99,8 @@ export default function App() {
   const [activeProduct, setActiveProduct] = useState<TrendingProduct | null>(null);
   const [painelEsquerdoRecolhido, setPainelEsquerdoRecolhido] = useState(false);
   const [painelDireitoRecolhido, setPainelDireitoRecolhido] = useState(true); // AI panel disabled
-  const [mobileTab, setMobileTab] = useState<'produtos' | 'terminal' | 'copilot'>('produtos');
+  const [mobileTab, setMobileTab] = useState<'produtos' | 'terminal' | 'criadores' | 'copilot'>('produtos');
+  const [showCreators, setShowCreators] = useState(false);
   const [filterHighCommissionOnly, setFilterHighCommissionOnly] = useState<boolean>(false);
   const [filterKnownCommissionOnly, setFilterKnownCommissionOnly] = useState<boolean>(false);
   const [showSavedModal, setShowSavedModal] = useState<boolean>(false);
@@ -147,12 +149,13 @@ export default function App() {
         }
         const fresh = await fetchCatalog();
         if (cancelled) return;
-        setProducts(fresh);
+        setShowCreators(fresh.showCreators);
+        setProducts(fresh.products);
         setActiveProduct((current) => {
-          if (current && fresh.some((product) => product.id === current.id)) return current;
-          return fresh[0] || null;
+          if (current && fresh.products.some((product) => product.id === current.id)) return current;
+          return fresh.products[0] || null;
         });
-        cacheTrendProductsToIndexedDB(fresh, 'curated').catch(() => {});
+        cacheTrendProductsToIndexedDB(fresh.products, 'curated').catch(() => {});
       } catch (error) {
         console.warn('Falha ao carregar o radar autenticado:', error);
         if (!cancelled) {
@@ -701,7 +704,25 @@ export default function App() {
       />
 
       {/* 2. SELETOR DE ABAS MOBILE / TABLET (CINZA CLARO) */}
-      <nav className="grid grid-cols-2 lg:hidden w-full bg-white border-b border-slate-200 p-1.5 gap-1.5 shrink-0 text-xs font-bold select-none">
+      {showCreators && (
+        <div className="hidden lg:flex items-center gap-2 px-3 py-2 bg-white border-b border-slate-200 shrink-0">
+          <button
+            type="button"
+            onClick={() => setMobileTab('produtos')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold border ${mobileTab !== 'criadores' ? 'bg-slate-900 text-white border-slate-900' : 'bg-white text-slate-700 border-slate-300'}`}
+          >
+            Tendências
+          </button>
+          <button
+            type="button"
+            onClick={() => setMobileTab('criadores')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold border ${mobileTab === 'criadores' ? 'bg-slate-900 text-white border-slate-900' : 'bg-white text-slate-700 border-slate-300'}`}
+          >
+            Top Criadores
+          </button>
+        </div>
+      )}
+      <nav className={`grid ${showCreators ? 'grid-cols-3' : 'grid-cols-2'} lg:hidden w-full bg-white border-b border-slate-200 p-1.5 gap-1.5 shrink-0 text-xs font-bold select-none`}>
         <button
           onClick={() => setMobileTab('produtos')}
           className={`py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1 cursor-pointer transition-all border ${
@@ -724,14 +745,29 @@ export default function App() {
           <span>🔬 Raio-X Produto</span>
         </button>
 
-        
+        {showCreators && (
+          <button
+            type="button"
+            onClick={() => setMobileTab('criadores')}
+            className={`py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1 cursor-pointer transition-all border ${
+              mobileTab === 'criadores'
+                ? 'bg-slate-900 text-white border-slate-900 shadow-2xs font-black'
+                : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100'
+            }`}
+          >
+            <span>Top Criadores</span>
+          </button>
+        )}
       </nav>
 
       {/* 3. ÁREA PRINCIPAL: THREE-PANEL TERMINAL (REDIMENSIONÁVEL NO NOTEBOOK/DESKTOP) */}
+      {showCreators && mobileTab === 'criadores' ? (
+        <CreatorsPanel />
+      ) : null}
       <div
         className={`flex-1 flex flex-col lg:flex-row w-full max-w-full overflow-hidden min-h-0 bg-[#F1F5F9] relative ${
           redimensionando ? 'select-none cursor-col-resize' : ''
-        }`}
+        } ${showCreators && mobileTab === 'criadores' ? 'hidden' : ''}`}
       >
         {/* PAINEL 1: Lista de Produtos */}
         <div

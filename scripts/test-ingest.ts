@@ -139,6 +139,7 @@ const fetchImpl: typeof fetch = async () => {
 let savedSold: number | null = null;
 const deps = {
   token: 'test-token',
+  kalodataKey: '',
   now: new Date('2026-11-06T09:00:00.000Z'),
   fetchImpl,
   claimRun: async () => {

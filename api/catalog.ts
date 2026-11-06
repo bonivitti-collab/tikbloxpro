@@ -1,6 +1,7 @@
 import { listCatalog } from '../lib/catalog.js';
 import { requirePaidSession } from '../lib/guard.js';
 import { sendJson } from '../lib/http.js';
+import { canSeeKalodata } from '../lib/kalodataAccess.js';
 
 export default async function handler(req: any, res: any) {
   if (req.method === 'OPTIONS') {
@@ -21,12 +22,13 @@ export default async function handler(req: any, res: any) {
     } catch {
       queryFromUrl = '';
     }
+    const viewer = { email: auth.claims.email, role: auth.claims.role };
     const products = await listCatalog({
       niche: body.niche || req.query?.niche,
       originCountry: body.originCountry || body.origin || req.query?.originCountry,
       query: body.query || req.query?.query || queryFromUrl,
-    });
-    return sendJson(res, 200, { success: true, products });
+    }, viewer);
+    return sendJson(res, 200, { success: true, products, showCreators: canSeeKalodata(viewer) });
   } catch (error) {
     console.error('[CATALOG]', error);
     return sendJson(res, 500, { error: 'Não foi possível carregar o radar.' });
