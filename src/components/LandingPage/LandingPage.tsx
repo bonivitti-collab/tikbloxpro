@@ -31,6 +31,7 @@ import { InteractiveScreensCarousel } from './InteractiveScreensCarousel';
 import { ProfitSimulator } from './ProfitSimulator';
 import { SocialProofSection } from './SocialProofSection';
 import { TikBloxLogo } from '../TikBloxLogo';
+import { REFUND_7_DAYS } from '../../copy/guarantee';
 
 interface LandingPageProps {
   onOpenLogin: () => void;
@@ -261,8 +262,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </span>
             <span className="text-[#25F4EE] font-black uppercase">VARREDURA 06:00 BRT CONCLUÍDA</span>
             <span className="hidden sm:inline text-slate-500">•</span>
-            <span className="hidden sm:inline">140+ produtos no radar</span>
-            <span className="hidden md:inline text-slate-500">•</span>
             <span className="hidden md:inline font-mono text-emerald-400 font-bold">
               Próxima em: {countdown}
             </span>
@@ -307,7 +306,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <span className="hidden sm:inline text-slate-600">•</span>
             <span className="flex items-center gap-1.5 text-slate-300">
               <Sparkles className="w-4 h-4 text-amber-400" />
-              <span>Garantia Incondicional de 7 Dias</span>
+              <span>{REFUND_7_DAYS}</span>
             </span>
           </div>
 
@@ -328,7 +327,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <ShieldCheck className="w-3.5 h-3.5 text-[#25F4EE]" />
                 <span>&lt; 10 Vídeos no Feed</span>
               </span>
-              <span className="text-[10px] text-slate-400 block font-mono">Vácuo de conteúdo</span>
+              <span className="text-[10px] text-slate-400 block font-mono">Quando a contagem veio</span>
             </div>
 
             <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 space-y-1 hover:border-amber-500/40 transition">
@@ -368,7 +367,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               Conheça as Telas do TikBlox Pro por Dentro
             </h2>
             <p className="text-xs sm:text-sm text-slate-300">
-              Passe o carrossel abaixo e veja exatamente como o radar, o raio-x financeiro e os links de amostra funcionam antes de assinar:
+              Passe o carrossel e veja o que cada tela do radar mostra, sem números de exemplo:
             </p>
           </div>
 
@@ -387,7 +386,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               Por que a maioria dos criadores falha no TikTok Shop?
             </h2>
             <h3 className="text-2xl sm:text-4xl font-black text-white">
-              O Segredo está na Velocidade de Envio e no Vácuo de Conteúdo
+              Entrar num feed já cheio é diferente de ver a coleta antes
             </h3>
           </div>
 
@@ -406,7 +405,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-rose-400 font-bold shrink-0">•</span>
-                  <span><strong>Feed abarrotado de criadores:</strong> Mais de 300 pessoas já postaram com o mesmo carrinho amarelo, derrubando o alcance.</span>
+                  <span><strong>Feed já ocupado:</strong> Quando muita gente já postou o mesmo produto, o alcance de um vídeo novo costuma cair. O radar não mede esse alcance por você.</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-rose-400 font-bold shrink-0">•</span>
@@ -428,11 +427,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-[#25F4EE] font-bold shrink-0">✓</span>
-                  <span><strong>Oceano Azul (&lt; 10 vídeos no feed BR):</strong> Vácuo de conteúdo. O algoritmo do TikTok entrega visualizações massivas porque há procura e pouca oferta.</span>
+                  <span><strong>Vídeos medidos:</strong> Quando a coleta traz a contagem, o card mostra esse número. Se não veio, o card fica sem score.</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-[#25F4EE] font-bold shrink-0">✓</span>
-                  <span><strong>Risco 100% calculado:</strong> Ponto zero garantido em 3 a 5 vendas. Lucro líquido limpo no seu bolso.</span>
+                  <span><strong>Equilíbrio:</strong> A conta diz quantas vendas, na comissão informada, cobrem o menor preço da faixa ou o preço que você digitou. Não é uma previsão de vendas.</span>
                 </li>
               </ul>
             </div>
@@ -473,7 +472,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 1. Radar Diário Automatizado (06:00 BRT)
               </h4>
               <p className="text-xs text-slate-300 leading-relaxed">
-                Varredura diária no catálogo brasileiro. Você acorda às 06:00 com o radar atualizado, sem itens saturados ou caros demais.
+                A coleta roda todo dia às 06:00 no horário de Brasília e atualiza a lista. O que não veio na coleta não é preenchido com estimativa de views.
               </p>
             </div>
 
@@ -499,7 +498,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 3. Raio-X e ponto de equilíbrio
               </h4>
               <p className="text-xs text-slate-300 leading-relaxed">
-                Cada produto mostra comissão, margem, gancho de 3 segundos e em quantas vendas o custo da amostra se paga.
+                Cada produto mostra a faixa de preço, a comissão quando a taxa existe, e um campo para o preço que você vê no TikTok agora.
               </p>
             </div>
 
@@ -527,7 +526,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               Radar Essential por R$ 37/mês
             </h3>
             <p className="text-xs text-slate-400">
-              Cancele quando quiser com apenas 1 clique. Acesso imediato pelo e-mail da compra.
+              Cancele quando quiser no painel da Kiwify. {REFUND_7_DAYS}
             </p>
           </div>
 
@@ -555,7 +554,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <ul className="space-y-2.5 text-xs text-slate-300 pt-4 border-t border-white/10">
                   <li className="flex items-center gap-2">
                     <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                    <span>Acesso a todos os 140+ produtos catalogados</span>
+                    <span>Acesso à lista de produtos coletados</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <Check className="w-4 h-4 text-emerald-400 shrink-0" />
@@ -622,7 +621,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               },
               {
                 q: 'Posso cancelar a assinatura quando eu quiser?',
-                a: 'Sim, com 100% de liberdade! Não há nenhuma fidelidade ou multa. Você pode cancelar sua assinatura mensal diretamente no painel da Kiwify a qualquer momento. O cancelamento ou o reembolso encerra o acesso ao radar.'
+                a: 'Sim. Não há fidelidade. O cancelamento é no painel da Kiwify e encerra o acesso ao radar.'
+              },
+              {
+                q: 'Como funciona o reembolso de 7 dias?',
+                a: REFUND_7_DAYS + ' O pedido é feito na Kiwify. Quando o reembolso é confirmado, o acesso ao radar acaba.'
               }
             ].map((faq, idx) => (
               <div
@@ -711,7 +714,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </span>
               <div className="truncate">
                 <span className="font-extrabold text-white block truncate">
-                  ⚡ 140+ produtos no radar
+                  Radar do TikTok Shop
                 </span>
                 <span className="text-[10px] text-slate-400 font-mono hidden sm:inline">
                   Varredura das 06:00 BRT

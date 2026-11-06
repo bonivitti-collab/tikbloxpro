@@ -1,4 +1,5 @@
 import React from 'react';
+import { REFUND_7_DAYS } from '../copy/guarantee';
 
 type LegalKind = 'termos' | 'privacidade';
 
@@ -29,14 +30,12 @@ export const LegalPage: React.FC<{ kind: LegalKind }> = ({ kind }) => {
         ) : (
           <>
             <p>
-              O acesso pago entra pelo checkout da Kiwify. Reembolso, atraso e cancelamento seguem o webhook
-              assinado da Kiwify: sem assinatura válida o radar não abre. A garantia anunciada na página de
-              pagamento é a da oferta da Kiwify, não uma promessa extra deste site.
+              O acesso pago entra pelo checkout da Kiwify. {REFUND_7_DAYS} O pedido de reembolso é feito na Kiwify.
+              Cancelamento e reembolso confirmados encerram o acesso. Sem assinatura válida o radar não abre.
             </p>
             <p>
-              O radar mostra faixa de preço, comissão quando a taxa existe, e um score só quando a contagem de
-              vídeos foi medida: 95 menos o número de vídeos, entre 5 e 95. Catálogo de exemplo, ilustrações da
-              landing e texto de gancho não são medição nem resultado de cliente.
+              O radar mostra a faixa de preço coletada, a comissão quando a taxa existe, e um score só quando a
+              contagem de vídeos foi medida. Não publicamos faturamento, depoimento nem resultado de cliente.
             </p>
           </>
         )}

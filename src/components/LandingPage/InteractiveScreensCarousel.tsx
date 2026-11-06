@@ -35,15 +35,15 @@ const SLIDES: SlideData[] = [
     id: 'radar',
     badge: 'PAINEL 1: RADAR DE PRODUTOS',
     badgeColor: 'bg-[#25F4EE]/10 text-[#25F4EE] border-[#25F4EE]/30',
-    title: '140+ Produtos Virais em Oceano Azul',
-    subtitle: 'Varredura automatizada diária às 06:00 BRT',
+    title: 'Lista dos produtos coletados',
+    subtitle: 'Coleta diária às 06:00 BRT',
     description:
-      'Ao invés de tentar adivinhar o que vende, o radar destaca comissão e concorrência no feed brasileiro. O comprador escolhe o vendedor no TikTok Shop.',
+      'A lista mostra o que a coleta trouxe: faixa de preço, comissão quando a taxa existe, e score só se a contagem de vídeos foi medida.',
     highlights: [
       'Link que abre o produto no TikTok Shop',
-      'Menos de 10 vídeos publicados por criadores no Brasil',
-      'Filtros por nicho: Beleza, Casa, Gadgets, Moda e Fitness',
-      'Margem bruta e comissão líquida em R$ já calculadas',
+      'Busca por nome e filtro por categoria',
+      'Sem score quando os vídeos não vieram na coleta',
+      'Comissão em faixa, na mesma taxa do anúncio',
     ],
     mockupType: 'radar',
   },
@@ -51,15 +51,15 @@ const SLIDES: SlideData[] = [
     id: 'terminal',
     badge: 'PAINEL 2: RAIO-X & CONVICÇÃO',
     badgeColor: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30',
-    title: 'Terminal de Convicção & Break-Even Matemático',
-    subtitle: 'Saiba o Ponto Zero exato para recuperar 100% da compra da amostra física',
+    title: 'Raio-X do produto',
+    subtitle: 'Você informa o preço que está vendo no TikTok',
     description:
-      'Compre a amostra com recursos próprios com risco zero calculado. O terminal mostra o número exato de vendas necessárias para amortizar o produto.',
+      'A tela começa no menor preço da faixa. Troque pelo valor do anúncio aberto agora. A comissão e as vendas para cobrir esse preço são recalculadas.',
     highlights: [
-      'Break-Even em apenas 3 a 5 vendas no feed',
-      'Veredito objetivo: ENTRADA FORTE vs ENTRADA MODERADA',
-      'Score de Convicção de 0 a 100 com assimetria de risco',
-      'Projeção de retorno financeiro líquido em 20, 50 e 100 vendas',
+      'Faixa de preço com a data da coleta',
+      'Aviso de que cupom e promoção mudam o valor',
+      'Score apenas com vídeos medidos',
+      'Campo para o preço que você vê agora',
     ],
     mockupType: 'terminal',
   },
@@ -254,7 +254,7 @@ export const InteractiveScreensCarousel: React.FC<InteractiveScreensCarouselProp
                   </span>
                 </div>
                 <span className="text-[9px] font-mono uppercase font-black px-2 py-0.5 rounded bg-white/5 text-slate-300">
-                  Ao Vivo
+                  A tela
                 </span>
               </div>
 
@@ -263,59 +263,20 @@ export const InteractiveScreensCarousel: React.FC<InteractiveScreensCarouselProp
                 
                 {/* 1. MOCKUP: RADAR DE PRODUTOS */}
                 {slide.mockupType === 'radar' && (
-                  <div className="space-y-3">
+                  <div className="space-y-3 text-left">
                     <div className="flex items-center justify-between pb-2 border-b border-white/10">
                       <div>
-                        <span className="text-[10px] text-slate-400 font-bold uppercase">Varredura Diária</span>
-                        <h4 className="text-sm font-black text-white">140 Produtos Catalogados</h4>
+                        <span className="text-[10px] text-slate-400 font-bold uppercase">Lista do radar</span>
+                        <h4 className="text-sm font-black text-white">Produtos da coleta</h4>
                       </div>
                       <span className="text-[10px] font-mono font-bold px-2 py-1 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-                        06:00 BRT • Atualizado
+                        06:00 BRT
                       </span>
                     </div>
-
-                    {/* Exemplo de 3 cards da lista */}
                     <div className="space-y-2">
-                      {[
-                        {
-                          name: 'Mini Seladora Térmica Portátil 2 em 1',
-                          price: 'R$ 29,90',
-                          comm: 'R$ 8,97 (30%)',
-                          videos: '4 vídeos no BR',
-                          badge: 'Oceano Azul',
-                        },
-                        {
-                          name: 'Limpador Ultrassônico de Jóias & Óculos',
-                          price: 'R$ 69,90',
-                          comm: 'R$ 17,47 (25%)',
-                          videos: '7 vídeos no BR',
-                          badge: 'Alta comissão',
-                        },
-                        {
-                          name: 'Escova Secadora de Cabelos Íons Negativos',
-                          price: 'R$ 89,90',
-                          comm: 'R$ 25,17 (28%)',
-                          videos: '5 vídeos no BR',
-                          badge: 'Oceano Azul',
-                        },
-                      ].map((item, i) => (
-                        <div
-                          key={i}
-                          className="p-3 rounded-xl bg-white/5 border border-white/10 hover:border-[#25F4EE]/50 transition flex items-center justify-between gap-3"
-                        >
-                          <div className="space-y-1 min-w-0">
-                            <span className="text-[10px] text-[#25F4EE] font-mono font-bold block truncate">
-                              {item.badge}
-                            </span>
-                            <p className="font-bold text-xs text-white truncate">{item.name}</p>
-                            <span className="text-[11px] text-slate-400">
-                              Venda: <strong className="text-white">{item.price}</strong> | Comissão:{' '}
-                              <strong className="text-emerald-400">{item.comm}</strong>
-                            </span>
-                          </div>
-                          <span className="text-[10px] font-mono font-bold px-2 py-1 rounded bg-white/10 text-slate-200 shrink-0">
-                            {item.videos}
-                          </span>
+                      {['Faixa de preço coletada', 'Comissão, se a taxa veio', 'Sem score se os vídeos não vieram'].map((line) => (
+                        <div key={line} className="p-3 rounded-xl bg-white/5 border border-white/10 text-xs text-slate-200">
+                          {line}
                         </div>
                       ))}
                     </div>
@@ -324,44 +285,17 @@ export const InteractiveScreensCarousel: React.FC<InteractiveScreensCarouselProp
 
                 {/* 2. MOCKUP: TERMINAL DE RAIO-X & BREAK-EVEN */}
                 {slide.mockupType === 'terminal' && (
-                  <div className="space-y-3.5">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-black uppercase px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
-                        Ilustração da tela
-                      </span>
-                      <span className="text-xs font-mono font-black text-[#25F4EE]">Score só com vídeos medidos</span>
-                    </div>
-
-                    <h4 className="text-sm font-black text-white">
-                      Mini Seladora Térmica Portátil 2 em 1
-                    </h4>
-
-                    {/* Os 4 Pilares Financeiros */}
-                    <div className="grid grid-cols-2 gap-2 text-left">
-                      <div className="p-2.5 rounded-xl bg-white/5 border border-white/10">
-                        <span className="text-[10px] uppercase font-bold text-slate-400 block">Custo da Amostra</span>
-                        <span className="text-base font-black text-white font-mono">R$ 29,90</span>
-                        <span className="text-[9px] text-slate-400 block">Preço de referência</span>
-                      </div>
-                      <div className="p-2.5 rounded-xl bg-emerald-950/30 border border-emerald-500/30">
-                        <span className="text-[10px] uppercase font-bold text-emerald-400 block">Comissão por Venda</span>
-                        <span className="text-base font-black text-emerald-400 font-mono">R$ 8,97 (30%)</span>
-                        <span className="text-[9px] text-emerald-300/80 block">Líquida no seu bolso</span>
-                      </div>
-                      <div className="p-2.5 rounded-xl bg-cyan-950/30 border border-[#25F4EE]/30">
-                        <span className="text-[10px] uppercase font-bold text-[#25F4EE] block">Ponto Zero (Break-Even)</span>
-                        <span className="text-base font-black text-white font-mono">4 vendas</span>
-                        <span className="text-[9px] text-[#25F4EE] block">Risco 100% zerado</span>
-                      </div>
-                      <div className="p-2.5 rounded-xl bg-white/5 border border-white/10">
-                        <span className="text-[10px] uppercase font-bold text-slate-400 block">Vídeos no Feed BR</span>
-                        <span className="text-base font-black text-white font-mono">~4 vídeos</span>
-                        <span className="text-[9px] text-emerald-400 block">Oceano Azul Absoluto</span>
-                      </div>
-                    </div>
-
-                    <div className="p-2.5 rounded-xl bg-white/5 border border-white/10 text-[11px] text-slate-300 italic">
-                      "Com modestas 5.000 visualizações no TikTok você faz de 15 a 30 vendas, recupera a amostra e lucra R$ 100+ no primeiro vídeo."
+                  <div className="space-y-3 text-left">
+                    <span className="text-[10px] font-black uppercase px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                      Raio-X
+                    </span>
+                    <h4 className="text-sm font-black text-white">Detalhe do produto</h4>
+                    <div className="grid grid-cols-1 gap-2">
+                      {['Faixa de preço e data da coleta', 'Comissão na taxa informada', 'Preço que você vê agora no TikTok', 'Vendas para cobrir esse preço'].map((line) => (
+                        <div key={line} className="p-2.5 rounded-xl bg-white/5 border border-white/10 text-xs text-slate-200">
+                          {line}
+                        </div>
+                      ))}
                     </div>
                   </div>
                 )}
@@ -374,7 +308,7 @@ export const InteractiveScreensCarousel: React.FC<InteractiveScreensCarouselProp
                         Ação Rápida Para o Criador
                       </span>
                       <h4 className="text-sm font-black text-white">
-                        Mini Seladora Térmica Portátil 2 em 1
+                        Abrir o anúncio
                       </h4>
                       <p className="text-[11px] text-slate-400">
                         Abre o produto no TikTok Shop. O vendedor é escolhido lá.
@@ -409,7 +343,7 @@ export const InteractiveScreensCarousel: React.FC<InteractiveScreensCarouselProp
                       <div className="flex items-center gap-2">
                         <Zap className="w-4 h-4 text-amber-400" />
                         <span className="text-xs font-bold text-slate-200">
-                          Gancho Viral 3s: "Para de jogar comida fora só porque o pacote abriu..."
+                          O gancho sugerido pode ser copiado para o roteiro
                         </span>
                       </div>
                       <span className="text-[10px] font-mono text-[#25F4EE] bg-[#25F4EE]/10 px-2 py-0.5 rounded font-bold">
