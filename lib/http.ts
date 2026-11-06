@@ -85,25 +85,74 @@ export function sendJson(
   res.status(status).json(body);
 }
 
-export async function readRawBody(req: any, limit = 200_000): Promise<string> {
-  let raw = '';
-  if (typeof req.rawBody === 'string') raw = req.rawBody;
-  else if (typeof req.body === 'string') raw = req.body;
-  else if (Buffer.isBuffer(req.body)) raw = req.body.toString('utf8');
-  else if (req.body == null && req && typeof req[Symbol.asyncIterator] === 'function') {
-    const chunks: Buffer[] = [];
-    let size = 0;
-    for await (const chunk of req) {
-      const buf = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
-      size += buf.length;
-      if (size > limit) throw new Error('PAYLOAD_TOO_LARGE');
-      chunks.push(buf);
+function pushCandidate(candidates: string[], value: string, limit: number): void {
+  if (value.length > limit) throw new Error('PAYLOAD_TOO_LARGE');
+  if (!candidates.includes(value)) candidates.push(value);
+}
+
+function streamStillOpen(req: any): boolean {
+  if (!req || req.body != null || req.rawBody != null) return false;
+  if (req.readableEnded || req.readable === false) return false;
+  return typeof req[Symbol.asyncIterator] === 'function';
+}
+
+async function readStream(req: any, limit: number): Promise<string> {
+  const chunks: Buffer[] = [];
+  let size = 0;
+  for await (const chunk of req) {
+    const buf = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+    size += buf.length;
+    if (size > limit) throw new Error('PAYLOAD_TOO_LARGE');
+    chunks.push(buf);
+  }
+  return Buffer.concat(chunks).toString('utf8');
+}
+
+/**
+ * Corpo para o HMAC da Kiwify.
+ * No runtime Node da Vercel (não Next), `req.body` já chega parseado e o stream
+ * já foi lido. `config.api.bodyParser` é do Pages API do Next / @vercel/node antigo
+ * e esse runtime ignora. Por isso o candidato principal, quando não há bytes crus,
+ * é JSON.stringify(req.body): o parse preserva a ordem das chaves e a Kiwify assina
+ * o JSON compacto que enviou.
+ */
+export async function readWebhookBody(
+  req: any,
+  limit = 200_000
+): Promise<{ payload: unknown; candidates: string[] }> {
+  const candidates: string[] = [];
+
+  if (typeof req.rawBody === 'string') pushCandidate(candidates, req.rawBody, limit);
+  else if (Buffer.isBuffer(req.rawBody)) pushCandidate(candidates, req.rawBody.toString('utf8'), limit);
+
+  let payload: unknown;
+  if (typeof req.body === 'string') {
+    pushCandidate(candidates, req.body, limit);
+    try {
+      payload = JSON.parse(req.body);
+    } catch {
+      payload = undefined;
     }
-    raw = Buffer.concat(chunks).toString('utf8');
+  } else if (Buffer.isBuffer(req.body)) {
+    const text = req.body.toString('utf8');
+    pushCandidate(candidates, text, limit);
+    try {
+      payload = JSON.parse(text);
+    } catch {
+      payload = undefined;
+    }
   } else if (req.body && typeof req.body === 'object') {
-    throw new Error('RAW_BODY_REQUIRED');
+    payload = req.body;
+    pushCandidate(candidates, JSON.stringify(req.body), limit);
+  } else if (streamStillOpen(req)) {
+    const raw = await readStream(req, limit);
+    pushCandidate(candidates, raw, limit);
+    try {
+      payload = raw ? JSON.parse(raw) : {};
+    } catch {
+      payload = undefined;
+    }
   }
 
-  if (raw.length > limit) throw new Error('PAYLOAD_TOO_LARGE');
-  return raw;
+  return { payload, candidates };
 }

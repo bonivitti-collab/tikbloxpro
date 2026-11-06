@@ -43,6 +43,10 @@ export function signatureIsValid(rawBody: string, signature: string | null | und
   return timingSafeEqualText(expected, signature.trim().toLowerCase());
 }
 
+export function signatureMatchesAny(candidates: string[], signature: string | null | undefined): boolean {
+  return candidates.some((raw) => raw.length > 0 && signatureIsValid(raw, signature));
+}
+
 export function signatureFromRequest(req: any): string {
   const query = req.query?.signature;
   if (typeof query === 'string' && query.length > 0) return query;

@@ -6,6 +6,8 @@ Relatório do que mudou neste projeto.
 
 O `package.json` declara `"type": "module"`. No Node 24 da Vercel cada arquivo de `api/` e `lib/` vira um módulo ESM separado, e import relativo sem extensão quebra com `ERR_MODULE_NOT_FOUND`. Os imports desses arquivos, e dos módulos em `src/data` que o catálogo carrega, usam sufixo `.js`.
 
+O runtime Node (não Next) parseia `req.body` antes do handler e consome o stream. `export const config = { api: { bodyParser: false } }` é do Pages API do Next e esse runtime ignora. O HMAC usa os bytes crus quando existem e, no caso parseado, `JSON.stringify(req.body)`, que reproduz o JSON compacto que a Kiwify assinou. Assinatura errada responde 401.
+
 ## O que mudou
 
 ### Admin
