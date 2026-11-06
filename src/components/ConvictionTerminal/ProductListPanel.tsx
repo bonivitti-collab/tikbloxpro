@@ -23,14 +23,6 @@ interface ProductListPanelProps {
   setSelectedNiche: (niche: ProductNiche) => void;
   searchQuery: string;
   setSearchQuery: (q: string) => void;
-  filterFreeSampleOnly: boolean;
-  setFilterFreeSampleOnly: (val: boolean) => void;
-  filterBlueOceanOnly: boolean;
-  setFilterBlueOceanOnly: (val: boolean) => void;
-  filterHighCommissionOnly: boolean;
-  setFilterHighCommissionOnly: (val: boolean) => void;
-  filterKnownCommissionOnly: boolean;
-  setFilterKnownCommissionOnly: (val: boolean) => void;
   onOpenAddCustomProduct?: () => void;
 }
 
@@ -46,14 +38,6 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
   setSelectedNiche,
   searchQuery,
   setSearchQuery,
-  filterFreeSampleOnly,
-  setFilterFreeSampleOnly,
-  filterBlueOceanOnly,
-  setFilterBlueOceanOnly,
-  filterHighCommissionOnly,
-  setFilterHighCommissionOnly,
-  filterKnownCommissionOnly,
-  setFilterKnownCommissionOnly,
   onOpenAddCustomProduct,
 }) => {
   const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
@@ -190,7 +174,7 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
           </button>
           {showRules && (
             <div role="tooltip" className="absolute left-2 right-2 top-12 z-40 rounded-lg bg-slate-900 text-white text-[11px] leading-snug p-2.5 shadow-lg">
-              Ao vivo: estoque ≥ 500, menos de 50 vídeos e comissão ≥ R$ 10. Sem valor, o card mostra “comissão não informada”. O filtro “Só comissão informada” esconde esses cards.
+              Ao vivo: estoque ≥ 500, menos de 50 vídeos e comissão ≥ R$ 10. Sem valor, o card mostra “comissão não informada”.
             </div>
           )}
 
@@ -260,25 +244,6 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
           </label>
         )}
 
-        {!compactHeader && (
-          <div className="flex gap-1 overflow-x-auto no-scrollbar pb-0.5">
-            {[
-              { on: filterBlueOceanOnly, toggle: () => setFilterBlueOceanOnly(!filterBlueOceanOnly), label: 'Oceano azul', active: 'bg-[#0F172A] text-white border-[#0F172A]' },
-              { on: filterHighCommissionOnly, toggle: () => setFilterHighCommissionOnly(!filterHighCommissionOnly), label: 'Comissão alta', active: 'bg-amber-700 text-white border-amber-700' },
-              { on: filterFreeSampleOnly, toggle: () => setFilterFreeSampleOnly(!filterFreeSampleOnly), label: 'Amostra grátis', active: 'bg-emerald-700 text-white border-emerald-700' },
-              { on: filterKnownCommissionOnly, toggle: () => setFilterKnownCommissionOnly(!filterKnownCommissionOnly), label: 'Só comissão informada', active: 'bg-amber-700 text-white border-amber-700' },
-            ].map((chip) => (
-              <button
-                key={chip.label}
-                type="button"
-                onClick={chip.toggle}
-                className={`shrink-0 min-h-9 px-3 rounded-full text-[11px] font-bold border ${chip.on ? chip.active : 'bg-white border-slate-300 text-slate-800'}`}
-              >
-                {chip.label}
-              </button>
-            ))}
-          </div>
-        )}
       </div>
 
       <div
@@ -293,15 +258,11 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
         {filtered.length === 0 ? (
           <div className="p-6 text-center text-slate-500 text-xs bg-white rounded-xl border border-slate-200 my-4 shadow-2xs">
             <p className="font-bold text-slate-700">Nenhum produto com essas regras.</p>
-            <p className="text-[11px] text-slate-500 mt-1">Os produtos ao vivo precisam de estoque, poucos vídeos e comissão de pelo menos R$ 10. Comissão em branco continua na lista até você pedir só a informada.</p>
+            <p className="text-[11px] text-slate-500 mt-1">Os produtos ao vivo precisam de estoque, poucos vídeos e comissão de pelo menos R$ 10. Comissão em branco continua na lista.</p>
             <button
               onClick={() => {
                 setSelectedNiche('all');
                 setSearchQuery('');
-                setFilterFreeSampleOnly(false);
-                setFilterBlueOceanOnly(false);
-                setFilterHighCommissionOnly(false);
-                setFilterKnownCommissionOnly(false);
               }}
               className="mt-3 px-3 py-1 bg-[#0F172A] text-white rounded-lg text-xs font-bold transition cursor-pointer"
             >
