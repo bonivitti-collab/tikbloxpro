@@ -29,6 +29,7 @@ import { useTranslation } from '../i18n/LanguageContext';
 import { downloadProductViabilityPDF } from '../services/pdfExportService';
 import { SocialProofBadge } from './SocialProofBadge';
 import { enrichWithTikTokShopData } from '../data/tiktokShopEnricher';
+import { tiktokVideoSearchHref } from '../lib/productRules';
 
 interface ProductDetailModalProps {
   product: TrendingProduct | null;
@@ -144,9 +145,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
   const shopeeBrUrl = `https://shopee.com.br/search?keyword=${encodeURIComponent(
     product.name.split(' ').slice(0, 3).join(' ')
   )}`;
-  const tiktokViralUrl = `https://www.tiktok.com/search?q=${encodeURIComponent(
-    product.exactViralSearchQuery || (product.supplierKeywords && product.supplierKeywords[0]) || product.originalName
-  )}`;
+  const tiktokViralUrl = tiktokVideoSearchHref(product);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#141722]/80 backdrop-blur-md p-3 sm:p-4 overflow-y-auto animate-in fade-in duration-200">

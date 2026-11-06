@@ -60,25 +60,13 @@ export function enrichWithTikTokShopData(product: any): any {
 
   const charCodeSum = (product.id || '').split('').reduce((acc: number, char: string) => acc + char.charCodeAt(0), 0);
 
-  let activeCreatorsCount = product.tiktokShop?.activeCreatorsCount || 8;
-  let recentSalesCount = product.tiktokShop?.recentSalesCount || 2840;
-  let saturationLevel = product.tiktokShop?.saturationLevel || product.creatorSaturationBR || 'Oceano Azul';
-
-  if (!product.tiktokShop && !product.creatorSaturationBR) {
-    if (product.waveStage === 'early_wave') {
-      activeCreatorsCount = (charCodeSum % 7) + 3;
-      recentSalesCount = ((charCodeSum * 37) % 2500) + 1200;
-      saturationLevel = 'Oceano Azul';
-    } else if (product.waveStage === 'rising_wave') {
-      activeCreatorsCount = (charCodeSum % 8) + 8;
-      recentSalesCount = ((charCodeSum * 43) % 3500) + 3200;
-      saturationLevel = 'Baixa';
-    } else {
-      activeCreatorsCount = (charCodeSum % 8) + 6;
-      recentSalesCount = ((charCodeSum * 51) % 6000) + 6500;
-      saturationLevel = 'Baixa';
-    }
-  }
+  const explicitVideos = Number(product.videoCountBR ?? product.tiktokShop?.videoCountBR);
+  const activeCreatorsCount = Number.isFinite(explicitVideos) ? explicitVideos : undefined;
+  const explicitSales = Number(product.tiktokShop?.recentSalesCount);
+  const recentSalesCount = Number.isFinite(explicitSales) ? explicitSales : undefined;
+  const explicitStock = Number(product.stockUnits ?? product.tiktokShop?.stockUnits);
+  const stockUnits = Number.isFinite(explicitStock) ? explicitStock : undefined;
+  const saturationLevel = product.tiktokShop?.saturationLevel || product.creatorSaturationBR || 'Oceano Azul';
 
   const stockLocations = [
     'São Paulo - SP (Envio Full 24h)',
@@ -122,7 +110,8 @@ export function enrichWithTikTokShopData(product: any): any {
   else if (creatorVideoCountBR >= 10) creatorCompetitionLevel = 'Baixa Concorrência (10-25 vídeos)';
 
   // Score de Convicção e Veredito TikBlox
-  let convictionScore = Math.min(99, Math.max(65, Math.round((product.viralityScore || 85) - (creatorVideoCountBR * 0.35))));
+  const videoPenalty = typeof creatorVideoCountBR === 'number' ? creatorVideoCountBR * 0.35 : 0;
+  let convictionScore = Math.min(99, Math.max(65, Math.round((product.viralityScore || 85) - videoPenalty)));
   if (product.waveStage === 'early_wave') convictionScore = Math.min(99, Math.max(91, convictionScore + 6));
 
   let verdict: 'COMPRA_RECOMENDADA' | 'ENTRADA_MODERADA' | 'ALERTA_SATURACAO' = 'COMPRA_RECOMENDADA';
@@ -130,12 +119,12 @@ export function enrichWithTikTokShopData(product: any): any {
   let riskLevel: 'MUITO_BAIXO' | 'BAIXO' | 'MODERADO' = 'MUITO_BAIXO';
   let riskLabel = 'Risco Mínimo (Assimetria Altamente Positiva)';
 
-  if (convictionScore < 75 || creatorVideoCountBR > 45) {
+  if (creatorVideoCountBR != null && (convictionScore < 75 || creatorVideoCountBR > 45)) {
     verdict = 'ALERTA_SATURACAO';
     verdictLabel = '🔴 ALERTA DE SATURAÇÃO (ALTA CONCORRÊNCIA)';
     riskLevel = 'MODERADO';
     riskLabel = 'Risco Moderado (Muitos criadores competindo no feed)';
-  } else if (convictionScore < 88 || creatorVideoCountBR > 20) {
+  } else if (creatorVideoCountBR != null && (convictionScore < 88 || creatorVideoCountBR > 20)) {
     verdict = 'ENTRADA_MODERADA';
     verdictLabel = '🟡 ENTRADA MODERADA (ACOMPANHAR FEED)';
     riskLevel = 'BAIXO';
@@ -144,7 +133,9 @@ export function enrichWithTikTokShopData(product: any): any {
 
   const reasons = [
     `Estoque Pronta Entrega Brasil: Vendedor nacional despacha de ${stockLocation.split('(')[0].trim()}. Chega em 3 a 5 dias para você gravar antes do produto espalhar.`,
-    `Apenas ${creatorVideoCountBR} vídeos de criadores no TikTok Brasil (${creatorCompetitionLevel}). Vácuo de conteúdo no algoritmo com carrinho amarelo ativo.`,
+    creatorVideoCountBR == null
+      ? 'Contagem de vídeos no feed BR ainda não verificada. Métrica sem número inventado.'
+      : `Apenas ${creatorVideoCountBR} vídeos de criadores no TikTok Brasil (${creatorCompetitionLevel}). Vácuo de conteúdo no algoritmo com carrinho amarelo ativo.`,
     `Amortização Imediata: Com apenas ${breakEvenSales} vendas no feed você recupera 100% dos R$ ${sampleCostBRL.toFixed(2)} pagos na compra. A partir da ${breakEvenSales + 1}ª venda, o retorno é lucro puro.`
   ];
 
@@ -167,8 +158,14 @@ export function enrichWithTikTokShopData(product: any): any {
     reasons
   };
 
+  const dataSource = product.dataSource === 'live' ? 'live' : 'curated';
+
   return {
     ...product,
+    dataSource,
+    metricsEstimated: dataSource !== 'live',
+    stockUnits,
+    videoCountBR: activeCreatorsCount,
     tradeConviction,
     // Root level compatibility properties with safe fallbacks
     commissionPercent: commissionRatePercent,
@@ -192,6 +189,8 @@ export function enrichWithTikTokShopData(product: any): any {
       freeSampleAvailable: isFreeSample,
       minFollowersForSample: 1000,
       activeCreatorsCount,
+      videoCountBR: activeCreatorsCount,
+      stockUnits,
       recentSalesCount,
       saturationLevel,
       tiktokShopAffiliateLink,

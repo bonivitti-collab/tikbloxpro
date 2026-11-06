@@ -55,6 +55,15 @@ export interface TrendingProduct {
   brazilEntryStatus: string;
   targetAudience: string;
   imageUrl?: string;
+  productUrl?: string;
+  stockUnits?: number;
+  videoCountBR?: number;
+  commissionPercent?: number;
+  commissionEstimatedBRL?: number;
+  freeSampleAvailable?: boolean;
+  stockLocationBrazil?: string;
+  dataSource?: 'curated' | 'live';
+  metricsEstimated?: boolean;
   iconType: string;
   highlights: string[];
   adHooks: string[];
@@ -73,7 +82,10 @@ export interface TrendingProduct {
     freeSampleAvailable: boolean;
     minFollowersForSample: number;
     activeCreatorsCount: number;
-    recentSalesCount: number;
+    recentSalesCount?: number;
+    stockUnits?: number;
+    videoCountBR?: number;
+    productUrl?: string;
     saturationLevel: 'Oceano Azul' | 'Baixa' | 'Média' | 'Saturado';
     tiktokShopAffiliateLink: string;
     topViralHook: string;

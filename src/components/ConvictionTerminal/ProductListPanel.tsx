@@ -12,35 +12,13 @@ import {
   Check
 } from 'lucide-react';
 import { TrendingProduct, ProductNiche } from '../../types';
-import { enrichWithTikTokShopData } from '../../data/tiktokShopEnricher';
-import { isBlueOceanOpportunity } from '../../lib/blueOcean';
-
-interface CategoryOption {
-  id: ProductNiche;
-  label: string;
-  icon: string;
-}
-
-const CATEGORIES: CategoryOption[] = [
-  { id: 'all', label: 'Todas as Categorias', icon: '🌐' },
-  { id: 'beauty', label: 'Beleza & Cuidados', icon: '✨' },
-  { id: 'home', label: 'Casa & Cozinha', icon: '🏠' },
-  { id: 'tech', label: 'Tech & Celular', icon: '📱' },
-  { id: 'accessories', label: 'Bolsas & Acessórios', icon: '👜' },
-  { id: 'fitness', label: 'Saúde & Fitness', icon: '⚡' },
-  { id: 'pets', label: 'Pets & Animais', icon: '🐾' },
-  { id: 'kids', label: 'Kids & Bebês', icon: '👶' },
-  { id: 'tools', label: 'Ferramentas', icon: '🔧' },
-  { id: 'auto', label: 'Automotivo', icon: '🚗' },
-  { id: 'gaming', label: 'Games & Setup', icon: '🎮' },
-  { id: 'office', label: 'Escritório', icon: '💼' },
-  { id: 'outdoor', label: 'Outdoor & Camping', icon: '🏕️' },
-  { id: 'travel', label: 'Viagem', icon: '✈️' },
-];
+import { ALL_CATEGORY, categoriesForCounts } from '../../data/taxonomy';
+import { commissionBrlOf, stockUnitsOf, videoCountOf } from '../../lib/productRules';
 
 interface ProductListPanelProps {
   width?: number;
   products: TrendingProduct[];
+  categoryProducts?: TrendingProduct[];
   activeProduct: TrendingProduct | null;
   onSelectProduct: (p: TrendingProduct) => void;
   isCollapsed: boolean;
@@ -61,6 +39,7 @@ interface ProductListPanelProps {
 export const ProductListPanel: React.FC<ProductListPanelProps> = ({
   width,
   products,
+  categoryProducts,
   activeProduct,
   onSelectProduct,
   isCollapsed,
@@ -78,7 +57,6 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
   onOpenAddCustomProduct,
 }) => {
   const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
-  const [showSearchInput, setShowSearchInput] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Fechar dropdown ao clicar fora
@@ -92,35 +70,20 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Enriquecer e filtrar produtos (Apenas Oceano Azul e Início de Onda)
-  const enrichedProducts = useMemo(() => {
-    return (products || [])
-      .map(enrichWithTikTokShopData)
-      .filter(isBlueOceanOpportunity);
-  }, [products]);
+  const filtered = products || [];
+  const counted = categoryProducts || filtered;
 
-  // Contagem de produtos por categoria
   const categoryCounts = useMemo(() => {
-    const counts: Record<string, number> = { all: enrichedProducts.length };
-    enrichedProducts.forEach((p) => {
-      const niche = p.niche || 'other';
+    const counts: Record<string, number> = { all: counted.length };
+    counted.forEach((product) => {
+      const niche = product.niche || 'other';
       counts[niche] = (counts[niche] || 0) + 1;
     });
     return counts;
-  }, [enrichedProducts]);
+  }, [counted]);
 
-  const filtered = useMemo(() => {
-    let list = enrichedProducts;
-
-    // Filtro por Categoria / Nicho
-    if (selectedNiche && selectedNiche !== 'all') {
-      list = list.filter((p) => p.niche === selectedNiche);
-    }
-
-    return list;
-  }, [enrichedProducts, selectedNiche]);
-
-  const activeCategoryObj = CATEGORIES.find((c) => c.id === selectedNiche) || CATEGORIES[0];
+  const categories = useMemo(() => categoriesForCounts(categoryCounts), [categoryCounts]);
+  const activeCategoryObj = categories.find((category) => category.id === selectedNiche) || ALL_CATEGORY;
 
   // Se o painel estiver recolhido no Desktop
   if (isCollapsed) {
@@ -226,7 +189,7 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
               </div>
 
               <div className="grid grid-cols-2 gap-1 max-h-60 overflow-y-auto pr-0.5">
-                {CATEGORIES.map((cat) => {
+                {categories.map((cat) => {
                   const isSelected = selectedNiche === cat.id;
                   const count = categoryCounts[cat.id] || 0;
                   if (cat.id !== 'all' && count === 0) return null;
@@ -280,14 +243,59 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
             </span>
           </button>
         )}
+
+        <label className="block">
+          <span className="sr-only">Buscar produto</span>
+          <span className="relative flex items-center">
+            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5" />
+            <input
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              placeholder="Buscar por nome, palavra-chave ou nicho"
+              className="w-full rounded-xl border border-slate-300 bg-white py-2 pl-8 pr-8 text-xs text-slate-900 outline-none focus:border-[#25F4EE]"
+            />
+            {searchQuery && (
+              <button type="button" onClick={() => setSearchQuery('')} className="absolute right-2 text-slate-400" title="Limpar busca">
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </span>
+        </label>
+
+        <div className="flex flex-wrap gap-1">
+          <button
+            type="button"
+            onClick={() => setFilterBlueOceanOnly(!filterBlueOceanOnly)}
+            className={`px-2 py-1 rounded-lg text-[10px] font-bold border ${filterBlueOceanOnly ? 'bg-[#25F4EE]/15 border-[#25F4EE] text-[#007A87]' : 'bg-white border-slate-300 text-slate-600'}`}
+          >
+            Oceano azul
+          </button>
+          <button
+            type="button"
+            onClick={() => setFilterHighCommissionOnly(!filterHighCommissionOnly)}
+            className={`px-2 py-1 rounded-lg text-[10px] font-bold border ${filterHighCommissionOnly ? 'bg-amber-50 border-amber-300 text-amber-800' : 'bg-white border-slate-300 text-slate-600'}`}
+          >
+            Comissão alta
+          </button>
+          <button
+            type="button"
+            onClick={() => setFilterFreeSampleOnly(!filterFreeSampleOnly)}
+            className={`px-2 py-1 rounded-lg text-[10px] font-bold border ${filterFreeSampleOnly ? 'bg-emerald-50 border-emerald-300 text-emerald-800' : 'bg-white border-slate-300 text-slate-600'}`}
+          >
+            Amostra grátis
+          </button>
+        </div>
+        <p className="text-[10px] text-slate-500 leading-snug">
+          Sempre ligados: estoque ≥ 500, menos de 50 vídeos e comissão ≥ R$ 10.
+        </p>
       </div>
 
       {/* Lista Rolável de Cards com Foto Real e Identidade TikBlox */}
       <div className="flex-1 overflow-y-auto p-2 sm:p-2.5 space-y-2 min-h-0">
         {filtered.length === 0 ? (
           <div className="p-6 text-center text-slate-500 text-xs bg-white rounded-xl border border-slate-200 my-4 shadow-2xs">
-            <p className="font-bold text-slate-700">Nenhum produto nesta categoria.</p>
-            <p className="text-[11px] text-slate-500 mt-1">Experimente selecionar "Todas as Categorias" ou limpar os filtros.</p>
+            <p className="font-bold text-slate-700">Nenhum produto com essas regras.</p>
+            <p className="text-[11px] text-slate-500 mt-1">Estoque de pelo menos 500 unidades, menos de 50 vídeos e comissão de pelo menos R$ 10. A lista não é preenchida com itens fora da regra.</p>
             <button
               onClick={() => {
                 setSelectedNiche('all');
@@ -312,7 +320,9 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
             const tc = prod.tradeConviction;
             const breakEvenSales = tc?.breakEvenSales || Math.max(1, Math.ceil(priceBRL / Math.max(1, commVal)));
             const convictionScore = tc?.convictionScore || Math.min(99, Math.round(prod.viralityScore || 92));
-            const videoCount = tc?.creatorVideoCountBR || (prod.creatorSaturationBR === 'Baixa' ? 6 : 18);
+            const videoCount = videoCountOf(prod);
+            const stock = stockUnitsOf(prod);
+            const estimate = prod.metricsEstimated !== false && prod.dataSource !== 'live';
 
             return (
               <div
@@ -347,7 +357,8 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
                     </div>
 
                     <span className="text-[9px] font-mono font-bold px-1.5 py-0.2 rounded bg-sky-50 text-[#007A87] border border-sky-200 shrink-0">
-                      ~{videoCount} vídeos BR
+                      {videoCount == null ? 'vídeos n/d' : `${videoCount} vídeos`}
+                      {estimate ? ' · Estimativa' : ''}
                     </span>
                   </div>
 
@@ -371,7 +382,8 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
                       Sua Comissão
                     </span>
                     <span className="font-extrabold text-emerald-600">
-                      R$ {commVal.toFixed(2)} ({commPct}%)
+                      R$ {(commissionBrlOf(prod) ?? commVal).toFixed(2)} ({commPct}%)
+                      {estimate ? <span className="block text-[8px] font-sans text-slate-400">Estimativa</span> : null}
                     </span>
                   </div>
                 </div>
@@ -380,7 +392,7 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
                 <div className="flex items-center justify-between text-[10px] pt-0.5">
                   <span className="font-bold text-slate-700 flex items-center gap-1">
                     <span className="w-1.5 h-1.5 rounded-full bg-[#25F4EE]" />
-                    <span>Zera em <strong>{breakEvenSales} vendas</strong></span>
+                    <span>{stock == null ? 'Estoque n/d' : `${stock} un.`} · zera em <strong>{breakEvenSales}</strong></span>
                   </span>
                   <span className="font-bold text-[#FE2C55] shrink-0 flex items-center gap-0.5 hover:underline text-[11px]">
                     <span>Ver Setup</span>

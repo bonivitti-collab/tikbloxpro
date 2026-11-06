@@ -55,6 +55,8 @@ const OnboardingModal = React.lazy(() =>
 const ONBOARDING_STORAGE_KEY = 'tikblox_onboarding_completed_v1';
 import { TrendingProduct, ProductNiche, AppUpdateInfo, ProductPriceCheck, PriceMonitorSummary } from './types';
 import { isBlueOceanOpportunity } from './lib/blueOcean';
+import { enrichWithTikTokShopData } from './data/tiktokShopEnricher';
+import { isIsoDiscoveredAt, matchScore, passesBusinessRules } from './lib/productRules';
 import {
   scanTrends,
   fetchCatalog,
@@ -542,58 +544,51 @@ export default function App() {
     }
   };
 
-  // High-performance filter products based on activeTab, niche, origin, search, and TikTok Shop metrics
-  // Novos parâmetros: >500 vendas, <50 vídeos BR, comissão >= R$ 10
+  const enrichedProducts = useMemo(
+    () => (products || []).map((product) => enrichWithTikTokShopData(product)),
+    [products]
+  );
+  const qualifiedProducts = useMemo(
+    () => enrichedProducts.filter(passesBusinessRules),
+    [enrichedProducts]
+  );
+  const showNovidades = useMemo(
+    () => qualifiedProducts.some((product) => isIsoDiscoveredAt(product.discoveredAt)),
+    [qualifiedProducts]
+  );
+
   const filteredProducts = useMemo(() => {
     const isEarlyWave = activeTab === 'early_wave';
-    const isHighMargin = activeTab === 'high_margin';
-    const isNovidades = activeTab === 'novidades';
+    const isHighMargin = activeTab === 'high_margin' || filterHighCommissionOnly;
+    const isNovidades = activeTab === 'novidades' && showNovidades;
     const filterNiche = selectedNiche !== 'all' ? selectedNiche : null;
     const filterOrigin = selectedOrigin !== 'all' ? selectedOrigin : null;
-    const queryTrim = searchQuery.toLowerCase().trim();
-    const queryTokens = queryTrim ? queryTrim.split(' ').filter(Boolean) : [];
 
-    const today = new Date().toISOString().slice(0, 10);
-
-    return products.filter((p) => {
-      // Parâmetros rígidos de pesquisa
-      const sales = p.tiktokShop?.recentSalesCount || p.tradeConviction?.netProfitAt50Sales || 0;
-      const videos = p.tradeConviction?.creatorVideoCountBR || (p.creatorSaturationBR === 'Baixa' ? 8 : 25);
-      const commission = p.tiktokShop?.commissionValueBRL || p.tradeConviction?.commissionBRL || (Number(p.estimatedPriceBRL || 0) * 0.2);
-
-      if (sales < 500) return false;
-      if (videos >= 50) return false;
-      if (commission < 10) return false;
-
-      // 1. Fast tab filter
-      if (isEarlyWave && p.waveStage !== 'early_wave' && p.tiktokShop?.saturationLevel !== 'Oceano Azul') return false;
-      if (isHighMargin && (p.tiktokShop?.commissionRatePercent || 0) < 20 && p.estimatedProfitMarginPercent < 280) return false;
-      if (isNovidades) {
-        const discovered = (p.discoveredAt || '').toLowerCase();
-        const isToday = discovered.includes(today) || discovered.includes('hoje') || discovered.includes('escaneado') || discovered.includes('tempo real') || !discovered;
-        if (!isToday) return false;
-      }
-
-      // 2. Fast niche filter
-      if (filterNiche && p.niche !== filterNiche) return false;
-
-      // 3. Fast origin filter
-      if (filterOrigin && p.originCountry !== filterOrigin) return false;
-
-      // 4. TikTok Shop affiliate filters
-      if (filterFreeSampleOnly && !p.tiktokShop?.freeSampleAvailable) return false;
-      if (filterBlueOceanOnly && p.tiktokShop?.saturationLevel !== 'Oceano Azul' && p.waveStage !== 'early_wave') return false;
-
-      // 5. Search query matching
-      if (queryTokens.length > 0) {
-        const textToSearch = `${p.name} ${p.originalName} ${p.niche} ${p.nicheLabel} ${p.culturalFitReason} ${(p.supplierKeywords || []).join(' ')} ${p.tiktokShop?.topViralHook || ''} ${p.tiktokShop?.stockLocation || ''}`.toLowerCase();
-        const matches = queryTokens.some(token => textToSearch.includes(token));
-        if (!matches) return false;
-      }
-
+    const matched = qualifiedProducts.filter((product) => {
+      if (isEarlyWave && product.waveStage !== 'early_wave' && product.tiktokShop?.saturationLevel !== 'Oceano Azul') return false;
+      if (isHighMargin && (product.tiktokShop?.commissionRatePercent || 0) < 20) return false;
+      if (isNovidades && !isIsoDiscoveredAt(product.discoveredAt)) return false;
+      if (filterNiche && product.niche !== filterNiche) return false;
+      if (filterOrigin && product.originCountry !== filterOrigin) return false;
+      if (filterFreeSampleOnly && !product.tiktokShop?.freeSampleAvailable && !product.freeSampleAvailable) return false;
+      if (filterBlueOceanOnly && product.tiktokShop?.saturationLevel !== 'Oceano Azul' && product.waveStage !== 'early_wave') return false;
+      if (searchQuery.trim() && matchScore(product, searchQuery) === 0) return false;
       return true;
     });
-  }, [products, activeTab, selectedNiche, selectedOrigin, searchQuery, filterFreeSampleOnly, filterBlueOceanOnly]);
+
+    if (!searchQuery.trim()) return matched;
+    return [...matched].sort((a, b) => matchScore(b, searchQuery) - matchScore(a, searchQuery));
+  }, [
+    qualifiedProducts,
+    activeTab,
+    selectedNiche,
+    selectedOrigin,
+    searchQuery,
+    filterFreeSampleOnly,
+    filterBlueOceanOnly,
+    filterHighCommissionOnly,
+    showNovidades,
+  ]);
 
   // Progressive DOM Chunking / Windowing:
   // Rendering 3,000 cards simultaneously would block the main thread with >75k DOM nodes.
@@ -605,7 +600,7 @@ export default function App() {
   // Reset display chunk when active filters change so the user starts smoothly at the top
   useEffect(() => {
     setDisplayLimit(CHUNK_SIZE);
-  }, [activeTab, selectedNiche, selectedOrigin]);
+  }, [activeTab, selectedNiche, selectedOrigin, searchQuery, filterFreeSampleOnly, filterBlueOceanOnly, filterHighCommissionOnly]);
 
   const visibleProducts = useMemo(() => {
     return filteredProducts.slice(0, displayLimit);
@@ -743,7 +738,8 @@ export default function App() {
         >
           <ProductListPanel
             width={isDesktop && !painelEsquerdoRecolhido ? leftWidth : undefined}
-            products={products}
+            products={filteredProducts}
+            categoryProducts={qualifiedProducts}
             activeProduct={activeProduct}
             onSelectProduct={(p) => {
               setActiveProduct(p);
