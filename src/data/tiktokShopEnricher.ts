@@ -115,41 +115,53 @@ export function enrichWithTikTokShopData(product: any): any {
   const netProfitAt20Sales = Math.max(0, Number(((20 * commissionForMath) - sampleCostBRL).toFixed(2)));
   const netProfitAt50Sales = Math.max(0, Number(((50 * commissionForMath) - sampleCostBRL).toFixed(2)));
 
-  // Concorrência de vídeos no feed do TikTok Brasil
+  // Concorrência só existe quando a contagem de vídeos veio da coleta.
   const creatorVideoCountBR = activeCreatorsCount;
-  let creatorCompetitionLevel: 'Oceano Azul (< 10 vídeos)' | 'Baixa Concorrência (10-25 vídeos)' | 'Concorrência Média (25-50 vídeos)' | 'Saturado (> 50 vídeos)' = 'Oceano Azul (< 10 vídeos)';
-  if (creatorVideoCountBR > 50) creatorCompetitionLevel = 'Saturado (> 50 vídeos)';
-  else if (creatorVideoCountBR > 25) creatorCompetitionLevel = 'Concorrência Média (25-50 vídeos)';
-  else if (creatorVideoCountBR >= 10) creatorCompetitionLevel = 'Baixa Concorrência (10-25 vídeos)';
+  const measured = product.dataSource === 'live' && typeof creatorVideoCountBR === 'number';
+  let creatorCompetitionLevel: 'Oceano Azul (< 10 vídeos)' | 'Baixa Concorrência (10-25 vídeos)' | 'Concorrência Média (25-50 vídeos)' | 'Saturado (> 50 vídeos)' | 'Contagem não informada' = 'Contagem não informada';
+  if (measured && creatorVideoCountBR > 50) creatorCompetitionLevel = 'Saturado (> 50 vídeos)';
+  else if (measured && creatorVideoCountBR > 25) creatorCompetitionLevel = 'Concorrência Média (25-50 vídeos)';
+  else if (measured && creatorVideoCountBR >= 10) creatorCompetitionLevel = 'Baixa Concorrência (10-25 vídeos)';
+  else if (measured) creatorCompetitionLevel = 'Oceano Azul (< 10 vídeos)';
 
-  // Score de Convicção e Veredito TikBlox
-  const videoPenalty = typeof creatorVideoCountBR === 'number' ? creatorVideoCountBR * 0.35 : 0;
-  let convictionScore = Math.min(99, Math.max(65, Math.round((product.viralityScore || 85) - videoPenalty)));
-  if (product.waveStage === 'early_wave') convictionScore = Math.min(99, Math.max(91, convictionScore + 6));
+  // Score = 95 − vídeos medidos, entre 5 e 95. Sem piso de 91 e sem viralityScore do catálogo de exemplo.
+  const convictionScore = measured ? Math.max(5, Math.min(95, 95 - Math.round(creatorVideoCountBR))) : null;
 
-  let verdict: 'COMPRA_RECOMENDADA' | 'ENTRADA_MODERADA' | 'ALERTA_SATURACAO' = 'COMPRA_RECOMENDADA';
-  let verdictLabel = '🟢 ENTRADA FORTE (COMPRA DE AMOSTRA VALIDADA)';
-  let riskLevel: 'MUITO_BAIXO' | 'BAIXO' | 'MODERADO' = 'MUITO_BAIXO';
-  let riskLabel = 'Risco Mínimo (Assimetria Altamente Positiva)';
+  let verdict: 'COMPRA_RECOMENDADA' | 'ENTRADA_MODERADA' | 'ALERTA_SATURACAO' = 'ENTRADA_MODERADA';
+  let verdictLabel = 'DADOS INCOMPLETOS';
+  let riskLevel: 'MUITO_BAIXO' | 'BAIXO' | 'MODERADO' = 'MODERADO';
+  let riskLabel = 'Contagem de vídeos ausente';
 
-  if (creatorVideoCountBR != null && (convictionScore < 75 || creatorVideoCountBR > 45)) {
-    verdict = 'ALERTA_SATURACAO';
-    verdictLabel = '🔴 ALERTA DE SATURAÇÃO (ALTA CONCORRÊNCIA)';
-    riskLevel = 'MODERADO';
-    riskLabel = 'Risco Moderado (Muitos criadores competindo no feed)';
-  } else if (creatorVideoCountBR != null && (convictionScore < 88 || creatorVideoCountBR > 20)) {
-    verdict = 'ENTRADA_MODERADA';
-    verdictLabel = '🟡 ENTRADA MODERADA (ACOMPANHAR FEED)';
+  if (measured && creatorVideoCountBR < 10) {
+    verdict = 'COMPRA_RECOMENDADA';
+    verdictLabel = 'POUCOS VÍDEOS NO FEED';
     riskLevel = 'BAIXO';
-    riskLabel = 'Risco Baixo (Monitorar primeiras 24h)';
+    riskLabel = 'Menos de 10 vídeos medidos';
+  } else if (measured && creatorVideoCountBR <= 25) {
+    verdict = 'ENTRADA_MODERADA';
+    verdictLabel = 'CONCORRÊNCIA BAIXA';
+    riskLevel = 'BAIXO';
+    riskLabel = '10 a 25 vídeos medidos';
+  } else if (measured && creatorVideoCountBR <= 50) {
+    verdict = 'ENTRADA_MODERADA';
+    verdictLabel = 'CONCORRÊNCIA MÉDIA';
+    riskLevel = 'MODERADO';
+    riskLabel = '26 a 50 vídeos medidos';
+  } else if (measured) {
+    verdict = 'ALERTA_SATURACAO';
+    verdictLabel = 'FEED CHEIO';
+    riskLevel = 'MODERADO';
+    riskLabel = 'Mais de 50 vídeos medidos';
   }
 
   const reasons = [
-    'O comprador escolhe o vendedor dentro do TikTok Shop. Prazo e disponibilidade são os da loja escolhida.',
-    creatorVideoCountBR == null
-      ? 'Contagem de vídeos no feed BR ainda não verificada. Métrica sem número inventado.'
-      : `Apenas ${creatorVideoCountBR} vídeos de criadores no TikTok Brasil (${creatorCompetitionLevel}). Vácuo de conteúdo no algoritmo com carrinho amarelo ativo.`,
-    `No menor preço da faixa, cerca de ${breakEvenSales} vendas cobrem esse valor. O preço no TikTok muda com cupom, promoção e vendedor.`
+    'O comprador escolhe o vendedor dentro do TikTok Shop.',
+    measured
+      ? `${creatorVideoCountBR} vídeos medidos no TikTok Brasil (${creatorCompetitionLevel}).`
+      : 'A contagem de vídeos não veio nesta coleta. O radar não completa esse número.',
+    breakEvenSales > 0
+      ? `No menor preço da faixa, cerca de ${breakEvenSales} vendas cobrem esse valor. O preço no TikTok muda com cupom, promoção e vendedor.`
+      : 'Sem comissão informada não dá para calcular em quantas vendas o menor preço se paga.'
   ];
 
   const tradeConviction = {

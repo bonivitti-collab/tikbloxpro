@@ -327,9 +327,9 @@ export const InteractiveScreensCarousel: React.FC<InteractiveScreensCarouselProp
                   <div className="space-y-3.5">
                     <div className="flex items-center justify-between">
                       <span className="text-[10px] font-black uppercase px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
-                        🟢 ENTRADA FORTE (COMPRA DE AMOSTRA VALIDADA)
+                        Ilustração da tela
                       </span>
-                      <span className="text-xs font-mono font-black text-[#25F4EE]">Convicção 94/100</span>
+                      <span className="text-xs font-mono font-black text-[#25F4EE]">Score só com vídeos medidos</span>
                     </div>
 
                     <h4 className="text-sm font-black text-white">

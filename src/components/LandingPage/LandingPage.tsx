@@ -332,12 +332,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </div>
 
             <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 space-y-1 hover:border-amber-500/40 transition">
-              <span className="text-[10px] uppercase font-bold text-slate-400 block">Risco Mínimo</span>
+              <span className="text-[10px] uppercase font-bold text-slate-400 block">Simulação</span>
               <span className="text-xs font-black text-white flex items-center gap-1.5">
                 <Target className="w-3.5 h-3.5 text-amber-400" />
-                <span>Break-Even 3 Vendas</span>
+                <span>Você informa o preço</span>
               </span>
-              <span className="text-[10px] text-slate-400 block font-mono">Retorno ultra rápido</span>
+              <span className="text-[10px] text-slate-400 block font-mono">A conta usa o menor preço da faixa</span>
             </div>
 
             <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 space-y-1 hover:border-[#FE2C55]/40 transition">
@@ -688,6 +688,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <button onClick={scrollToPricing} className="hover:text-white transition cursor-pointer">
             Planos Kiwify
           </button>
+          <span>•</span>
+          <a href="/termos" className="hover:text-white transition">Termos</a>
+          <span>•</span>
+          <a href="/privacidade" className="hover:text-white transition">Privacidade</a>
         </div>
         <p className="text-[10px] text-slate-600">
           © {new Date().getFullYear()} TIKBLOX PRO. Uma tecnologia do ecossistema Sentinel Systems. Todos os direitos reservados.

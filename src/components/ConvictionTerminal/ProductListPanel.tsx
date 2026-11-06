@@ -278,7 +278,7 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
             const collectedLabel = formatCollectedAt(prod.collectedAt);
             const tc = prod.tradeConviction;
             const breakEvenSales = tc?.breakEvenSales || (commissionBand && commissionBand.min > 0 ? Math.max(1, Math.ceil(band.min / commissionBand.min)) : 0);
-            const convictionScore = tc?.convictionScore || Math.min(99, Math.round(prod.viralityScore || 92));
+            const convictionScore = prod.dataSource === 'live' && typeof tc?.convictionScore === 'number' ? tc.convictionScore : null;
             const videoCount = videoCountOf(prod);
             const stock = stockUnitsOf(prod);
             const estimate = prod.metricsEstimated !== false && prod.dataSource !== 'live';
@@ -299,13 +299,15 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
                       {prod.nicheLabel || 'Nicho'}
                     </span>
                     <span className={`text-[9px] font-mono font-black px-1 py-0.5 rounded border shrink-0 ${
-                      convictionScore >= 90
-                        ? 'bg-emerald-50 text-emerald-900 border-emerald-300'
+                      convictionScore == null
+                        ? 'bg-slate-50 text-slate-700 border-slate-300'
                         : convictionScore >= 80
+                        ? 'bg-emerald-50 text-emerald-900 border-emerald-300'
+                        : convictionScore >= 50
                         ? 'bg-amber-50 text-amber-900 border-amber-300'
                         : 'bg-rose-50 text-rose-900 border-rose-300'
                     }`}>
-                      {convictionScore}/100
+                      {convictionScore == null ? (prod.dataSource === 'live' ? 'sem score' : 'exemplo') : `${convictionScore}/100`}
                     </span>
                   </div>
                   <span className="text-[9px] font-mono font-bold text-slate-600 shrink-0">

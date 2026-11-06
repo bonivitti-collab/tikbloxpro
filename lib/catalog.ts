@@ -1,8 +1,5 @@
-import { enrichWithTikTokShopData } from '../src/data/tiktokShopEnricher.js';
-import { INITIAL_CURATED_TRENDS } from '../src/data/curatedTrends.js';
 import { keepLiveProduct, matchScore } from '../src/lib/productRules.js';
 import type { TrendingProduct } from '../src/types.js';
-import { mergeLiveAndCurated } from './ingestPlan.js';
 import { liveRowToProduct } from './liveCatalog.js';
 import { canSeeKalodata } from './kalodataAccess.js';
 import { listStoredProducts, type StoredProductRow } from './productsStore.js';
@@ -50,9 +47,7 @@ export async function listCatalog(filters: {
     live = [];
   }
 
-  const curated = INITIAL_CURATED_TRENDS.map((product) => enrichWithTikTokShopData({
-    ...product,
-    dataSource: 'curated',
-  }));
-  return applyFilters(mergeLiveAndCurated(live, curated), filters);
+  // O catálogo de exemplo (src/data/niches) não entra no radar pago.
+  // Os números dele são texto de demonstração, não medição.
+  return applyFilters(live, filters);
 }
