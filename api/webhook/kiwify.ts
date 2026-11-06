@@ -1,8 +1,10 @@
 import { applyKiwifyPayload } from '../../lib/access.js';
-import { clientIp, maskEmail, readRawBody, sendJson } from '../../lib/http.js';
-import { signatureFromRequest, signatureIsValid, webhookToken, webhookTokenIsConfigured } from '../../lib/kiwify.js';
+import { clientIp, maskEmail, readWebhookBody, sendJson } from '../../lib/http.js';
+import { signatureFromRequest, signatureMatchesAny, webhookToken, webhookTokenIsConfigured } from '../../lib/kiwify.js';
 import { isRateLimited } from '../../lib/rateLimit.js';
 
+// Convenção do Pages API do Next. O runtime Node da Vercel (nodejs24.x, não Next)
+// ignora isto e entrega req.body já parseado. O handler trata os dois casos.
 export const config = {
   api: {
     bodyParser: false,
@@ -28,18 +30,13 @@ export default async function handler(req: any, res: any) {
       return sendJson(res, 503, { error: 'Webhook não configurado' });
     }
 
-    const rawBody = await readRawBody(req);
+    const { payload: parsed, candidates } = await readWebhookBody(req);
     const signature = signatureFromRequest(req);
-    if (!signatureIsValid(rawBody, signature)) {
+    if (!signatureMatchesAny(candidates, signature)) {
       return sendJson(res, 401, { error: 'Assinatura inválida' });
     }
 
-    let payload: any;
-    try {
-      payload = rawBody ? JSON.parse(rawBody) : {};
-    } catch {
-      return sendJson(res, 400, { error: 'JSON inválido' });
-    }
+    const payload = parsed;
     if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
       return sendJson(res, 400, { error: 'JSON inválido' });
     }
@@ -60,12 +57,7 @@ export default async function handler(req: any, res: any) {
     if (code === 'PAYLOAD_TOO_LARGE') {
       return sendJson(res, 413, { error: 'Payload grande demais' });
     }
-    if (
-      code === 'RAW_BODY_REQUIRED' ||
-      code === 'SUBSCRIBER_STORE_UNCONFIGURED' ||
-      code === 'AUTH_SECRET_MISSING' ||
-      code === 'AUTH_SECRET_LEAKED'
-    ) {
+    if (code === 'SUBSCRIBER_STORE_UNCONFIGURED' || code === 'AUTH_SECRET_MISSING' || code === 'AUTH_SECRET_LEAKED') {
       console.error('[KIWIFY]', code);
       return sendJson(res, 503, { error: 'Webhook sem persistência configurada' });
     }

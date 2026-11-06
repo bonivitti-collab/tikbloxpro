@@ -341,6 +341,36 @@ const tiny = await postWebhook(shortBody, '00');
 assert(tiny.statusCode === 503, 'token com menos de 8 caracteres continua 503');
 process.env.KIWIFY_WEBHOOK_TOKEN = savedToken;
 
+const vercelPayload = {
+  order_id: 'order-vercel-parsed',
+  order_status: 'waiting_payment',
+  webhook_event_type: 'pix_created',
+  Customer: { email: 'vercel@example.com' },
+};
+const vercelRaw = JSON.stringify(vercelPayload);
+const vercelSig = kiwifySignature(vercelRaw, process.env.KIWIFY_WEBHOOK_TOKEN || '');
+const parsedReq = {
+  method: 'POST',
+  headers: { 'content-type': 'application/json' },
+  url: `/api/webhook/kiwify?signature=${vercelSig}`,
+  query: { signature: vercelSig },
+  body: vercelPayload,
+  readableEnded: true,
+  socket: { remoteAddress: '203.0.113.77' },
+};
+const parsedRes = mockRes();
+await webhook(parsedReq, parsedRes);
+assert(
+  parsedRes.statusCode === 200 && parsedRes.body?.outcome === 'ignored',
+  'body já parseado pela Vercel valida o HMAC de JSON.stringify'
+);
+const badParsed = mockRes();
+await webhook(
+  { ...parsedReq, query: { signature: '0'.repeat(40) }, url: '/api/webhook/kiwify?signature=' + '0'.repeat(40) },
+  badParsed
+);
+assert(badParsed.statusCode === 401, 'body parseado com assinatura errada responde 401');
+
 if (failed > 0) {
   console.error(`\n${failed} verificação(ões) falharam`);
   process.exit(1);
