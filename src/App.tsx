@@ -57,21 +57,20 @@ const WifeBotConfigModal = React.lazy(() =>
 );
 const ONBOARDING_STORAGE_KEY = 'tikblox_onboarding_completed_v1';
 import { TrendingProduct, ProductNiche, AppUpdateInfo, ProductPriceCheck, PriceMonitorSummary } from './types';
-import { INITIAL_CURATED_TRENDS, isBlueOceanOpportunity } from './data/curatedTrends';
+import { isBlueOceanOpportunity } from './lib/blueOcean';
 import {
   scanTrends,
+  fetchCatalog,
   getSavedProductIds,
   toggleSaveProduct,
-  getCachedScannedProducts,
-  syncSavedProductsToIndexedDB,
   checkSavedProductsPrices,
   getStoredPriceChecks,
 } from './services/api';
 import {
-  seedInitialIndexedDB,
   getAllSavedProductsFromIndexedDB,
   getAllCachedTrendsFromIndexedDB,
   saveProductToIndexedDB,
+  cacheTrendProductsToIndexedDB,
   autoCleanupTrendCacheIfDue,
 } from './services/indexedDbService';
 import {
@@ -89,20 +88,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<
     'all' | 'early_wave' | 'high_margin' | 'novidades' | 'saved' | 'calculator'
   >('all');
-  const [products, setProducts] = useState<TrendingProduct[]>(() => {
-    try {
-      localStorage.removeItem('tikblox_scan_cache_v1');
-      localStorage.removeItem('tikblox_scan_cache_v2');
-    } catch {}
-    const cached = getCachedScannedProducts().filter(isBlueOceanOpportunity);
-    if (cached.length > 0) {
-      // Merge unique
-      const ids = new Set(cached.map((p) => p.id));
-      const rest = INITIAL_CURATED_TRENDS.filter((p) => !ids.has(p.id) && isBlueOceanOpportunity(p));
-      return [...cached, ...rest];
-    }
-    return INITIAL_CURATED_TRENDS.filter(isBlueOceanOpportunity);
-  });
+  const [products, setProducts] = useState<TrendingProduct[]>([]);
 
   const [savedIds, setSavedIds] = useState<string[]>(() => getSavedProductIds());
   const [selectedNiche, setSelectedNiche] = useState<ProductNiche>('all');
@@ -110,7 +96,7 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [filterFreeSampleOnly, setFilterFreeSampleOnly] = useState<boolean>(false);
   const [filterBlueOceanOnly, setFilterBlueOceanOnly] = useState<boolean>(false);
-  const [activeProduct, setActiveProduct] = useState<TrendingProduct | null>(() => INITIAL_CURATED_TRENDS[0] || null);
+  const [activeProduct, setActiveProduct] = useState<TrendingProduct | null>(null);
   const [painelEsquerdoRecolhido, setPainelEsquerdoRecolhido] = useState(false);
   const [painelDireitoRecolhido, setPainelDireitoRecolhido] = useState(true); // AI panel disabled
   const [mobileTab, setMobileTab] = useState<'produtos' | 'terminal' | 'copilot'>('produtos');
@@ -141,6 +127,44 @@ export default function App() {
       cancelled = true;
     };
   }, []);
+
+  useEffect(() => {
+    if (!session?.isAuthenticated) {
+      setProducts([]);
+      setActiveProduct(null);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      try {
+        if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+          const cached = await getAllCachedTrendsFromIndexedDB();
+          if (cancelled) return;
+          const visible = (cached || []).filter(isBlueOceanOpportunity);
+          setProducts(visible);
+          setActiveProduct((current) => current || visible[0] || null);
+          return;
+        }
+        const fresh = await fetchCatalog();
+        if (cancelled) return;
+        setProducts(fresh);
+        setActiveProduct((current) => {
+          if (current && fresh.some((product) => product.id === current.id)) return current;
+          return fresh[0] || null;
+        });
+        cacheTrendProductsToIndexedDB(fresh, 'curated').catch(() => {});
+      } catch (error) {
+        console.warn('Falha ao carregar o radar autenticado:', error);
+        if (!cancelled) {
+          setProducts([]);
+          setActiveProduct(null);
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [session?.email, session?.isAuthenticated]);
 
   // Redimensionamento dos painéis estilo TikBlox (com persistência no localStorage)
   const [redimensionando, setRedimensionando] = useState<'left' | 'right' | null>(null);
@@ -251,27 +275,7 @@ export default function App() {
           setSavedIds(merged);
         }
 
-        // 2. Hydrate trend history from IndexedDB if available (Strict Blue Ocean Only)
-        const offlineTrends = await getAllCachedTrendsFromIndexedDB();
-        if (isMounted && offlineTrends && offlineTrends.length > 0) {
-          const validTrends = offlineTrends.filter(isBlueOceanOpportunity);
-          setProducts((prev) => {
-            const map = new Map<string, TrendingProduct>();
-            validTrends.forEach((p) => map.set(p.id, p));
-            prev.filter(isBlueOceanOpportunity).forEach((p) => {
-              if (!map.has(p.id)) map.set(p.id, p);
-            });
-            return Array.from(map.values()).filter(isBlueOceanOpportunity);
-          });
-        }
-
-        // 3. Seed initial curated trends into IndexedDB in the background if database is empty
-        await seedInitialIndexedDB(INITIAL_CURATED_TRENDS);
-
-        // 4. Sync existing saved products into IndexedDB
-        await syncSavedProductsToIndexedDB(INITIAL_CURATED_TRENDS);
-
-        // 5. Automatic maintenance: purge products from trend cache older than 30 days
+        // 2. Automatic maintenance: purge products from trend cache older than 30 days
         await autoCleanupTrendCacheIfDue(30);
       } catch (e) {
         console.warn('IndexedDB initial sync error:', e);

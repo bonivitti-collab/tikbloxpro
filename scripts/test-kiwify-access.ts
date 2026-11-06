@@ -8,15 +8,17 @@ process.env.KIWIFY_WEBHOOK_TOKEN = 'kiwify-token-de-teste';
 process.env.TIKBLOX_ADMIN_EMAIL = 'owner@example.com';
 process.env.TIKBLOX_ADMIN_PASSWORD = 'owner-pass-123';
 process.env.TIKBLOX_ADMIN_NAME = 'Dono';
+process.env.KIWIFY_LATE_GRACE_HOURS = '48';
 delete process.env.SUPABASE_URL;
 delete process.env.SUPABASE_SERVICE_ROLE_KEY;
 delete process.env.VERCEL;
 
 const { kiwifySignature } = await import('../lib/kiwify');
-const { resetMemorySubscribers, getSubscriber } = await import('../lib/subscribers');
+const { resetMemorySubscribers, getSubscriber, saveSubscriber } = await import('../lib/subscribers');
 const { resetMemoryRateLimit } = await import('../lib/rateLimit');
 const webhook = (await import('../api/webhook/kiwify')).default;
 const auth = (await import('../api/auth')).default;
+const catalog = (await import('../api/catalog')).default;
 
 const OFFICIAL_BODY =
   '{"order_id":"9b1c2d3e-0000-4000-8000-000000000001","order_status":"paid","webhook_event_type":"order_approved"}';
@@ -107,6 +109,7 @@ assert(getRes.statusCode === 405, 'GET no webhook responde 405');
 const buyer = 'comprador@example.com';
 const paidBody = JSON.stringify({
   order_id: 'order-paid-1',
+  order_ref: 'PEDIDO1',
   order_status: 'paid',
   webhook_event_type: 'order_approved',
   updated_at: '2026-11-06 10:00',
@@ -126,8 +129,18 @@ const registerWithoutPay = await postAuth({
   name: 'Intruso',
   email: 'intruso@example.com',
   password: 'senha-forte-1',
+  orderCode: 'PEDIDO1',
 });
 assert(registerWithoutPay.statusCode === 403, 'cadastro sem pagamento é recusado');
+
+const wrongCode = await postAuth({
+  action: 'register',
+  name: 'Comprador Teste',
+  email: buyer,
+  password: 'senha-forte-1',
+  orderCode: 'CODIGO-ERRADO',
+});
+assert(wrongCode.statusCode === 401, 'código de pedido errado não define senha');
 
 const noPasswordYet = await postAuth({ action: 'login', email: buyer, password: 'senha-forte-1' });
 assert(noPasswordYet.statusCode === 403, 'pago ainda sem senha não entra direto');
@@ -137,6 +150,7 @@ const registered = await postAuth({
   name: 'Comprador Teste',
   email: buyer,
   password: 'senha-forte-1',
+  orderCode: 'PEDIDO1',
 });
 assert(registered.statusCode === 200 && registered.body?.session?.plan === 'essential', 'primeiro acesso define senha');
 assert(
@@ -200,6 +214,23 @@ const owner = await postAuth({
 });
 assert(owner.statusCode === 200 && owner.body?.session?.role === 'owner', 'dono entra pela senha do ambiente');
 
+const catalogDenied = mockRes();
+await catalog({ method: 'GET', headers: {}, url: '/api/catalog', socket: { remoteAddress: '203.0.113.30' } }, catalogDenied);
+assert(catalogDenied.statusCode === 401, 'catálogo sem sessão responde 401');
+
+const ownerCookie = String(owner.headers['set-cookie'] || '').split(';')[0];
+const catalogOk = mockRes();
+await catalog(
+  { method: 'GET', headers: { cookie: ownerCookie }, url: '/api/catalog', socket: { remoteAddress: '203.0.113.30' } },
+  catalogOk
+);
+assert(
+  catalogOk.statusCode === 200 &&
+    Array.isArray(catalogOk.body?.products) &&
+    catalogOk.body.products.some((product: { id?: string }) => product.id === 'tb-home-001'),
+  'sessão paga recebe o catálogo, inclusive tb-home-001'
+);
+
 const waitingBody = JSON.stringify({
   order_id: 'order-pix',
   order_status: 'waiting_payment',
@@ -209,6 +240,80 @@ const waitingBody = JSON.stringify({
 const waiting = await postWebhook(waitingBody, sign(waitingBody));
 assert(waiting.body?.outcome === 'ignored', 'Pix pendente não libera acesso');
 assert((await getSubscriber('pix@example.com')) == null, 'e-mail do Pix não vira assinante');
+
+const lateEmail = 'atraso@example.com';
+const latePaid = JSON.stringify({
+  order_id: 'order-late-1',
+  order_ref: 'ATRASO1',
+  order_status: 'paid',
+  webhook_event_type: 'order_approved',
+  updated_at: '2026-11-01 10:00',
+  Customer: { email: lateEmail, full_name: 'Atraso' },
+});
+assert((await postWebhook(latePaid, sign(latePaid))).body?.outcome === 'granted', 'compra do teste de atraso libera');
+assert(
+  (await postAuth({
+    action: 'register',
+    name: 'Atraso',
+    email: lateEmail,
+    password: 'senha-forte-1',
+    orderCode: 'ATRASO1',
+  })).statusCode === 200,
+  'código do pedido da Kiwify define a senha'
+);
+const lateEvent = JSON.stringify({
+  order_id: 'order-late-1',
+  order_status: 'paid',
+  webhook_event_type: 'subscription_late',
+  updated_at: new Date().toISOString(),
+  Customer: { email: lateEmail },
+});
+assert((await postWebhook(lateEvent, sign(lateEvent))).body?.outcome === 'late', 'subscription_late entra em carência');
+assert(
+  (await postAuth({ action: 'login', email: lateEmail, password: 'senha-forte-1' })).statusCode === 200,
+  'dentro da carência o acesso continua'
+);
+const lateRow = await getSubscriber(lateEmail);
+assert(lateRow != null, 'assinante em atraso existe');
+if (lateRow) {
+  lateRow.late_since = new Date(Date.now() - 72 * 60 * 60 * 1000).toISOString();
+  await saveSubscriber(lateRow);
+}
+assert(
+  (await postAuth({ action: 'login', email: lateEmail, password: 'senha-forte-1' })).statusCode === 403,
+  'depois da carência o atraso suspende o acesso'
+);
+
+process.env.KIWIFY_LATE_GRACE_HOURS = '0';
+const zeroEmail = 'zerocarencia@example.com';
+const zeroPaid = JSON.stringify({
+  order_id: 'order-zero-1',
+  order_ref: 'ZERO123',
+  order_status: 'paid',
+  webhook_event_type: 'order_approved',
+  updated_at: '2026-11-02 10:00',
+  Customer: { email: zeroEmail, full_name: 'Zero' },
+});
+await postWebhook(zeroPaid, sign(zeroPaid));
+await postAuth({
+  action: 'register',
+  name: 'Zero',
+  email: zeroEmail,
+  password: 'senha-forte-1',
+  orderCode: 'ZERO123',
+});
+const zeroLate = JSON.stringify({
+  order_id: 'order-zero-1',
+  order_status: 'paid',
+  webhook_event_type: 'subscription_late',
+  updated_at: new Date().toISOString(),
+  Customer: { email: zeroEmail },
+});
+assert((await postWebhook(zeroLate, sign(zeroLate))).body?.outcome === 'revoked', 'carência zero revoga na hora');
+assert(
+  (await postAuth({ action: 'login', email: zeroEmail, password: 'senha-forte-1' })).statusCode === 403,
+  'carência zero impede o login'
+);
 
 if (failed > 0) {
   console.error(`\n${failed} verificação(ões) falharam`);

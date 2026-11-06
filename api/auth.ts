@@ -6,6 +6,8 @@ import {
   readCookie,
   sendJson,
 } from '../lib/http';
+import { accessDeniedMessage, subscriberCanAccess } from '../lib/accessPolicy';
+import { claimCodesMatch } from '../lib/claim';
 import { isOwnerEmail, ownerName, ownerPasswordMatches } from '../lib/owner';
 import { hashPassword, verifyPassword } from '../lib/passwords';
 import { isRateLimited } from '../lib/rateLimit';
@@ -72,8 +74,8 @@ export default async function handler(req: any, res: any) {
         return sendJson(res, 503, { error: 'Base de assinantes ainda não configurada.' });
       }
       const subscriber = await getSubscriber(claims.email);
-      if (!subscriber || subscriber.status !== 'active') {
-        return sendJson(res, 403, { error: 'Assinatura inativa.' }, {
+      if (!subscriberCanAccess(subscriber)) {
+        return sendJson(res, 403, { error: accessDeniedMessage(subscriber) }, {
           'Set-Cookie': clearSessionCookie(req),
         });
       }
@@ -110,10 +112,8 @@ export default async function handler(req: any, res: any) {
         return sendJson(res, 503, { error: 'Base de assinantes ainda não configurada.' });
       }
       const subscriber = await getSubscriber(email);
-      if (!subscriber || subscriber.status !== 'active') {
-        return sendJson(res, 403, {
-          error: 'Não há assinatura ativa para este e-mail. O acesso libera depois do pagamento aprovado na Kiwify.',
-        });
+      if (!subscriberCanAccess(subscriber)) {
+        return sendJson(res, 403, { error: accessDeniedMessage(subscriber) });
       }
       return issueSession(req, res, email, subscriber.name || name, 'subscriber');
     }
@@ -138,14 +138,12 @@ export default async function handler(req: any, res: any) {
         return sendJson(res, 503, { error: 'Base de assinantes ainda não configurada.' });
       }
       const subscriber = await getSubscriber(email);
-      if (!subscriber || subscriber.status !== 'active') {
-        return sendJson(res, 403, {
-          error: 'Não há assinatura ativa para este e-mail. O acesso libera depois do pagamento aprovado na Kiwify.',
-        });
+      if (!subscriberCanAccess(subscriber)) {
+        return sendJson(res, 403, { error: accessDeniedMessage(subscriber) });
       }
       if (!subscriber.password_hash) {
         return sendJson(res, 403, {
-          error: 'Primeiro acesso: abra a aba Primeiro acesso e defina uma senha com o mesmo e-mail da compra.',
+          error: 'Primeiro acesso: use o código do pedido que a Kiwify enviou no e-mail da compra.',
         });
       }
       if (!verifyPassword(password, subscriber.password_hash)) {
@@ -156,23 +154,30 @@ export default async function handler(req: any, res: any) {
 
     if (action === 'register') {
       const name = cleanName(body.name);
-      if (!name || !email || !password) {
-        return sendJson(res, 400, { error: 'Informe nome, e-mail da compra e uma senha de pelo menos 8 caracteres.' });
+      const orderCode = typeof body.orderCode === 'string' ? body.orderCode.trim() : '';
+      if (!name || !email || !password || orderCode.length < 4) {
+        return sendJson(res, 400, {
+          error: 'Informe nome, e-mail da compra, o código do pedido da Kiwify e uma senha de pelo menos 8 caracteres.',
+        });
       }
       if (isOwnerEmail(email)) {
         return sendJson(res, 403, { error: 'Este e-mail entra pela aba Já tenho conta.' });
+      }
+      if (await isRateLimited(`claim:${ip}:${email}`, 8, LOGIN_WINDOW_MS)) {
+        return sendJson(res, 429, { error: 'Muitas tentativas para este e-mail. Aguarde alguns minutos.' });
       }
       if (subscriberBackend() === 'unconfigured') {
         return sendJson(res, 503, { error: 'Base de assinantes ainda não configurada.' });
       }
       const subscriber = await getSubscriber(email);
-      if (!subscriber || subscriber.status !== 'active') {
-        return sendJson(res, 403, {
-          error: 'Este e-mail não tem uma compra aprovada. Pague o Radar Essential e use o mesmo e-mail da Kiwify.',
-        });
+      if (!subscriberCanAccess(subscriber) || !subscriber) {
+        return sendJson(res, 403, { error: accessDeniedMessage(subscriber) });
       }
       if (subscriber.password_hash) {
         return sendJson(res, 409, { error: 'Esta conta já tem senha. Entre em Já tenho conta.' });
+      }
+      if (!subscriber.claim_code_hash || !claimCodesMatch(orderCode, subscriber.claim_code_hash)) {
+        return sendJson(res, 401, { error: 'O código do pedido não confere com a compra deste e-mail.' });
       }
       subscriber.name = name;
       subscriber.password_hash = hashPassword(password);

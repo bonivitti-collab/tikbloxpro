@@ -49,6 +49,8 @@ export default async function handler(req: any, res: any) {
       console.log(`[KIWIFY] acesso liberado ${maskEmail(result.email)}`);
     } else if (result.outcome === 'revoked') {
       console.log(`[KIWIFY] acesso revogado ${maskEmail(result.email)}`);
+    } else if (result.outcome === 'late') {
+      console.log(`[KIWIFY] assinatura em atraso ${maskEmail(result.email)}`);
     } else {
       console.log(`[KIWIFY] evento ignorado (${result.reason})`);
     }
@@ -58,7 +60,12 @@ export default async function handler(req: any, res: any) {
     if (code === 'PAYLOAD_TOO_LARGE') {
       return sendJson(res, 413, { error: 'Payload grande demais' });
     }
-    if (code === 'RAW_BODY_REQUIRED' || code === 'SUBSCRIBER_STORE_UNCONFIGURED') {
+    if (
+      code === 'RAW_BODY_REQUIRED' ||
+      code === 'SUBSCRIBER_STORE_UNCONFIGURED' ||
+      code === 'AUTH_SECRET_MISSING' ||
+      code === 'AUTH_SECRET_LEAKED'
+    ) {
       console.error('[KIWIFY]', code);
       return sendJson(res, 503, { error: 'Webhook sem persistência configurada' });
     }

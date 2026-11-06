@@ -14,7 +14,11 @@ A terceira aba já não era renderizada, mas o código dela ainda estava no proj
 
 ### Checkout e acesso
 
-Uma compra aprovada na Kiwify grava o e-mail no Supabase. Reembolso, chargeback ou cancelamento de assinatura marcam o e-mail como revogado. Login e “Primeiro acesso” só funcionam para e-mail com assinatura ativa, ou para o dono configurado no ambiente. Pix pendente não libera nada. Um replay do mesmo pedido pago, depois do reembolso, não devolve o acesso. Uma compra nova, com outro `order_id`, libera de novo.
+Uma compra aprovada na Kiwify grava o e-mail no Supabase. Reembolso, chargeback ou cancelamento marcam o e-mail como revogado. `subscription_late` deixa o acesso em carência (`KIWIFY_LATE_GRACE_HOURS`, padrão 48). Depois desse prazo o login e o catálogo passam a recusar. Com `0`, o atraso revoga na hora. Pix pendente não libera nada. Um replay do mesmo pedido pago, depois do reembolso ou do atraso, não devolve o acesso. Uma compra nova, com outro `order_id`, libera de novo.
+
+O catálogo não vai mais no JavaScript público. `GET /api/catalog` e `POST /api/scan` só respondem com a lista se o cookie for de uma sessão paga ainda válida.
+
+O primeiro acesso não cria senha só com o e-mail. O projeto não tem um envio de e-mail gratuito já configurado (nem SMTP, nem Resend, nem o mailer do Supabase). A alternativa sem custo é o código do pedido que a própria Kiwify manda no e-mail da compra (`order_ref`, ou o `order_id` se o ref não vier). O servidor guarda só o hash desse código. Quem não tem o código não define a senha. O Google continua entrando se o e-mail da conta for o da compra, porque o Google prova a caixa de entrada.
 
 O webhook exige o HMAC-SHA1 da Kiwify: o corpo cru é assinado com `KIWIFY_WEBHOOK_TOKEN` e a assinatura chega em `?signature=`. A comparação é em tempo constante. Sem token, a resposta é 503, não um acesso liberado.
 
@@ -55,6 +59,7 @@ Cadastre em Project Settings → Environment Variables, no ambiente de Productio
 | `SUPABASE_URL` | sim | URL do projeto Supabase do TikBlox, algo como `https://xxxx.supabase.co`. |
 | `SUPABASE_SERVICE_ROLE_KEY` | sim | Chave `service_role`. Só no servidor. Nunca no front. |
 | `KIWIFY_PRODUCT_ID` | não | Se preenchido, só esses `product_id` (separados por vírgula) liberam acesso. |
+| `KIWIFY_LATE_GRACE_HOURS` | não | Horas de acesso depois de `subscription_late`. Padrão 48. `0` revoga na hora. |
 | `VITE_KIWIFY_CHECKOUT_ESSENTIAL` | não | Troca o link público de checkout. O padrão já é o Essential. |
 | `TELEGRAM_BOT_TOKEN` e `TELEGRAM_CHAT_ID` | não | Só se o alerta de Telegram for usado. O navegador não envia mais o token. |
 
@@ -66,7 +71,7 @@ A conta já tem dois projetos: `encaixe` (ativo) e `antitrader` (inativo). O pla
 
 1. Crie o projeto na região São Paulo, se quiser.
 2. Abra o SQL Editor.
-3. Cole e execute o arquivo `supabase/migrations/20261106010000_tikblox_subscribers.sql`.
+3. Cole e execute `supabase/migrations/20261106010000_tikblox_subscribers.sql`. Se essa migration já rodou antes desta atualização, execute também `supabase/migrations/20261106020000_late_and_claim.sql`.
 4. Em Project Settings → API, copie a URL e a chave `service_role` para as variáveis da Vercel.
 
 A tabela `subscribers` tem RLS ligado e nenhuma policy. `anon` e `authenticated` não leem a tabela. Só o servidor, com a service role, grava e consulta. A tabela `auth_attempts` serve ao limite de tentativas.
@@ -85,10 +90,10 @@ where email = 'pessoa@email.com';
 2. Mantenha o Radar Essential (R$ 37), o checkout `https://pay.kiwify.com.br/B69SrmS`.
 3. Em Apps → Webhooks, aponte para `https://tikbloxpro.vercel.app/api/webhook/kiwify`. Se o domínio próprio `tikblox.com.br` passar a servir esta mesma Vercel, pode usar `https://tikblox.com.br/api/webhook/kiwify`.
 4. No webhook, cadastre um token longo e cole o mesmo valor em `KIWIFY_WEBHOOK_TOKEN`. A Kiwify manda `?signature=` com o HMAC-SHA1 do corpo.
-5. Marque os eventos: compra aprovada, compra reembolsada, chargeback, assinatura cancelada e assinatura renovada. Pix gerado e boleto gerado são ignorados de propósito.
-6. O comprador entra com o mesmo e-mail da compra. No primeiro acesso ele define a senha. O Google só entra se esse e-mail já estiver ativo.
+5. Marque os eventos: compra aprovada, compra reembolsada, chargeback, assinatura cancelada, assinatura renovada e assinatura atrasada (`subscription_late`). Pix gerado e boleto gerado continuam ignorados.
+6. No primeiro acesso, a pessoa usa o mesmo e-mail da compra e o código do pedido que está no e-mail da Kiwify. O Google só entra se esse e-mail já estiver ativo.
 
-Quem já comprou antes desta mudança não está no Supabase. Ou a pessoa compra de novo, ou você insere o e-mail:
+Quem já comprou antes desta mudança não está no Supabase. Ou a pessoa compra de novo, ou você insere o e-mail. Sem `claim_code_hash`, o primeiro acesso pelo código do pedido não funciona. Essa pessoa entra com Google, se o e-mail da conta for o da compra, ou precisa de uma compra nova para o webhook gravar o código.
 
 ```sql
 insert into public.subscribers (email, name, plan, status)
@@ -105,10 +110,13 @@ As contas `contato.dudavitti@gmail.com` e `dudavitti@gmail.com` estavam fixas no
 - assinatura inválida (401) e GET (405)
 - compra paga libera
 - login e cadastro sem pagamento recusam
-- primeiro acesso define a senha e grava cookie HttpOnly
+- primeiro acesso exige o código do pedido e grava cookie HttpOnly
+- código errado não define senha
 - reembolso e cancelamento revogam
 - replay do mesmo pedido não restaura
 - compra nova libera de novo
+- `subscription_late` respeita a carência e, com carência zero, revoga na hora
+- o catálogo responde 401 sem sessão e devolve os produtos com sessão do dono
 - Pix pendente não cria assinante
 - login do dono pela senha do ambiente
 
@@ -127,23 +135,21 @@ As contas `contato.dudavitti@gmail.com` e `dudavitti@gmail.com` estavam fixas no
 - Endpoint de chat que aceitava chave de IA vinda do navegador.
 - Token de bot do Telegram enviado pelo navegador. O valor que estava no modal era um placeholder, não um token real, e foi removido.
 - Cabeçalhos: CSP, HSTS, COOP, Permissions-Policy, nosniff, frame SAMEORIGIN, referrer.
+- Catálogo fora do bundle. Ele só sai de `/api/catalog` e `/api/scan` com sessão paga ativa.
+- Primeiro acesso amarrado ao código do pedido da Kiwify, não só ao e-mail.
+- `subscription_late` suspende depois da carência configurável.
+- `aggregateRating` sem fonte saiu do schema.org estático e do schema dinâmico.
 
 ### O que ainda fica, por severidade
 
-**Alta.** O catálogo de produtos continua dentro do JavaScript do site. A tela de login barra o visitante comum, mas quem lê o bundle vê os dados sem pagar. Tirar isso do bundle e servir o catálogo só com sessão válida é outra mudança, e mexe no modo offline.
+**Alta, no histórico.** O commit `21db788` ainda tem o segredo antigo de sessão e os hashes SHA-256. Este PR não reescreve a história. Gere um `TIKBLOX_AUTH_SECRET` novo e troque a senha do dono se ela for a mesma daquela época.
 
-**Alta, no histórico.** O commit `21db788` ainda tem o segredo antigo de sessão e os hashes SHA-256. Este PR não reescreve a história. Gere um `TIKBLOX_AUTH_SECRET` novo e troque a senha do dono se ela for a mesma daquela época. Os hashes não estão repetidos aqui.
+**Média.** Quem já baixou o radar neste navegador pode ficar com uma cópia no IndexedDB para usar offline. Quem nunca entrou não recebe essa lista no JavaScript. Não há envio próprio de e-mail: o código de primeiro acesso viaja no e-mail que a Kiwify já manda. Um link mágico nosso pediria um serviço de e-mail novo.
 
-**Média.** Até o comprador definir a senha, alguém que saiba o e-mail da compra pode fazer o primeiro acesso antes dele. O Google, se estiver configurado, prova o e-mail. Para desfazer, zere `password_hash` no SQL acima.
+**Média.** O limite de tentativas vale por instância e, quando a tabela existir, também no Supabase.
 
-**Média.** O limite de tentativas vale por instância e, quando a tabela existir, também no Supabase. Não é um limite global perfeito antes da migration.
+**Baixa.** `npm audit` ainda aponta avisos que só saem com mudança quebrada: `firebase` / `@grpc/grpc-js` e `glob` / `minimatch` / `deepmerge` via `vite-plugin-pwa`.
 
-**Média.** `subscription_late` (assinatura atrasada) não revoga. Só reembolso, chargeback e cancelamento revogam. Se quiser cortar no atraso, dá para incluir esse evento depois.
-
-**Baixa.** `npm audit` ainda aponta 10 avisos que só saem com mudança quebrada: `firebase` / `@grpc/grpc-js` (alto, no cliente de Firestore que o app não usa como servidor gRPC; o `npm audit fix --force` queria descer o Firebase para a versão 9) e `glob` / `minimatch` / `deepmerge` via `vite-plugin-pwa` (moderado, ferramenta de build). `body-parser`, `vite`, `qs` e `re2js` foram atualizados sem forçar major.
-
-**Baixa.** O `aggregateRating` do schema.org (nota 4,9 e 1240 avaliações) não tem fonte verificável. Não é um vazamento, é um dado de marketing antigo.
-
-**Baixa.** O Client ID OAuth do Google em `firebase-applet-config.json` é identificador público. A `apiKey` do Firebase está vazia. Nenhuma chave `service_role`, segredo de sessão ou link de R$ 57 aparece no bundle do front. O link de R$ 37 aparece, porque o botão de compra é público.
+**Baixa.** O Client ID OAuth do Google em `firebase-applet-config.json` é identificador público. A `apiKey` do Firebase está vazia. Nenhuma chave `service_role` aparece no bundle. O link de R$ 37 aparece, porque o botão de compra é público.
 
 **Baixa.** CSP permite estilo inline, porque a página e o Tailwind usam isso. Script inline não está liberado.

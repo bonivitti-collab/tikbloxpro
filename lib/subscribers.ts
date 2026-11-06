@@ -2,12 +2,14 @@ export interface Subscriber {
   email: string;
   name: string;
   plan: 'essential';
-  status: 'active' | 'revoked';
+  status: 'active' | 'revoked' | 'late';
   password_hash: string | null;
   kiwify_order_id: string | null;
   kiwify_product_id: string | null;
   kiwify_event: string | null;
   kiwify_event_at: string | null;
+  late_since: string | null;
+  claim_code_hash: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -52,7 +54,7 @@ export async function getSubscriber(email: string): Promise<Subscriber | null> {
   if (backend === 'unconfigured') throw new Error('SUBSCRIBER_STORE_UNCONFIGURED');
   if (backend === 'memory') return memory.get(email) || null;
   const rows = await sb(
-    `subscribers?email=eq.${encodeURIComponent(email)}&select=email,name,plan,status,password_hash,kiwify_order_id,kiwify_product_id,kiwify_event,kiwify_event_at,created_at,updated_at`
+    `subscribers?email=eq.${encodeURIComponent(email)}&select=email,name,plan,status,password_hash,kiwify_order_id,kiwify_product_id,kiwify_event,kiwify_event_at,late_since,claim_code_hash,created_at,updated_at`
   );
   return Array.isArray(rows) && rows[0] ? (rows[0] as Subscriber) : null;
 }

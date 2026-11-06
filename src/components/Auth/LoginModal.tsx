@@ -35,6 +35,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
       return '';
     }
   });
+  const [orderCode, setOrderCode] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -111,7 +112,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
         if (password !== confirmPassword) {
           throw new Error('As senhas digitadas não coincidem.');
         }
-        const session = await registerWithEmailAndPassword(name, email, password, rememberMe);
+        const session = await registerWithEmailAndPassword(name, email, password, orderCode);
         onLoginSuccess(session);
         onClose();
       } else {
@@ -267,7 +268,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
         <form onSubmit={handleSubmit} className="space-y-3.5">
           {mode === 'register' && (
             <p className="text-[11px] text-slate-400 leading-relaxed">
-              Use o mesmo e-mail da compra aprovada na Kiwify. Sem pagamento, a conta não é criada.
+              Use o mesmo e-mail da compra e o código do pedido que a Kiwify enviou no e-mail de confirmação. Sem esse código, a senha não é criada.
             </p>
           )}
 
@@ -295,6 +296,27 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                   className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-[16px] text-white placeholder:text-slate-500 focus:outline-none focus:border-[#25F4EE] transition font-medium select-text cursor-text"
                 />
               </div>
+            </div>
+          )}
+
+          {mode === 'register' && (
+            <div className="space-y-1">
+              <label htmlFor="auth-order-code" className="text-[11px] font-bold text-slate-300 block">
+                Código do pedido na Kiwify:
+              </label>
+              <input
+                id="auth-order-code"
+                name="orderCode"
+                type="text"
+                autoCapitalize="characters"
+                autoCorrect="off"
+                spellCheck={false}
+                required
+                value={orderCode}
+                onChange={(e) => setOrderCode(e.target.value)}
+                placeholder="Código que chegou no e-mail da compra"
+                className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-[16px] text-white placeholder:text-slate-500 focus:outline-none focus:border-[#25F4EE] transition font-medium select-text cursor-text"
+              />
             </div>
           )}
 

@@ -105,7 +105,7 @@ export async function registerWithEmailAndPassword(
   name: string,
   email: string,
   password: string,
-  _rememberDevice: boolean = true
+  orderCode: string
 ): Promise<UserSession> {
   const res = await fetch('/api/auth', {
     method: 'POST',
@@ -116,6 +116,7 @@ export async function registerWithEmailAndPassword(
       name: name.trim(),
       email: email.trim().toLowerCase(),
       password: password.trim(),
+      orderCode: orderCode.trim(),
     }),
   });
 

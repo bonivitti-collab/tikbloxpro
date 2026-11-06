@@ -135,13 +135,6 @@ export function updateProductMetadata(product: TrendingProduct, lang: 'pt' | 'en
         name: 'TIKBLOX PRO',
       },
     },
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: Math.min(5, Math.max(4.0, product.viralityScore / 20)).toFixed(1),
-      reviewCount: Math.max(15, Math.floor((product.trendingMetrics?.growthRatePercent || 150) / 10)),
-      bestRating: '5',
-      worstRating: '1',
-    },
   };
 
   setJsonLd('tikblox-dynamic-schema', productSchema);
@@ -194,13 +187,6 @@ export function resetDefaultMetadata(lang: 'pt' | 'en' = 'pt'): void {
       '@type': 'Offer',
       price: '37.00',
       priceCurrency: 'BRL',
-    },
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: '4.9',
-      reviewCount: '1240',
-      bestRating: '5',
-      worstRating: '1',
     },
   };
 

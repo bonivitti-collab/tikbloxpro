@@ -6,12 +6,14 @@ create table if not exists public.subscribers (
   email text primary key,
   name text not null default '',
   plan text not null default 'essential' check (plan = 'essential'),
-  status text not null check (status in ('active', 'revoked')),
+  status text not null check (status in ('active', 'revoked', 'late')),
   password_hash text,
   kiwify_order_id text,
   kiwify_product_id text,
   kiwify_event text,
   kiwify_event_at timestamptz,
+  late_since timestamptz,
+  claim_code_hash text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );

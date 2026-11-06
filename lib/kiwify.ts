@@ -17,7 +17,9 @@ const GRANT_STATUSES = new Set(['paid', 'approved']);
 
 const BLOCKED_GRANT_STATUSES = new Set(['waiting_payment', 'pending', 'refused', 'rejected', 'expired']);
 
-export type KiwifyDecision = 'grant' | 'revoke' | 'ignore';
+const LATE_EVENTS = new Set(['subscription_late']);
+
+export type KiwifyDecision = 'grant' | 'revoke' | 'late' | 'ignore';
 
 export function kiwifySignature(rawBody: string, token: string): string {
   return crypto.createHmac('sha1', token).update(rawBody).digest('hex');
@@ -76,6 +78,12 @@ export function extractOrderId(payload: any): string {
   return typeof value === 'string' ? value.slice(0, 80) : '';
 }
 
+export function extractClaimMaterial(payload: any): string {
+  const ref = payload?.order_ref || payload?.orderRef || '';
+  if (typeof ref === 'string' && ref.trim().length >= 4) return ref.trim().slice(0, 64);
+  return extractOrderId(payload);
+}
+
 export function extractProductId(payload: any): string {
   const value = payload?.Product?.product_id || payload?.product?.product_id || payload?.product_id || '';
   return typeof value === 'string' ? value : '';
@@ -95,6 +103,7 @@ export function classifyKiwifyPayload(payload: any): KiwifyDecision {
     .toLowerCase();
 
   if (REVOKE_EVENTS.has(event) || REVOKE_STATUSES.has(status)) return 'revoke';
+  if (LATE_EVENTS.has(event)) return 'late';
   if (BLOCKED_GRANT_STATUSES.has(status) && !GRANT_EVENTS.has(event)) return 'ignore';
   if (GRANT_EVENTS.has(event) || GRANT_STATUSES.has(status)) {
     if (BLOCKED_GRANT_STATUSES.has(status)) return 'ignore';

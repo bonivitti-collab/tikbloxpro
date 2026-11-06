@@ -7,6 +7,7 @@ import { enrichWithTikTokShopData } from './src/data/tiktokShopEnricher.js';
 import { TrendingProduct, ProductNiche, DeepDiveAnalysis } from './src/types.js';
 import { streamProductViabilityPDF } from './src/server/pdfGenerator.js';
 import authHandler from './api/auth.js';
+import catalogHandler from './api/catalog.js';
 import kiwifyWebhookHandler from './api/webhook/kiwify.js';
 
 dotenv.config();
@@ -25,6 +26,8 @@ app.use(
 
 app.all('/api/auth', (req, res) => authHandler(req, res));
 app.all('/api/webhook/kiwify', (req, res) => kiwifyWebhookHandler(req, res));
+app.all('/api/catalog', (req, res) => catalogHandler(req, res));
+app.all('/api/scan', (req, res) => catalogHandler(req, res));
 
 // Circuit breaker and API Key Rotation
 const getAvailableKeys = (prefix: string) => [

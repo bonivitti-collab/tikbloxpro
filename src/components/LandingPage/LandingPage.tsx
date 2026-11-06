@@ -610,7 +610,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             {[
               {
                 q: 'Como recebo meu acesso após pagar na Kiwify?',
-                a: 'A aprovação é instantânea! Assim que o pagamento via Pix ou Cartão for aprovado na Kiwify, você receberá o e-mail de confirmação e poderá fazer login imediatamente no TikBlox Pro utilizando o mesmo e-mail informado na compra.'
+                a: 'A Kiwify confirma a compra no e-mail dela e mostra o código do pedido. No TikBlox, abra Primeiro acesso, use o mesmo e-mail da compra, esse código e uma senha sua. Sem o código, a senha não é criada.'
               },
               {
                 q: 'Preciso ter mais de 1.000 seguidores no TikTok para usar?',

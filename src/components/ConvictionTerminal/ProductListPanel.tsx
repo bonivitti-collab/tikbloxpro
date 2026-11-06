@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import { TrendingProduct, ProductNiche } from '../../types';
 import { enrichWithTikTokShopData } from '../../data/tiktokShopEnricher';
-import { isBlueOceanOpportunity } from '../../data/curatedTrends';
+import { isBlueOceanOpportunity } from '../../lib/blueOcean';
 
 interface CategoryOption {
   id: ProductNiche;
