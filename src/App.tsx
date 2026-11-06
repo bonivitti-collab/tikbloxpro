@@ -52,9 +52,6 @@ const WorkspaceHubModal = React.lazy(() =>
 const OnboardingModal = React.lazy(() =>
   import('./components/OnboardingModal').then((m) => ({ default: m.OnboardingModal }))
 );
-const WifeBotConfigModal = React.lazy(() =>
-  import('./components/WifeBotConfigModal').then((m) => ({ default: m.WifeBotConfigModal }))
-);
 const ONBOARDING_STORAGE_KEY = 'tikblox_onboarding_completed_v1';
 import { TrendingProduct, ProductNiche, AppUpdateInfo, ProductPriceCheck, PriceMonitorSummary } from './types';
 import { isBlueOceanOpportunity } from './lib/blueOcean';
@@ -259,7 +256,6 @@ export default function App() {
 
   // Onboarding Welcome Tour state (manual only, never blocks terminal on login)
   const [showOnboardingModal, setShowOnboardingModal] = useState(false);
-  const [showWifeBotModal, setShowWifeBotModal] = useState(false);
 
   // IndexedDB offline cache initialization & background hydration (deferred so initial UI paint is instant)
   useEffect(() => {
@@ -705,9 +701,6 @@ export default function App() {
           setSelectedProductForCalc(activeProduct);
           setShowCalculatorModal(true);
         }}
-        onOpenAdmin={() => {}} // Admin locked
-        onOpenCreatorVIP={() => {}} // Creator locked
-        onOpenTutorial={() => {}} // Tutorial locked
       />
 
       {/* 2. SELETOR DE ABAS MOBILE / TABLET (CINZA CLARO) */}
@@ -966,13 +959,6 @@ export default function App() {
             setSelectedProductForCalc(prod || products[0] || null);
           }}
           sampleProduct={products[0] || null}
-        />
-
-        {/* Wife Bot Telegram & TikTok Personal Radar Modal */}
-        <WifeBotConfigModal
-          isOpen={showWifeBotModal}
-          onClose={() => setShowWifeBotModal(false)}
-          products={products}
         />
 
       </Suspense>

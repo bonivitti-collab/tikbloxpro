@@ -61,7 +61,6 @@ Cadastre em Project Settings → Environment Variables, no ambiente de Productio
 | `KIWIFY_PRODUCT_ID` | não | Se preenchido, só esses `product_id` (separados por vírgula) liberam acesso. |
 | `KIWIFY_LATE_GRACE_HOURS` | não | Horas de acesso depois de `subscription_late`. Padrão 48. `0` revoga na hora. |
 | `VITE_KIWIFY_CHECKOUT_ESSENTIAL` | não | Troca o link público de checkout. O padrão já é o Essential. |
-| `TELEGRAM_BOT_TOKEN` e `TELEGRAM_CHAT_ID` | não | Só se o alerta de Telegram for usado. O navegador não envia mais o token. |
 
 Depois de salvar, faça um novo deploy. Este PR não dispara esse deploy.
 
@@ -100,7 +99,32 @@ insert into public.subscribers (email, name, plan, status)
 values ('cliente@email.com', 'Nome', 'essential', 'active');
 ```
 
-As contas `contato.dudavitti@gmail.com` e `dudavitti@gmail.com` estavam fixas no código, com papel de creator. Saíram. Se ainda precisarem entrar, insira o e-mail como assinante ativo e peça um primeiro acesso. Troque a senha antiga: o hash está no histórico do Git.
+## Eduarda (Duda), assinante comum
+
+O painel de influencer saiu: o modal Radar Pessoal / Bot Telegram, o atalho de Creator VIP e o rastreio de afiliado `?ref=duda`. Não existe papel especial. Ela entra com e-mail e senha e vê o mesmo radar que qualquer assinante.
+
+No código antigo apareciam dois e-mails, os dois como a mesma conta de creator:
+
+- `contato.dudavitti@gmail.com`
+- `dudavitti@gmail.com`
+
+Use o e-mail com o qual ela realmente vai entrar. Os dois podem ficar ativos se ela usar os dois. Não coloque esses e-mails em `TIKBLOX_ADMIN_EMAIL`.
+
+No SQL Editor do Supabase do TikBlox:
+
+```sql
+insert into public.subscribers (email, name, plan, status)
+values
+  ('contato.dudavitti@gmail.com', 'Eduarda Vitti', 'essential', 'active'),
+  ('dudavitti@gmail.com', 'Eduarda Vitti', 'essential', 'active')
+on conflict (email) do update
+set name = excluded.name,
+    plan = 'essential',
+    status = 'active',
+    updated_at = now();
+```
+
+A senha segue a regra de todo assinante. Se a Kiwify gravar o código do pedido nesse e-mail, ela abre Primeiro acesso, informa o código e escolhe a senha. Sem código de pedido, o Google entra se a conta Google for esse mesmo e-mail. Não há senha separada de influencer. A senha antiga que estava no código deve ser trocada, porque o hash continua no histórico do Git.
 
 ## Como testar
 

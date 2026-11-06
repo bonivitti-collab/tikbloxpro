@@ -17,45 +17,15 @@ export interface UserSession {
   subscriptionStatus: 'active' | 'trial' | 'canceled';
   expiresAt?: string;
   source?: 'kiwify' | 'supabase' | 'direct' | 'google' | 'apple' | 'email_registered';
-  affiliateCode?: string;
   photoUrl?: string;
   token?: string;
 }
 
 const STORAGE_SESSION_KEY = 'tikblox_auth_session_v1';
-const STORAGE_AFFILIATE_REF_KEY = 'tikblox_affiliate_ref_v1';
 const KIWIFY_CHECKOUT_ESSENTIAL = 'https://pay.kiwify.com.br/B69SrmS';
 
-/**
- * Captura e persiste parâmetros de afiliado (?ref=duda ou ?src=duda) na URL
- */
-export function getActiveAffiliateRef(): string | null {
-  try {
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
-      const refFromUrl = params.get('ref') || params.get('src') || params.get('utm_source');
-      if (refFromUrl && refFromUrl.trim().length > 0) {
-        const cleanRef = refFromUrl.trim().toLowerCase();
-        localStorage.setItem(STORAGE_AFFILIATE_REF_KEY, cleanRef);
-        return cleanRef;
-      }
-      return localStorage.getItem(STORAGE_AFFILIATE_REF_KEY);
-    }
-  } catch {}
-  return null;
-}
-
-/**
- * Obtém os links de checkout do Kiwify configuráveis (com rastreamento automático de afiliado se houver ?ref=)
- */
 export function getKiwifyCheckoutUrl(): string {
-  const base =
-    (import.meta as any).env?.VITE_KIWIFY_CHECKOUT_ESSENTIAL || KIWIFY_CHECKOUT_ESSENTIAL;
-  const activeRef = getActiveAffiliateRef();
-  if (activeRef && !base.includes('?')) {
-    return `${base}?src=${encodeURIComponent(activeRef)}`;
-  }
-  return base;
+  return (import.meta as any).env?.VITE_KIWIFY_CHECKOUT_ESSENTIAL || KIWIFY_CHECKOUT_ESSENTIAL;
 }
 
 /**

@@ -1122,43 +1122,6 @@ app.post('/api/export-product-pdf', async (req: Request, res: Response) => {
   }
 });
 
-// Endpoint: Send message to Telegram Bot
-app.post('/api/telegram/send', async (req: Request, res: Response) => {
-  try {
-    const token = process.env.TELEGRAM_BOT_TOKEN || '';
-    const allowedChat = process.env.TELEGRAM_CHAT_ID || '';
-    const chatId = typeof req.body?.chatId === 'string' ? req.body.chatId.trim() : '';
-    const text = typeof req.body?.text === 'string' ? req.body.text.slice(0, 3500) : '';
-    if (!token || !allowedChat) {
-      return res.status(503).json({ error: 'Telegram não configurado no servidor' });
-    }
-    if (!text || chatId !== allowedChat) {
-      return res.status(400).json({ error: 'Chat não autorizado' });
-    }
-    const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chat_id: chatId,
-        text: text,
-        parse_mode: 'Markdown'
-      })
-    });
-    const data = await response.json();
-    if (!data.ok) {
-      return res.status(400).json({ success: false, error: data.description || 'Telegram API error' });
-    }
-    return res.json({ success: true, data });
-  } catch (error: any) {
-    console.error('Error sending Telegram message:', error);
-    return res.status(500).json({ success: false, error: error.message });
-  }
-});
-
-app.post('/api/assistant-chat', (_req: Request, res: Response) => {
-  res.status(410).json({ error: 'O copiloto de IA foi removido do TikBlox.' });
-});
-
 // Vite middleware setup
 async function startServer() {
   const publicPath = path.join(process.cwd(), 'public');

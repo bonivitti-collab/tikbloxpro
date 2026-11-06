@@ -28,9 +28,6 @@ interface HeaderProps {
   userSession?: UserSession | null;
   onLogout?: () => void;
   onViewLanding?: () => void;
-  onOpenAdmin?: () => void;
-  onOpenCreatorVIP?: () => void;
-  onOpenTutorial?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -46,9 +43,6 @@ export const Header: React.FC<HeaderProps> = ({
   userSession,
   onLogout,
   onViewLanding,
-  onOpenAdmin,
-  onOpenCreatorVIP,
-  onOpenTutorial,
 }) => {
   const [showScheduleModal, setShowScheduleModal] = useState(false);
 
@@ -160,7 +154,7 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         </div>
 
-        {/* BARRA DE CONTA MOBILE (< lg): Sempre 100% visível no celular para você, para a Duda e para qualquer cliente público */}
+        {/* BARRA DE CONTA MOBILE (< lg) */}
         {userSession && (
           <div className="flex lg:hidden items-center justify-between gap-2 pt-1.5 mt-1.5 border-t border-slate-100 overflow-x-auto no-scrollbar">
             {/* Identificação do Usuário Logado no Celular */}
@@ -174,7 +168,7 @@ export const Header: React.FC<HeaderProps> = ({
               </span>
             </div>
 
-            {/* Botões de Ação Mobile: Painel ADM, Divulgação, Início e Sair */}
+            {/* Botões de Ação Mobile */}
             <div className="flex items-center gap-1 shrink-0">
               {onViewLanding && (
                 <button
