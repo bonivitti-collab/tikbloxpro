@@ -94,15 +94,11 @@ export default function App() {
   const [selectedNiche, setSelectedNiche] = useState<ProductNiche>('all');
   const [selectedOrigin, setSelectedOrigin] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [filterFreeSampleOnly, setFilterFreeSampleOnly] = useState<boolean>(false);
-  const [filterBlueOceanOnly, setFilterBlueOceanOnly] = useState<boolean>(false);
   const [activeProduct, setActiveProduct] = useState<TrendingProduct | null>(null);
   const [painelEsquerdoRecolhido, setPainelEsquerdoRecolhido] = useState(false);
   const [painelDireitoRecolhido, setPainelDireitoRecolhido] = useState(true); // AI panel disabled
   const [mobileTab, setMobileTab] = useState<'produtos' | 'terminal' | 'criadores' | 'copilot'>('produtos');
   const [showCreators, setShowCreators] = useState(false);
-  const [filterHighCommissionOnly, setFilterHighCommissionOnly] = useState<boolean>(false);
-  const [filterKnownCommissionOnly, setFilterKnownCommissionOnly] = useState<boolean>(false);
   const [showSavedModal, setShowSavedModal] = useState<boolean>(false);
   const [showCalculatorModal, setShowCalculatorModal] = useState<boolean>(false);
   const [showAddCustomModal, setShowAddCustomModal] = useState<boolean>(false);
@@ -553,8 +549,8 @@ export default function App() {
     [products]
   );
   const qualifiedProducts = useMemo(
-    () => enrichedProducts.filter((product) => includeInCatalog(product, { requireKnownCommission: filterKnownCommissionOnly })),
-    [enrichedProducts, filterKnownCommissionOnly]
+    () => enrichedProducts.filter((product) => includeInCatalog(product)),
+    [enrichedProducts]
   );
   const showNovidades = useMemo(
     () => qualifiedProducts.some((product) => isIsoDiscoveredAt(product.discoveredAt)),
@@ -563,7 +559,7 @@ export default function App() {
 
   const filteredProducts = useMemo(() => {
     const isEarlyWave = activeTab === 'early_wave';
-    const isHighMargin = activeTab === 'high_margin' || filterHighCommissionOnly;
+    const isHighMargin = activeTab === 'high_margin';
     const isNovidades = activeTab === 'novidades' && showNovidades;
     const filterNiche = selectedNiche !== 'all' ? selectedNiche : null;
     const filterOrigin = selectedOrigin !== 'all' ? selectedOrigin : null;
@@ -574,8 +570,6 @@ export default function App() {
       if (isNovidades && !isIsoDiscoveredAt(product.discoveredAt)) return false;
       if (filterNiche && product.niche !== filterNiche) return false;
       if (filterOrigin && product.originCountry !== filterOrigin) return false;
-      if (filterFreeSampleOnly && !product.tiktokShop?.freeSampleAvailable && !product.freeSampleAvailable) return false;
-      if (filterBlueOceanOnly && product.tiktokShop?.saturationLevel !== 'Oceano Azul' && product.waveStage !== 'early_wave') return false;
       if (searchQuery.trim() && matchScore(product, searchQuery) === 0) return false;
       return true;
     });
@@ -588,10 +582,6 @@ export default function App() {
     selectedNiche,
     selectedOrigin,
     searchQuery,
-    filterFreeSampleOnly,
-    filterBlueOceanOnly,
-    filterHighCommissionOnly,
-    filterKnownCommissionOnly,
     showNovidades,
   ]);
 
@@ -605,7 +595,7 @@ export default function App() {
   // Reset display chunk when active filters change so the user starts smoothly at the top
   useEffect(() => {
     setDisplayLimit(CHUNK_SIZE);
-  }, [activeTab, selectedNiche, selectedOrigin, searchQuery, filterFreeSampleOnly, filterBlueOceanOnly, filterHighCommissionOnly, filterKnownCommissionOnly]);
+  }, [activeTab, selectedNiche, selectedOrigin, searchQuery]);
 
   const visibleProducts = useMemo(() => {
     return filteredProducts.slice(0, displayLimit);
@@ -789,14 +779,6 @@ export default function App() {
             setSelectedNiche={setSelectedNiche}
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
-            filterFreeSampleOnly={filterFreeSampleOnly}
-            setFilterFreeSampleOnly={setFilterFreeSampleOnly}
-            filterBlueOceanOnly={filterBlueOceanOnly}
-            setFilterBlueOceanOnly={setFilterBlueOceanOnly}
-            filterHighCommissionOnly={filterHighCommissionOnly}
-            setFilterHighCommissionOnly={setFilterHighCommissionOnly}
-            filterKnownCommissionOnly={filterKnownCommissionOnly}
-            setFilterKnownCommissionOnly={setFilterKnownCommissionOnly}
             onOpenAddCustomProduct={() => setShowAddCustomModal(true)}
           />
         </div>
