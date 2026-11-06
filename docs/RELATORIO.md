@@ -1,6 +1,10 @@
 # TikBlox Pro — acesso, checkout e segurança
 
-Relatório do que mudou neste PR. Nada foi publicado em produção e nada foi mesclado.
+Relatório do que mudou neste projeto.
+
+## Runtime da Vercel
+
+O `package.json` declara `"type": "module"`. No Node 24 da Vercel cada arquivo de `api/` e `lib/` vira um módulo ESM separado, e import relativo sem extensão quebra com `ERR_MODULE_NOT_FOUND`. Os imports desses arquivos, e dos módulos em `src/data` que o catálogo carrega, usam sufixo `.js`.
 
 ## O que mudou
 

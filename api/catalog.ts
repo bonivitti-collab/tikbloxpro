@@ -1,6 +1,6 @@
-import { listCatalog } from '../lib/catalog';
-import { requirePaidSession } from '../lib/guard';
-import { sendJson } from '../lib/http';
+import { listCatalog } from '../lib/catalog.js';
+import { requirePaidSession } from '../lib/guard.js';
+import { sendJson } from '../lib/http.js';
 
 export default async function handler(req: any, res: any) {
   if (req.method === 'OPTIONS') {

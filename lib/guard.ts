@@ -1,8 +1,8 @@
-import { accessDeniedMessage, subscriberCanAccess } from './accessPolicy';
-import { readCookie } from './http';
-import { isOwnerEmail } from './owner';
-import { SESSION_COOKIE_NAME, verifySession, type SessionClaims } from './session';
-import { getSubscriber, subscriberBackend } from './subscribers';
+import { accessDeniedMessage, subscriberCanAccess } from './accessPolicy.js';
+import { readCookie } from './http.js';
+import { isOwnerEmail } from './owner.js';
+import { SESSION_COOKIE_NAME, verifySession, type SessionClaims } from './session.js';
+import { getSubscriber, subscriberBackend } from './subscribers.js';
 
 export type PaidSession =
   | { ok: true; claims: SessionClaims }

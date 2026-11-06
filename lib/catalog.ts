@@ -1,5 +1,5 @@
-import { INITIAL_CURATED_TRENDS, isBlueOceanOpportunity } from '../src/data/curatedTrends';
-import type { TrendingProduct } from '../src/types';
+import { INITIAL_CURATED_TRENDS, isBlueOceanOpportunity } from '../src/data/curatedTrends.js';
+import type { TrendingProduct } from '../src/types.js';
 
 export function listCatalog(filters: {
   niche?: unknown;

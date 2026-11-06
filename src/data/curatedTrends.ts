@@ -1,7 +1,7 @@
-import { TrendingProduct } from '../types';
-import { ALL_NICHE_TRENDS, NICHE_TRENDS_MAP } from './niches/index';
-import { enrichWithTikTokShopData } from './tiktokShopEnricher';
-import { isBlueOceanOpportunity } from '../lib/blueOcean';
+import { TrendingProduct } from '../types.js';
+import { ALL_NICHE_TRENDS, NICHE_TRENDS_MAP } from './niches/index.js';
+import { enrichWithTikTokShopData } from './tiktokShopEnricher.js';
+import { isBlueOceanOpportunity } from '../lib/blueOcean.js';
 
 export { ALL_NICHE_TRENDS, NICHE_TRENDS_MAP, isBlueOceanOpportunity };
 

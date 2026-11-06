@@ -1,5 +1,5 @@
-import { resolveRealProductImage } from './productImageResolver';
-import { TrendingProduct } from '../types';
+import { resolveRealProductImage } from './productImageResolver.js';
+import { TrendingProduct } from '../types.js';
 
 export function extractSharpProductIdentifiers(product: any): {
   exactViralSearchQuery: string;

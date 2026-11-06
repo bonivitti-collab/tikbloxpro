@@ -1,7 +1,7 @@
-import { applyKiwifyPayload } from '../../lib/access';
-import { clientIp, maskEmail, readRawBody, sendJson } from '../../lib/http';
-import { signatureFromRequest, signatureIsValid, webhookToken } from '../../lib/kiwify';
-import { isRateLimited } from '../../lib/rateLimit';
+import { applyKiwifyPayload } from '../../lib/access.js';
+import { clientIp, maskEmail, readRawBody, sendJson } from '../../lib/http.js';
+import { signatureFromRequest, signatureIsValid, webhookToken } from '../../lib/kiwify.js';
+import { isRateLimited } from '../../lib/rateLimit.js';
 
 export const config = {
   api: {

@@ -1,4 +1,4 @@
-import { timingSafeEqualText } from './http';
+import { timingSafeEqualText } from './http.js';
 
 export function ownerEmail(): string {
   return (process.env.TIKBLOX_ADMIN_EMAIL || '').trim().toLowerCase();
