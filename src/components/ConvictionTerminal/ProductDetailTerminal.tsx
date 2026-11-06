@@ -336,17 +336,6 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
             </p>
           </div>
 
-          <div className="flex items-center gap-3 shrink-0 bg-slate-50 px-3.5 py-2 rounded-xl border border-slate-200">
-            <div className="text-right">
-              <span className="text-[10px] uppercase font-bold text-slate-400 block">Convicção TikBlox</span>
-              <span className="text-lg font-mono font-black text-slate-900 leading-none">
-                {typeof tc.convictionScore === 'number' ? `${tc.convictionScore}/100` : 'sem score'}
-              </span>
-            </div>
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#25F4EE] to-[#FE2C55] text-white flex items-center justify-center font-black text-sm shadow-2xs">
-              ⚡
-            </div>
-          </div>
         </div>
 
         {/* Os 4 pilares financeiros */}

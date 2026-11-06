@@ -3,6 +3,7 @@ import type { ScrapedProduct } from './apifyShop.js';
 import { parseIntegerCount, parseLooseNumber } from './apifyShop.js';
 import { canSpend, planKalodataSpend, rankCreditCost, resolveKalodataMaxCredits, KALODATA_PAGE_SIZE } from './kalodataPlan.js';
 import { mergePriceHistory, snapshotFromObserved, type PriceFields } from '../src/lib/priceRange.js';
+import { videoUrlFromKalodata } from './creatorSignal.js';
 
 /** api.kalodata.com não completa o TLS. O host que responde é www. */
 export const KALODATA_BASE = 'https://www.kalodata.com/openapi/v1';
@@ -127,7 +128,9 @@ export interface KalodataCreator {
   revenue_brl: number | null;
   sales_volume: number | null;
   category: string | null;
+  avatarUrl: string | null;
   productIds: string[];
+  videoByProduct: Record<string, string>;
 }
 
 export function mapKalodataCreator(item: any): KalodataCreator | null {
@@ -142,7 +145,9 @@ export function mapKalodataCreator(item: any): KalodataCreator | null {
     revenue_brl: parseLooseNumber(item?.revenue),
     sales_volume: parseIntegerCount(item?.sales_volumn),
     category: categories[0] || null,
+    avatarUrl: typeof item?.creator_avatar === 'string' ? item.creator_avatar : (typeof item?.avatar_url === 'string' ? item.avatar_url : null),
     productIds: [],
+    videoByProduct: {},
   };
 }
 
@@ -194,6 +199,7 @@ export interface KalodataIngestResult {
   spent: number;
   products: ScrapedProduct[];
   creators: KalodataCreator[];
+  lookedUpCreatorIds: string[];
 }
 
 export async function collectKalodata(input: {
@@ -202,6 +208,8 @@ export async function collectKalodata(input: {
   balance?: number;
   fetchImpl?: typeof fetch;
   now?: Date;
+  /** Criadores que devem ser consultados primeiro (os menos atualizados). */
+  lookupCreatorIds?: string[];
 }): Promise<KalodataIngestResult> {
   const fetchImpl = input.fetchImpl || fetch;
   const cap = resolveKalodataMaxCredits(input.maxCredits ?? process.env.KALODATA_MAX_CREDITS_PER_RUN);
@@ -307,7 +315,13 @@ export async function collectKalodata(input: {
     }
   }
 
-  const lookups = creators.slice(0, plan.creatorProductLookups);
+  const preferred = input.lookupCreatorIds || [];
+  const preferredSet = new Set(preferred);
+  const lookupOrder = [
+    ...preferred.map((id) => creators.find((creator) => creator.id === id)).filter((creator): creator is KalodataCreator => Boolean(creator)),
+    ...creators.filter((creator) => !preferredSet.has(creator.id)),
+  ];
+  const lookups = lookupOrder.slice(0, plan.creatorProductLookups);
   for (const creator of lookups) {
     const rows = await pullRank('/tiktok/product/rank', {
       ...COMMON,
@@ -319,9 +333,12 @@ export async function collectKalodata(input: {
     });
     for (const row of rows) {
       const mapped = rememberProduct(row, creator.handle || creator.nickname);
-      if (mapped) creator.productIds.push(mapped.id);
+      if (!mapped) continue;
+      if (!creator.productIds.includes(mapped.id)) creator.productIds.push(mapped.id);
+      const video = videoUrlFromKalodata(row, creator.handle);
+      if (video) creator.videoByProduct[mapped.id] = video;
     }
   }
 
-  return { calls, spent, products, creators };
+  return { calls, spent, products, creators, lookedUpCreatorIds: lookups.map((creator) => creator.id) };
 }

@@ -27,10 +27,10 @@ function assert(condition: unknown, message: string): void {
 }
 
 const full = planKalodataSpend(1);
-assert(full.productPages === 5 && full.creatorPages === 1 && full.detailCalls === 4 && full.creatorProductLookups === 0, '1 crédito cobre 500 produtos, 100 criadores e 4 fichas');
+assert(full.productPages === 1 && full.creatorPages === 1 && full.creatorProductLookups === 8 && full.detailCalls === 0 && full.estimatedCredits === 1, '1 crédito cobre criadores e os produtos que eles promovem');
 assert(full.estimatedCredits === 1, 'o plano de 1 crédito não passa de 1');
 const thin = planKalodataSpend(0.3);
-assert(thin.productPages === 2 && thin.creatorPages === 1 && thin.creatorProductLookups === 0, '0,30 crédito prioriza ranking e não estoura');
+assert(thin.productPages === 1 && thin.creatorPages === 1 && thin.creatorProductLookups === 1 && thin.estimatedCredits <= 0.3, '0,30 crédito prioriza criadores e não estoura');
 assert(planKalodataSpend(0.05).estimatedCredits === 0, 'saldo menor que uma página não gasta');
 assert(rankCreditCost(0) === 0 && rankCreditCost(100) === 0.1 && rankCreditCost(101) === 0.2, 'rank cobra 0,1 a cada 100 linhas, arredondando para cima');
 assert(canSpend(0.9, 1, 1, 0.1) && !canSpend(1, 5, 1, 0.1) && !canSpend(0, 0.05, 1, 0.1), 'para antes de passar do teto ou do saldo');
@@ -182,13 +182,12 @@ const balance = await readKalodataBalance('test-key', fetchImpl);
 assert(balance === 1, 'saldo totalRemain');
 const collected = await collectKalodata({ apiKey: 'test-key', balance: 1, fetchImpl, maxCredits: 1 });
 const paid = requested.filter((line) => line.includes('/tiktok/'));
-assert(paid.length === 10, `gasta 10 chamadas pagas, veio ${paid.length}`);
-assert(collected.spent === 1 && collected.products.length === 500, '500 produtos do ranking, sem estourar o crédito');
+assert(paid.length === 6, `gasta 6 chamadas pagas, veio ${paid.length}`);
+assert(collected.spent === 0.6 && collected.products.length === 104, 'uma página de produtos e os itens dos criadores, dentro do crédito');
 assert(collected.creators[0]?.followers === 1700, 'criador com seguidores inteiros');
-const enriched = ['1000', '1001', '1002', '1003'].map((id) => collected.products.find((product) => product.id === id));
-assert(enriched.every((product) => product?.video_count === 8 && product?.stock_units == null), 'as 4 fichas preenchem vídeos e deixam estoque ausente');
-assert(enriched.every((product) => product?.price_estimated === false && product?.price_min === 70 && product?.price_max === 90), 'a ficha troca o ±15% pela faixa real');
-assert(collected.products.find((product) => product.id === '1004')?.video_count == null, 'o quinto produto não gasta ficha');
+assert(collected.lookedUpCreatorIds.length === 4, 'os quatro criadores do ranking têm a lista de produtos consultada');
+assert(collected.products.some((product) => product.id === 'sold-by-creator-0'), 'o produto promovido pelo criador entra na coleta');
+assert(collected.products.find((product) => product.id === '1000')?.video_count == null, 'sem crédito de ficha o vídeo do ranking continua ausente');
 
 let blocked = 0;
 const blockingFetch: typeof fetch = async (input, init) => {
