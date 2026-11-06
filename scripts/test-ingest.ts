@@ -1,6 +1,7 @@
 import { enrichWithTikTokShopData } from '../src/data/tiktokShopEnricher.ts';
 import { commissionBrlOf, formatCollectedAt, passesBusinessRules } from '../src/lib/productRules.ts';
-import { parseApifyProduct, priceFromItem, stockFromItem } from '../lib/apifyShop.ts';
+import { parseApifyProduct, parseIntegerCount, priceFromItem, stockFromItem } from '../lib/apifyShop.ts';
+import { runDailyIngest, statusForIngestError } from '../lib/ingestRun.ts';
 import {
   assignNiche,
   mergeLiveAndCurated,
@@ -95,6 +96,74 @@ assert(mixed.some((product) => product.id === 'tb-home-001'), 'o curado completa
 assert(mixed.filter((product) => product.id === '1730123').length === 1, 'id ao vivo não repete o curado');
 const many = Array.from({ length: 100 }, (_, index) => ({ id: `live-${index}` }));
 assert(mergeLiveAndCurated(many, curated).length === 100, 'com 100 ao vivo o curado sai');
+
+assert(parseIntegerCount('1.73') === 2, 'texto 1.73 vira 2');
+assert(parseIntegerCount(1.73) === 2, 'float 1.73 vira 2');
+assert(parseIntegerCount('1.7K') === 1700, '1.7K vira 1700');
+assert(parseIntegerCount('1,7 mil') === 1700, '1,7 mil vira 1700');
+assert(parseIntegerCount('2.3M') === 2_300_000, '2.3M vira 2300000');
+const fractional = parseApifyProduct({
+  product_id: '99',
+  product_title: 'Copo térmico',
+  total_sale_7d_cnt: '1.73',
+  total_sale_30d_cnt: 4.2,
+  videos_count: '1.7K',
+  influencers_count: '1.2',
+  stock: '3.6',
+  real_price: '10.50',
+  commission_brl: '1.73',
+}, 'fone bluetooth', '2026-11-06T15:00:00.000Z');
+assert(fractional?.sold_7d === 2 && fractional?.sold_30d === 4, 'vendas quebradas viram inteiro');
+assert(fractional?.video_count === 1700 && fractional?.influencer_count === 1 && fractional?.stock_units === 4, 'vídeo, influenciador e estoque inteiros');
+assert(fractional?.price_brl === 10.5 && fractional?.commission_brl === 1.73, 'preço e comissão continuam decimais');
+for (const key of ['sold_7d', 'sold_30d', 'video_count', 'influencer_count', 'stock_units'] as const) {
+  assert(Number.isInteger(fractional?.[key]), `${key} é inteiro`);
+}
+
+assert(statusForIngestError(new Error('Supabase 400: invalid input syntax for type integer: "1.73"')) === 200, 'erro de integer responde 200 para não repetir o cron');
+assert(statusForIngestError(new Error('APIFY_TOKEN_MISSING')) === 503, 'sem token continua 503');
+assert(statusForIngestError(new Error('BEFORE_APIFY: lista caiu')) === 502, 'falha antes do ator ainda pode repetir');
+
+let fetches = 0;
+let claimed = false;
+const fetchImpl: typeof fetch = async () => {
+  fetches += 1;
+  return new Response(JSON.stringify([{
+    product_id: '42',
+    product_title: 'Copo',
+    total_sale_7d_cnt: '1.73',
+    videos_count: '1.7K',
+    real_price: '19.90',
+  }]), { status: 200, headers: { 'content-type': 'application/json' } });
+};
+let savedSold: number | null = null;
+const deps = {
+  token: 'test-token',
+  now: new Date('2026-11-06T09:00:00.000Z'),
+  fetchImpl,
+  claimRun: async () => {
+    if (claimed) return 'already' as const;
+    claimed = true;
+    return 'claimed' as const;
+  },
+  finishRun: async () => {},
+  listProducts: async () => [],
+  saveProducts: async (rows: Array<{ sold_7d: number | null; video_count: number | null }>) => {
+    savedSold = rows[0]?.sold_7d ?? null;
+    assert(rows[0]?.video_count === 1700 && Number.isInteger(rows[0]?.sold_7d), 'payload do Supabase não leva 1.73');
+    throw new Error('Supabase 400: invalid input syntax for type integer: "1.73"');
+  },
+};
+let firstFailed = false;
+try {
+  await runDailyIngest(deps);
+} catch (error) {
+  firstFailed = String((error as Error).message).includes('1.73');
+}
+assert(firstFailed && fetches === 1, 'a primeira execução chama a Apify uma vez');
+assert(savedSold === 2, 'o valor gravado de vendas é 2, não 1.73');
+const second = await runDailyIngest(deps);
+assert(second.alreadyRan === true && fetches === 1, 'a falha não chama a Apify de novo');
 
 if (failed > 0) {
   console.error(`\n${failed} verificação(ões) falharam`);
