@@ -141,10 +141,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <button onClick={() => scrollToSection('diferencial')} className="hover:text-white transition cursor-pointer">
               Oceano Azul
             </button>
-            <button onClick={() => scrollToSection('simulador')} className="hover:text-[#25F4EE] transition cursor-pointer flex items-center gap-1">
-              <span>Simulador de Lucro</span>
-              <span className="px-1.5 py-0.2 rounded bg-[#25F4EE]/10 text-[9px] text-[#25F4EE] border border-[#25F4EE]/30">NOVO</span>
-            </button>
             <button onClick={() => scrollToSection('pilares')} className="hover:text-white transition cursor-pointer">
               Onde comprar
             </button>
@@ -208,13 +204,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 🌊 Método Oceano Azul vs Tradicional
               </button>
               <button
-                onClick={() => scrollToSection('simulador')}
-                className="text-left py-2 px-3 rounded-lg hover:bg-white/5 hover:text-[#25F4EE] transition flex items-center justify-between"
-              >
-                <span>🧮 Simulador de Lucro Líquido</span>
-                <span className="text-[10px] px-2 py-0.5 rounded bg-[#25F4EE]/20 text-[#25F4EE] font-mono">NOVO</span>
-              </button>
-              <button
                 onClick={() => scrollToSection('pilares')}
                 className="text-left py-2 px-3 rounded-lg hover:bg-white/5 hover:text-white transition"
               >
@@ -269,16 +258,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
           {/* Título Principal */}
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.15] text-white">
-            Descubra Produtos Virais em <br className="hidden sm:inline" />
-            <span className="bg-gradient-to-r from-[#25F4EE] via-[#00D2C4] to-[#25F4EE] bg-clip-text text-transparent">
-              Oceano Azul no TikTok Shop
-            </span> <br />
-            Antes da Concorrência.
+            Veja o que os maiores criadores do TikTok Shop começaram a vender essa semana.
           </h1>
 
-          {/* Subtítulo persuasivo */}
           <p className="text-sm sm:text-lg text-slate-300 max-w-3xl mx-auto leading-relaxed">
-            Identifique produtos com concorrência baixa no feed brasileiro e veja a comissão antes de abrir o anúncio no TikTok Shop. O comprador escolhe o vendedor dentro do app.
+            Quando vários top creators apostam no mesmo produto ao mesmo tempo, isso é sinal. A gente junta tudo num lugar, todo dia, e te avisa no celular pra você pegar carona antes de saturar.
+          </p>
+          <p className="text-xs text-slate-400 max-w-2xl mx-auto">
+            Isso é dado de promoção pública, não uma promessa de venda. Os criadores não endossam o TikBlox.
           </p>
 
           {/* Botão de Ação Hero Principal */}

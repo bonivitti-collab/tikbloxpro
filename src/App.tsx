@@ -8,7 +8,7 @@ import { EarlyWaveDashboard } from './components/EarlyWaveDashboard';
 import { TrendPulseSection } from './components/TrendPulseSection';
 import { Header } from './components/ConvictionTerminal/Header';
 import { ProductListPanel } from './components/ConvictionTerminal/ProductListPanel';
-import { CreatorsPanel } from './components/CreatorsPanel';
+import { CreatorRadar } from './components/CreatorRadar';
 import { ProductDetailTerminal } from './components/ConvictionTerminal/ProductDetailTerminal';
 import { SavedRadarView } from './components/SavedRadarView';
 import { AddCustomProductModal } from './components/ConvictionTerminal/AddCustomProductModal';
@@ -700,25 +700,7 @@ export default function App() {
       />
 
       {/* 2. SELETOR DE ABAS MOBILE / TABLET (CINZA CLARO) */}
-      {showCreators && (
-        <div className="hidden lg:flex items-center gap-2 px-3 py-2 bg-white border-b border-slate-200 shrink-0">
-          <button
-            type="button"
-            onClick={() => setMobileTab('produtos')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold border ${mobileTab !== 'criadores' ? 'bg-slate-900 text-white border-slate-900' : 'bg-white text-slate-700 border-slate-300'}`}
-          >
-            Tendências
-          </button>
-          <button
-            type="button"
-            onClick={() => setMobileTab('criadores')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold border ${mobileTab === 'criadores' ? 'bg-slate-900 text-white border-slate-900' : 'bg-white text-slate-700 border-slate-300'}`}
-          >
-            Top Criadores
-          </button>
-        </div>
-      )}
-      <nav className={`grid ${showCreators ? 'grid-cols-3' : 'grid-cols-2'} lg:hidden w-full bg-white border-b border-slate-200 p-1.5 gap-1.5 shrink-0 text-xs font-bold select-none`}>
+      <nav className={`grid grid-cols-2 lg:hidden w-full bg-white border-b border-slate-200 p-1.5 gap-1.5 shrink-0 text-xs font-bold select-none ${showCreators ? 'hidden' : ''}`}>
         <button
           onClick={() => setMobileTab('produtos')}
           className={`py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1 cursor-pointer transition-all border ${
@@ -741,29 +723,13 @@ export default function App() {
           <span>🔬 Raio-X Produto</span>
         </button>
 
-        {showCreators && (
-          <button
-            type="button"
-            onClick={() => setMobileTab('criadores')}
-            className={`py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1 cursor-pointer transition-all border ${
-              mobileTab === 'criadores'
-                ? 'bg-slate-900 text-white border-slate-900 shadow-2xs font-black'
-                : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100'
-            }`}
-          >
-            <span>Top Criadores</span>
-          </button>
-        )}
       </nav>
 
-      {/* 3. ÁREA PRINCIPAL: THREE-PANEL TERMINAL (REDIMENSIONÁVEL NO NOTEBOOK/DESKTOP) */}
-      {showCreators && mobileTab === 'criadores' ? (
-        <CreatorsPanel />
-      ) : null}
+      {showCreators ? <CreatorRadar /> : null}
       <div
         className={`flex-1 flex flex-col lg:flex-row w-full max-w-full overflow-hidden min-h-0 bg-[#F1F5F9] relative ${
           redimensionando ? 'select-none cursor-col-resize' : ''
-        } ${showCreators && mobileTab === 'criadores' ? 'hidden' : ''}`}
+        } ${showCreators ? 'hidden' : ''}`}
       >
         {/* PAINEL 1: Lista de Produtos */}
         <div

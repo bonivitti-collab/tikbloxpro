@@ -14,7 +14,6 @@ import {
   sendTestNotification,
   notifyProductDetected,
   getPushAlertHistory,
-  checkAndRunAutomatedDailyPush,
 } from '../services/pushNotifications';
 import {
   checkAndNotifyTrendPulseSpikes,
@@ -109,27 +108,6 @@ export function usePushNotifications(currentProducts?: TrendingProduct[]) {
     },
     [settings, permission]
   );
-
-  // Automated 3x Daily Scans & Push Dispatcher (Morning, Afternoon, Evening)
-  useEffect(() => {
-    if (true || !settings.enabled || permission !== 'granted' || !currentProducts || currentProducts.length === 0) { // PWA FROZEN
-      return;
-    }
-
-    // Run immediately on mount / products update, then check every 60 seconds
-    const runCheck = async () => {
-      await checkAndRunAutomatedDailyPush(currentProducts, settings);
-      setHistory(getPushAlertHistory());
-    };
-
-    runCheck();
-
-    const interval = setInterval(() => {
-      runCheck();
-    }, 60000); // Check every 60 seconds
-
-    return () => clearInterval(interval);
-  }, [settings, permission, currentProducts]);
 
   return {
     isSupported,

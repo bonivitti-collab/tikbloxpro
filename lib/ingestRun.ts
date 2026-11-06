@@ -1,5 +1,6 @@
 import { fetchApifySearch, parseApifyProduct, type ScrapedProduct } from './apifyShop.js';
-import { upsertCreators } from './creatorsStore.js';
+import { listCreatorLookupOrder, markCreatorsChecked, upsertCreators } from './creatorsStore.js';
+import { sendDailyAlerts } from './dailyPush.js';
 import { planIngestCalls, resolveChargeUsd, resolveResultBudget, type StoredProductRef } from './ingestPlan.js';
 import { collectKalodata } from './kalodata.js';
 import {
@@ -79,15 +80,23 @@ export async function runDailyIngest(options: IngestDeps = {}): Promise<IngestSu
   let kalodataCalls = 0;
   if (kalodataKey) {
     try {
+      const lookupCreatorIds = options.fetchImpl ? [] : await listCreatorLookupOrder().catch(() => [] as string[]);
       const collected = await collectKalodata({
         apiKey: kalodataKey,
         fetchImpl: options.fetchImpl,
         now,
+        lookupCreatorIds,
       });
       kalodataCalls = collected.calls;
       if (collected.calls > 0) {
         await saveProducts(collected.products);
         await upsertCreators(collected.creators, now.toISOString());
+        if (!options.fetchImpl) {
+          await markCreatorsChecked(collected.lookedUpCreatorIds, now.toISOString()).catch(() => {});
+          await sendDailyAlerts(now).catch((error) => {
+            console.error('[PUSH]', String((error as { message?: string })?.message || error).slice(0, 180));
+          });
+        }
         await finishRun(runKey, 'ok').catch(() => {});
         return {
           budget,

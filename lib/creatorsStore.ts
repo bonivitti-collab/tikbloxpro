@@ -59,6 +59,7 @@ export async function upsertCreators(creators: KalodataCreator[], refreshedAt: s
       revenue_brl: creator.revenue_brl,
       sales_volume: creator.sales_volume,
       category: creator.category,
+      avatar_url: creator.avatarUrl,
       source: 'kalodata',
       last_refreshed_at: refreshedAt,
     }))),
@@ -67,12 +68,31 @@ export async function upsertCreators(creators: KalodataCreator[], refreshedAt: s
     creator_id: creator.id,
     product_id: productId,
     source: 'kalodata',
+    last_seen_at: refreshedAt,
+    video_url: creator.videoByProduct?.[productId] || null,
   })));
   if (links.length === 0) return;
+  // first_seen_at fica de fora: no insert o banco usa now(); no update a data original permanece.
   await sb('creator_products?on_conflict=creator_id,product_id', {
     method: 'POST',
     headers: { Prefer: 'resolution=merge-duplicates,return=minimal' },
     body: JSON.stringify(links),
+  });
+}
+
+export async function listCreatorLookupOrder(): Promise<string[]> {
+  if (!supabaseConfig()) return [];
+  const rows = await sb('creators?select=id,products_checked_at&source=eq.kalodata&order=products_checked_at.asc.nullsfirst&limit=100');
+  return (Array.isArray(rows) ? rows : []).map((row) => String(row.id));
+}
+
+export async function markCreatorsChecked(ids: string[], refreshedAt: string): Promise<void> {
+  if (!supabaseConfig() || ids.length === 0) return;
+  const quoted = ids.map((id) => encodeURIComponent(id)).join(',');
+  await sb(`creators?id=in.(${quoted})`, {
+    method: 'PATCH',
+    headers: { Prefer: 'return=minimal' },
+    body: JSON.stringify({ products_checked_at: refreshedAt }),
   });
 }
 
