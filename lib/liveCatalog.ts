@@ -11,11 +11,15 @@ function saturation(videos: number | null): 'Oceano Azul' | 'Baixa' | 'Média' |
 }
 
 export function liveRowToProduct(row: StoredProductRow): TrendingProduct | null {
-  if (row.price_brl == null || row.stock_units == null || row.video_count == null || !row.product_url) return null;
+  const kalodata = row.source === 'kalodata';
+  if (row.price_brl == null || !row.product_url) return null;
+  if (!kalodata && (row.stock_units == null || row.video_count == null)) return null;
   const niche = nicheById(row.niche || '') ;
   const nicheId = niche?.id || 'home';
   const collectedAt = row.last_refreshed_at || row.scraped_at;
-  const videos = Number(row.video_count);
+  const videos = row.video_count == null ? null : Number(row.video_count);
+  const stock = row.stock_units == null ? null : Number(row.stock_units);
+  const countsUnknown = kalodata && (videos == null || stock == null);
   const sales = row.sold_30d ?? row.sold_7d ?? 0;
   const commissionUnknown = row.commission_brl == null;
   return enrichWithTikTokShopData({
@@ -26,10 +30,10 @@ export function liveRowToProduct(row: StoredProductRow): TrendingProduct | null 
     nicheLabel: niche?.label || 'Casa & Cozinha',
     originCountry: 'CN',
     originPlatform: 'TikTok Shop BR',
-    waveStage: videos < 25 ? 'early_wave' : 'rising_wave',
-    waveStageLabel: videos < 25 ? 'Início de onda' : 'Em tração',
-    viralityScore: Math.max(60, Math.min(99, 96 - Math.round(videos / 2))),
-    saturationInBrazil: videos < 25 ? 'Baixa' : 'Média',
+    waveStage: videos != null && videos >= 25 ? 'rising_wave' : 'early_wave',
+    waveStageLabel: videos != null && videos >= 25 ? 'Em tração' : 'Início de onda',
+    viralityScore: Math.max(60, Math.min(99, 96 - Math.round((videos ?? 0) / 2))),
+    saturationInBrazil: videos != null && videos >= 25 ? 'Média' : 'Baixa',
     estimatedCostUSD: 0,
     estimatedPriceBRL: Number(row.price_brl),
     estimatedProfitMarginPercent: 0,
@@ -38,8 +42,10 @@ export function liveRowToProduct(row: StoredProductRow): TrendingProduct | null 
     targetAudience: 'Criadores do TikTok Shop Brasil',
     imageUrl: row.cover_url || undefined,
     productUrl: row.product_url,
-    stockUnits: Number(row.stock_units),
-    videoCountBR: videos,
+    stockUnits: stock ?? undefined,
+    videoCountBR: videos ?? undefined,
+    feedSource: kalodata ? 'kalodata' : 'apify',
+    countsUnknown,
     commissionUnknown,
     commissionEstimatedBRL: commissionUnknown ? undefined : Number(row.commission_brl),
     dataSource: 'live',
@@ -56,15 +62,15 @@ export function liveRowToProduct(row: StoredProductRow): TrendingProduct | null 
       searchVolumeBR: 'Emergindo agora',
     },
     tiktokShop: {
-      hasBrazilStock: Number(row.stock_units) > 0,
+      hasBrazilStock: (stock ?? 0) > 0,
       stockLocation: 'TikTok Shop BR',
       commissionValueBRL: commissionUnknown ? undefined : Number(row.commission_brl),
-      stockUnits: Number(row.stock_units),
-      videoCountBR: videos,
+      stockUnits: stock ?? undefined,
+      videoCountBR: videos ?? undefined,
       productUrl: row.product_url,
       activeCreatorsCount: Number(row.influencer_count || 0),
       recentSalesCount: Number(sales),
-      saturationLevel: saturation(videos),
+      saturationLevel: saturation(videos ?? 0),
       freeSampleAvailable: false,
     },
   }) as TrendingProduct;

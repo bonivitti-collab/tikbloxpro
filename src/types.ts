@@ -63,6 +63,8 @@ export interface TrendingProduct {
   freeSampleAvailable?: boolean;
   stockLocationBrazil?: string;
   dataSource?: 'curated' | 'live';
+  feedSource?: 'apify' | 'kalodata';
+  countsUnknown?: boolean;
   metricsEstimated?: boolean;
   commissionUnknown?: boolean;
   collectedAt?: string;

@@ -175,6 +175,7 @@ export async function collectKalodata(input: {
       page_size: KALODATA_PAGE_SIZE,
       page_number: page,
       need_image: 1,
+      need_extra: true,
       is_affiliate: 1,
     });
     if (rows.length === 0) break;
@@ -193,6 +194,38 @@ export async function collectKalodata(input: {
     for (const row of creatorRows) {
       const creator = mapKalodataCreator(row);
       if (creator) creators.push(creator);
+    }
+  }
+
+  const detailTargets = [...products]
+    .filter((product) => (product.commission_brl ?? 0) >= 10)
+    .sort((a, b) => (b.commission_brl ?? 0) - (a.commission_brl ?? 0) || a.id.localeCompare(b.id))
+    .slice(0, plan.detailCalls);
+  for (const product of detailTargets) {
+    if (!canSpend(spent, balance, cap, 0.1)) break;
+    try {
+      const payload = await postKalodata('/tiktok/product/detail', {
+        ...COMMON,
+        product_id: product.id,
+        need_image: 1,
+        need_extra: true,
+      }, input.apiKey, fetchImpl);
+      calls += 1;
+      spent = Math.round((spent + 0.1) * 10) / 10;
+      const data = payload?.data;
+      if (!data || typeof data !== 'object') continue;
+      const videos = parseIntegerCount(data.video_number ?? data.videos_count);
+      const stock = parseIntegerCount(data.stock ?? data.stock_count ?? data.inventory ?? data.sku_stock);
+      if (videos != null) product.video_count = videos;
+      if (stock != null) product.stock_units = stock;
+      const price = parseLooseNumber(data.unit_price ?? data.min_price) ?? product.price_brl;
+      const rate = parseLooseNumber(data.commission_rate);
+      const commission = commissionBrlFromRate(price, rate);
+      if (commission != null) product.commission_brl = commission;
+      if (typeof data.master_image_url === 'string' && data.master_image_url) product.cover_url = data.master_image_url;
+    } catch (error) {
+      console.error('[KALODATA]', String((error as { message?: string })?.message || error).slice(0, 180));
+      break;
     }
   }
 

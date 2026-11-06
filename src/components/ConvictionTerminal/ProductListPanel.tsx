@@ -381,6 +381,9 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
                   {collectedLabel ? (
                     <p className="text-[10px] text-slate-500 mt-0.5">Coletado em {collectedLabel}</p>
                   ) : null}
+                  {prod.countsUnknown ? (
+                    <p className="text-[10px] font-bold text-amber-700 mt-0.5">estoque/vídeos não informados</p>
+                  ) : null}
                 </div>
 
                 {/* Linha 2: Métricas de Custo, Comissão e Break-Even */}

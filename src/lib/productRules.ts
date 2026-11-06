@@ -63,12 +63,32 @@ export function passesBusinessRules(
   return true;
 }
 
+/**
+ * Kalodata exige comissão de pelo menos R$ 10. Estoque e vídeos, quando existem,
+ * seguem os limites. Se um dos dois não veio, o card continua e marca a lacuna.
+ */
+export function keepLiveProduct(
+  product: Partial<TrendingProduct> | any,
+  options: BusinessRuleOptions = {}
+): boolean {
+  if (product?.feedSource === 'kalodata' || product?.countsUnknown) {
+    const commission = commissionBrlOf(product);
+    if (commission == null || commission < MIN_COMMISSION_BRL) return false;
+    const stock = stockUnitsOf(product);
+    const videos = videoCountOf(product);
+    if (stock != null && stock < MIN_STOCK_UNITS) return false;
+    if (videos != null && videos >= MAX_CREATOR_VIDEOS) return false;
+    return true;
+  }
+  return passesBusinessRules(product, options);
+}
+
 /** Ao vivo obedece as regras. O complemento curado entra marcado como estimativa. */
 export function includeInCatalog(
   product: Partial<TrendingProduct> | any,
   options: BusinessRuleOptions = {}
 ): boolean {
-  if (product?.dataSource === 'live') return passesBusinessRules(product, options);
+  if (product?.dataSource === 'live') return keepLiveProduct(product, options);
   if (options.requireKnownCommission && commissionBrlOf(product) == null) return false;
   return true;
 }

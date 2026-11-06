@@ -1,4 +1,5 @@
-import { passesBusinessRules } from '../src/lib/productRules.ts';
+import { keepLiveProduct, passesBusinessRules } from '../src/lib/productRules.ts';
+import { scrapedProductRecord } from '../lib/productsStore.ts';
 import { liveRowToProduct } from '../lib/liveCatalog.ts';
 import { rowsVisibleTo } from '../lib/catalog.ts';
 import { canSeeKalodata } from '../lib/kalodataAccess.ts';
@@ -22,7 +23,7 @@ function assert(condition: unknown, message: string): void {
 }
 
 const full = planKalodataSpend(1);
-assert(full.productPages === 5 && full.creatorPages === 1 && full.creatorProductLookups === 4, '1 crédito cobre 500 produtos, 100 criadores e 4 listas');
+assert(full.productPages === 5 && full.creatorPages === 1 && full.detailCalls === 4 && full.creatorProductLookups === 0, '1 crédito cobre 500 produtos, 100 criadores e 4 fichas');
 assert(full.estimatedCredits === 1, 'o plano de 1 crédito não passa de 1');
 const thin = planKalodataSpend(0.3);
 assert(thin.productPages === 2 && thin.creatorPages === 1 && thin.creatorProductLookups === 0, '0,30 crédito prioriza ranking e não estoura');
@@ -43,11 +44,17 @@ const mapped = mapKalodataProduct({
 assert(mapped?.source === 'kalodata', 'origem kalodata');
 assert(mapped?.product_url === tiktokProductUrl('1729508370969629931'), 'o clique abre o produto exato no TikTok Shop');
 assert(mapped?.sold_7d === 2 && mapped?.commission_brl === 12 && mapped?.price_brl === 80, 'venda inteira e comissão em reais');
-assert(!passesBusinessRules(mapped), 'sem estoque e sem vídeos o ranking não entra no radar');
+assert(!passesBusinessRules(mapped), 'regra estrita da Apify continua exigindo estoque e vídeos');
+const visible = liveRowToProduct({ ...mapped!, scraped_at: mapped!.last_refreshed_at });
+assert(visible?.countsUnknown === true && keepLiveProduct(visible), 'Kalodata sem estoque/vídeos entra no radar se a comissão passa de R$ 10');
 const qualified = liveRowToProduct({ ...mapped!, scraped_at: mapped!.last_refreshed_at, stock_units: 500, video_count: 12 });
-assert(qualified != null && passesBusinessRules(qualified), 'com estoque, vídeos e comissão de R$ 12 passa');
-const cheap = liveRowToProduct({ ...mapped!, scraped_at: mapped!.last_refreshed_at, stock_units: 500, video_count: 12, commission_brl: 9 });
-assert(cheap != null && !passesBusinessRules(cheap), 'comissão abaixo de R$ 10 não passa');
+assert(qualified != null && keepLiveProduct(qualified) && qualified.countsUnknown === false, 'com estoque, vídeos e comissão de R$ 12 passa sem aviso');
+const cheap = liveRowToProduct({ ...mapped!, scraped_at: mapped!.last_refreshed_at, commission_brl: 9 });
+assert(cheap != null && !keepLiveProduct(cheap), 'comissão abaixo de R$ 10 não passa');
+const saturated = liveRowToProduct({ ...mapped!, scraped_at: mapped!.last_refreshed_at, video_count: 50, stock_units: 800 });
+assert(saturated != null && !keepLiveProduct(saturated), '50 vídeos continuam fora');
+assert(scrapedProductRecord(mapped!).source === 'kalodata', 'upsert grava a origem kalodata');
+assert(scrapedProductRecord({ ...mapped!, source: undefined as unknown as 'apify' }).source === 'apify', 'sem origem o upsert continua apify');
 
 const previousFlag = process.env.KALODATA_PUBLIC_DISPLAY;
 delete process.env.KALODATA_PUBLIC_DISPLAY;
@@ -83,6 +90,12 @@ const fetchImpl: typeof fetch = async (input, init) => {
     return json({ success: true, data: { totalRemain: 1 } });
   }
   const body = JSON.parse(String(init?.body || '{}'));
+  if (url.endsWith('/tiktok/product/detail')) {
+    return json({
+      success: true,
+      data: { product_id: body.product_id, video_number: 8, unit_price: 80, commission_rate: 15 },
+    });
+  }
   assert(body.region === 'BR' && body.currency === 'BRL' && body.language === 'pt-BR', 'região BR e moeda BRL');
   if (url.endsWith('/tiktok/creator/rank')) {
     return json({
@@ -128,9 +141,11 @@ assert(balance === 1, 'saldo totalRemain');
 const collected = await collectKalodata({ apiKey: 'test-key', balance: 1, fetchImpl, maxCredits: 1 });
 const paid = requested.filter((line) => line.includes('/tiktok/'));
 assert(paid.length === 10, `gasta 10 chamadas pagas, veio ${paid.length}`);
-assert(collected.spent === 1 && collected.products.length === 504, '500 do ranking mais 4 produtos de criadores');
-assert(collected.creators[0]?.followers === 1700 && collected.creators[0]?.productIds.length === 1, 'criador com seguidores inteiros e o produto que vende');
-assert(collected.products.some((product) => product.id === 'sold-by-creator-0' && product.sold_7d === 2 && product.product_url.includes('/view/product/sold-by-creator-0')), 'produto do criador abre no link exato');
+assert(collected.spent === 1 && collected.products.length === 500, '500 produtos do ranking, sem estourar o crédito');
+assert(collected.creators[0]?.followers === 1700, 'criador com seguidores inteiros');
+const enriched = ['1000', '1001', '1002', '1003'].map((id) => collected.products.find((product) => product.id === id));
+assert(enriched.every((product) => product?.video_count === 8 && product?.stock_units == null), 'as 4 fichas preenchem vídeos e deixam estoque ausente');
+assert(collected.products.find((product) => product.id === '1004')?.video_count == null, 'o quinto produto não gasta ficha');
 
 let blocked = 0;
 const blockingFetch: typeof fetch = async (input, init) => {

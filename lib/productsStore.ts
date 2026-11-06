@@ -55,10 +55,8 @@ export async function listStoredProducts(): Promise<StoredProductRow[]> {
   return Array.isArray(data) ? (data as StoredProductRow[]) : [];
 }
 
-export async function upsertScrapedProducts(rows: ScrapedProduct[]): Promise<{ inserted: number; updated: number }> {
-  if (rows.length === 0) return { inserted: 0, updated: 0 };
-  const existing = new Set((await listStoredProducts()).map((row) => row.id));
-  const payload = rows.map((row) => ({
+export function scrapedProductRecord(row: ScrapedProduct) {
+  return {
     id: row.id,
     title: row.title,
     price_brl: row.price_brl,
@@ -72,9 +70,15 @@ export async function upsertScrapedProducts(rows: ScrapedProduct[]): Promise<{ i
     product_url: row.product_url,
     niche: row.niche,
     keyword: row.keyword,
-    source: 'apify',
+    source: row.source || 'apify',
     last_refreshed_at: row.last_refreshed_at,
-  }));
+  };
+}
+
+export async function upsertScrapedProducts(rows: ScrapedProduct[]): Promise<{ inserted: number; updated: number }> {
+  if (rows.length === 0) return { inserted: 0, updated: 0 };
+  const existing = new Set((await listStoredProducts()).map((row) => row.id));
+  const payload = rows.map((row) => scrapedProductRecord(row));
   await sb('products?on_conflict=id', {
     method: 'POST',
     headers: { Prefer: 'resolution=merge-duplicates,return=minimal' },

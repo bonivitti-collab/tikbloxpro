@@ -1,6 +1,6 @@
 import { enrichWithTikTokShopData } from '../src/data/tiktokShopEnricher.js';
 import { INITIAL_CURATED_TRENDS } from '../src/data/curatedTrends.js';
-import { matchScore, passesBusinessRules } from '../src/lib/productRules.js';
+import { keepLiveProduct, matchScore } from '../src/lib/productRules.js';
 import type { TrendingProduct } from '../src/types.js';
 import { mergeLiveAndCurated } from './ingestPlan.js';
 import { liveRowToProduct } from './liveCatalog.js';
@@ -44,7 +44,7 @@ export async function listCatalog(filters: {
     live = rows
       .map((row) => liveRowToProduct(row))
       .filter((product): product is TrendingProduct => product != null)
-      .filter((product) => passesBusinessRules(product));
+      .filter((product) => keepLiveProduct(product));
   } catch (error) {
     console.error('[CATALOG] live', error);
     live = [];
