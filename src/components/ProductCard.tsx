@@ -22,7 +22,6 @@ import {
   ExternalLink,
   Gift,
   ShoppingBag,
-  MapPin,
   Users,
 } from 'lucide-react';
 import { TrendingProduct, ProductPriceCheck } from '../types';
@@ -249,15 +248,7 @@ export const ProductCard: React.FC<ProductCardProps> = React.memo(({
             </div>
           </div>
 
-          {/* Logistics & Saturation Status */}
           <div className="mt-2.5 space-y-1 text-[11px]">
-            <div className="flex items-center justify-between text-[#C5C6D0]">
-              <span className="flex items-center gap-1 text-[#25F4EE] font-medium">
-                <MapPin className="w-3 h-3 text-[#25F4EE]" />
-                <span>Estoque:</span>
-              </span>
-              <span className="font-semibold text-white">{tk.stockLocation}</span>
-            </div>
             <div className="flex items-center justify-between text-[#C5C6D0]">
               <span className="flex items-center gap-1 text-[#FE2C55] font-medium">
                 <Users className="w-3 h-3 text-[#FE2C55]" />

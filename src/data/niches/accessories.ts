@@ -16,7 +16,7 @@ export const accessoriesTrends: TrendingProduct[] = [
     estimatedCostUSD: 14.50,
     estimatedPriceBRL: 269.90,
     estimatedProfitMarginPercent: 280,
-    culturalFitReason: 'O medo de furto de notebook e carteira em ônibus, metrô de São Paulo/Rio e aeroportos é diário. A trava de segredo TSA e zíperes ocultos nas costas eliminam o medo.',
+    culturalFitReason: 'O medo de furto de notebook e carteira em ônibus, metrô e aeroportos é diário. A trava de segredo TSA e zíperes ocultos nas costas eliminam o medo.',
     brazilEntryStatus: 'Sucesso massivo e duradouro no mercado brasileiro para profissionais corporativos e estudantes.',
     targetAudience: 'Homens e mulheres de 20 a 45 anos que andam de transporte público ou viajam a trabalho.',
     iconType: 'ShieldCheck',

@@ -88,7 +88,7 @@ const VIRAL_HUBS = [
   {
     id: 'br-hub',
     countryIso: 'BR',
-    name: 'São Paulo (Mercado Destino)',
+    name: 'Brasil (mercado de destino)',
     coordinates: [-46.6333, -23.5505] as [number, number],
     type: 'Mercado de Arbitragem & Entrada',
     description: 'Ponto focal de absorção de tendências no Brasil com baixa saturação e alta margem.',
@@ -211,7 +211,7 @@ export const GlobalTrendHeatmap: React.FC<GlobalTrendHeatmapProps> = ({
       language === 'en' ? 'Brazil (Destination)' : 'Brasil (Mercado Destino)',
       '🇧🇷',
       'destination',
-      'São Paulo & E-commerce LatAm',
+      'Brasil e e-commerce na América Latina',
       [-51.9253, -14.235],
       language === 'en'
         ? 'Target Market with High Arbitrage Spread'
@@ -315,7 +315,7 @@ export const GlobalTrendHeatmap: React.FC<GlobalTrendHeatmapProps> = ({
       {
         id: 'flow-cn-south-to-br',
         fromName: 'Shenzhen (CN)',
-        toName: 'São Paulo (BR)',
+        toName: 'Brasil',
         fromCoord: [114.0579, 22.5431] as [number, number],
         color: '#25F4EE',
         label: 'Arbitragem de Fábrica (1688 / Douyin)',
@@ -323,7 +323,7 @@ export const GlobalTrendHeatmap: React.FC<GlobalTrendHeatmapProps> = ({
       {
         id: 'flow-us-west-to-br',
         fromName: 'Los Angeles (US)',
-        toName: 'São Paulo (BR)',
+        toName: 'Brasil',
         fromCoord: [-118.2437, 34.0522] as [number, number],
         color: '#FE2C55',
         label: 'Replicação Viral (TikTok Shop US)',

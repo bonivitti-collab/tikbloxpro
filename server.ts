@@ -170,7 +170,7 @@ async function callGroqFreeAPI(prompt: string): Promise<string | null> {
 }
 
 const DEFAULT_SOURCES = [
-  { title: 'TikTok Shop Brasil - Vitrine de Afiliados', uri: 'https://shop.tiktok.com' },
+  { title: 'TikTok Shop Brasil', uri: 'https://shop.tiktok.com' },
   { title: 'TikTok Creative Center Brasil - Top Produtos & Criativos', uri: 'https://ads.tiktok.com/business/creativecenter/inspiration/popular/pc/pt' },
   { title: 'Tendências Virais #TikTokShopBrasil', uri: 'https://www.tiktok.com/tag/tiktokshopbrasil' },
 ];
@@ -188,7 +188,7 @@ function getFallbackDeepDive(product: any) {
     marketPotentialSummary: `${product.name} apresenta demanda explosiva no exterior com mais de ${product.trendingMetrics?.viewsLast30Days || '35M visualizaÃ§Ãµes'} e margem bruta superior a ${product.estimatedProfitMarginPercent || 280}% para dropshipping e e-commerce no Brasil.`,
     brazilOpportunityScore: product.viralityScore || 94,
     competitionAnalysis: {
-      shopeeStatus: 'Menos de 10 lojas ativas; maioria sÃ£o envios internacionais lentos da Ãsia sem estoque nacional.',
+      shopeeStatus: 'Poucas lojas ativas com o mesmo anúncio. Compare o vendedor dentro do marketplace.',
       mercadoLivreStatus: 'Poucos vendedores no Full com preÃ§os inflacionados (altÃ­ssima margem de arbitragem).',
       tiktokShopBRStatus: 'Oceano azul absoluto: vÃ­deos comeÃ§am a viralizar de forma orgÃ¢nica sem vendedores estruturados.',
     },
@@ -700,7 +700,7 @@ function generateAutonomousTikTokShopReply(
   const commission = productContext?.tiktokShop?.commissionValueBRL 
     ? `R$ ${Number(productContext.tiktokShop.commissionValueBRL).toFixed(2)} (${productContext.tiktokShop.commissionRatePercent}%)` 
     : '20% a 25%';
-  const stock = productContext?.tiktokShop?.stockLocation || 'São Paulo - SP (Pronta Entrega)';
+  const stock = 'a loja escolhida no TikTok Shop';
 
   if (q.includes('gancho') || q.includes('hook') || q.includes('abertura') || q.includes('começar') || q.includes('gravar')) {
     return `### 🎯 3 Ganchos Magnéticos de 3 Segundos para ${prodName}
@@ -713,9 +713,9 @@ function generateAutonomousTikTokShopReply(
 > *"Eu duvido você assistir esse vídeo até o final e não querer pedir um desse no TikTok Shop agora mesmo..."*
 > *(Ação: Mostre o resultado final satisfatório nos primeiros 2 segundos).*
 
-3. **Gancho de Estoque Nacional & Escassez:**
-> *"Finalmente chegou com estoque no Brasil o que os gringos estavam escondendo! Olha só..."*
-> *(Ação: Desembale rápido mostrando a caixinha recebida com envio de ${stock}).*
+3. **Gancho de Escassez:**
+> *"Olha o que está saindo no TikTok Shop antes de todo mundo copiar..."*
+> *(Ação: Mostre o produto em uso. Quem compra escolhe o vendedor em ${stock}).*
 
 💡 **Dica de Ouro:** Não comece dizendo "Oi gente". Mostre o movimento ou a dor nos primeiros 1.5 segundos!`;
   }
@@ -724,11 +724,11 @@ function generateAutonomousTikTokShopReply(
     return `### 🎬 Estrutura de Live Selling (5 Minutos de Alta Conversão) para ${prodName}
 
 * **Minuto 1: Abertura Explosiva & Fixação do Carrinho**
-  * Segure o produto na mão e aponte para a sacola amarela: *"Gente, liberaram cupom e o estoque tá saindo de ${stock} com envio rápido. Prestem atenção nessa demonstração!"*
+  * Segure o produto na mão e aponte para a sacola amarela: *"Gente, o produto está no carrinho. Quem comprar escolhe o vendedor dentro do app. Prestem atenção nessa demonstração!"*
 * **Minuto 2: A Demonstração Prática (O 'Efeito Uau')**
   * Mostre a função principal ao vivo sem enrolação. Mostre o antes e depois com boa iluminação.
 * **Minuto 3: Quebra de Objeções Clássicas**
-  * *"Mas funciona mesmo? Chega rápido?"* Responda: *"Tem pronta entrega no Brasil, chega em 2 a 4 dias e você não paga taxa de importação nenhuma."*
+  * *"Mas funciona mesmo?"* Responda mostrando o uso. O prazo é o da loja que a pessoa escolher no TikTok Shop.
 * **Minuto 4: Escassez Real**
   * Mostre as unidades acabando no carrinho: *"Restam poucas peças com esse preço promocional no carrinho 1!"*
 * **Minuto 5: Chamada para Ação Final (CTA)**
@@ -750,7 +750,7 @@ Copie e envie esta mensagem no chat do vendedor dentro do Centro de Criadores do
 *Fico no aguardo para aprovação e envio para começarmos a rodar as vendas juntos! Muito obrigado!"*
 ---
 
-💡 **Dica:** Lojas com estoque no Brasil aprovam muito mais rápido criadores que se comprometem com número específico de vídeos (ex: 3 vídeos + 1 live)!`;
+💡 **Dica:** Combine um número específico de vídeos (por exemplo 3 vídeos + 1 live) com a loja que você escolher no TikTok Shop.`;
   }
 
   if (q.includes('objeç') || q.includes('publico') || q.includes('público') || q.includes('vender') || q.includes('estratégia')) {
@@ -758,7 +758,7 @@ Copie e envie esta mensagem no chat do vendedor dentro do Centro de Criadores do
 
 * **Público-Alvo Ideal:** Homens e mulheres de 18 a 45 anos que compram por impulso visual e buscam praticidade imediata.
 * **Objeção 1: 'Demora para chegar?'**
-  * *Como quebrar no vídeo:* Enfatize verbalmente e com texto na tela: *"Estoque já no Brasil, chega rapidinho em São Paulo e capitais!"*
+  * *Como quebrar no vídeo:* O prazo é o da loja escolhida no TikTok Shop. Não prometa cidade de estoque nem prazo fixo.
 * **Objeção 2: 'Será que compensa o valor?'**
   * *Como quebrar no vídeo:* Mostre o custo por uso diário. Se custa R$ 69,90, mostre que custa centavos por dia e dura anos.
 * **Objeção 3: 'É golpe ou frágil?'**

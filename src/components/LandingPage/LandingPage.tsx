@@ -145,7 +145,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <span className="px-1.5 py-0.2 rounded bg-[#25F4EE]/10 text-[9px] text-[#25F4EE] border border-[#25F4EE]/30">NOVO</span>
             </button>
             <button onClick={() => scrollToSection('pilares')} className="hover:text-white transition cursor-pointer">
-              Pronta Entrega SP
+              Onde comprar
             </button>
             <button onClick={() => scrollToSection('pricing')} className="hover:text-[#25F4EE] transition cursor-pointer">
               Planos & Preços
@@ -217,7 +217,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 onClick={() => scrollToSection('pilares')}
                 className="text-left py-2 px-3 rounded-lg hover:bg-white/5 hover:text-white transition"
               >
-                📦 Pronta Entrega São Paulo
+                🛍️ Onde comprar no TikTok
               </button>
               <button
                 onClick={() => scrollToSection('pricing')}
@@ -261,7 +261,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </span>
             <span className="text-[#25F4EE] font-black uppercase">VARREDURA 06:00 BRT CONCLUÍDA</span>
             <span className="hidden sm:inline text-slate-500">•</span>
-            <span className="hidden sm:inline">140+ Oportunidades Pronta Entrega SP</span>
+            <span className="hidden sm:inline">140+ produtos no radar</span>
             <span className="hidden md:inline text-slate-500">•</span>
             <span className="hidden md:inline font-mono text-emerald-400 font-bold">
               Próxima em: {countdown}
@@ -279,7 +279,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
           {/* Subtítulo persuasivo */}
           <p className="text-sm sm:text-lg text-slate-300 max-w-3xl mx-auto leading-relaxed">
-            Identifique produtos validados com estoque nacional em São Paulo (chega em 2 a 4 dias), concorrência zerada (&lt; 10 vídeos no feed BR) e ponto de equilíbrio em 3 vendas.
+            Identifique produtos com concorrência baixa no feed brasileiro e veja a comissão antes de abrir o anúncio no TikTok Shop. O comprador escolhe o vendedor dentro do app.
           </p>
 
           {/* Botão de Ação Hero Principal */}
@@ -314,12 +314,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           {/* Selos dos 4 Pilares Principais em Cards Interativos */}
           <div className="pt-8 grid grid-cols-2 sm:grid-cols-4 gap-3 text-left max-w-4xl mx-auto">
             <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 space-y-1 hover:border-emerald-500/40 transition">
-              <span className="text-[10px] uppercase font-bold text-slate-400 block">Estoque Local</span>
+              <span className="text-[10px] uppercase font-bold text-slate-400 block">Onde comprar</span>
               <span className="text-xs font-black text-white flex items-center gap-1.5">
                 <Package className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Pronta Entrega SP</span>
+                <span>Link do produto</span>
               </span>
-              <span className="text-[10px] text-slate-400 block font-mono">2 a 4 dias na sua casa</span>
+              <span className="text-[10px] text-slate-400 block font-mono">Você escolhe o vendedor</span>
             </div>
 
             <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 space-y-1 hover:border-[#25F4EE]/40 transition">
@@ -398,11 +398,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500/20 text-rose-300 text-xs font-bold">
                 ❌ O Jeito Tradicional (Perda de Tempo e Dinheiro)
               </div>
-              <h4 className="text-lg font-black text-white">Esperando da China e Copiando Produtos Saturados</h4>
+              <h4 className="text-lg font-black text-white">Copiando produtos já saturados</h4>
               <ul className="space-y-3 text-xs text-slate-300">
                 <li className="flex items-start gap-2">
                   <span className="text-rose-400 font-bold shrink-0">•</span>
-                  <span><strong>20 a 30 dias para a amostra chegar:</strong> Quando o produto chega na sua casa, o produto já explodiu e morreu.</span>
+                  <span><strong>Você entra tarde:</strong> Quando o feed já está cheio, o mesmo carrinho não entrega mais alcance.</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-rose-400 font-bold shrink-0">•</span>
@@ -420,11 +420,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#25F4EE]/20 text-[#25F4EE] text-xs font-bold">
                 ✅ O Método TikBlox Pro (Alta Assimetria de Lucro)
               </div>
-              <h4 className="text-lg font-black text-white">Pronta Entrega em São Paulo + Oceano Azul</h4>
+              <h4 className="text-lg font-black text-white">Oceano azul no TikTok Shop</h4>
               <ul className="space-y-3 text-xs text-slate-200">
                 <li className="flex items-start gap-2">
                   <span className="text-[#25F4EE] font-bold shrink-0">✓</span>
-                  <span><strong>Despacho em 24h/48h de SP:</strong> A amostra chega em 2 a 4 dias na sua casa. Você grava antes de 99% da internet.</span>
+                  <span><strong>Link do produto:</strong> Você abre o anúncio no TikTok Shop e escolhe o vendedor ali. O radar não promete prazo nem cidade de estoque.</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-[#25F4EE] font-bold shrink-0">✓</span>
@@ -483,10 +483,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 📦
               </div>
               <h4 className="text-base font-black text-white group-hover:text-emerald-400 transition">
-                2. Links Diretos de Amostra & Vitrine
+                2. Link do produto no TikTok Shop
               </h4>
               <p className="text-xs text-slate-300 leading-relaxed">
-                Botões diretos para comprar a amostra com envio de São Paulo e copiar o termo oficial homologado do carrinho amarelo em 1 clique.
+                O card abre o produto exato no TikTok Shop. Quem compra escolhe o vendedor dentro do app.
               </p>
             </div>
 
@@ -542,7 +542,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <div>
                   <h4 className="text-xl font-black text-white">Radar Essential</h4>
                   <p className="text-xs text-slate-400 mt-1">
-                    Para quem deseja apenas minerar os produtos virais com pronta entrega nacional.
+                    Para quem quer minerar produtos virais no TikTok Shop.
                   </p>
                 </div>
 
@@ -567,7 +567,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   </li>
                   <li className="flex items-center gap-2">
                     <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                    <span>Links diretos de fornecedores em SP e TikTok Shop</span>
+                    <span>Link do produto no TikTok Shop</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <Check className="w-4 h-4 text-emerald-400 shrink-0" />
@@ -614,11 +614,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               },
               {
                 q: 'Preciso ter mais de 1.000 seguidores no TikTok para usar?',
-                a: 'Não para usar a ferramenta! O TikBlox Pro é o seu radar de oportunidades e roteiros. Para solicitar amostras gratuitas no aplicativo do TikTok, a plataforma geralmente solicita 1.000 seguidores ou cadastro direto no Creator Center. Mas com o TikBlox você compra a amostra pronta entrega por conta própria e recupera o dinheiro em 3 a 5 vendas.'
+                a: 'Não para usar a ferramenta. O TikBlox é o radar de oportunidades. Amostra grátis, quando existir, é uma regra do TikTok Shop, não uma entrega nossa. O link do produto abre o anúncio e você escolhe o vendedor ali.'
               },
               {
-                q: 'Como funciona a pronta entrega de São Paulo?',
-                a: 'Ao invés de indicar produtos que vêm da China (e demoram 20 a 30 dias para chegar), o TikBlox só minera produtos com fornecedores e lojistas que já têm estoque no Brasil (São Paulo). Você recebe a amostra em 2 a 4 dias úteis.'
+                q: 'O TikBlox envia o produto para a minha casa?',
+                a: 'Não. O radar mostra o produto no TikTok Shop. Quem compra escolhe o vendedor dentro do app, e o prazo é o daquela loja.'
               },
               {
                 q: 'Posso cancelar a assinatura quando eu quiser?',
@@ -707,7 +707,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </span>
               <div className="truncate">
                 <span className="font-extrabold text-white block truncate">
-                  ⚡ 140+ Itens Pronta Entrega SP
+                  ⚡ 140+ produtos no radar
                 </span>
                 <span className="text-[10px] text-slate-400 font-mono hidden sm:inline">
                   Varredura das 06:00 BRT

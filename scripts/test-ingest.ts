@@ -81,7 +81,7 @@ const row = {
 const live = liveRowToProduct(row);
 assert(live?.dataSource === 'live', 'linha completa vira produto ao vivo');
 assert(live?.productUrl?.includes('1730123'), 'productUrl preenchido');
-assert(formatCollectedAt(live?.collectedAt) === '06/11/2026', 'data da coleta em São Paulo');
+assert(formatCollectedAt(live?.collectedAt) === '06/11/2026', 'data da coleta no fuso de Brasília');
 assert(commissionBrlOf(live) == null, 'enriquecer não inventa comissão');
 assert(passesBusinessRules(live), 'estoque, vídeos e comissão desconhecida passam');
 assert(liveRowToProduct({ ...row, stock_units: null }) == null, 'sem estoque não entra como ao vivo');

@@ -1063,13 +1063,11 @@ export default function App() {
             <span>
               — {language === 'en'
                 ? 'Viral Trends Radar for TikTok Shop Brazil.'
-                : 'Radar de Tendências Virais e Produtos Pronta Entrega no Brasil.'}
+                : 'Radar de tendências virais no TikTok Shop Brasil.'}
             </span>
           </div>
           <div className="flex items-center gap-3 text-slate-400 text-[11px]">
             <span>PWA Compatível</span>
-            <span>•</span>
-            <span className="text-[#007A87] font-bold">100% Estoque Nacional SP/PR</span>
           </div>
         </div>
       </footer>

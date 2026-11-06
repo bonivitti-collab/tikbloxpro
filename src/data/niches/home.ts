@@ -104,7 +104,7 @@ export const homeTrends: TrendingProduct[] = [
     adHooks: [
       'Transformei meu quarto comum em quarto de hotel 5 estrelas por menos de R$ 160.',
       'Esqueça as fitas de LED antigas com pontinhos feios: olha esse efeito cascata contínuo!',
-      'O segredo dos arquitetos caros de São Paulo para iluminar sancas e corredores.'
+      'O segredo dos arquitetos para iluminar sancas e corredores.'
     ],
     supplierKeywords: ['cob running water led strip', 'flowing led light strip sensor', 'fita led cob cascata'],
     logisticsComplexity: 'Fácil (Leve / Sem Bateria)',

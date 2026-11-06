@@ -62,7 +62,7 @@ export const Header: React.FC<HeaderProps> = ({
 
             <span className="hidden xl:inline-flex items-center gap-1.5 text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-300">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              <span>Pronta Entrega no Brasil</span>
+              <span>TikTok Shop Brasil</span>
             </span>
           </div>
 

@@ -9,19 +9,19 @@ export const SocialProofSection: React.FC = () => {
     {
       product: 'Copo Térmico 1.2L com Alça e Canudo',
       category: 'Fitness & Rotina',
-      origin: 'Estoque SP (Chegou em 2 dias)',
+      origin: 'TikTok Shop',
       views: '184.000 views',
       sales: '192 pedidos',
       commission: 'R$ 3.840,00',
       badge: 'Oceano Azul Validado',
       badgeColor: 'bg-[#25F4EE]/10 text-[#25F4EE] border-[#25F4EE]/30',
-      story: 'A amostra custou R$ 38 no fornecedor de SP. Com o gancho de 3 segundos do raio-x do radar, o primeiro vídeo orgânico ultrapassou 100k views em 48h, batendo o ponto de equilíbrio na primeira hora.',
+      story: 'Com o gancho de 3 segundos do raio-x do radar, o primeiro vídeo orgânico ultrapassou 100k views em 48h e bateu o ponto de equilíbrio na primeira hora.',
       hookUsed: '"O motivo pelo qual todo mundo na academia trocou a garrafa comum por este copo..."',
     },
     {
       product: 'Mini Seladora a Vácuo Portátil USB',
       category: 'Casa & Cozinha Prática',
-      origin: 'Estoque SP (Pronta Entrega)',
+      origin: 'TikTok Shop',
       views: '96.000 views',
       sales: '118 pedidos',
       commission: 'R$ 2.124,00',
@@ -33,7 +33,7 @@ export const SocialProofSection: React.FC = () => {
     {
       product: 'Lâmpada LED Sem Fio com Sensor',
       category: 'Decoração & Iluminação',
-      origin: 'Estoque SP (Despacho 24h)',
+      origin: 'TikTok Shop',
       views: '240.000 views',
       sales: '235 pedidos',
       commission: 'R$ 4.512,00',
@@ -58,7 +58,7 @@ export const SocialProofSection: React.FC = () => {
             Como Funciona a Assimetria na Prática
           </h2>
           <p className="text-xs sm:text-sm text-slate-300">
-            Veja exemplos de oportunidades que foram mineradas no radar, receberam a amostra de SP e geraram comissões em tempo recorde:
+            Veja exemplos de oportunidades mineradas no radar que geraram comissão no TikTok Shop:
           </p>
         </div>
 
