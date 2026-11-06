@@ -14,7 +14,6 @@ delete process.env.SUPABASE_SERVICE_ROLE_KEY;
 delete process.env.VERCEL;
 
 const { kiwifySignature } = await import('../lib/kiwify');
-const { passesBusinessRules } = await import('../src/lib/productRules');
 const { resetMemorySubscribers, getSubscriber, saveSubscriber } = await import('../lib/subscribers');
 const { resetMemoryRateLimit } = await import('../lib/rateLimit');
 const webhook = (await import('../api/webhook/kiwify')).default;
@@ -228,9 +227,10 @@ await catalog(
 assert(
   catalogOk.statusCode === 200 &&
     Array.isArray(catalogOk.body?.products) &&
-    catalogOk.body.products.every((product: object) => passesBusinessRules(product)) &&
-    !catalogOk.body.products.some((product: { id?: string }) => product.id === 'tb-home-001'),
-  'catálogo autenticado só devolve itens com estoque, vídeos e comissão reais'
+    catalogOk.body.products.length > 0 &&
+    catalogOk.body.products.every((product: { dataSource?: string }) => product.dataSource !== 'live') &&
+    catalogOk.body.products.some((product: { id?: string }) => product.id === 'tb-home-001'),
+  'sem produtos ao vivo o catálogo completa com a base curada'
 );
 
 const waitingBody = JSON.stringify({

@@ -175,7 +175,7 @@ const DEFAULT_SOURCES = [
   { title: 'Tendências Virais #TikTokShopBrasil', uri: 'https://www.tiktok.com/tag/tiktokshopbrasil' },
 ];
 
-function getFilteredCuratedTrends(niche?: string, originCountry?: string, query?: string) {
+async function getFilteredCuratedTrends(niche?: string, originCountry?: string, query?: string) {
   return listCatalog({ niche, originCountry, query });
 }
 
@@ -314,7 +314,7 @@ app.post('/api/scan', async (req: Request, res: Response) => {
     const hasGemini = false;
 
     if (!hasGroq && !hasGemini) {
-      const filtered = getFilteredCuratedTrends(niche, originCountry, query);
+      const filtered = await getFilteredCuratedTrends(niche, originCountry, query);
       return res.status(200).json({
         success: true,
         source: 'radar_curated_dataset',
@@ -454,7 +454,7 @@ Retorne EXCLUSIVAMENTE o array JSON sem delimitadores markdown adicionais.`;
     
     // Resilient fallback to high-quality curated trends matching filters
     const { niche = 'all', originCountry = 'all', query = '' } = req.body;
-    const filtered = getFilteredCuratedTrends(niche, originCountry, query);
+    const filtered = await getFilteredCuratedTrends(niche, originCountry, query);
 
     // Save in cache to prevent repeated errors
     const cacheKey = `${niche}_${originCountry}_${(query || '').toLowerCase().trim()}`;

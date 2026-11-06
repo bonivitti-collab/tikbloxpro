@@ -56,7 +56,7 @@ const ONBOARDING_STORAGE_KEY = 'tikblox_onboarding_completed_v1';
 import { TrendingProduct, ProductNiche, AppUpdateInfo, ProductPriceCheck, PriceMonitorSummary } from './types';
 import { isBlueOceanOpportunity } from './lib/blueOcean';
 import { enrichWithTikTokShopData } from './data/tiktokShopEnricher';
-import { isIsoDiscoveredAt, matchScore, passesBusinessRules } from './lib/productRules';
+import { includeInCatalog, isIsoDiscoveredAt, matchScore } from './lib/productRules';
 import {
   scanTrends,
   fetchCatalog,
@@ -100,6 +100,7 @@ export default function App() {
   const [painelDireitoRecolhido, setPainelDireitoRecolhido] = useState(true); // AI panel disabled
   const [mobileTab, setMobileTab] = useState<'produtos' | 'terminal' | 'copilot'>('produtos');
   const [filterHighCommissionOnly, setFilterHighCommissionOnly] = useState<boolean>(false);
+  const [filterKnownCommissionOnly, setFilterKnownCommissionOnly] = useState<boolean>(false);
   const [showSavedModal, setShowSavedModal] = useState<boolean>(false);
   const [showCalculatorModal, setShowCalculatorModal] = useState<boolean>(false);
   const [showAddCustomModal, setShowAddCustomModal] = useState<boolean>(false);
@@ -549,8 +550,8 @@ export default function App() {
     [products]
   );
   const qualifiedProducts = useMemo(
-    () => enrichedProducts.filter(passesBusinessRules),
-    [enrichedProducts]
+    () => enrichedProducts.filter((product) => includeInCatalog(product, { requireKnownCommission: filterKnownCommissionOnly })),
+    [enrichedProducts, filterKnownCommissionOnly]
   );
   const showNovidades = useMemo(
     () => qualifiedProducts.some((product) => isIsoDiscoveredAt(product.discoveredAt)),
@@ -587,6 +588,7 @@ export default function App() {
     filterFreeSampleOnly,
     filterBlueOceanOnly,
     filterHighCommissionOnly,
+    filterKnownCommissionOnly,
     showNovidades,
   ]);
 
@@ -600,7 +602,7 @@ export default function App() {
   // Reset display chunk when active filters change so the user starts smoothly at the top
   useEffect(() => {
     setDisplayLimit(CHUNK_SIZE);
-  }, [activeTab, selectedNiche, selectedOrigin, searchQuery, filterFreeSampleOnly, filterBlueOceanOnly, filterHighCommissionOnly]);
+  }, [activeTab, selectedNiche, selectedOrigin, searchQuery, filterFreeSampleOnly, filterBlueOceanOnly, filterHighCommissionOnly, filterKnownCommissionOnly]);
 
   const visibleProducts = useMemo(() => {
     return filteredProducts.slice(0, displayLimit);
@@ -757,6 +759,8 @@ export default function App() {
             setFilterBlueOceanOnly={setFilterBlueOceanOnly}
             filterHighCommissionOnly={filterHighCommissionOnly}
             setFilterHighCommissionOnly={setFilterHighCommissionOnly}
+            filterKnownCommissionOnly={filterKnownCommissionOnly}
+            setFilterKnownCommissionOnly={setFilterKnownCommissionOnly}
             onOpenAddCustomProduct={() => setShowAddCustomModal(true)}
           />
         </div>

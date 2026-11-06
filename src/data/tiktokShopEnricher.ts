@@ -43,20 +43,28 @@ export function extractSharpProductIdentifiers(product: any): {
 export function enrichWithTikTokShopData(product: any): any {
   if (!product) return product;
 
-  // Realistic commission rate based on niche and margin
-  let commissionRatePercent = product.tiktokShop?.commissionRatePercent || product.commissionPercent || 20;
-  if (!product.tiktokShop && !product.commissionPercent) {
-    if (product.niche === 'beauty' || product.niche === 'health') commissionRatePercent = 25;
-    else if (product.niche === 'accessories' || product.niche === 'home') commissionRatePercent = 22;
-    else if (product.niche === 'tech' || product.niche === 'gaming') commissionRatePercent = 18;
-    else if (product.niche === 'fitness') commissionRatePercent = 20;
-    else commissionRatePercent = 20;
+  // Comissão ausente no dado ao vivo fica ausente. Não inventar 20% em cima do preço.
+  const commissionUnknown = product.commissionUnknown === true;
+  let commissionRatePercent: number | null = null;
+  let commissionValueBRL: number | null = null;
+  if (!commissionUnknown) {
+    commissionRatePercent = product.tiktokShop?.commissionRatePercent || product.commissionPercent || 20;
+    if (!product.tiktokShop && !product.commissionPercent) {
+      if (product.niche === 'beauty' || product.niche === 'health') commissionRatePercent = 25;
+      else if (product.niche === 'accessories' || product.niche === 'home') commissionRatePercent = 22;
+      else if (product.niche === 'tech' || product.niche === 'gaming') commissionRatePercent = 18;
+      else if (product.niche === 'fitness') commissionRatePercent = 20;
+      else commissionRatePercent = 20;
+    }
   }
 
-  const priceBRL = Number(product.estimatedPriceBRL) || 89.90;
-  const commissionValueBRL = product.tiktokShop?.commissionValueBRL || 
-    product.commissionEstimatedBRL || 
-    Number(((priceBRL * commissionRatePercent) / 100).toFixed(2));
+  const priceBRL = Number(product.estimatedPriceBRL) || (product.dataSource === 'live' ? 0 : 89.90);
+  if (!commissionUnknown) {
+    const explicitCommission = product.tiktokShop?.commissionValueBRL ?? product.commissionEstimatedBRL;
+    commissionValueBRL = explicitCommission != null && explicitCommission !== ''
+      ? Number(explicitCommission)
+      : Number((((priceBRL * (commissionRatePercent || 0)) / 100)).toFixed(2));
+  }
 
   const charCodeSum = (product.id || '').split('').reduce((acc: number, char: string) => acc + char.charCodeAt(0), 0);
 
@@ -98,9 +106,10 @@ export function enrichWithTikTokShopData(product: any): any {
   // MOTOR DE CONVICÇÃO TIKBLOX: UNIT ECONOMICS & SINAL DE ENTRADA DO AFILIADO
   // =========================================================================
   const sampleCostBRL = priceBRL;
-  const breakEvenSales = Math.max(1, Math.ceil(sampleCostBRL / Math.max(1, commissionValueBRL)));
-  const netProfitAt20Sales = Math.max(0, Number(((20 * commissionValueBRL) - sampleCostBRL).toFixed(2)));
-  const netProfitAt50Sales = Math.max(0, Number(((50 * commissionValueBRL) - sampleCostBRL).toFixed(2)));
+  const commissionForMath = commissionValueBRL ?? 0;
+  const breakEvenSales = commissionForMath > 0 ? Math.max(1, Math.ceil(sampleCostBRL / commissionForMath)) : 0;
+  const netProfitAt20Sales = Math.max(0, Number(((20 * commissionForMath) - sampleCostBRL).toFixed(2)));
+  const netProfitAt50Sales = Math.max(0, Number(((50 * commissionForMath) - sampleCostBRL).toFixed(2)));
 
   // Concorrência de vídeos no feed do TikTok Brasil
   const creatorVideoCountBR = activeCreatorsCount;
@@ -144,8 +153,8 @@ export function enrichWithTikTokShopData(product: any): any {
     verdictLabel,
     convictionScore,
     sampleCostBRL,
-    commissionBRL: commissionValueBRL,
-    commissionPercent: commissionRatePercent,
+    commissionBRL: commissionUnknown ? null : commissionValueBRL,
+    commissionPercent: commissionUnknown ? null : commissionRatePercent,
     breakEvenSales,
     netProfitAt20Sales,
     netProfitAt50Sales,
@@ -164,12 +173,12 @@ export function enrichWithTikTokShopData(product: any): any {
     ...product,
     dataSource,
     metricsEstimated: dataSource !== 'live',
+    commissionUnknown,
     stockUnits,
     videoCountBR: activeCreatorsCount,
     tradeConviction,
-    // Root level compatibility properties with safe fallbacks
-    commissionPercent: commissionRatePercent,
-    commissionEstimatedBRL: commissionValueBRL,
+    commissionPercent: commissionUnknown ? undefined : commissionRatePercent,
+    commissionEstimatedBRL: commissionUnknown ? undefined : commissionValueBRL,
     stockLocationBrazil: stockLocation,
     freeSampleAvailable: isFreeSample,
     creatorSaturationBR: saturationLevel,
@@ -184,8 +193,9 @@ export function enrichWithTikTokShopData(product: any): any {
     tiktokShop: {
       hasBrazilStock: true,
       stockLocation,
-      commissionRatePercent,
-      commissionValueBRL,
+      commissionRatePercent: commissionUnknown ? undefined : commissionRatePercent,
+      commissionValueBRL: commissionUnknown ? undefined : commissionValueBRL,
+      productUrl: product.productUrl || product.tiktokShop?.productUrl,
       freeSampleAvailable: isFreeSample,
       minFollowersForSample: 1000,
       activeCreatorsCount,

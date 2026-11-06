@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import { TrendingProduct, ProductNiche } from '../../types';
 import { ALL_CATEGORY, categoriesForCounts } from '../../data/taxonomy';
-import { commissionBrlOf, stockUnitsOf, videoCountOf } from '../../lib/productRules';
+import { commissionBrlOf, formatCollectedAt, stockUnitsOf, videoCountOf } from '../../lib/productRules';
 
 interface ProductListPanelProps {
   width?: number;
@@ -33,6 +33,8 @@ interface ProductListPanelProps {
   setFilterBlueOceanOnly: (val: boolean) => void;
   filterHighCommissionOnly: boolean;
   setFilterHighCommissionOnly: (val: boolean) => void;
+  filterKnownCommissionOnly: boolean;
+  setFilterKnownCommissionOnly: (val: boolean) => void;
   onOpenAddCustomProduct?: () => void;
 }
 
@@ -54,6 +56,8 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
   setFilterBlueOceanOnly,
   filterHighCommissionOnly,
   setFilterHighCommissionOnly,
+  filterKnownCommissionOnly,
+  setFilterKnownCommissionOnly,
   onOpenAddCustomProduct,
 }) => {
   const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
@@ -284,9 +288,16 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
           >
             Amostra grátis
           </button>
+          <button
+            type="button"
+            onClick={() => setFilterKnownCommissionOnly(!filterKnownCommissionOnly)}
+            className={`px-2 py-1 rounded-lg text-[10px] font-bold border ${filterKnownCommissionOnly ? 'bg-amber-50 border-amber-300 text-amber-800' : 'bg-white border-slate-300 text-slate-600'}`}
+          >
+            Só comissão informada
+          </button>
         </div>
         <p className="text-[10px] text-slate-500 leading-snug">
-          Sempre ligados: estoque ≥ 500, menos de 50 vídeos e comissão ≥ R$ 10.
+          Ao vivo: estoque ≥ 500, menos de 50 vídeos e comissão ≥ R$ 10. Sem valor, o card mostra “comissão não informada”. O botão acima esconde esses cards.
         </p>
       </div>
 
@@ -295,7 +306,7 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
         {filtered.length === 0 ? (
           <div className="p-6 text-center text-slate-500 text-xs bg-white rounded-xl border border-slate-200 my-4 shadow-2xs">
             <p className="font-bold text-slate-700">Nenhum produto com essas regras.</p>
-            <p className="text-[11px] text-slate-500 mt-1">Estoque de pelo menos 500 unidades, menos de 50 vídeos e comissão de pelo menos R$ 10. A lista não é preenchida com itens fora da regra.</p>
+            <p className="text-[11px] text-slate-500 mt-1">Os produtos ao vivo precisam de estoque, poucos vídeos e comissão de pelo menos R$ 10. Comissão em branco continua na lista até você pedir só a informada.</p>
             <button
               onClick={() => {
                 setSelectedNiche('all');
@@ -303,6 +314,7 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
                 setFilterFreeSampleOnly(false);
                 setFilterBlueOceanOnly(false);
                 setFilterHighCommissionOnly(false);
+                setFilterKnownCommissionOnly(false);
               }}
               className="mt-3 px-3 py-1 bg-[#0F172A] text-white rounded-lg text-xs font-bold transition cursor-pointer"
             >
@@ -313,12 +325,13 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
           filtered.map((prod) => {
             const isSelected = activeProduct?.id === prod.id;
             const priceBRL = Number(prod.estimatedPriceBRL || 0);
-            const commVal = Number(prod.commissionEstimatedBRL || prod.tiktokShop?.commissionValueBRL || (priceBRL * 0.22) || 0);
-            const commPct = Number(prod.commissionPercent || prod.tiktokShop?.commissionRatePercent || 20);
+            const commission = commissionBrlOf(prod);
+            const commPct = Number(prod.commissionPercent || prod.tiktokShop?.commissionRatePercent || 0);
+            const collectedLabel = formatCollectedAt(prod.collectedAt);
             const isSample = Boolean(prod.freeSampleAvailable || prod.tiktokShop?.freeSampleAvailable);
             const stockLoc = String(prod.stockLocationBrazil || prod.tiktokShop?.stockLocation || 'São Paulo - SP');
             const tc = prod.tradeConviction;
-            const breakEvenSales = tc?.breakEvenSales || Math.max(1, Math.ceil(priceBRL / Math.max(1, commVal)));
+            const breakEvenSales = tc?.breakEvenSales || (commission != null && commission > 0 ? Math.max(1, Math.ceil(priceBRL / commission)) : 0);
             const convictionScore = tc?.convictionScore || Math.min(99, Math.round(prod.viralityScore || 92));
             const videoCount = videoCountOf(prod);
             const stock = stockUnitsOf(prod);
@@ -365,6 +378,9 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
                   <h3 className="text-xs font-bold text-slate-900 leading-snug line-clamp-1" title={prod.name}>
                     {prod.name}
                   </h3>
+                  {collectedLabel ? (
+                    <p className="text-[10px] text-slate-500 mt-0.5">Coletado em {collectedLabel}</p>
+                  ) : null}
                 </div>
 
                 {/* Linha 2: Métricas de Custo, Comissão e Break-Even */}
@@ -382,8 +398,14 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
                       Sua Comissão
                     </span>
                     <span className="font-extrabold text-emerald-600">
-                      R$ {(commissionBrlOf(prod) ?? commVal).toFixed(2)} ({commPct}%)
-                      {estimate ? <span className="block text-[8px] font-sans text-slate-400">Estimativa</span> : null}
+                      {commission == null ? (
+                        <span className="font-sans text-[10px] font-bold text-amber-700">comissão não informada</span>
+                      ) : (
+                        <>
+                          R$ {commission.toFixed(2)}{commPct > 0 ? ` (${commPct}%)` : ''}
+                          {estimate ? <span className="block text-[8px] font-sans text-slate-400">Estimativa</span> : null}
+                        </>
+                      )}
                     </span>
                   </div>
                 </div>

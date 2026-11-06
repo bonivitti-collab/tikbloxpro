@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { TrendingProduct } from '../../types';
 import { enrichWithTikTokShopData } from '../../data/tiktokShopEnricher';
+import { commissionBrlOf, formatCollectedAt } from '../../lib/productRules';
 import { tiktokShopHref, tiktokVideoSearchHref } from '../../lib/productRules';
 
 interface ProductDetailTerminalProps {
@@ -147,8 +148,10 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
   };
 
   const priceBRL = Number(tk.estimatedPriceBRL || tc.sampleCostBRL || 0);
-  const commissionVal = Number(tk.commissionEstimatedBRL || tc.commissionBRL || 0);
-  const commissionPct = Number(tk.commissionPercent || tc.commissionPercent || 20);
+  const knownCommission = commissionBrlOf(tk);
+  const commissionVal = knownCommission ?? 0;
+  const collectedLabel = formatCollectedAt(tk.collectedAt);
+  const commissionPct = Number(tk.commissionPercent || tc.commissionPercent || 0);
   const stockLoc = String(tk.stockLocationBrazil || tc.stockLocation || 'São Paulo - SP (Pronta Entrega)');
   const hookText = String(tk.hookViral3s || tk.tiktokShop?.topViralHook || tk.adHooks?.[0] || 'Oportunidade em alta no TikTok Shop!');
   const affiliateTerm = String(tk.name || tk.originalName || '');
@@ -233,7 +236,7 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
             </span>
             <span className="inline-flex items-center gap-1 font-semibold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-full border border-slate-200/80 text-[10.5px]">
               <Clock className="w-3 h-3 text-[#007A87] shrink-0" />
-              <span>Há {lifecycle.daysActive} dias no radar</span>
+              <span>{collectedLabel ? `Coletado em ${collectedLabel}` : `Há ${lifecycle.daysActive} dias no radar`}</span>
             </span>
             <span className="inline-flex items-center gap-1 text-[10.5px] font-extrabold text-rose-600 bg-rose-50 px-2.5 py-1 rounded-full border border-rose-200">
               <Flame className="w-3 h-3 fill-current text-[#FE2C55] shrink-0" />
@@ -448,15 +451,23 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
               Comissão por Venda
             </span>
             <div className="flex items-baseline gap-1 mt-1 whitespace-nowrap overflow-hidden">
-              <span className="text-lg sm:text-xl font-black text-emerald-700 font-mono">
-                R$ {commissionVal.toFixed(2)}
-              </span>
-              <span className="text-xs font-bold text-emerald-600 font-mono">
-                ({commissionPct}%)
-              </span>
+              {knownCommission == null ? (
+                <span className="text-sm font-black text-amber-700">comissão não informada</span>
+              ) : (
+                <>
+                  <span className="text-lg sm:text-xl font-black text-emerald-700 font-mono">
+                    R$ {commissionVal.toFixed(2)}
+                  </span>
+                  {commissionPct > 0 ? (
+                    <span className="text-xs font-bold text-emerald-600 font-mono">
+                      ({commissionPct}%)
+                    </span>
+                  ) : null}
+                </>
+              )}
             </div>
             <span className="text-[10px] text-emerald-700 mt-0.5 block truncate">
-              Líquido no carrinho
+              {knownCommission == null ? 'A loja não publicou a comissão' : 'Líquido no carrinho'}
             </span>
           </div>
 

@@ -40,15 +40,49 @@ export function commissionBrlOf(product: Partial<TrendingProduct> | any): number
   return Number(((price * rate) / 100).toFixed(2));
 }
 
-/** Regras de negócio sempre ligadas. Campo ausente não passa. */
-export function passesBusinessRules(product: Partial<TrendingProduct> | any): boolean {
+export interface BusinessRuleOptions {
+  /** Quando verdadeiro, comissão ausente sai da lista. O padrão mostra o selo e mantém o card. */
+  requireKnownCommission?: boolean;
+}
+
+/**
+ * Estoque e vídeos ausentes não passam. Comissão abaixo de R$ 10 não passa.
+ * Comissão ausente passa, a menos que o toggle peça só comissão informada.
+ */
+export function passesBusinessRules(
+  product: Partial<TrendingProduct> | any,
+  options: BusinessRuleOptions = {}
+): boolean {
   const stock = stockUnitsOf(product);
   const videos = videoCountOf(product);
   const commission = commissionBrlOf(product);
   if (stock == null || stock < MIN_STOCK_UNITS) return false;
   if (videos == null || videos >= MAX_CREATOR_VIDEOS) return false;
-  if (commission == null || commission < MIN_COMMISSION_BRL) return false;
+  if (commission == null) return !options.requireKnownCommission;
+  if (commission < MIN_COMMISSION_BRL) return false;
   return true;
+}
+
+/** Ao vivo obedece as regras. O complemento curado entra marcado como estimativa. */
+export function includeInCatalog(
+  product: Partial<TrendingProduct> | any,
+  options: BusinessRuleOptions = {}
+): boolean {
+  if (product?.dataSource === 'live') return passesBusinessRules(product, options);
+  if (options.requireKnownCommission && commissionBrlOf(product) == null) return false;
+  return true;
+}
+
+export function formatCollectedAt(value: unknown): string | null {
+  if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}/.test(value)) return null;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+  return date.toLocaleDateString('pt-BR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    timeZone: 'America/Sao_Paulo',
+  });
 }
 
 export function isIsoDiscoveredAt(value: unknown): boolean {

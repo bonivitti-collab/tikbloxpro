@@ -21,7 +21,7 @@ export default async function handler(req: any, res: any) {
     } catch {
       queryFromUrl = '';
     }
-    const products = listCatalog({
+    const products = await listCatalog({
       niche: body.niche || req.query?.niche,
       originCountry: body.originCountry || body.origin || req.query?.originCountry,
       query: body.query || req.query?.query || queryFromUrl,

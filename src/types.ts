@@ -64,6 +64,8 @@ export interface TrendingProduct {
   stockLocationBrazil?: string;
   dataSource?: 'curated' | 'live';
   metricsEstimated?: boolean;
+  commissionUnknown?: boolean;
+  collectedAt?: string;
   iconType: string;
   highlights: string[];
   adHooks: string[];

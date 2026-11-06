@@ -35,6 +35,9 @@ assert(!passesBusinessRules({ ...qualified, stockUnits: 499 }), 'estoque 499 nã
 assert(!passesBusinessRules({ ...qualified, videoCountBR: 50 }), '50 vídeos não passa');
 assert(!passesBusinessRules({ ...qualified, stockUnits: undefined, videoCountBR: undefined }), 'sem estoque e sem vídeos não passa');
 assert(!passesBusinessRules({ ...qualified, estimatedPriceBRL: 20, commissionPercent: 10, tiktokShop: undefined, commissionEstimatedBRL: undefined }), 'comissão abaixo de R$ 10 não passa');
+const unknownCommission = { stockUnits: 800, videoCountBR: 4, name: 'Sem comissão' };
+assert(passesBusinessRules(unknownCommission), 'comissão ausente não exclui');
+assert(!passesBusinessRules(unknownCommission, { requireKnownCommission: true }), 'toggle de comissão informada esconde a ausente');
 
 const titleHit = matchScore({ name: 'Mini ferro de viagem', originalName: 'travel steamer', niche: 'travel', nicheLabel: 'Viagem', supplierKeywords: ['ferro'] }, 'ferro viagem');
 const nicheOnly = matchScore({ name: 'Outro item', originalName: 'other', niche: 'travel', nicheLabel: 'Viagem e ferro', supplierKeywords: [] }, 'ferro viagem');
