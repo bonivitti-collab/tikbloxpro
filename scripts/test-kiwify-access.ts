@@ -315,6 +315,32 @@ assert(
   'carência zero impede o login'
 );
 
+const savedToken = process.env.KIWIFY_WEBHOOK_TOKEN;
+process.env.KIWIFY_WEBHOOK_TOKEN = 'k1w1fy11abc';
+assert(process.env.KIWIFY_WEBHOOK_TOKEN.length === 11, 'amostra do token tem o tamanho da Kiwify');
+const shortBody = JSON.stringify({
+  order_id: 'order-short-token',
+  order_status: 'waiting_payment',
+  webhook_event_type: 'pix_created',
+  Customer: { email: 'curto@example.com' },
+});
+const shortSig = kiwifySignature(shortBody, process.env.KIWIFY_WEBHOOK_TOKEN);
+const shortReq = {
+  method: 'POST',
+  headers: { 'content-type': 'application/json' },
+  url: `/api/webhook/kiwify?signature=${shortSig}`,
+  body: shortBody,
+  socket: { remoteAddress: '203.0.113.40' },
+};
+const shortRes = mockRes();
+await webhook(shortReq, shortRes);
+assert(shortRes.statusCode === 200 && shortRes.body?.outcome === 'ignored', 'token de 11 caracteres passa no HMAC via ?signature=');
+
+process.env.KIWIFY_WEBHOOK_TOKEN = 'abcdefg';
+const tiny = await postWebhook(shortBody, '00');
+assert(tiny.statusCode === 503, 'token com menos de 8 caracteres continua 503');
+process.env.KIWIFY_WEBHOOK_TOKEN = savedToken;
+
 if (failed > 0) {
   console.error(`\n${failed} verificação(ões) falharam`);
   process.exit(1);

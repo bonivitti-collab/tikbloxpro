@@ -1,6 +1,6 @@
 import { applyKiwifyPayload } from '../../lib/access.js';
 import { clientIp, maskEmail, readRawBody, sendJson } from '../../lib/http.js';
-import { signatureFromRequest, signatureIsValid, webhookToken } from '../../lib/kiwify.js';
+import { signatureFromRequest, signatureIsValid, webhookToken, webhookTokenIsConfigured } from '../../lib/kiwify.js';
 import { isRateLimited } from '../../lib/rateLimit.js';
 
 export const config = {
@@ -23,8 +23,8 @@ export default async function handler(req: any, res: any) {
     }
 
     const token = webhookToken();
-    if (token.length < 16) {
-      console.error('[KIWIFY] KIWIFY_WEBHOOK_TOKEN ausente');
+    if (!webhookTokenIsConfigured(token)) {
+      console.error('[KIWIFY] KIWIFY_WEBHOOK_TOKEN ausente ou curto demais');
       return sendJson(res, 503, { error: 'Webhook não configurado' });
     }
 

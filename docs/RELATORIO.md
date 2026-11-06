@@ -59,7 +59,7 @@ Cadastre em Project Settings → Environment Variables, no ambiente de Productio
 | `TIKBLOX_ADMIN_EMAIL` | sim | E-mail do dono. Use o mesmo com o qual você já entra. |
 | `TIKBLOX_ADMIN_PASSWORD` | sim | Senha do dono, a que você já usa. Mínimo de 4 caracteres; o recomendado é 12 ou mais. |
 | `TIKBLOX_ADMIN_NAME` | não | Nome exibido. Se vazio, usa a parte local do e-mail. |
-| `KIWIFY_WEBHOOK_TOKEN` | sim | O mesmo token cadastrado no webhook da Kiwify. Mínimo de 16 caracteres. |
+| `KIWIFY_WEBHOOK_TOKEN` | sim | O token que a Kiwify gera no webhook (cerca de 11 caracteres). Mínimo aceito: 8. |
 | `SUPABASE_URL` | sim | URL do projeto Supabase do TikBlox, algo como `https://xxxx.supabase.co`. |
 | `SUPABASE_SERVICE_ROLE_KEY` | sim | Chave `service_role`. Só no servidor. Nunca no front. |
 | `KIWIFY_PRODUCT_ID` | não | Se preenchido, só esses `product_id` (separados por vírgula) liberam acesso. |
@@ -92,7 +92,7 @@ where email = 'pessoa@email.com';
 1. Desative o produto ou o plano Combo PRO + IA (R$ 57), o checkout `https://pay.kiwify.com.br/ejnXKgn`.
 2. Mantenha o Radar Essential (R$ 37), o checkout `https://pay.kiwify.com.br/B69SrmS`.
 3. Em Apps → Webhooks, aponte para `https://tikbloxpro.vercel.app/api/webhook/kiwify`. Se o domínio próprio `tikblox.com.br` passar a servir esta mesma Vercel, pode usar `https://tikblox.com.br/api/webhook/kiwify`.
-4. No webhook, cadastre um token longo e cole o mesmo valor em `KIWIFY_WEBHOOK_TOKEN`. A Kiwify manda `?signature=` com o HMAC-SHA1 do corpo.
+4. Copie o token que a Kiwify gera no webhook (cerca de 11 caracteres) para `KIWIFY_WEBHOOK_TOKEN`. A assinatura continua HMAC-SHA1 do corpo cru, no parâmetro `?signature=`.
 5. Marque os eventos: compra aprovada, compra reembolsada, chargeback, assinatura cancelada, assinatura renovada e assinatura atrasada (`subscription_late`). Pix gerado e boleto gerado continuam ignorados.
 6. No primeiro acesso, a pessoa usa o mesmo e-mail da compra e o código do pedido que está no e-mail da Kiwify. O Google só entra se esse e-mail já estiver ativo.
 
