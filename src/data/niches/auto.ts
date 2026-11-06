@@ -815,7 +815,7 @@ export const autoTrends: TrendingProduct[] = [
     estimatedPriceBRL: 29.90,
     estimatedProfitMarginPercent: 670,
     culturalFitReason: 'O trânsito do Brasil tem enxames de motos passando nos corredores entre os carros. Mudar de faixa sem ver a moto no ponto cego causa acidentes gravíssimos diários.',
-    brazilEntryStatus: 'Item de sobrevivência no trânsito urbano de São Paulo, Rio e grandes capitais.',
+    brazilEntryStatus: 'Item de sobrevivência no trânsito das grandes cidades.',
     targetAudience: 'Qualquer motorista urbano, motoristas de app e condutores recém-habilitados.',
     iconType: 'ShieldCheck',
     highlights: [

@@ -200,7 +200,7 @@ function triggerOfflinePrintSummary(
       <div class="section">
         <div class="section-title">Diagnóstico de Mercado & Concorrência no Brasil</div>
         <div class="row"><span>Shopee Brasil:</span> <span>${analysis?.competitionAnalysis?.shopeeStatus || 'Poucos anúncios internacionais com prazos longos.'}</span></div>
-        <div class="row"><span>Mercado Livre Full:</span> <span>${analysis?.competitionAnalysis?.mercadoLivreStatus || 'Raros vendedores com estoque nacional pronta entrega.'}</span></div>
+        <div class="row"><span>Mercado Livre:</span> <span>${analysis?.competitionAnalysis?.mercadoLivreStatus || 'Compare os vendedores dentro do marketplace.'}</span></div>
         <div class="row"><span>Saturação TikTok Brasil:</span> <span>${product.saturationInBrazil || 'Muito Baixa / Incipiente'}</span></div>
       </div>
 

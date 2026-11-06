@@ -39,7 +39,7 @@
   },
   "tiktokShop": {
     "hasBrazilStock": true,
-    "stockLocation": "Curitiba - PR (Estoque Nacional)",
+    "stockLocation": "TikTok Shop",
     "commissionRatePercent": 18,
     "commissionValueBRL": 43.18,
     "freeSampleAvailable": true,
@@ -66,12 +66,12 @@
       "netProfitAt50Sales": 1919.1,
       "creatorVideoCountBR": 5,
       "creatorCompetitionLevel": "Oceano Azul (< 10 vídeos)",
-      "stockLocation": "Curitiba - PR (Estoque Nacional)",
-      "shippingDays": "2 a 4 dias úteis",
+      "stockLocation": "TikTok Shop",
+      "shippingDays": "",
       "riskLevel": "MUITO_BAIXO",
       "riskLabel": "Risco Mínimo (Assimetria Altamente Positiva)",
       "reasons": [
-        "Estoque Pronta Entrega Brasil: Vendedor nacional despacha de Curitiba - PR. Chega em 3 a 5 dias para você gravar antes do produto espalhar.",
+        "O comprador escolhe o vendedor no TikTok Shop.",
         "Apenas 5 vídeos de criadores no TikTok Brasil (Oceano Azul (< 10 vídeos)). Vácuo de conteúdo no algoritmo com carrinho amarelo ativo.",
         "Amortização Imediata: Com apenas 6 vendas no feed você recupera 100% dos R$ 239.90 pagos na compra. A partir da 7ª venda, o retorno é lucro puro."
       ]
@@ -91,12 +91,12 @@
     "netProfitAt50Sales": 1919.1,
     "creatorVideoCountBR": 5,
     "creatorCompetitionLevel": "Oceano Azul (< 10 vídeos)",
-    "stockLocation": "Curitiba - PR (Estoque Nacional)",
-    "shippingDays": "2 a 4 dias úteis",
+    "stockLocation": "TikTok Shop",
+    "shippingDays": "",
     "riskLevel": "MUITO_BAIXO",
     "riskLabel": "Risco Mínimo (Assimetria Altamente Positiva)",
     "reasons": [
-      "Estoque Pronta Entrega Brasil: Vendedor nacional despacha de Curitiba - PR. Chega em 3 a 5 dias para você gravar antes do produto espalhar.",
+      "O comprador escolhe o vendedor no TikTok Shop.",
       "Apenas 5 vídeos de criadores no TikTok Brasil (Oceano Azul (< 10 vídeos)). Vácuo de conteúdo no algoritmo com carrinho amarelo ativo.",
       "Amortização Imediata: Com apenas 6 vendas no feed você recupera 100% dos R$ 239.90 pagos na compra. A partir da 7ª venda, o retorno é lucro puro."
     ]

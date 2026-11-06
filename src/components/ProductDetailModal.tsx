@@ -494,7 +494,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                     </a>
                   </div>
                   <p className="text-slate-300 text-[11px]">
-                    {analysis?.competitionAnalysis.mercadoLivreStatus || (language === 'en' ? 'Rare sellers with local Brazilian warehouse stock.' : 'Raros vendedores com estoque nacional.')}
+                    {analysis?.competitionAnalysis.mercadoLivreStatus || (language === 'en' ? 'Compare sellers inside the marketplace.' : 'Compare os vendedores dentro do marketplace.')}
                   </p>
                 </div>
               </div>
@@ -579,12 +579,9 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                   <div>
                     <h3 className="text-sm font-black text-white flex items-center gap-1.5">
                       <span>TikTok Shop Brasil • Centro de Afiliados</span>
-                      <span className="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-1.5 py-0.5 rounded font-bold">
-                        🇧🇷 Estoque Nacional
-                      </span>
                     </h3>
                     <p className="text-[11px] text-[#A6A7B2]">
-                      Local: {tk.stockLocation}
+                      O comprador escolhe o vendedor no TikTok Shop.
                     </p>
                   </div>
                 </div>
@@ -681,7 +678,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
             <div className="mt-3 text-[11px] text-slate-400 flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
               <span>
-                <strong>{language === 'en' ? 'Logistics & Dispatch:' : 'Logística & Despacho:'}</strong> {product.logisticsComplexity}. {language === 'en' ? 'Suggested AliExpress Standard / Cainiao shipping with tracking in Brazil.' : 'Sugerido fornecedor com frete AliExpress Standard / Cainiao com rastreamento no Brasil.'}
+                <strong>{language === 'en' ? 'Where to buy:' : 'Onde comprar:'}</strong> {language === 'en' ? 'Open the product on TikTok Shop and pick the seller there.' : 'Abra o produto no TikTok Shop e escolha o vendedor lá.'} {product.logisticsComplexity}.
               </span>
             </div>
           </div>

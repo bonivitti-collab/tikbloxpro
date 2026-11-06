@@ -2,13 +2,13 @@ import { TrendingProduct } from '../types';
 
 export const BASE_APP_URL = 'https://tikblox.com.br';
 
-const DEFAULT_TITLE_PT = 'TIKBLOX PRO | Radar TikTok Shop Brasil - Produtos Virais & Fornecedores SP';
-const DEFAULT_TITLE_EN = 'TIKBLOX PRO | TikTok Shop Brazil Radar - Viral Products & Fast Suppliers';
+const DEFAULT_TITLE_PT = 'TIKBLOX PRO | Radar TikTok Shop Brasil - Produtos Virais';
+const DEFAULT_TITLE_EN = 'TIKBLOX PRO | TikTok Shop Brazil Radar - Viral Products';
 
 const DEFAULT_DESCRIPTION_PT =
-  'Minere produtos virais no TikTok Shop Brasil antes da saturação. Radar com catálogo nacional em SP/PR, envio em 24h, comissões de 15% a 30% e amostras grátis.';
+  'Minere produtos virais no TikTok Shop Brasil antes da saturação. Radar de comissões e concorrência para afiliados.';
 const DEFAULT_DESCRIPTION_EN =
-  'Discover viral products on TikTok Shop Brazil before market saturation. National catalog with SP/PR warehouses, 24h dispatch and 15%-30% commissions.';
+  'Discover viral products on TikTok Shop Brazil before market saturation. Commission and competition radar for affiliates.';
 
 const DEFAULT_IMAGE = `${BASE_APP_URL}/pwa-512x512.png`;
 
@@ -73,8 +73,8 @@ export function updateProductMetadata(product: TrendingProduct, lang: 'pt' | 'en
   const descriptionText = product.culturalFitReason || product.highlights?.join(', ') || 'Produto viral com alto potencial de vendas no TikTok Shop Brasil.';
   
   const productDescription = lang === 'en'
-    ? `${product.name}: ${descriptionText.slice(0, 120)}... Estimated profit margin ${product.estimatedProfitMarginPercent}%, commission ${product.tiktokShop?.commissionRatePercent || 20}%, stocked in ${product.tiktokShop?.stockLocation || 'SP/BR'}.`
-    : `${product.name}: ${descriptionText.slice(0, 130)}... Margem estimada de ${product.estimatedProfitMarginPercent}%, comissão de ${product.tiktokShop?.commissionRatePercent || 20}%, estoque em ${product.tiktokShop?.stockLocation || 'SP/BR'}.`;
+    ? `${product.name}: ${descriptionText.slice(0, 120)}... Estimated profit margin ${product.estimatedProfitMarginPercent}%, commission ${product.tiktokShop?.commissionRatePercent || 20}%. The buyer picks the seller inside TikTok Shop.`
+    : `${product.name}: ${descriptionText.slice(0, 130)}... Margem estimada de ${product.estimatedProfitMarginPercent}%, comissão de ${product.tiktokShop?.commissionRatePercent || 20}%. O comprador escolhe o vendedor no TikTok Shop.`;
 
   const productImage = product.imageUrl || DEFAULT_IMAGE;
 
@@ -86,7 +86,7 @@ export function updateProductMetadata(product: TrendingProduct, lang: 'pt' | 'en
     'keywords',
     lang === 'en'
       ? `${product.name}, ${product.nicheLabel}, viral tiktok products, tiktok shop brazil, blue ocean products, ${product.supplierKeywords.join(', ')}`
-      : `${product.name}, ${product.nicheLabel}, produtos virais tiktok, tiktok shop brasil, fornecedores pronta entrega sp, ${product.supplierKeywords.join(', ')}`
+      : `${product.name}, ${product.nicheLabel}, produtos virais tiktok, tiktok shop brasil, ${product.supplierKeywords.join(', ')}`
   );
   setLinkTag('canonical', productUrl);
 
@@ -155,8 +155,8 @@ export function resetDefaultMetadata(lang: 'pt' | 'en' = 'pt'): void {
     'name',
     'keywords',
     lang === 'en'
-      ? 'tiktok shop brazil radar, viral products tiktok, suppliers sao paulo, affiliate tiktok shop, winners products 2026, tikblox pro'
-      : 'tiktok shop brasil, radar tiktok shop, produtos virais tiktok, minerador tiktok shop, afiliados tiktok shop brasil, fornecedores pronta entrega sao paulo, tikblox pro'
+      ? 'tiktok shop brazil radar, viral products tiktok, affiliate tiktok shop, winners products 2026, tikblox pro'
+      : 'tiktok shop brasil, radar tiktok shop, produtos virais tiktok, minerador tiktok shop, afiliados tiktok shop brasil, tikblox pro'
   );
   setLinkTag('canonical', `${BASE_APP_URL}/`);
 

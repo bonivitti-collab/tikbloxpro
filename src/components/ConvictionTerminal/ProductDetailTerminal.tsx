@@ -3,7 +3,6 @@ import {
   Bookmark,
   Copy,
   Check,
-  Package,
   ShoppingBag,
   Flame,
   ShieldCheck,
@@ -22,7 +21,7 @@ import {
 import { TrendingProduct } from '../../types';
 import { enrichWithTikTokShopData } from '../../data/tiktokShopEnricher';
 import { commissionBrlOf, formatCollectedAt } from '../../lib/productRules';
-import { tiktokShopHref, tiktokVideoSearchHref } from '../../lib/productRules';
+import { tiktokShopHref } from '../../lib/productRules';
 
 interface ProductDetailTerminalProps {
   product: TrendingProduct | null;
@@ -38,7 +37,6 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
   onOpenCalculator,
 }) => {
   const [copiedHook, setCopiedHook] = useState(false);
-  const [copiedTerm, setCopiedTerm] = useState(false);
   const [copiedName, setCopiedName] = useState(false);
   const [simulationSales, setSimulationSales] = useState<number>(25);
 
@@ -136,12 +134,12 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
     netProfitAt50Sales: 705,
     creatorVideoCountBR: 6,
     creatorCompetitionLevel: 'Oceano Azul (< 10 vídeos)',
-    stockLocation: String(tk.stockLocationBrazil || 'São Paulo - SP (Pronta Entrega)'),
-    shippingDays: '2 a 4 dias úteis',
+    stockLocation: 'TikTok Shop',
+    shippingDays: '',
     riskLevel: 'MUITO_BAIXO',
     riskLabel: 'Risco Mínimo (Assimetria Altamente Positiva)',
     reasons: [
-      'Estoque Pronta Entrega Brasil: Vendedor nacional despacha de São Paulo. Chega em 3 a 5 dias para você gravar antes do produto espalhar.',
+      'O comprador escolhe o vendedor dentro do TikTok Shop. O radar não indica cidade de estoque nem prazo de entrega.',
       'Apenas 6 vídeos de criadores no TikTok Brasil. Vácuo de conteúdo no algoritmo com carrinho amarelo ativo.',
       'Amortização Imediata: Com apenas 5 vendas no feed você recupera 100% do que pagou na compra.'
     ]
@@ -152,16 +150,8 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
   const commissionVal = knownCommission ?? 0;
   const collectedLabel = formatCollectedAt(tk.collectedAt);
   const commissionPct = Number(tk.commissionPercent || tc.commissionPercent || 0);
-  const stockLoc = String(tk.stockLocationBrazil || tc.stockLocation || 'São Paulo - SP (Pronta Entrega)');
   const hookText = String(tk.hookViral3s || tk.tiktokShop?.topViralHook || tk.adHooks?.[0] || 'Oportunidade em alta no TikTok Shop!');
-  const affiliateTerm = String(tk.name || tk.originalName || '');
   const shopLink = tiktokShopHref(tk);
-  const videoSearchUrl = tiktokVideoSearchHref(tk);
-
-  const sampleDeliveryUrl =
-    tk.supplierUrl ||
-    (tk as any).shopeeUrl ||
-    `https://lista.mercadolivre.com.br/${encodeURIComponent(affiliateTerm + ' pronta entrega')}`;
 
   // =========================================================================
   // SIMULAÇÃO DINÂMICA DE RETORNO DO CRIADOR
@@ -207,12 +197,6 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
     setTimeout(() => setCopiedHook(false), 2000);
   };
 
-  const handleCopyTerm = () => {
-    navigator.clipboard.writeText(affiliateTerm);
-    setCopiedTerm(true);
-    setTimeout(() => setCopiedTerm(false), 2000);
-  };
-
   return (
     <main className="flex-1 min-w-0 bg-[#F8FAFC] overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-5 text-slate-900">
       
@@ -229,10 +213,6 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
           <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
             <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full bg-slate-900 text-white shadow-2xs">
               {tk.nicheLabel || 'Nicho'}
-            </span>
-            <span className="inline-flex items-center gap-1 font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200 text-[10.5px]">
-              <Package className="w-3 h-3 text-emerald-600 shrink-0" />
-              <span>{stockLoc.replace(' - SP', ', SP')}</span>
             </span>
             <span className="inline-flex items-center gap-1 font-semibold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-full border border-slate-200/80 text-[10.5px]">
               <Clock className="w-3 h-3 text-[#007A87] shrink-0" />
@@ -281,31 +261,7 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
           )}
         </div>
 
-        {/* Linha 3: Box Interativo de Termo de Busca para Vitrine (1-Clique para Copiar) */}
-        <div className="bg-slate-50/90 border border-slate-200/90 rounded-xl p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-          <div className="min-w-0">
-            <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block">
-              Termo de Busca para Vitrine (TikTok Shop):
-            </span>
-            <div className="font-mono text-xs sm:text-sm font-black text-slate-900 truncate mt-0.5 select-all">
-              {affiliateTerm}
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={handleCopyTerm}
-            className={`px-3.5 py-2 rounded-lg font-extrabold text-xs transition cursor-pointer flex items-center justify-center gap-1.5 shrink-0 border shadow-2xs active:scale-95 ${
-              copiedTerm
-                ? 'bg-emerald-600 text-white border-emerald-600'
-                : 'bg-white hover:bg-slate-100 text-slate-800 border-slate-300'
-            }`}
-          >
-            {copiedTerm ? <Check className="w-3.5 h-3.5 text-white" /> : <Copy className="w-3.5 h-3.5 text-slate-500" />}
-            <span>{copiedTerm ? 'Termo Copiado!' : 'Copiar Termo Vitrine'}</span>
-          </button>
-        </div>
-
-        {/* Linha 4: Grid Simétrico 2x2 de Ações (Espaço Amplo no Celular e no Notebook com 3 painéis abertos) */}
+        {/* Ações: o link abre o produto exato no TikTok Shop */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-0.5">
           <div className="sm:col-span-2 rounded-xl border border-slate-200 bg-slate-50 p-3 flex gap-3 items-center">
             {tk.imageUrl && (
@@ -338,29 +294,8 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
             <ShoppingBag className="w-4 h-4 text-[#25F4EE] shrink-0" />
             <span className="truncate">{shopLink.exact ? 'Abrir produto exato' : 'Busca precisa no TikTok Shop'}</span>
           </a>
-          <a
-            href={videoSearchUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-full min-w-0 inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white border border-slate-300 text-slate-900 font-black text-xs"
-          >
-            <span className="truncate">Vídeos com o nome exato</span>
-          </a>
 
-          {/* 2. Comprar Amostra Pronta Entrega (SP) */}
-          <a
-            href={sampleDeliveryUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-full min-w-0 inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:brightness-105 text-white font-black text-xs transition cursor-pointer shadow-sm active:scale-98 group overflow-hidden"
-            title="Comprar amostra física com envio imediato de São Paulo (2 a 4 dias úteis)"
-          >
-            <Package className="w-4 h-4 text-white shrink-0" />
-            <span className="truncate">Comprar Amostra (SP)</span>
-            <ExternalLink className="w-3.5 h-3.5 text-emerald-200 group-hover:text-white transition-colors shrink-0" />
-          </a>
-
-          {/* 3. Copiar Gancho Viral 3s */}
+          {/* Copiar Gancho Viral 3s */}
           <button
             type="button"
             onClick={handleCopyHook}
@@ -375,20 +310,6 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
             <span className="truncate">{copiedHook ? 'Gancho Copiado!' : 'Copiar Gancho 3s'}</span>
           </button>
 
-        </div>
-
-        {/* Linha 5: Guia Rápido de Afiliação Limpo e Bem Formatado */}
-        <div className="bg-slate-50/80 rounded-xl p-3 border border-slate-200/70 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <div className="flex items-start sm:items-center gap-2 text-xs text-slate-600 leading-relaxed">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0 mt-1.5 sm:mt-0" />
-            <p>
-              <strong className="text-slate-900">Como afiliar no celular:</strong> Abra o{' '}
-              <strong className="text-slate-800">App TikTok &gt; Perfil &gt; Vitrine &gt; Adicionar Produtos</strong> e cole o termo acima.
-            </p>
-          </div>
-          <span className="text-[10px] text-emerald-700 bg-emerald-50 border border-emerald-200/80 px-2.5 py-1 rounded-md font-mono font-bold shrink-0 self-start sm:self-auto">
-            ✓ Estoque BR • Entrega 2 a 4 dias
-          </span>
         </div>
       </div>
 
@@ -765,28 +686,21 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
           </div>
         </div>
 
-        {/* Bloco 2: Validação de Pronta Entrega */}
         <div className="bg-white border border-slate-200/90 rounded-xl p-4 shadow-2xs space-y-2">
           <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-            <span>📦 Logística & Despacho Nacional</span>
+            <span>Onde comprar</span>
           </h3>
-          <div className="space-y-1 text-xs text-slate-700">
-            <div className="flex items-center justify-between">
-              <span className="text-slate-500">Origem do Estoque:</span>
-              <span className="font-bold text-slate-900">{stockLoc}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-slate-500">Prazo Médio p/ Sua Casa:</span>
-              <span className="font-bold text-emerald-700">2 a 4 dias úteis</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-slate-500">Complexidade:</span>
-              <span className="font-bold text-slate-800">{tk.logisticsComplexity || 'Fácil (Envio Rápido)'}</span>
-            </div>
-          </div>
-          <p className="text-[11px] text-slate-500 pt-1 border-t border-slate-100">
-            Chega rápido para você gravar enquanto o vácuo de concorrência estiver aberto.
+          <p className="text-xs text-slate-700 leading-relaxed">
+            O comprador escolhe o vendedor dentro do TikTok Shop. O link abaixo abre este produto; prazo e estoque são os da loja que ele selecionar.
           </p>
+          <a
+            href={shopLink.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 text-xs font-bold text-[#007A87] hover:underline"
+          >
+            {shopLink.exact ? 'Abrir produto exato' : 'Buscar no TikTok Shop'}
+          </a>
         </div>
       </div>
 

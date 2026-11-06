@@ -329,7 +329,6 @@ export const ProductListPanel: React.FC<ProductListPanelProps> = ({
             const commPct = Number(prod.commissionPercent || prod.tiktokShop?.commissionRatePercent || 0);
             const collectedLabel = formatCollectedAt(prod.collectedAt);
             const isSample = Boolean(prod.freeSampleAvailable || prod.tiktokShop?.freeSampleAvailable);
-            const stockLoc = String(prod.stockLocationBrazil || prod.tiktokShop?.stockLocation || 'São Paulo - SP');
             const tc = prod.tradeConviction;
             const breakEvenSales = tc?.breakEvenSales || (commission != null && commission > 0 ? Math.max(1, Math.ceil(priceBRL / commission)) : 0);
             const convictionScore = tc?.convictionScore || Math.min(99, Math.round(prod.viralityScore || 92));

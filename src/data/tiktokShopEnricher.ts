@@ -27,7 +27,7 @@ export function extractSharpProductIdentifiers(product: any): {
     exactAffiliateSearchTerm = ptName.split(' ').slice(0, 4).join(' ');
   }
 
-  // 3. Links de validação multicanal para cross-check de preço e pronta entrega nacional
+  // 3. Links de validação de preço em outros marketplaces
   const ptQueryShort = ptName.split(' ').slice(0, 4).join(' ');
   const globalQuery = primarySupplierKw || orig || ptName;
 
@@ -66,8 +66,6 @@ export function enrichWithTikTokShopData(product: any): any {
       : Number((((priceBRL * (commissionRatePercent || 0)) / 100)).toFixed(2));
   }
 
-  const charCodeSum = (product.id || '').split('').reduce((acc: number, char: string) => acc + char.charCodeAt(0), 0);
-
   const explicitVideos = Number(product.videoCountBR ?? product.tiktokShop?.videoCountBR);
   const activeCreatorsCount = Number.isFinite(explicitVideos) ? explicitVideos : undefined;
   const explicitSales = Number(product.tiktokShop?.recentSalesCount);
@@ -76,15 +74,7 @@ export function enrichWithTikTokShopData(product: any): any {
   const stockUnits = Number.isFinite(explicitStock) ? explicitStock : undefined;
   const saturationLevel = product.tiktokShop?.saturationLevel || product.creatorSaturationBR || 'Oceano Azul';
 
-  const stockLocations = [
-    'São Paulo - SP (Envio Full 24h)',
-    'Barueri - SP (Pronta Entrega)',
-    'Curitiba - PR (Estoque Nacional)',
-    'Guarulhos - SP (Entrega Expressa)',
-  ];
-  const stockLocation = product.tiktokShop?.stockLocation || 
-    product.stockLocationBrazil || 
-    stockLocations[charCodeSum % stockLocations.length];
+  const stockLocation = 'TikTok Shop';
 
   // Identificadores de precisão cirúrgica (substitui busca genérica de 3 palavras)
   const sharp = extractSharpProductIdentifiers(product);
@@ -141,7 +131,7 @@ export function enrichWithTikTokShopData(product: any): any {
   }
 
   const reasons = [
-    `Estoque Pronta Entrega Brasil: Vendedor nacional despacha de ${stockLocation.split('(')[0].trim()}. Chega em 3 a 5 dias para você gravar antes do produto espalhar.`,
+    'O comprador escolhe o vendedor dentro do TikTok Shop. Prazo e disponibilidade são os da loja escolhida.',
     creatorVideoCountBR == null
       ? 'Contagem de vídeos no feed BR ainda não verificada. Métrica sem número inventado.'
       : `Apenas ${creatorVideoCountBR} vídeos de criadores no TikTok Brasil (${creatorCompetitionLevel}). Vácuo de conteúdo no algoritmo com carrinho amarelo ativo.`,
@@ -161,7 +151,7 @@ export function enrichWithTikTokShopData(product: any): any {
     creatorVideoCountBR,
     creatorCompetitionLevel,
     stockLocation,
-    shippingDays: '2 a 4 dias úteis',
+    shippingDays: '',
     riskLevel,
     riskLabel,
     reasons

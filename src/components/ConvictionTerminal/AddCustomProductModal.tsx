@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Sparkles, Plus, Package, DollarSign, Target, ShieldCheck } from 'lucide-react';
+import { X, Sparkles, Plus, DollarSign, Target, ShieldCheck } from 'lucide-react';
 import { TrendingProduct, ProductNiche } from '../../types';
 import { enrichWithTikTokShopData } from '../../data/tiktokShopEnricher';
 
@@ -19,7 +19,7 @@ export const AddCustomProductModal: React.FC<AddCustomProductModalProps> = ({
   const [niche, setNiche] = useState<ProductNiche>('beauty');
   const [priceBRL, setPriceBRL] = useState('59.90');
   const [commissionPct, setCommissionPct] = useState('22');
-  const [stockLocation, setStockLocation] = useState('São Paulo - SP (Pronta Entrega)');
+  const stockLocation = 'TikTok Shop';
   const [videoCount, setVideoCount] = useState('5');
 
   if (!isOpen) return null;
@@ -50,12 +50,12 @@ export const AddCustomProductModal: React.FC<AddCustomProductModalProps> = ({
       estimatedPriceBRL: numPrice,
       estimatedProfitMarginPercent: 280,
       culturalFitReason: 'Produto validado pelo criador com apelo imediato de compra por impulso.',
-      brazilEntryStatus: 'Pronta entrega confirmada',
+      brazilEntryStatus: 'Anúncio no TikTok Shop',
       targetAudience: 'Público consumidor do TikTok Brasil',
       iconType: 'Package',
-      highlights: ['Pronta entrega nacional', 'Baixíssima concorrência', 'Break-even rápido'],
+      highlights: ['Baixa concorrência', 'Break-even rápido'],
       adHooks: [`Se você mora no Brasil e ainda não viu esse ${name.split(' ')[0]}, você tá vivendo errado!`],
-      supplierKeywords: [`${name.split(' ')[0]} atacado sp`, `${name.split(' ')[0]} pronta entrega`],
+      supplierKeywords: [name.split(' ')[0]],
       logisticsComplexity: 'Fácil (Leve / Sem Bateria)',
       trendingMetrics: {
         viewsLast30Days: '15.4M views',
@@ -75,7 +75,7 @@ export const AddCustomProductModal: React.FC<AddCustomProductModalProps> = ({
         recentSalesCount: 1850,
         saturationLevel: 'Oceano Azul',
         tiktokShopAffiliateLink: productUrl.trim() || 'https://seller-br.tiktok.com',
-        topViralHook: `O motivo pelo qual o ${name.split(' ')[0]} está esgotando nas lojas de São Paulo:`,
+        topViralHook: `O motivo pelo qual o ${name.split(' ')[0]} está no TikTok Shop:`,
         customProductUrl: productUrl.trim() || undefined,
       },
     };
@@ -210,19 +210,6 @@ export const AddCustomProductModal: React.FC<AddCustomProductModalProps> = ({
                 className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:border-[#25F4EE] outline-none font-mono font-bold text-emerald-700"
               />
             </div>
-          </div>
-
-          <div>
-            <label className="block text-[11px] font-bold text-slate-700 uppercase mb-1">
-              Local do Estoque Nacional:
-            </label>
-            <input
-              type="text"
-              value={stockLocation}
-              onChange={(e) => setStockLocation(e.target.value)}
-              placeholder="Ex: São Paulo - SP (Pronta Entrega 24h)"
-              className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:border-[#25F4EE] outline-none font-medium"
-            />
           </div>
 
           {/* Botões */}

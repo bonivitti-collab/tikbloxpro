@@ -36,11 +36,11 @@ const SLIDES: SlideData[] = [
     badge: 'PAINEL 1: RADAR DE PRODUTOS',
     badgeColor: 'bg-[#25F4EE]/10 text-[#25F4EE] border-[#25F4EE]/30',
     title: '140+ Produtos Virais em Oceano Azul',
-    subtitle: 'Varredura automatizada diária às 06:00 BRT com estoque em São Paulo',
+    subtitle: 'Varredura automatizada diária às 06:00 BRT',
     description:
-      'Ao invés de tentar adivinhar o que vende, o radar filtra apenas itens com pronta entrega no Brasil, comissão de 15% a 35% e concorrência zerada no feed brasileiro.',
+      'Ao invés de tentar adivinhar o que vende, o radar destaca comissão e concorrência no feed brasileiro. O comprador escolhe o vendedor no TikTok Shop.',
     highlights: [
-      'Estoque confirmado em São Paulo (chega em 2 a 4 dias úteis)',
+      'Link que abre o produto no TikTok Shop',
       'Menos de 10 vídeos publicados por criadores no Brasil',
       'Filtros por nicho: Beleza, Casa, Gadgets, Moda e Fitness',
       'Margem bruta e comissão líquida em R$ já calculadas',
@@ -67,15 +67,15 @@ const SLIDES: SlideData[] = [
     id: 'links',
     badge: 'AÇÃO RÁPIDA: LINKS DIRETOS',
     badgeColor: 'bg-rose-500/10 text-rose-400 border-rose-500/30',
-    title: 'Links do TikTok Shop & Amostras Pronta Entrega',
-    subtitle: 'Compre a amostra com envio em 24h e vincule o carrinho amarelo em 1 clique',
+    title: 'Link do produto no TikTok Shop',
+    subtitle: 'Abra o anúncio exato e escolha o vendedor no app',
     description:
-      'Agilidade máxima para criadores. Dois botões diretos: veja o item oficial na loja do TikTok e compre a amostra em São Paulo para gravar antes de todos.',
+      'O card leva ao produto no TikTok Shop. Prazo e estoque são os da loja que o comprador escolher.',
     highlights: [
-      'Botão direto: Ver Produto oficial no TikTok Shop Brasil',
-      'Botão direto: Comprar Amostra Pronta Entrega de SP (Mercado Livre/Shopee)',
-      'Copiar Termo Oficial Homologado para a Vitrine móvel com 1 clique',
-      'Copiar Gancho Magnético dos primeiros 3 segundos para o roteiro',
+      'Botão direto: abrir o produto no TikTok Shop',
+      'O comprador escolhe o vendedor dentro do app',
+      'Sem promessa de cidade de estoque ou prazo',
+      'Copiar o gancho dos primeiros 3 segundos para o roteiro',
     ],
     mockupType: 'links',
   },
@@ -176,7 +176,7 @@ export const InteractiveScreensCarousel: React.FC<InteractiveScreensCarouselProp
                 ? 'Radar de Produtos'
                 : idx === 1
                 ? 'Raio-X & Break-Even'
-                : 'Links & Amostras SP'}
+                : 'Link do produto'}
             </span>
           </button>
         ))}
@@ -289,7 +289,7 @@ export const InteractiveScreensCarousel: React.FC<InteractiveScreensCarouselProp
                           price: 'R$ 69,90',
                           comm: 'R$ 17,47 (25%)',
                           videos: '7 vídeos no BR',
-                          badge: 'Pronta Entrega SP',
+                          badge: 'Alta comissão',
                         },
                         {
                           name: 'Escova Secadora de Cabelos Íons Negativos',
@@ -305,7 +305,7 @@ export const InteractiveScreensCarousel: React.FC<InteractiveScreensCarouselProp
                         >
                           <div className="space-y-1 min-w-0">
                             <span className="text-[10px] text-[#25F4EE] font-mono font-bold block truncate">
-                              {item.badge} • Estoque São Paulo
+                              {item.badge}
                             </span>
                             <p className="font-bold text-xs text-white truncate">{item.name}</p>
                             <span className="text-[11px] text-slate-400">
@@ -333,7 +333,7 @@ export const InteractiveScreensCarousel: React.FC<InteractiveScreensCarouselProp
                     </div>
 
                     <h4 className="text-sm font-black text-white">
-                      Mini Seladora Térmica Portátil 2 em 1 (Pronta Entrega SP)
+                      Mini Seladora Térmica Portátil 2 em 1
                     </h4>
 
                     {/* Os 4 Pilares Financeiros */}
@@ -341,7 +341,7 @@ export const InteractiveScreensCarousel: React.FC<InteractiveScreensCarouselProp
                       <div className="p-2.5 rounded-xl bg-white/5 border border-white/10">
                         <span className="text-[10px] uppercase font-bold text-slate-400 block">Custo da Amostra</span>
                         <span className="text-base font-black text-white font-mono">R$ 29,90</span>
-                        <span className="text-[9px] text-slate-400 block">Chega em 2 a 4 dias úteis</span>
+                        <span className="text-[9px] text-slate-400 block">Preço de referência</span>
                       </div>
                       <div className="p-2.5 rounded-xl bg-emerald-950/30 border border-emerald-500/30">
                         <span className="text-[10px] uppercase font-bold text-emerald-400 block">Comissão por Venda</span>
@@ -377,10 +377,7 @@ export const InteractiveScreensCarousel: React.FC<InteractiveScreensCarouselProp
                         Mini Seladora Térmica Portátil 2 em 1
                       </h4>
                       <p className="text-[11px] text-slate-400">
-                        Termo de busca oficial homologado:{' '}
-                        <code className="text-[#25F4EE] bg-white/10 px-1 py-0.5 rounded font-mono">
-                          Mini Seladora Termica Portatil SP
-                        </code>
+                        Abre o produto no TikTok Shop. O vendedor é escolhido lá.
                       </p>
                     </div>
 
@@ -397,15 +394,14 @@ export const InteractiveScreensCarousel: React.FC<InteractiveScreensCarouselProp
                         <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
                       </div>
 
-                      <div className="p-3 rounded-xl bg-gradient-to-r from-emerald-600/30 to-teal-600/30 border border-emerald-500/40 flex items-center justify-between shadow-md">
+                      <div className="p-3 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between shadow-md">
                         <div className="flex items-center gap-2">
                           <Package className="w-4 h-4 text-emerald-400" />
                           <div>
-                            <span className="text-xs font-black text-white block">Comprar Amostra (SP)</span>
-                            <span className="text-[10px] text-emerald-300">Despacho 24h Mercado Livre</span>
+                            <span className="text-xs font-black text-white block">Comissão no card</span>
+                            <span className="text-[10px] text-emerald-300">Antes de abrir o anúncio</span>
                           </div>
                         </div>
-                        <ExternalLink className="w-3.5 h-3.5 text-emerald-400" />
                       </div>
                     </div>
 

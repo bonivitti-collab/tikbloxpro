@@ -12,8 +12,8 @@ export interface TradeConviction {
   netProfitAt50Sales: number; // Lucro líquido estimado com 50 vendas
   creatorVideoCountBR: number; // Quantidade de vídeos de criadores ativos no feed BR
   creatorCompetitionLevel: 'Oceano Azul (< 10 vídeos)' | 'Baixa Concorrência (10-25 vídeos)' | 'Concorrência Média (25-50 vídeos)' | 'Saturado (> 50 vídeos)';
-  stockLocation: string; // Ex: São Paulo - SP (Pronta Entrega)
-  shippingDays: string; // Ex: 2 a 4 dias úteis
+  stockLocation: string;
+  shippingDays: string;
   riskLevel: 'MUITO_BAIXO' | 'BAIXO' | 'MODERADO';
   riskLabel: string;
   reasons: string[]; // 3 teses objetivas de entrada

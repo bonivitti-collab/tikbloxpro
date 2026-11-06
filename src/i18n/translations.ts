@@ -331,7 +331,7 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     onboarding_step1_point2_title: 'Filtros Estratégicos',
     onboarding_step1_point2_desc: 'Filtre por nichos lucrativos (Tech, Casa, Beleza, Pets) e selecione a procedência (🇺🇸 EUA ou 🇨🇳 China).',
     onboarding_step1_point3_title: 'Varredura diária do radar',
-    onboarding_step1_point3_desc: 'Dispare uma varredura para atualizar o mapa de produtos com estoque nacional e baixa concorrência.',
+    onboarding_step1_point3_desc: 'Dispare uma varredura para atualizar o mapa de produtos com baixa concorrência.',
     onboarding_step1_action: 'Explorar Produtos no Radar',
     onboarding_step2_badge: '2. MINERAÇÃO & CACHE',
     onboarding_step2_title: 'Salvamento de Produtos & Banco Offline',

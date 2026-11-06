@@ -300,7 +300,7 @@ export function streamProductViabilityPDF(
           label: 'Mercado Livre Full:',
           val: sanitizePdfText(
             analysis?.competitionAnalysis?.mercadoLivreStatus,
-            'Raros vendedores com estoque nacional pronta entrega.'
+            'Compare os vendedores dentro do marketplace.'
           ),
         },
       ];
