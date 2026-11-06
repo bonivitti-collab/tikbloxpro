@@ -21,6 +21,9 @@ const LATE_EVENTS = new Set(['subscription_late']);
 
 export type KiwifyDecision = 'grant' | 'revoke' | 'late' | 'ignore';
 
+/** A Kiwify gera o token do webhook (cerca de 11 caracteres). Não dá para alongar. */
+export const MIN_KIWIFY_WEBHOOK_TOKEN_LENGTH = 8;
+
 export function kiwifySignature(rawBody: string, token: string): string {
   return crypto.createHmac('sha1', token).update(rawBody).digest('hex');
 }
@@ -29,9 +32,13 @@ export function webhookToken(): string {
   return (process.env.KIWIFY_WEBHOOK_TOKEN || '').trim();
 }
 
+export function webhookTokenIsConfigured(token = webhookToken()): boolean {
+  return token.length >= MIN_KIWIFY_WEBHOOK_TOKEN_LENGTH;
+}
+
 export function signatureIsValid(rawBody: string, signature: string | null | undefined): boolean {
   const token = webhookToken();
-  if (token.length < 16 || !signature) return false;
+  if (!webhookTokenIsConfigured(token) || !signature) return false;
   const expected = kiwifySignature(rawBody, token);
   return timingSafeEqualText(expected, signature.trim().toLowerCase());
 }
