@@ -5,9 +5,12 @@ export function isBlueOceanOpportunity(p: TrendingProduct | any): boolean {
   if (p.waveStage === 'peak_wave') return false;
   if (p.creatorSaturationBR === 'Alta' || p.creatorSaturationBR === 'Saturado') return false;
   if (p.tradeConviction) {
-    if (p.tradeConviction.creatorVideoCountBR > 18) return false;
+    const videos = p.tradeConviction.creatorVideoCountBR;
+    if (typeof videos === 'number' && videos > 18) return false;
     if (p.tradeConviction.verdict === 'ALERTA_SATURACAO') return false;
-    if (p.tradeConviction.convictionScore < 80) return false;
+    // null < 80 é true em JavaScript. Score ausente significa "sem vídeos medidos", não score baixo.
+    const score = p.tradeConviction.convictionScore;
+    if (typeof score === 'number' && score < 80) return false;
   }
   return true;
 }

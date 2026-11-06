@@ -14,6 +14,7 @@ import {
 import { productUpsertPayload } from '../lib/productsStore.ts';
 import { formatCommissionBand, formatPriceBand, mergePriceHistory, roundMoney } from '../src/lib/priceRange.ts';
 import { canSpend, planKalodataSpend, rankCreditCost } from '../lib/kalodataPlan.ts';
+import { isBlueOceanOpportunity } from '../src/lib/blueOcean.ts';
 
 let failed = 0;
 function assert(condition: unknown, message: string): void {
@@ -82,6 +83,11 @@ assert(!passesBusinessRules(mapped), 'regra estrita da Apify continua exigindo e
 const visible = liveRowToProduct({ ...mapped!, scraped_at: mapped!.last_refreshed_at });
 assert(visible?.countsUnknown === true && keepLiveProduct(visible), 'Kalodata sem estoque/vídeos entra no radar se a comissão passa de R$ 10');
 assert(visible?.tradeConviction?.convictionScore == null, 'sem vídeos medidos não há score');
+assert(isBlueOceanOpportunity(visible), 'score nulo permanece no radar');
+assert(!isBlueOceanOpportunity({
+  waveStage: 'early_wave',
+  tradeConviction: { convictionScore: 40, creatorVideoCountBR: 12, verdict: 'ENTRADA_MODERADA' },
+}), 'score medido abaixo de 80 continua fora');
 const qualified = liveRowToProduct({ ...mapped!, scraped_at: mapped!.last_refreshed_at, stock_units: 500, video_count: 12 });
 assert(qualified != null && keepLiveProduct(qualified) && qualified.countsUnknown === false, 'com estoque, vídeos e comissão de R$ 12 passa sem aviso');
 assert(qualified?.tradeConviction?.convictionScore === 83, 'score é 95 menos os vídeos medidos');
