@@ -39,8 +39,74 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
   const [copiedTerm, setCopiedTerm] = useState(false);
   const [simulationSales, setSimulationSales] = useState<number>(25);
 
+  // O terminal monta com produto nulo (catálogo ainda não chegou) e só
+  // depois recebe o item ativo. Este hook precisa existir nos dois renders.
+  const lifecycle = useMemo(() => {
+    if (!product?.id) return null;
 
-  if (!product) {
+    const tk = enrichWithTikTokShopData(product);
+    const videoCount = Number(tk.tradeConviction?.creatorVideoCountBR ?? 6);
+    const sat = tk.creatorSaturationBR || 'Baixa';
+    const id = String(tk.id);
+    let hash = 0;
+    for (let i = 0; i < id.length; i++) {
+      hash = (hash * 31 + id.charCodeAt(i)) % 100;
+    }
+
+    let daysActive = 5;
+    let stageIndex = 0;
+    let saturationPercent = 22;
+    let remainingDays = 35;
+    let stageName = 'Fase 1: Entrada no Radar & Descoberta';
+    let recommendation = 'Oceano Azul! Poucos criadores postando no Brasil. Momento ideal para comprar a amostra e garantir os primeiros rankings no feed.';
+
+    if (sat === 'Baixa' || videoCount < 12) {
+      daysActive = 3 + (hash % 5);
+      stageIndex = 0;
+      saturationPercent = 18 + (hash % 14);
+      remainingDays = 30 + (hash % 10);
+      stageName = 'Fase 1: Entrada & Descoberta';
+      recommendation = `Oceano Azul! Apenas ~${videoCount} criadores ativos no Brasil. Compre sua amostra agora e poste os primeiros vídeos para fixar seu carrinho amarelo.`;
+    } else if (sat === 'Média' || videoCount <= 25) {
+      daysActive = 12 + (hash % 9);
+      stageIndex = 1;
+      saturationPercent = 48 + (hash % 16);
+      remainingDays = 15 + (hash % 8);
+      stageName = 'Fase 2: Tração & Escala Acelerada';
+      recommendation = 'Ponto Doce (Sweet Spot)! Algoritmo entregando com força no For You. Poste 2 a 3 vídeos por semana.';
+    } else {
+      daysActive = 28 + (hash % 16);
+      if (daysActive > 36 || videoCount > 50) {
+        stageIndex = 3;
+        saturationPercent = 82 + (hash % 12);
+        remainingDays = 5 + (hash % 5);
+        stageName = 'Fase 4: Alerta de Saturação & Fadiga';
+        recommendation = 'Alerta de Saturação! Muitos vídeos semelhantes no feed. Evite comprar amostra agora; priorize produtos em Fase 1.';
+      } else {
+        stageIndex = 2;
+        saturationPercent = 68 + (hash % 12);
+        remainingDays = 11 + (hash % 6);
+        stageName = 'Fase 3: Volume Máximo / Pico de Vendas';
+        recommendation = 'Pico de Vendas! Volume diário altíssimo. Utilize quebras de objeções imediatas nos primeiros 3 segundos.';
+      }
+    }
+
+    const entryDate = new Date();
+    entryDate.setDate(entryDate.getDate() - daysActive);
+    const formattedEntryDate = entryDate.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+    return {
+      daysActive,
+      stageIndex,
+      saturationPercent,
+      remainingDays,
+      stageName,
+      recommendation,
+      formattedEntryDate,
+    };
+  }, [product]);
+
+  if (!product || !lifecycle) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center p-8 text-center text-slate-500 bg-[#F8FAFC]">
         <div className="w-14 h-14 rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-2xl mb-3 shadow-xs">
@@ -101,70 +167,6 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
   const simGrossCommission = simulationSales * commissionVal;
   const simNetProfit = Math.max(0, simGrossCommission - priceBRL);
   const simRoi = priceBRL > 0 ? Math.round((simNetProfit / priceBRL) * 100) : 0;
-
-
-  // =========================================================================
-  // CICLO DE VIDA NO RADAR: Acompanhamento da Entrada até a Saturação
-  // =========================================================================
-  const lifecycle = useMemo(() => {
-    const sat = tk.creatorSaturationBR || 'Baixa';
-    let hash = 0;
-    for (let i = 0; i < tk.id.length; i++) {
-      hash = (hash * 31 + tk.id.charCodeAt(i)) % 100;
-    }
-
-    let daysActive = 5;
-    let stageIndex = 0;
-    let saturationPercent = 22;
-    let remainingDays = 35;
-    let stageName = 'Fase 1: Entrada no Radar & Descoberta';
-    let recommendation = 'Oceano Azul! Poucos criadores postando no Brasil. Momento ideal para comprar a amostra e garantir os primeiros rankings no feed.';
-
-    if (sat === 'Baixa' || tc.creatorVideoCountBR < 12) {
-      daysActive = 3 + (hash % 5);
-      stageIndex = 0;
-      saturationPercent = 18 + (hash % 14);
-      remainingDays = 30 + (hash % 10);
-      stageName = 'Fase 1: Entrada & Descoberta';
-      recommendation = `Oceano Azul! Apenas ~${tc.creatorVideoCountBR} criadores ativos no Brasil. Compre sua amostra agora e poste os primeiros vídeos para fixar seu carrinho amarelo.`;
-    } else if (sat === 'Média' || tc.creatorVideoCountBR <= 25) {
-      daysActive = 12 + (hash % 9);
-      stageIndex = 1;
-      saturationPercent = 48 + (hash % 16);
-      remainingDays = 15 + (hash % 8);
-      stageName = 'Fase 2: Tração & Escala Acelerada';
-      recommendation = 'Ponto Doce (Sweet Spot)! Algoritmo entregando com força no For You. Poste 2 a 3 vídeos por semana.';
-    } else {
-      daysActive = 28 + (hash % 16);
-      if (daysActive > 36 || tc.creatorVideoCountBR > 50) {
-        stageIndex = 3;
-        saturationPercent = 82 + (hash % 12);
-        remainingDays = 5 + (hash % 5);
-        stageName = 'Fase 4: Alerta de Saturação & Fadiga';
-        recommendation = 'Alerta de Saturação! Muitos vídeos semelhantes no feed. Evite comprar amostra agora; priorize produtos em Fase 1.';
-      } else {
-        stageIndex = 2;
-        saturationPercent = 68 + (hash % 12);
-        remainingDays = 11 + (hash % 6);
-        stageName = 'Fase 3: Volume Máximo / Pico de Vendas';
-        recommendation = 'Pico de Vendas! Volume diário altíssimo. Utilize quebras de objeções imediatas nos primeiros 3 segundos.';
-      }
-    }
-
-    const entryDate = new Date();
-    entryDate.setDate(entryDate.getDate() - daysActive);
-    const formattedEntryDate = entryDate.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-
-    return {
-      daysActive,
-      stageIndex,
-      saturationPercent,
-      remainingDays,
-      stageName,
-      recommendation,
-      formattedEntryDate,
-    };
-  }, [tk.id, tk.creatorSaturationBR, tc.creatorVideoCountBR]);
 
   const STAGES = [
     {
