@@ -13,6 +13,7 @@ import { ProductDetailTerminal } from './components/ConvictionTerminal/ProductDe
 import { SavedRadarView } from './components/SavedRadarView';
 import { AddCustomProductModal } from './components/ConvictionTerminal/AddCustomProductModal';
 import { LandingPage } from './components/LandingPage/LandingPage';
+import { LegalPage } from './components/LegalPage';
 import { LoginModal } from './components/Auth/LoginModal';
 import {
   getCurrentSession,
@@ -636,6 +637,11 @@ export default function App() {
       setCurrentView('landing');
     });
   };
+
+  const publicPath = typeof window !== 'undefined' ? window.location.pathname : '';
+  if (publicPath === '/termos' || publicPath === '/privacidade') {
+    return <LegalPage kind={publicPath === '/termos' ? 'termos' : 'privacidade'} />;
+  }
 
   // =========================================================================
   // LANDING PAGE (visitantes sem sessão)

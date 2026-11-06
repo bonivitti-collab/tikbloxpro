@@ -52,13 +52,13 @@ export const SocialProofSection: React.FC = () => {
         <div className="text-center space-y-3 max-w-2xl mx-auto">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-xs font-bold text-emerald-400">
             <Flame className="w-3.5 h-3.5" />
-            <span>Casos Típicos de Sucesso</span>
+            <span>Ilustração, não é resultado de cliente</span>
           </div>
           <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
             Como Funciona a Assimetria na Prática
           </h2>
           <p className="text-xs sm:text-sm text-slate-300">
-            Veja exemplos de oportunidades mineradas no radar que geraram comissão no TikTok Shop:
+            Os números abaixo são um exemplo de leitura. Não são vendas, views nem comissão de clientes do TikBlox.
           </p>
         </div>
 

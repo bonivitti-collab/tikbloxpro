@@ -57,64 +57,55 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
     if (!product?.id) return null;
 
     const tk = enrichWithTikTokShopData(product);
-    const videoCount = Number(tk.tradeConviction?.creatorVideoCountBR ?? 6);
-    const sat = tk.creatorSaturationBR || 'Baixa';
-    const id = String(tk.id);
-    let hash = 0;
-    for (let i = 0; i < id.length; i++) {
-      hash = (hash * 31 + id.charCodeAt(i)) % 100;
-    }
-
-    let daysActive = 5;
-    let stageIndex = 0;
-    let saturationPercent = 22;
-    let remainingDays = 35;
-    let stageName = 'Fase 1: Entrada no Radar & Descoberta';
-    let recommendation = 'Oceano Azul. Poucos criadores postando no Brasil. Bom momento para entrar antes do feed encher.';
-
-    if (sat === 'Baixa' || videoCount < 12) {
-      daysActive = 3 + (hash % 5);
-      stageIndex = 0;
-      saturationPercent = 18 + (hash % 14);
-      remainingDays = 30 + (hash % 10);
-      stageName = 'Fase 1: Entrada & Descoberta';
-      recommendation = `Oceano Azul. Cerca de ${videoCount} criadores ativos no Brasil. Ainda dá para publicar antes da concorrência.`;
-    } else if (sat === 'Média' || videoCount <= 25) {
-      daysActive = 12 + (hash % 9);
-      stageIndex = 1;
-      saturationPercent = 48 + (hash % 16);
-      remainingDays = 15 + (hash % 8);
-      stageName = 'Fase 2: Tração & Escala Acelerada';
-      recommendation = 'Ponto Doce (Sweet Spot)! Algoritmo entregando com força no For You. Poste 2 a 3 vídeos por semana.';
-    } else {
-      daysActive = 28 + (hash % 16);
-      if (daysActive > 36 || videoCount > 50) {
-        stageIndex = 3;
-        saturationPercent = 82 + (hash % 12);
-        remainingDays = 5 + (hash % 5);
-        stageName = 'Fase 4: Alerta de Saturação & Fadiga';
-        recommendation = 'Alerta de saturação. Muitos vídeos semelhantes no feed. Priorize produtos ainda na fase 1.';
-      } else {
-        stageIndex = 2;
-        saturationPercent = 68 + (hash % 12);
-        remainingDays = 11 + (hash % 6);
-        stageName = 'Fase 3: Volume Máximo / Pico de Vendas';
-        recommendation = 'Pico de Vendas! Volume diário altíssimo. Utilize quebras de objeções imediatas nos primeiros 3 segundos.';
+    const rawVideos = tk.tradeConviction?.creatorVideoCountBR;
+    const videoCount = tk.dataSource === 'live' && typeof rawVideos === 'number' && Number.isFinite(rawVideos) ? rawVideos : null;
+    const collected = tk.collectedAt || (typeof tk.discoveredAt === 'string' && /^\d{4}-\d{2}-\d{2}/.test(tk.discoveredAt) ? tk.discoveredAt : '');
+    let daysOnRadar: number | null = null;
+    let formattedEntryDate = 'data não informada';
+    if (collected) {
+      const then = new Date(collected);
+      if (!Number.isNaN(then.getTime())) {
+        daysOnRadar = Math.max(0, Math.floor((Date.now() - then.getTime()) / 86_400_000));
+        formattedEntryDate = then.toLocaleDateString('pt-BR', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+          timeZone: 'America/Sao_Paulo',
+        });
       }
     }
 
-    const entryDate = new Date();
-    entryDate.setDate(entryDate.getDate() - daysActive);
-    const formattedEntryDate = entryDate.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    let stageIndex = 0;
+    let stageName = 'Contagem de vídeos ausente';
+    let recommendation = 'Sem a contagem de vídeos o radar não diz se o feed está vazio.';
+    if (videoCount != null && videoCount < 10) {
+      stageIndex = 0;
+      stageName = 'Menos de 10 vídeos medidos';
+      recommendation = `${videoCount} vídeos medidos. Ainda há pouco conteúdo com esse produto no recorte coletado.`;
+    } else if (videoCount != null && videoCount <= 25) {
+      stageIndex = 1;
+      stageName = '10 a 25 vídeos medidos';
+      recommendation = `${videoCount} vídeos medidos. Já existe conteúdo, sem sinal de feed cheio.`;
+    } else if (videoCount != null && videoCount <= 50) {
+      stageIndex = 2;
+      stageName = '26 a 50 vídeos medidos';
+      recommendation = `${videoCount} vídeos medidos. A concorrência no feed já é visível.`;
+    } else if (videoCount != null) {
+      stageIndex = 3;
+      stageName = 'Mais de 50 vídeos medidos';
+      recommendation = `${videoCount} vídeos medidos. O feed desse produto está cheio no recorte coletado.`;
+    }
+
+    const saturationPercent = videoCount == null ? 0 : Math.max(0, Math.min(100, Math.round((videoCount / 50) * 100)));
 
     return {
-      daysActive,
+      daysOnRadar,
       stageIndex,
       saturationPercent,
-      remainingDays,
       stageName,
       recommendation,
       formattedEntryDate,
+      videoCount,
     };
   }, [product]);
 
@@ -135,8 +126,8 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
   const tk = enrichWithTikTokShopData(product);
   const tc = tk.tradeConviction || {
     verdict: 'COMPRA_RECOMENDADA',
-    verdictLabel: '🟢 ENTRADA FORTE',
-    convictionScore: 94,
+    verdictLabel: 'DADOS INCOMPLETOS',
+    convictionScore: null,
     sampleCostBRL: Number(tk.estimatedPriceBRL || 69.90),
     commissionBRL: Number(tk.commissionEstimatedBRL || 15.50),
     commissionPercent: Number(tk.commissionPercent || 22),
@@ -148,7 +139,7 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
     stockLocation: 'TikTok Shop',
     shippingDays: '',
     riskLevel: 'MUITO_BAIXO',
-    riskLabel: 'Risco Mínimo (Assimetria Altamente Positiva)',
+    riskLabel: 'Contagem de vídeos ausente',
     reasons: [
       'O comprador escolhe o vendedor dentro do TikTok Shop.',
       'Apenas 6 vídeos de criadores no TikTok Brasil. Vácuo de conteúdo no algoritmo com carrinho amarelo ativo.',
@@ -178,28 +169,28 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
     {
       step: 1,
       title: 'Entrada no Radar',
-      subtitle: 'Dia 1 a 7',
+      subtitle: 'até 10 vídeos',
       desc: 'Descoberta / Oceano Azul',
       badge: `🟢 < 10 Vídeos BR`,
     },
     {
       step: 2,
       title: 'Tração & Escala',
-      subtitle: 'Dia 8 a 21',
+      subtitle: '10 a 25 vídeos',
       desc: 'Entrega Acelerada FYP',
       badge: '🔵 Sweet Spot (10-25 Vídeos)',
     },
     {
       step: 3,
       title: 'Pico de Vendas',
-      subtitle: 'Dia 22 a 45',
+      subtitle: '26 a 50 vídeos',
       desc: 'Volume Máximo',
       badge: '🟡 Demanda Alta (25-50 Vídeos)',
     },
     {
       step: 4,
       title: 'Alerta de Saturação',
-      subtitle: 'Dia 46+',
+      subtitle: 'acima de 50 vídeos',
       desc: 'Fadiga Criativa',
       badge: '🔴 Saturado (> 50 Vídeos)',
     },
@@ -230,7 +221,7 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
             </span>
             <span className="inline-flex items-center gap-1 font-semibold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-full border border-slate-200/80 text-[10.5px]">
               <Clock className="w-3 h-3 text-[#007A87] shrink-0" />
-              <span>{collectedLabel ? `Coletado em ${collectedLabel}` : `Há ${lifecycle.daysActive} dias no radar`}</span>
+              <span>{collectedLabel ? `Coletado em ${collectedLabel}` : 'Data de coleta não informada'}</span>
             </span>
             {tk.countsUnknown ? (
               <span className="inline-flex items-center font-bold text-amber-800 bg-amber-50 px-2.5 py-1 rounded-full border border-amber-200 text-[10.5px]">
@@ -349,7 +340,7 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
             <div className="text-right">
               <span className="text-[10px] uppercase font-bold text-slate-400 block">Convicção TikBlox</span>
               <span className="text-lg font-mono font-black text-slate-900 leading-none">
-                {tc.convictionScore}/100
+                {typeof tc.convictionScore === 'number' ? `${tc.convictionScore}/100` : 'sem score'}
               </span>
             </div>
             <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#25F4EE] to-[#FE2C55] text-white flex items-center justify-center font-black text-sm shadow-2xs">
@@ -413,7 +404,7 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
               Vídeos no TikTok BR
             </span>
             <div className="text-lg sm:text-xl font-black text-slate-900 font-mono mt-1 flex items-baseline gap-1 whitespace-nowrap overflow-hidden">
-              <span>~{tc.creatorVideoCountBR}</span>
+              <span>{typeof tc.creatorVideoCountBR === 'number' ? tc.creatorVideoCountBR : 'n/d'}</span>
               <span className="text-xs font-bold text-slate-500 font-sans">vídeos</span>
             </div>
             <span className="text-[10px] font-bold text-emerald-700 mt-0.5 block truncate">
@@ -553,19 +544,19 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
             </div>
             <div>
               <h3 className="text-xs sm:text-sm font-bold text-slate-900 flex items-center gap-2">
-                <span>Ciclo de Vida no Radar & Curva de Saturação</span>
+                <span>Vídeos medidos e data da coleta</span>
                 <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200 font-bold">
                   {lifecycle.stageName}
                 </span>
               </h3>
               <p className="text-[11px] text-slate-500">
-                Acompanhe a maturidade de criadores no TikTok Shop Brasil para não entrar no topo da onda.
+                A barra usa os vídeos medidos sobre 50. Não é uma previsão de quantos dias a oportunidade dura.
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-2 text-right">
-            <span className="text-[11px] font-bold text-slate-500">Saturação:</span>
+            <span className="text-[11px] font-bold text-slate-500">Vídeos / 50:</span>
             <span className="text-xs font-mono font-black text-slate-900 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
               {lifecycle.saturationPercent}%
             </span>
@@ -624,10 +615,10 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 text-xs font-bold text-slate-700">
             <span className="flex items-center gap-1.5">
               <Compass className="w-3.5 h-3.5 text-[#007A87] shrink-0" />
-              <span>Entrada no Radar: <strong>{lifecycle.formattedEntryDate}</strong> (há {lifecycle.daysActive} dias)</span>
+              <span>Coletado em <strong>{lifecycle.formattedEntryDate}</strong>{lifecycle.daysOnRadar == null ? '' : ` (há ${lifecycle.daysOnRadar} dias)`}</span>
             </span>
-            <span className="text-emerald-700 font-mono text-[11px] sm:text-xs">
-              Janela de Entrada: ~{lifecycle.remainingDays} dias ideais para lucrar
+            <span className="text-slate-600 font-mono text-[11px] sm:text-xs">
+              {lifecycle.videoCount == null ? 'vídeos não medidos' : `${lifecycle.videoCount} vídeos medidos`}
             </span>
           </div>
 
@@ -691,7 +682,11 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
           </p>
           <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500 font-mono">
             <span>Tráfego Viral Detectado:</span>
-            <span className="font-bold text-emerald-700">{tk.trendingMetrics?.viewsLast30Days || '48.5M views'}</span>
+            <span className="font-bold text-emerald-700">
+              {tk.dataSource === 'live'
+                ? (tk.trendingMetrics?.viewsLast30Days || 'vendas não informadas')
+                : 'exemplo de catálogo, não medido'}
+            </span>
           </div>
         </div>
 

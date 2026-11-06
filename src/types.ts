@@ -3,7 +3,7 @@ export type WaveStage = 'early_wave' | 'rising_wave' | 'peak_wave';
 export interface TradeConviction {
   verdict: 'COMPRA_RECOMENDADA' | 'ENTRADA_MODERADA' | 'ALERTA_SATURACAO';
   verdictLabel: string;
-  convictionScore: number; // 0-100
+  convictionScore: number | null;
   sampleCostBRL: number; // Preço de Compra da Amostra (dinheiro do bolso)
   commissionBRL: number; // Comissão Líquida por Venda
   commissionPercent: number; // Taxa de comissão (%)
@@ -11,7 +11,7 @@ export interface TradeConviction {
   netProfitAt20Sales: number; // Lucro líquido estimado com 20 vendas
   netProfitAt50Sales: number; // Lucro líquido estimado com 50 vendas
   creatorVideoCountBR: number; // Quantidade de vídeos de criadores ativos no feed BR
-  creatorCompetitionLevel: 'Oceano Azul (< 10 vídeos)' | 'Baixa Concorrência (10-25 vídeos)' | 'Concorrência Média (25-50 vídeos)' | 'Saturado (> 50 vídeos)';
+  creatorCompetitionLevel: 'Oceano Azul (< 10 vídeos)' | 'Baixa Concorrência (10-25 vídeos)' | 'Concorrência Média (25-50 vídeos)' | 'Saturado (> 50 vídeos)' | 'Contagem não informada';
   stockLocation: string;
   shippingDays: string;
   riskLevel: 'MUITO_BAIXO' | 'BAIXO' | 'MODERADO';
