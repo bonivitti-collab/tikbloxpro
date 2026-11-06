@@ -85,7 +85,7 @@ export const ProfitCalculatorModal: React.FC<ProfitCalculatorModalProps> = ({
             </div>
             <div>
               <h2 className="text-base sm:text-lg font-bold text-white">
-                {language === 'en' ? 'Arbitrage & Net Profit Simulator' : 'Simulador de Viabilidade & Lucro Líquido'}
+                {language === 'en' ? 'Price and commission math' : 'Conta de preço e comissão'}
               </h2>
               <p className="text-xs text-slate-400">
                 {product ? product.name : (language === 'en' ? 'Simulate import costs, taxes and net margin in BRL' : 'Simule importação, taxas e margem real em BRL')}

@@ -352,7 +352,7 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     onboarding_step3_point2_desc: 'Descubra exatamente seu ponto de equilíbrio de anúncio e o CPA máximo viável para não ter prejuízo.',
     onboarding_step3_point3_title: 'Projeções de Escala Mensal',
     onboarding_step3_point3_desc: 'Visualize o potencial de faturamento e lucro líquido estimado para 30, 100 e 300 vendas por mês.',
-    onboarding_step3_action: 'Abrir Simulador de Lucro',
+    onboarding_step3_action: 'Ver a conta do preço',
 
     // Price Monitor
     price_monitor_tab: 'Variações de Preço',
@@ -546,7 +546,7 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     onboarding_step3_point2_desc: 'Determine your exact break-even ROAS and maximum viable CPA to avoid operating at a loss.',
     onboarding_step3_point3_title: 'Monthly Scale Projections',
     onboarding_step3_point3_desc: 'Preview estimated revenue and net profit potential across 30, 100, and 300 unit sales per month.',
-    onboarding_step3_action: 'Open Profit Simulator',
+    onboarding_step3_action: 'See the price math',
 
     // Price Monitor
     price_monitor_tab: 'Price Variations',
