@@ -1,4 +1,4 @@
-import { TrendingProduct } from '../../types';
+import { TrendingProduct } from '../../types.js';
 
 export const toolsTrends: TrendingProduct[] = [
   {

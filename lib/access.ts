@@ -1,5 +1,5 @@
-import { lateGraceHours } from './accessPolicy';
-import { hashClaimCode } from './claim';
+import { lateGraceHours } from './accessPolicy.js';
+import { hashClaimCode } from './claim.js';
 import {
   classifyKiwifyPayload,
   extractClaimMaterial,
@@ -9,9 +9,9 @@ import {
   extractOrderId,
   extractProductId,
   productIsAllowed,
-} from './kiwify';
-import { normalizeEmail } from './http';
-import { getSubscriber, saveSubscriber, type Subscriber } from './subscribers';
+} from './kiwify.js';
+import { normalizeEmail } from './http.js';
+import { getSubscriber, saveSubscriber, type Subscriber } from './subscribers.js';
 
 export type AccessOutcome =
   | { outcome: 'granted'; email: string }

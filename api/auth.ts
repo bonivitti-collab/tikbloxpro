@@ -5,20 +5,20 @@ import {
   normalizeEmail,
   readCookie,
   sendJson,
-} from '../lib/http';
-import { accessDeniedMessage, subscriberCanAccess } from '../lib/accessPolicy';
-import { claimCodesMatch } from '../lib/claim';
-import { isOwnerEmail, ownerName, ownerPasswordMatches } from '../lib/owner';
-import { hashPassword, verifyPassword } from '../lib/passwords';
-import { isRateLimited } from '../lib/rateLimit';
+} from '../lib/http.js';
+import { accessDeniedMessage, subscriberCanAccess } from '../lib/accessPolicy.js';
+import { claimCodesMatch } from '../lib/claim.js';
+import { isOwnerEmail, ownerName, ownerPasswordMatches } from '../lib/owner.js';
+import { hashPassword, verifyPassword } from '../lib/passwords.js';
+import { isRateLimited } from '../lib/rateLimit.js';
 import {
   SESSION_COOKIE_NAME,
   clearSessionCookie,
   sessionCookie,
   signSession,
   verifySession,
-} from '../lib/session';
-import { getSubscriber, saveSubscriber, subscriberBackend } from '../lib/subscribers';
+} from '../lib/session.js';
+import { getSubscriber, saveSubscriber, subscriberBackend } from '../lib/subscribers.js';
 
 const LOGIN_WINDOW_MS = 15 * 60 * 1000;
 

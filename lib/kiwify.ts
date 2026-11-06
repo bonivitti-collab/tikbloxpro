@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import { timingSafeEqualText } from './http';
+import { timingSafeEqualText } from './http.js';
 
 const REVOKE_EVENTS = new Set([
   'order_refunded',

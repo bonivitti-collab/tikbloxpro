@@ -1,18 +1,18 @@
-import { TrendingProduct, ProductNiche } from '../../types';
-import { techTrends } from './tech';
-import { homeTrends } from './home';
-import { beautyTrends } from './beauty';
-import { fitnessTrends } from './fitness';
-import { petTrends } from './pets';
-import { accessoriesTrends } from './accessories';
-import { kidsTrends } from './kids';
-import { toolsTrends } from './tools';
-import { autoTrends } from './auto';
-import { healthTrends } from './health';
-import { gamingTrends } from './gaming';
-import { officeTrends } from './office';
-import { outdoorTrends } from './outdoor';
-import { travelTrends } from './travel';
+import { TrendingProduct, ProductNiche } from '../../types.js';
+import { techTrends } from './tech.js';
+import { homeTrends } from './home.js';
+import { beautyTrends } from './beauty.js';
+import { fitnessTrends } from './fitness.js';
+import { petTrends } from './pets.js';
+import { accessoriesTrends } from './accessories.js';
+import { kidsTrends } from './kids.js';
+import { toolsTrends } from './tools.js';
+import { autoTrends } from './auto.js';
+import { healthTrends } from './health.js';
+import { gamingTrends } from './gaming.js';
+import { officeTrends } from './office.js';
+import { outdoorTrends } from './outdoor.js';
+import { travelTrends } from './travel.js';
 
 export {
   techTrends,

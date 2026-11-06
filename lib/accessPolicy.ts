@@ -1,4 +1,4 @@
-import type { Subscriber } from './subscribers';
+import type { Subscriber } from './subscribers.js';
 
 export function lateGraceHours(): number {
   const raw = process.env.KIWIFY_LATE_GRACE_HOURS;

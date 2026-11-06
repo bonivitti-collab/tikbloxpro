@@ -1,6 +1,6 @@
 import crypto from 'crypto';
-import { timingSafeEqualText } from './http';
-import { authSecret } from './session';
+import { timingSafeEqualText } from './http.js';
+import { authSecret } from './session.js';
 
 export function normalizeClaimCode(value: string): string {
   return value.trim().toLowerCase().replace(/\s+/g, '');

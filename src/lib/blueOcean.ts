@@ -1,4 +1,4 @@
-import { TrendingProduct } from '../types';
+import { TrendingProduct } from '../types.js';
 
 export function isBlueOceanOpportunity(p: TrendingProduct | any): boolean {
   if (!p) return false;

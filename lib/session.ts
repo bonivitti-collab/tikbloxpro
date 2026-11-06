@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import { cookieSecure, timingSafeEqualText } from './http';
+import { cookieSecure, timingSafeEqualText } from './http.js';
 
 const SESSION_TTL_SECONDS = 60 * 60 * 24 * 7;
 const COOKIE_NAME = 'tikblox_session';

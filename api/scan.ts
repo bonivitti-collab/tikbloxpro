@@ -1,3 +1,3 @@
-import catalog from './catalog';
+import catalog from './catalog.js';
 
 export default catalog;
