@@ -41,6 +41,7 @@
     "test:white-screen": "tsx scripts/test-white-screen.ts",
     "test:catalog": "tsx scripts/test-catalog-rules.ts",
     "test:ingest": "tsx scripts/test-ingest.ts",
+    "test:kalodata": "tsx scripts/test-kalodata.ts",
     "electron:dev": "cross-env NODE_ENV=development electron electron-main.cjs",
     "electron:build": "vite build && electron-builder --win"
   },

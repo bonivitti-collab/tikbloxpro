@@ -17,7 +17,7 @@ export interface ScrapedProduct {
   product_url: string;
   niche: Exclude<ProductNiche, 'all'>;
   keyword: string;
-  source: 'apify';
+  source: 'apify' | 'kalodata';
   last_refreshed_at: string;
 }
 
