@@ -5,7 +5,7 @@ const points = [
   {
     icon: Search,
     title: 'Lista do que foi coletado',
-    body: 'O radar mostra produtos do TikTok Shop Brasil que a coleta do dia trouxe. Quando a contagem de vídeos não veio, o card fica sem score. Não completamos esse número.',
+    body: 'Você entra pelo nicho. Em seguida vêm os produtos em que top creators começaram a promover na última semana, e os criadores daquele nicho.',
   },
   {
     icon: ShoppingBag,

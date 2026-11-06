@@ -414,7 +414,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-[#25F4EE] font-bold shrink-0">✓</span>
-                  <span><strong>Vídeos medidos:</strong> Quando a coleta traz a contagem, o card mostra esse número. Se não veio, o card fica sem score.</span>
+                  <span><strong>Vários top creators no mesmo produto:</strong> O card conta quantos criadores do ranking começaram a promover aquele item nos últimos 7 dias. Novo, Subindo ou Esfriando compara com a semana anterior.</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-[#25F4EE] font-bold shrink-0">✓</span>
@@ -597,6 +597,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               {
                 q: 'Como recebo meu acesso após pagar na Kiwify?',
                 a: 'A Kiwify confirma a compra no e-mail dela e mostra o código do pedido. No TikBlox, abra Primeiro acesso, use o mesmo e-mail da compra, esse código e uma senha sua. Sem o código, a senha não é criada.'
+              },
+              {
+                q: 'O que significa Novo, Subindo e Esfriando?',
+                a: 'O sinal é quantos top creators diferentes começaram a promover o mesmo produto nos últimos 7 dias. Novo: na semana anterior ninguém do ranking tinha começado. Subindo: entrou mais gente do que na semana anterior. Esfriando: entrou menos. O card só aparece quando essa conta existe. É dado de promoção, não promessa de venda, e os criadores não endossam o TikBlox.'
               },
               {
                 q: 'Preciso ter mais de 1.000 seguidores no TikTok para usar?',

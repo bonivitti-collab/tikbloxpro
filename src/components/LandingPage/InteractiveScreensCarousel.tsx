@@ -38,12 +38,12 @@ const SLIDES: SlideData[] = [
     title: 'Lista dos produtos coletados',
     subtitle: 'Coleta diária às 06:00 BRT',
     description:
-      'A lista mostra o que a coleta trouxe: faixa de preço, comissão quando a taxa existe, e score só se a contagem de vídeos foi medida.',
+      'A lista começa pelo nicho e mostra produtos em que vários top creators começaram a promover na mesma semana.',
     highlights: [
       'Link que abre o produto no TikTok Shop',
-      'Busca por nome e filtro por categoria',
-      'Sem score quando os vídeos não vieram na coleta',
-      'Comissão em faixa, na mesma taxa do anúncio',
+      'Nicho como porta de entrada',
+      'Novo, Subindo ou Esfriando, quando a conta dos 7 dias existe',
+      'Comissão em faixa, quando a taxa veio na coleta',
     ],
     mockupType: 'radar',
   },
@@ -58,7 +58,7 @@ const SLIDES: SlideData[] = [
     highlights: [
       'Faixa de preço com a data da coleta',
       'Aviso de que cupom e promoção mudam o valor',
-      'Score apenas com vídeos medidos',
+      'Vídeos dos criadores, quando a Kalodata manda o link',
       'Campo para o preço que você vê agora',
     ],
     mockupType: 'terminal',
@@ -274,7 +274,7 @@ export const InteractiveScreensCarousel: React.FC<InteractiveScreensCarouselProp
                       </span>
                     </div>
                     <div className="space-y-2">
-                      {['Faixa de preço coletada', 'Comissão, se a taxa veio', 'Sem score se os vídeos não vieram'].map((line) => (
+                      {['Faixa de preço coletada', 'Comissão, se a taxa veio', 'Criadores que começaram nos últimos 7 dias'].map((line) => (
                         <div key={line} className="p-3 rounded-xl bg-white/5 border border-white/10 text-xs text-slate-200">
                           {line}
                         </div>
