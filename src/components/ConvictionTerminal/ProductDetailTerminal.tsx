@@ -238,6 +238,11 @@ export const ProductDetailTerminal: React.FC<ProductDetailTerminalProps> = ({
               <Clock className="w-3 h-3 text-[#007A87] shrink-0" />
               <span>{collectedLabel ? `Coletado em ${collectedLabel}` : `Há ${lifecycle.daysActive} dias no radar`}</span>
             </span>
+            {tk.countsUnknown ? (
+              <span className="inline-flex items-center font-bold text-amber-800 bg-amber-50 px-2.5 py-1 rounded-full border border-amber-200 text-[10.5px]">
+                estoque/vídeos não informados
+              </span>
+            ) : null}
             <span className="inline-flex items-center gap-1 text-[10.5px] font-extrabold text-rose-600 bg-rose-50 px-2.5 py-1 rounded-full border border-rose-200">
               <Flame className="w-3 h-3 fill-current text-[#FE2C55] shrink-0" />
               <span>Viralidade {tk.viralityScore}/100</span>

@@ -18,14 +18,16 @@ export function resolveKalodataMaxCredits(raw: unknown = process.env.KALODATA_MA
 export interface KalodataPlan {
   productPages: number;
   creatorPages: number;
+  detailCalls: number;
   creatorProductLookups: number;
   estimatedCredits: number;
 }
 
 /**
- * Com 1 crédito: 5 páginas de produtos (500), 1 de criadores (100)
- * e até 4 listas curtas do que os primeiros criadores vendem.
- * A página de criadores fica reservada quando o orçamento cabe os dois.
+ * Com 1 crédito: 5 páginas de produtos (500) e 1 de criadores (100).
+ * O que sobra (0,4) vira até 5 fichas /tiktok/product/detail, que trazem
+ * video_number. Estoque não vem nesse payload. Listas por criador só se
+ * ainda houver crédito depois das fichas.
  */
 export function planKalodataSpend(budget: number): KalodataPlan {
   const safe = Math.max(0, Number(budget) || 0);
@@ -35,9 +37,11 @@ export function planKalodataSpend(budget: number): KalodataPlan {
   let spent = productPages * page;
   const creatorPages = reserveCreators > 0 && safe - spent + 1e-9 >= page ? 1 : 0;
   spent += creatorPages * page;
-  const creatorProductLookups = Math.floor((safe - spent + 1e-9) / page);
-  const estimatedCredits = Math.round((productPages + creatorPages + creatorProductLookups) * page * 10) / 10;
-  return { productPages, creatorPages, creatorProductLookups, estimatedCredits };
+  const detailCalls = Math.min(5, Math.floor((safe - spent + 1e-9) / page));
+  spent += detailCalls * page;
+  const creatorProductLookups = Math.min(4, Math.floor((safe - spent + 1e-9) / page));
+  const estimatedCredits = Math.round((spent) * 10) / 10;
+  return { productPages, creatorPages, detailCalls, creatorProductLookups, estimatedCredits };
 }
 
 export function canSpend(spent: number, balance: number, cap: number, cost: number): boolean {
