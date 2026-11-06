@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
+import { Bell, X } from 'lucide-react';
 
 interface NicheOption {
   id: string;
   label: string;
 }
+
+const DISMISS_KEY = 'tikblox_alerts_dismissed';
 
 function urlBase64ToUint8Array(base64String: string): Uint8Array {
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
@@ -24,15 +27,34 @@ function isStandalone(): boolean {
 }
 
 export const PushAlertButton: React.FC<{ niches: NicheOption[] }> = ({ niches }) => {
+  const [open, setOpen] = useState(false);
+  const [dismissed, setDismissed] = useState(() => {
+    try {
+      return localStorage.getItem(DISMISS_KEY) === '1';
+    } catch {
+      return false;
+    }
+  });
   const [niche, setNiche] = useState(niches[0]?.id || '');
   const [tip, setTip] = useState('');
   const [status, setStatus] = useState('');
+
+  if (dismissed) return null;
+
+  const dismiss = () => {
+    setDismissed(true);
+    try {
+      localStorage.setItem(DISMISS_KEY, '1');
+    } catch {
+      /* o aviso some mesmo se o navegador bloquear o armazenamento */
+    }
+  };
 
   const activate = async () => {
     setTip('');
     setStatus('');
     if (isIos() && !isStandalone()) {
-      setTip('No iPhone, abra o Safari, toque em Compartilhar e escolha Adicionar à Tela de Início. Abra o TikBlox por esse ícone e volte aqui para ativar os alertas.');
+      setTip('No iPhone, abra o Safari, toque em Compartilhar e escolha Adicionar à Tela de Início. Abra o TikBlox por esse ícone e volte aqui.');
       return;
     }
     if (!('Notification' in window) || !('serviceWorker' in navigator) || !('PushManager' in window)) {
@@ -61,21 +83,39 @@ export const PushAlertButton: React.FC<{ niches: NicheOption[] }> = ({ niches })
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ subscription, niche }),
     });
-    setStatus(saved.ok ? 'Alertas ligados para este nicho.' : 'Não foi possível guardar o alerta.');
+    setStatus(saved.ok ? 'Alertas ligados.' : 'Não foi possível guardar o alerta.');
   };
 
   return (
-    <div className="space-y-2 text-right">
-      {niches.length > 0 ? (
-        <select value={niche} onChange={(event) => setNiche(event.target.value)} className="h-9 rounded-lg border border-slate-300 bg-white px-2 text-xs" aria-label="Nicho dos alertas">
-          {niches.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
-        </select>
-      ) : null}
-      <button type="button" onClick={activate} className="block min-h-11 rounded-xl bg-[#FE2C55] px-3 text-xs font-black text-white">
-        Ativar alertas no celular
-      </button>
-      {tip ? <p className="max-w-xs text-left text-[11px] text-slate-600">{tip}</p> : null}
-      {status ? <p className="text-[11px] text-slate-600">{status}</p> : null}
+    <div className="rounded-full border border-slate-200 bg-white/90 px-2 py-1 shadow-sm">
+      <div className="flex items-center gap-1.5">
+        <Bell className="h-3.5 w-3.5 shrink-0 text-[#007A87]" />
+        {open ? (
+          <>
+            {niches.length > 0 ? (
+              <select
+                value={niche}
+                onChange={(event) => setNiche(event.target.value)}
+                aria-label="Nicho dos alertas"
+                className="h-7 max-w-[9.5rem] rounded-full border border-slate-200 bg-slate-50 px-2 text-[11px] text-slate-800"
+              >
+                {niches.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
+              </select>
+            ) : null}
+            <button type="button" onClick={activate} className="h-7 rounded-full bg-slate-900 px-2.5 text-[11px] font-bold text-white">
+              Ativar
+            </button>
+          </>
+        ) : (
+          <button type="button" onClick={() => setOpen(true)} className="h-7 px-1 text-[11px] font-semibold text-slate-700">
+            Alertas no celular
+          </button>
+        )}
+        <button type="button" onClick={dismiss} aria-label="Dispensar alertas" className="inline-flex h-7 w-7 items-center justify-center rounded-full text-slate-400">
+          <X className="h-3.5 w-3.5" />
+        </button>
+      </div>
+      {tip || status ? <p className="max-w-xs px-1 pb-1 text-left text-[11px] leading-snug text-slate-500">{tip || status}</p> : null}
     </div>
   );
 };

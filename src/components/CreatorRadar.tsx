@@ -103,12 +103,12 @@ export const CreatorRadar: React.FC = () => {
   return (
     <div className="flex-1 overflow-y-auto bg-[#F8FAFC] p-4 sm:p-6">
       <div className="max-w-3xl mx-auto space-y-4">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <p className="text-[11px] font-bold uppercase tracking-wide text-[#007A87]">Top creators</p>
+        <div className="space-y-2">
+          <p className="text-[11px] font-bold uppercase tracking-wide text-[#007A87]">Top creators</p>
+          <div className="flex flex-wrap items-center justify-between gap-2">
             <h1 className="text-xl font-black text-slate-950">O que eles começaram a vender</h1>
+            <PushAlertButton niches={data.niches} />
           </div>
-          <PushAlertButton niches={data.niches} />
         </div>
 
         {(niche || creator || product) && (
